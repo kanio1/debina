@@ -1,0 +1,83 @@
+---
+status: not-started
+depends_on: [EPIC-00-repository-agent-foundation, EPIC-01-postgresql-foundation]
+source: "sepa-nexus-iteration-0-foundation-plan.md, EPIC 3 (Story 3.1-3.4), lines 303-433"
+---
+
+# EPIC-03 — Spring Boot / Modulith Backend Skeleton
+
+Moduł `payment-lifecycle`, cienki, z dyscypliną Controller→Service→Repository i podpięciem RLS-GUC udowodnionym naprawdę — wzorzec, który kopiuje każdy późniejszy moduł.
+
+## Story 3.1 — Szkielet projektu Maven
+
+status: not-started
+depends_on: []
+
+Opis: projekt Maven (JDK 25, Spring Boot 4.1.x, Spring Modulith) + test architektury `ApplicationModules.verify()` — źródło: linie 309-340.
+
+Kryterium ukończenia: `ModularityTest` przechodzi i jest to bramka CI.
+
+Taski:
+- [ ] **Wygeneruj projekt Maven** (JDK 25, `spring-boot-starter-parent` 4.1.x, `spring-modulith-starter-core`, `spring-boot-starter-web`, `spring-boot-starter-data-jpa`, `spring-boot-starter-oauth2-resource-server`, `spring-boot-starter-security`, driver `postgresql`, `flyway-core`, Testcontainers postgresql/kafka/junit-jupiter).
+      `verify: ./mvnw -f backend -q compile` → `BUILD SUCCESS`.
+- [ ] **Dodaj `application.yml`** z datasource na `sepa_app` (nigdy `sepa_migration`), Flyway na `sepa_migration`, issuer URI Keycloak dla resource servera.
+      `verify: ./mvnw -f backend -q spring-boot:run &` potem `curl -f http://localhost:8081/actuator/health` → `{"status":"UP"}`.
+- [ ] **Stwórz szkielet pakietów modułu**: `backend/src/main/java/.../modules/paymentlifecycle/{web,service,repository,domain}`.
+      `verify: find backend/src/main/java -type d -name paymentlifecycle` → istnieje z czterema podpakietami.
+- [ ] **Dodaj test architektury Spring Modulith** (`ApplicationModules.of(...).verify()`) — najważniejszy test tego epika, bo wymusza granice modułów dla każdego kolejnego modułu.
+      `verify: ./mvnw -f backend test -Dtest=ModularityTest` → przechodzi.
+
+## Story 3.2 — moduł `payment-lifecycle`: Controller → Service → Repository
+
+status: not-started
+depends_on: [Story 3.1]
+
+Opis: pełny pionowy przekrój warstwowy jednego modułu — źródło: linie 342-414.
+
+Kryterium ukończenia: `POST /api/v1/payments` zwraca 201, żaden `@TenantId`, RFC 7807 na błędach.
+
+Taski:
+- [ ] **`PaymentEntity`** (JPA, mapowanie `payment.payments`) — bez `@TenantId` (RLS jest jedyną warstwą egzekwowania).
+      `verify: ./mvnw -f backend -q compile` → kompiluje się czysto.
+- [ ] **`PaymentRepository`** (cienki interfejs Spring Data, schema-scoped, bez metod cross-tenant).
+      `verify: ./mvnw -f backend -q compile` → kompiluje się czysto.
+- [ ] **`SubmitPaymentRequest` DTO** (wąski, nazwany — nigdy generyczny entity-binding `PUT`, obrona przed mass-assignment).
+      `verify: ./mvnw -f backend -q compile` → kompiluje się czysto.
+- [ ] **`PaymentService.submitPayment(...)`** — właściciel reguły biznesowej (sprawdzenie idempotencji, przypisanie statusu), jeden `@Transactional` na komendę.
+      `verify: ./mvnw -f backend test -Dtest=PaymentServiceTest` → przechodzi (test jednostkowy z zamockowanym repository, jeden rekord, status `RECEIVED`).
+- [ ] **`PaymentController`** — parsuje/waliduje request, woła dokładnie jedną metodę service, bez logiki biznesowej.
+      `verify: ./mvnw -f backend test -Dtest=PaymentControllerTest` → przechodzi (`@WebMvcTest`/`MockMvc`, POST zwraca 201 z nagłówkiem `Location`).
+- [ ] **Kształt błędu RFC 7807 dla wszystkich 4xx/5xx** na tym kontrolerze — ustanów konwencję teraz, zanim powstanie więcej endpointów.
+      `verify: ./mvnw -f backend test -Dtest=PaymentControllerErrorTest` → duplikat zwraca HTTP 409 z `Content-Type: application/problem+json` i polem `correlationId`.
+
+## Story 3.3 — Spring Security Resource Server
+
+status: not-started
+depends_on: [Story 3.2, EPIC-02-keycloak-realm-iteration-0]
+
+Opis: walidacja JWT + method security — źródło: linie 416-423.
+
+Kryterium ukończenia: brak tokena → 401, zła rola → 403, właściwa rola → 201.
+
+Taski:
+- [ ] **Skonfiguruj Resource Server** do walidacji JWT wobec realmu Keycloak z EPIC-02, mapując `realm_access.roles` na Spring `GrantedAuthority`.
+      `verify: ./mvnw -f backend test -Dtest=SecurityConfigTest` → request bez auth na `POST /api/v1/payments` → 401; token z rolą `payment_submitter` → 201.
+- [ ] **Method security**: `@PreAuthorize("hasRole('payment_submitter')")` na `submitPayment`.
+      `verify: ./mvnw -f backend test -Dtest=PaymentAuthorizationTest` → token tylko z rolą `operator` dostaje 403 na submit.
+- [ ] **Zaszkieletuj własny `AuthorizationManager<MethodInvocation>`** z security review — pełne użycie dopiero przy endpointach approve/reject w Iteracji 1, ale bean ma istnieć już teraz.
+      `verify: ./mvnw -f backend -q compile` → kompiluje się czysto; placeholder test potwierdza załadowanie beana w kontekście Spring.
+
+## Story 3.4 — RLS GUC-setting
+
+status: not-started
+depends_on: [Story 3.3, EPIC-01-postgresql-foundation/Story 1.2]
+
+Opis: ustawianie `app.tenant_id` na poziomie transakcji z JWT — źródło: linie 425-433.
+
+Kryterium ukończenia: dwa requesty z różnymi `tenant_id` widzą tylko własne wiersze; brak claimu → zero wierszy.
+
+Taski:
+- [ ] **Napisz `StatementInspector`/interceptor połączenia** ustawiający `SET LOCAL app.tenant_id = '<value>'` na starcie każdej transakcji, czytając wartość z claimu `tenant_id` bieżącego JWT.
+      `verify: ./mvnw -f backend test -Dtest=TenantGucIntegrationTest` → test Testcontainers: dwa requesty z różnymi `tenant_id` widzą tylko swoje wiersze.
+- [ ] **Test negatywny: request bez claimu `tenant_id` widzi zero wierszy**, nie błąd i nie wszystkie wiersze (reguła empty-GUC-zero-rows na poziomie aplikacji, nie tylko surowego SQL).
+      `verify: ./mvnw -f backend test -Dtest=MissingTenantClaimTest` → przechodzi.
