@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: sepa-nexus-backend
+  datasource:
+    url: ${SEPA_APP_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
+    username: ${SEPA_APP_DB_USER:sepa_app}
+    password: ${SEPA_APP_DB_PASSWORD:dev-only-app}
+  flyway:
+    url: ${SEPA_MIGRATION_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
+    user: ${SEPA_MIGRATION_DB_USER:sepa_migration}
+    password: ${SEPA_MIGRATION_DB_PASSWORD:dev-only-migration}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/sepa-nexus}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+server:
+  port: 8081
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

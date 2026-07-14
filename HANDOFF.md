@@ -2,29 +2,30 @@
 
 ## Zadanie
 
-SEPA Nexus jest w Iteracji 0. Ten batch ukończył EPIC-01 — PostgreSQL 18 Foundation; kolejnym technicznie odblokowanym epikiem jest EPIC-02 — Keycloak 26.6.4 Realm.
+SEPA Nexus, Iteracja 0. Batch ukończył EPIC-02 — Keycloak Realm, EPIC-03 — Spring Boot/Modulith Backend Skeleton oraz EPIC-04 — Outbox/Inbox + Kafka. EPIC-05 nie został rozpoczęty.
 
 ## Zrobione
 
-- EPIC-01 oraz Stories 1.1, 1.2 i 1.3 mają `status: done`; `planning/README.md` wskazuje EPIC-01 jako done.
-- Utworzono minimalny Maven/Flyway prerequisite przed formalnym EPIC-03: rootowy i backendowy Maven Wrapper 3.9.11, `backend/pom.xml` z Flyway 12.11.0, PostgreSQL JDBC 42.7.7, JUnit Jupiter 5.11.0 i Testcontainers 2.0.5. To zapisany `[PLANNING-DEFECT]`; nie dodano jeszcze Spring Boot/Modulith.
-- Migracje `backend/src/main/resources/db/migration/V1__roles.sql`–`V6__payment_inbox_events.sql` tworzą role, `payment` schema, `payments` z RLS/force RLS oraz per-schema `outbox_events`/`inbox_events` z unikalnym `source_event_id`.
-- Testy `PaymentsRlsTest` i `OutboxOwnershipTest` na PostgreSQL 18 Testcontainers sprawdzają empty-GUC-zero-rows, izolację cross-tenant oraz SQLSTATE `42501` dla drugiej roli zapisującej do payment outbox.
-- Wykonane i pozytywne: `./mvnw -f backend flyway:info`, wszystkie `flyway:migrate`, kontenerowe `psql` verify przez `podman compose ... exec -T postgres`, `export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"; ./mvnw -f backend test` (3 testy, 0 błędów), `git diff --check`.
+- EPIC-02: realm `sepa-nexus`, 4 role, `sepa-web` confidential, `sepa-api` bearer-only, mappery `tenant_id`/`branch_id`, czterech użytkowników local-dev; OIDC/kcadm/token claim checks PASS. Keycloak bind mount używa wymaganego przez Fedora SELinux `:Z`.
+- EPIC-03: Spring Boot 4.1.0, JDK 25, Spring Modulith 2.0.6, runtime `sepa_app` i Flyway `sepa_migration`, moduł `paymentlifecycle`, RFC 7807/correlation ID, Resource Server/role mapping/method security, transaction-bound parametryzowany GUC i V7 naprawiająca empty-GUC-zero-rows.
+- EPIC-04: `spring-boot-starter-kafka` (Spring Kafka 4.1.0), deklaratywny `payment.lifecycle.events.v1` (1 partycja), scheduled outbox dispatcher co 2 s i Kafka inbox consumer z `ON CONFLICT DO NOTHING`.
+- Payment submission zapisuje outbox event w tej samej transakcji; dispatcher publikuje at-least-once, następnie oznacza `published_at`; consumer ustawia tenant GUC z event payloadu, przechodzi istniejący payment `RECEIVED`→`VALIDATED`, a inbox unique constraint blokuje drugi efekt.
+- Faktyczne PASS: `./mvnw -f backend -q compile`; `./mvnw -f backend test -Dtest=ModularityTest`; `./mvnw -f backend test -Dtest=PaymentServiceTest,PaymentControllerTest,PaymentControllerErrorTest,SecurityConfigTest,PaymentAuthorizationTest`; `./mvnw -f backend test -Dtest=TenantGucIntegrationTest,MissingTenantClaimTest`; `./mvnw -f backend test -Dtest=OutboxDispatcherTest`; `./mvnw -f backend test -Dtest=InboxConsumerIdempotencyTest`; pełne `./mvnw -f backend test` (15 testów, 0 błędów), wszystkie z `DOCKER_HOST=unix://${XDG_RUNTIME_DIR}/podman/podman.sock` gdy używały Testcontainers.
+- Faktyczne Podman PASS: `podman compose -f infra/docker-compose.yml up -d kafka`, `ps`, `exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list | grep -Fx payment.lifecycle.events.v1`; lokalne PostgreSQL, Keycloak i Kafka pozostają uruchomione.
 
 ## Utknęliśmy na
 
-Nic nie blokuje. EPIC-01 został ukończony i zweryfikowany; EPIC-02 nie został rozpoczęty. Lokalny PostgreSQL 18 pozostaje uruchomiony przez rootless Podman, bez usuwania named volume.
+Nic nie blokuje. Batch trzech epików został ukończony i zweryfikowany.
 
 ## Plan na następny krok
 
-Otwórz `planning/epics/EPIC-02-keycloak-realm-iteration-0.md`, przeczytaj wskazany source i skill `keycloak-realm-config`, a następnie wykonaj pierwszy nieodhaczony task Story 2.1.
+Otwórz `planning/epics/EPIC-05-nextjs-bff.md`, sprawdź `depends_on` oraz source i rozpocznij pierwszy nieodhaczony task. Nie wykonuj tego kroku w bieżącej sesji.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Fedora 44 KDE używa rootless Podmana, nie Dockera. W sandboxie Podman i Maven cache są read-only; testy/infrastruktura wymagają zatwierdzonego wykonania poza nim.
-- Testcontainers wymaga `DOCKER_HOST=unix://${XDG_RUNTIME_DIR}/podman/podman.sock`; nie wyłączaj Ryuk.
-- Lokalny `psql` nie istnieje; używaj kontenerowego `podman compose -f infra/docker-compose.yml exec -T postgres psql ...` i raportuj faktyczną komendę.
-- `podman-compose 1.6.0` nie obsługuje `podman compose ... ps <service>`; użyj `podman compose ... ps` bez nazwy usługi.
-- Nie obchodź PostgreSQL RLS, nie przyznawaj `DELETE` roli aplikacyjnej, nie usuwaj named volumes i nie wpisuj PASS bez uruchomionej komendy.
-- Node.js pozostaje `24.18.0`, TypeScript ma być exact 6.x po rozpoczęciu frontendu, a Playwright jest zakazany w Iteracji 0.
+- Fedora 44 KDE używa rootless Podmana; nie używaj Dockera. `podman-compose 1.6.0` wymaga pełnego `podman compose ... ps` bez filtra serwisu.
+- Testcontainers potrzebuje `DOCKER_HOST=unix://${XDG_RUNTIME_DIR}/podman/podman.sock`; Ryuk działa i nie wolno go wyłączać bez rzeczywistego powodu.
+- Nie usuwaj named volumes. Keycloak realm bind mount potrzebuje `:Z`, lecz nie dodawaj tej etykiety globalnie.
+- Nie obchodź RLS ani nie używaj `@TenantId`; `set_config('app.tenant_id', ?, true)` musi być transaction-local i na połączeniu Hibernate. Pusty GUC wymaga `NULLIF(..., '')::uuid` dla zero-wierszy.
+- Outbox to at-least-once, nie exactly-once: dopiero inbox unique constraint czyni redelivery bezpiecznym. Nie dodawaj CDC, Debezium, registry, DLQ ani kolejnych topiców w tym zakresie.
+- Node.js pozostaje 24.18.0. TypeScript 6.x i frontend nie zostały zainicjalizowane. Playwright jest zakazany w Iteracji 0.

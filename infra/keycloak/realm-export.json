@@ -1,0 +1,24 @@
+{
+  "realm": "sepa-nexus", "enabled": true,
+  "requiredActions": [
+    { "alias": "VERIFY_PROFILE", "enabled": false, "defaultAction": false, "priority": 10 }
+  ],
+  "roles": { "realm": [{ "name": "operator" }, { "name": "payment_submitter" }, { "name": "payment_approver" }, { "name": "reference_data_admin" }] },
+  "clients": [
+    {
+      "clientId": "sepa-web", "enabled": true, "protocol": "openid-connect", "publicClient": false, "clientAuthenticatorType": "client-secret", "secret": "dev-only-sepa-web-secret", "standardFlowEnabled": true, "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:3000/*"], "webOrigins": ["http://localhost:3000"],
+      "protocolMappers": [
+        { "name": "tenant_id", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-attribute-mapper", "config": { "user.attribute": "tenant_id", "claim.name": "tenant_id", "jsonType.label": "String", "access.token.claim": "true", "id.token.claim": "true", "userinfo.token.claim": "true", "multivalued": "false" } },
+        { "name": "branch_id", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-attribute-mapper", "config": { "user.attribute": "branch_id", "claim.name": "branch_id", "jsonType.label": "String", "access.token.claim": "true", "id.token.claim": "true", "userinfo.token.claim": "true", "multivalued": "false" } }
+      ]
+    },
+    { "clientId": "sepa-api", "enabled": true, "protocol": "openid-connect", "bearerOnly": true, "publicClient": false, "standardFlowEnabled": false, "directAccessGrantsEnabled": false }
+  ],
+  "users": [
+    { "username": "operator", "enabled": true, "requiredActions": [], "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000001"], "branch_id": ["00000000-0000-0000-0000-000000000101"] }, "realmRoles": ["operator"], "credentials": [{ "type": "password", "value": "dev-only-operator", "temporary": false }] },
+    { "username": "submitter", "enabled": true, "requiredActions": [], "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000001"], "branch_id": ["00000000-0000-0000-0000-000000000101"] }, "realmRoles": ["payment_submitter"], "credentials": [{ "type": "password", "value": "dev-only-submitter", "temporary": false }] },
+    { "username": "approver", "enabled": true, "requiredActions": [], "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000002"], "branch_id": ["00000000-0000-0000-0000-000000000201"] }, "realmRoles": ["payment_approver"], "credentials": [{ "type": "password", "value": "dev-only-approver", "temporary": false }] },
+    { "username": "refdata", "enabled": true, "requiredActions": [], "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000002"], "branch_id": ["00000000-0000-0000-0000-000000000201"] }, "realmRoles": ["reference_data_admin"], "credentials": [{ "type": "password", "value": "dev-only-refdata", "temporary": false }] }
+  ]
+}

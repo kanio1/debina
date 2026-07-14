@@ -19,9 +19,9 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 |---|---|---|---|
 | EPIC-00 — Repository & Agent Foundation | **done** | — | [epics/EPIC-00-repository-agent-foundation.md](epics/EPIC-00-repository-agent-foundation.md) |
 | EPIC-01 — PostgreSQL 18 Foundation | **done** | EPIC-00 | [epics/EPIC-01-postgresql-foundation.md](epics/EPIC-01-postgresql-foundation.md) |
-| EPIC-02 — Keycloak 26.6.4 Realm (4 role) | not-started | EPIC-00 | [epics/EPIC-02-keycloak-realm-iteration-0.md](epics/EPIC-02-keycloak-realm-iteration-0.md) |
-| EPIC-03 — Spring Boot/Modulith Backend Skeleton | not-started | EPIC-00, EPIC-01 | [epics/EPIC-03-spring-modulith-backend-skeleton.md](epics/EPIC-03-spring-modulith-backend-skeleton.md) |
-| EPIC-04 — Outbox/Inbox + Kafka (cienkie) | not-started | EPIC-01, EPIC-03 | [epics/EPIC-04-outbox-inbox-kafka-thin.md](epics/EPIC-04-outbox-inbox-kafka-thin.md) |
+| EPIC-02 — Keycloak 26.6.4 Realm (4 role) | **done** | EPIC-00 | [epics/EPIC-02-keycloak-realm-iteration-0.md](epics/EPIC-02-keycloak-realm-iteration-0.md) |
+| EPIC-03 — Spring Boot/Modulith Backend Skeleton | **done** | EPIC-00, EPIC-01 | [epics/EPIC-03-spring-modulith-backend-skeleton.md](epics/EPIC-03-spring-modulith-backend-skeleton.md) |
+| EPIC-04 — Outbox/Inbox + Kafka (cienkie) | **done** | EPIC-01, EPIC-03 | [epics/EPIC-04-outbox-inbox-kafka-thin.md](epics/EPIC-04-outbox-inbox-kafka-thin.md) |
 | EPIC-05 — Next.js BFF | not-started | EPIC-02, EPIC-03 | [epics/EPIC-05-nextjs-bff.md](epics/EPIC-05-nextjs-bff.md) |
 | EPIC-06 — React/shadcn Frontend Skeleton | not-started | EPIC-05 | [epics/EPIC-06-react-shadcn-frontend-skeleton.md](epics/EPIC-06-react-shadcn-frontend-skeleton.md) |
 | EPIC-07 — CI/CD Foundation | not-started | EPIC-03, EPIC-06 | [epics/EPIC-07-ci-cd-foundation.md](epics/EPIC-07-ci-cd-foundation.md) |
