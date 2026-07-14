@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,9 +34,15 @@ public class PaymentController {
             @AuthenticationPrincipal Jwt jwt) {
         PaymentEntity payment = paymentService.submitPayment(new SubmitPaymentCommand(
                 UUID.fromString(jwt.getClaimAsString("tenant_id")),
+                branchIdClaim(jwt),
                 request.endToEndId(), request.amount(), request.currency(), request.debtorIban(),
                 request.creditorIban(), idempotencyKey));
         return ResponseEntity.created(URI.create("/api/v1/payments/" + payment.getId())).build();
+    }
+
+    private static UUID branchIdClaim(Jwt jwt) {
+        String branchId = jwt.getClaimAsString("branch_id");
+        return branchId == null ? null : UUID.fromString(branchId);
     }
 
     @GetMapping
@@ -43,5 +50,10 @@ public class PaymentController {
         return paymentService.visiblePayments(jwt.getClaimAsString("tenant_id")).stream()
                 .map(PaymentSummaryResponse::from)
                 .toList();
+    }
+
+    @GetMapping("/{id}")
+    public PaymentDetailResponse detail(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return PaymentDetailResponse.from(paymentService.paymentDetail(jwt.getClaimAsString("tenant_id"), id));
     }
 }

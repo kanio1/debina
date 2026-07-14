@@ -1,7 +1,7 @@
 package com.sepanexus.modules.paymentlifecycle.ingress;
 
+import com.sepanexus.shared.ClockPort;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,14 +11,16 @@ import org.springframework.stereotype.Component;
 public class JdbcIdempotencyStore implements IdempotencyStore {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ClockPort clockPort;
 
-    public JdbcIdempotencyStore(JdbcTemplate jdbcTemplate) {
+    public JdbcIdempotencyStore(JdbcTemplate jdbcTemplate, ClockPort clockPort) {
         this.jdbcTemplate = jdbcTemplate;
+        this.clockPort = clockPort;
     }
 
     @Override
     public IdempotencyClaim claim(UUID sourceId, String idempotencyKey, byte[] requestHash) {
-        Timestamp now = Timestamp.from(Instant.now());
+        Timestamp now = Timestamp.from(clockPort.now());
         int inserted = jdbcTemplate.update("""
                 INSERT INTO ingress.idempotency_keys (source_id, idem_key, request_hash, first_seen_at, last_seen_at)
                 VALUES (?, ?, ?, ?, ?)
@@ -53,6 +55,6 @@ public class JdbcIdempotencyStore implements IdempotencyStore {
                 UPDATE ingress.idempotency_keys
                 SET payment_id = ?, response_code = ?, last_seen_at = ?
                 WHERE source_id = ? AND idem_key = ?
-                """, paymentId, responseCode, Timestamp.from(Instant.now()), sourceId, idempotencyKey);
+                """, paymentId, responseCode, Timestamp.from(clockPort.now()), sourceId, idempotencyKey);
     }
 }

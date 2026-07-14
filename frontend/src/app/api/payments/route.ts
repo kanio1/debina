@@ -6,6 +6,7 @@ import { getSession } from "@/lib/session-store";
 import { SESSION_COOKIE } from "@/lib/session-cookies";
 
 const CORRELATION_ID_HEADER = "X-Correlation-Id";
+const IDEMPOTENCY_KEY_HEADER = "Idempotency-Key";
 
 export async function GET(request: NextRequest) {
   const sessionId = request.cookies.get(SESSION_COOKIE)?.value;
@@ -42,6 +43,14 @@ export async function POST(request: NextRequest) {
     return authz.response;
   }
 
+  const idempotencyKey = request.headers.get(IDEMPOTENCY_KEY_HEADER);
+  if (!idempotencyKey) {
+    return NextResponse.json(
+      { type: "about:blank", title: "Missing Idempotency-Key header", status: 400 },
+      { status: 400 },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -60,6 +69,7 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${authz.session.accessToken}`,
       [CORRELATION_ID_HEADER]: correlationId,
+      [IDEMPOTENCY_KEY_HEADER]: idempotencyKey,
     },
     body: JSON.stringify(body),
   });

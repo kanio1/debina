@@ -13,6 +13,7 @@ export default async function PaymentsLayout({ children }: { children: React.Rea
       user={{
         preferredUsername: session.claims.preferredUsername,
         tenantId: session.claims.tenantId,
+        roles: session.claims.roles,
       }}
     >
       {children}

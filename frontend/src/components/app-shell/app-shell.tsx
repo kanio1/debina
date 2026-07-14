@@ -15,10 +15,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { visibleWorkspacesForRoles } from "@/lib/role-workspace-map";
 
 export interface AppShellUser {
   preferredUsername: string | null;
   tenantId: string | null;
+  roles: string[];
 }
 
 interface AppShellProps {
@@ -27,6 +29,8 @@ interface AppShellProps {
 }
 
 export function AppShell({ user, children }: AppShellProps) {
+  const workspaces = visibleWorkspacesForRoles(user.roles);
+
   return (
     <SidebarProvider>
       <Sidebar data-testid="app-shell.sidebar">
@@ -38,13 +42,15 @@ export function AppShell({ user, children }: AppShellProps) {
             <SidebarGroupLabel>Workspace</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    render={<a href="/payments" data-testid="app-shell.nav.payments" />}
-                  >
-                    Payments
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {workspaces.map((workspace) => (
+                  <SidebarMenuItem key={workspace.id}>
+                    <SidebarMenuButton
+                      render={<a href={workspace.path} data-testid={`app-shell.nav.${workspace.id}`} />}
+                    >
+                      {workspace.label}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

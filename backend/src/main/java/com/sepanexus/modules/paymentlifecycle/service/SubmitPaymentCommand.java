@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record SubmitPaymentCommand(
         UUID tenantId,
+        UUID branchId,
         String endToEndId,
         BigDecimal amount,
         String currency,

@@ -62,7 +62,7 @@ class JsonDirectIngestionTest {
     void repeatedSubmissionWithSameIdempotencyKeyReturnsSamePaymentId() {
         UUID tenantId = UUID.randomUUID();
         String idempotencyKey = UUID.randomUUID().toString();
-        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, "e2e-json-direct-1",
+        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, null, "e2e-json-direct-1",
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 idempotencyKey);
 
@@ -77,10 +77,10 @@ class JsonDirectIngestionTest {
     void sameIdempotencyKeyDifferentRequestBodyIsRejected() {
         UUID tenantId = UUID.randomUUID();
         String idempotencyKey = UUID.randomUUID().toString();
-        SubmitPaymentCommand original = new SubmitPaymentCommand(tenantId, "e2e-json-direct-2",
+        SubmitPaymentCommand original = new SubmitPaymentCommand(tenantId, null, "e2e-json-direct-2",
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 idempotencyKey);
-        SubmitPaymentCommand differentAmount = new SubmitPaymentCommand(tenantId, "e2e-json-direct-2",
+        SubmitPaymentCommand differentAmount = new SubmitPaymentCommand(tenantId, null, "e2e-json-direct-2",
                 new BigDecimal("99.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 idempotencyKey);
 
@@ -94,7 +94,7 @@ class JsonDirectIngestionTest {
     @WithMockUser(roles = "payment_submitter")
     void identifiersAndLineageRecordedForJsonDirectChannel() throws Exception {
         UUID tenantId = UUID.randomUUID();
-        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, "e2e-json-direct-3",
+        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, null, "e2e-json-direct-3",
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 UUID.randomUUID().toString());
 

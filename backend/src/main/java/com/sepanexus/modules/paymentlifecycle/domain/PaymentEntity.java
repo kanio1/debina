@@ -7,11 +7,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -24,6 +23,9 @@ public class PaymentEntity {
 
     @Column(name = "tenant_id", nullable = false, updatable = false)
     private UUID tenantId;
+
+    @Column(name = "branch_id", updatable = false)
+    private UUID branchId;
 
     @Column(name = "end_to_end_id", nullable = false, updatable = false)
     private String endToEndId;
@@ -45,7 +47,7 @@ public class PaymentEntity {
     private PaymentStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @Version
     @Column(nullable = false)
@@ -54,31 +56,27 @@ public class PaymentEntity {
     protected PaymentEntity() {
     }
 
-    private PaymentEntity(UUID tenantId, String endToEndId, BigDecimal amount, String currency,
-            String debtorIban, String creditorIban) {
+    private PaymentEntity(UUID tenantId, UUID branchId, String endToEndId, BigDecimal amount, String currency,
+            String debtorIban, String creditorIban, Instant createdAt) {
         this.tenantId = tenantId;
+        this.branchId = branchId;
         this.endToEndId = endToEndId;
         this.amount = amount;
         this.currency = currency;
         this.debtorIban = debtorIban;
         this.creditorIban = creditorIban;
         this.status = PaymentStatus.RECEIVED;
+        this.createdAt = createdAt;
     }
 
-    public static PaymentEntity received(UUID tenantId, String endToEndId, BigDecimal amount,
-            String currency, String debtorIban, String creditorIban) {
-        return new PaymentEntity(tenantId, endToEndId, amount, currency, debtorIban, creditorIban);
-    }
-
-    @PrePersist
-    void initializePersistenceDefaults() {
-        if (createdAt == null) {
-            createdAt = OffsetDateTime.now();
-        }
+    public static PaymentEntity received(UUID tenantId, UUID branchId, String endToEndId, BigDecimal amount,
+            String currency, String debtorIban, String creditorIban, Instant createdAt) {
+        return new PaymentEntity(tenantId, branchId, endToEndId, amount, currency, debtorIban, creditorIban, createdAt);
     }
 
     public UUID getId() { return id; }
     public UUID getTenantId() { return tenantId; }
+    public UUID getBranchId() { return branchId; }
     public String getEndToEndId() { return endToEndId; }
     public BigDecimal getAmount() { return amount; }
     public String getCurrency() { return currency; }

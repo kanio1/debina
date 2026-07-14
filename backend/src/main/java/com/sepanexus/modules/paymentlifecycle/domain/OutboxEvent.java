@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -35,21 +35,21 @@ public class OutboxEvent {
     private UUID correlationId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "published_at")
-    private OffsetDateTime publishedAt;
+    private Instant publishedAt;
 
     protected OutboxEvent() {
     }
 
-    public static OutboxEvent paymentSubmitted(UUID aggregateId, String payload, UUID correlationId) {
+    public static OutboxEvent paymentSubmitted(UUID aggregateId, String payload, UUID correlationId, Instant createdAt) {
         OutboxEvent event = new OutboxEvent();
         event.aggregateId = aggregateId;
         event.eventType = PAYMENT_SUBMITTED;
         event.payload = payload;
         event.correlationId = correlationId;
-        event.createdAt = OffsetDateTime.now();
+        event.createdAt = createdAt;
         return event;
     }
 
@@ -57,9 +57,9 @@ public class OutboxEvent {
     public UUID getAggregateId() { return aggregateId; }
     public String getEventType() { return eventType; }
     public String getPayload() { return payload; }
-    public OffsetDateTime getPublishedAt() { return publishedAt; }
+    public Instant getPublishedAt() { return publishedAt; }
 
-    public void markPublished() {
-        publishedAt = OffsetDateTime.now();
+    public void markPublished(Instant publishedAt) {
+        this.publishedAt = publishedAt;
     }
 }

@@ -11,7 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
+import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup.IsoIdentifierView;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentNotFoundException;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentDetail;
 import com.sepanexus.security.SecurityConfig;
 import java.math.BigDecimal;
 import java.util.List;
@@ -68,6 +71,42 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$[0].id").value(paymentId.toString()))
                 .andExpect(jsonPath("$[0].endToEndId").value("E2E-1"))
                 .andExpect(jsonPath("$[0].status").value("RECEIVED"));
+    }
+
+    @Test
+    void returnsPaymentDetailWithIsoIdentifiers() throws Exception {
+        PaymentEntity payment = org.mockito.Mockito.mock(PaymentEntity.class);
+        UUID paymentId = UUID.randomUUID();
+        when(payment.getId()).thenReturn(paymentId);
+        when(payment.getEndToEndId()).thenReturn("E2E-1");
+        when(payment.getAmount()).thenReturn(new BigDecimal("10.00"));
+        when(payment.getCurrency()).thenReturn("EUR");
+        when(payment.getStatus()).thenReturn(PaymentStatus.RECEIVED);
+        when(payment.getDebtorIban()).thenReturn("DE89370400440532013000");
+        when(payment.getCreditorIban()).thenReturn("FR7630006000011234567890189");
+        UUID isoMessageId = UUID.randomUUID();
+        when(paymentService.paymentDetail(any(), org.mockito.ArgumentMatchers.eq(paymentId))).thenReturn(
+                new PaymentDetail(payment, List.of(new IsoIdentifierView("JSON_DIRECT", "E2E-1", isoMessageId))));
+
+        mockMvc.perform(get("/api/v1/payments/" + paymentId)
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_payment_submitter")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(paymentId.toString()))
+                .andExpect(jsonPath("$.isoIdentifiers[0].sourceMessageType").value("JSON_DIRECT"))
+                .andExpect(jsonPath("$.isoIdentifiers[0].isoMessageId").value(isoMessageId.toString()));
+    }
+
+    @Test
+    void returnsNotFoundForUnknownPayment() throws Exception {
+        UUID paymentId = UUID.randomUUID();
+        when(paymentService.paymentDetail(any(), org.mockito.ArgumentMatchers.eq(paymentId)))
+                .thenThrow(new PaymentNotFoundException(paymentId));
+
+        mockMvc.perform(get("/api/v1/payments/" + paymentId)
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_payment_submitter")))
+                .andExpect(status().isNotFound());
     }
 
     static String validPaymentJson() {

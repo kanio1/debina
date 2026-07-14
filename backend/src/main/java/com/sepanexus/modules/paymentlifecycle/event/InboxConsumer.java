@@ -30,7 +30,8 @@ public class InboxConsumer {
         this.tenantGucConfigurer = tenantGucConfigurer;
     }
 
-    @KafkaListener(topics = PaymentLifecycleTopicConfig.TOPIC, groupId = "payment-lifecycle-inbox")
+    @KafkaListener(id = "payment-lifecycle-inbox", topics = PaymentLifecycleTopicConfig.TOPIC,
+            groupId = "payment-lifecycle-inbox")
     @Transactional
     public void consume(String payload) {
         PaymentLifecycleEvent event = parse(payload);

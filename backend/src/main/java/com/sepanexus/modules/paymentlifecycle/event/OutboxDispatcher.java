@@ -2,6 +2,7 @@ package com.sepanexus.modules.paymentlifecycle.event;
 
 import com.sepanexus.modules.paymentlifecycle.domain.OutboxEvent;
 import com.sepanexus.modules.paymentlifecycle.repository.OutboxEventRepository;
+import com.sepanexus.shared.ClockPort;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -18,10 +19,13 @@ public class OutboxDispatcher {
 
     private final OutboxEventRepository outboxEvents;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ClockPort clockPort;
 
-    public OutboxDispatcher(OutboxEventRepository outboxEvents, KafkaTemplate<String, String> kafkaTemplate) {
+    public OutboxDispatcher(OutboxEventRepository outboxEvents, KafkaTemplate<String, String> kafkaTemplate,
+            ClockPort clockPort) {
         this.outboxEvents = outboxEvents;
         this.kafkaTemplate = kafkaTemplate;
+        this.clockPort = clockPort;
     }
 
     @Scheduled(fixedDelay = 2000)
@@ -32,7 +36,7 @@ public class OutboxDispatcher {
             try {
                 kafkaTemplate.send(PaymentLifecycleTopicConfig.TOPIC, event.getAggregateId().toString(), event.getPayload())
                         .get(5, TimeUnit.SECONDS);
-                event.markPublished();
+                event.markPublished(clockPort.now());
             } catch (Exception exception) {
                 log.warn("Outbox event {} remains unpublished after Kafka publication failure", event.getId(), exception);
             }

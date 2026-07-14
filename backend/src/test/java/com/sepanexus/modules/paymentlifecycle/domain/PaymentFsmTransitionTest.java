@@ -49,7 +49,7 @@ class PaymentFsmTransitionTest {
     }
 
     private static PaymentEntity newReceivedPayment() {
-        return PaymentEntity.received(UUID.randomUUID(), "e2e-fsm-1", new BigDecimal("10.00"), "EUR",
-                "DE89370400440532013000", "FR7630006000011234567890189");
+        return PaymentEntity.received(UUID.randomUUID(), null, "e2e-fsm-1", new BigDecimal("10.00"), "EUR",
+                "DE89370400440532013000", "FR7630006000011234567890189", java.time.Instant.now());
     }
 }

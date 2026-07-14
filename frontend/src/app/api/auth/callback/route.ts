@@ -24,16 +24,26 @@ function getJwks(): JWTVerifyGetKey {
   return jwksCache;
 }
 
-function extractClaims(idTokenPayload: Record<string, unknown>): SessionClaims {
-  const realmAccess = idTokenPayload["realm_access"];
-  const roles =
-    realmAccess &&
+function extractRoles(tokenPayload: Record<string, unknown>): string[] {
+  const realmAccess = tokenPayload["realm_access"];
+  return realmAccess &&
     typeof realmAccess === "object" &&
     Array.isArray((realmAccess as { roles?: unknown }).roles)
-      ? ((realmAccess as { roles: unknown[] }).roles.filter(
-          (role): role is string => typeof role === "string",
-        ))
-      : [];
+    ? (realmAccess as { roles: unknown[] }).roles.filter(
+        (role): role is string => typeof role === "string",
+      )
+    : [];
+}
+
+// Roles come from the access token, not the ID token: this realm's "realm roles" client
+// scope mapper is only configured to add `realm_access.roles` to the access token (verified
+// empirically — the ID token carries tenant_id/branch_id/preferred_username but no
+// realm_access at all). The BFF already holds the access token as a trusted, direct
+// token-endpoint response (never client-supplied), so decoding it for a UI-nav hint is safe;
+// the backend independently re-verifies the same JWT and its roles via @PreAuthorize on every
+// forwarded request, so this is not itself a security boundary.
+function extractClaims(idTokenPayload: Record<string, unknown>, accessTokenPayload: Record<string, unknown>): SessionClaims {
+  const roles = extractRoles(accessTokenPayload);
 
   return {
     sub: String(idTokenPayload.sub),
@@ -105,6 +115,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // The access token has no `aud` claim in this realm (only `azp`) — verify issuer/signature
+  // only, matching how the resource server (backend SecurityConfig) validates it.
+  const { payload: accessTokenPayload } = await jwtVerify(tokens.access_token, getJwks(), {
+    issuer: oidcConfig.issuer,
+  });
+
   const sessionId = randomToken();
   const csrfToken = randomToken();
   const record: SessionRecord = {
@@ -113,7 +129,7 @@ export async function GET(request: NextRequest) {
     accessToken: tokens.access_token,
     refreshToken: tokens.refresh_token ?? null,
     idToken: tokens.id_token,
-    claims: extractClaims(payload),
+    claims: extractClaims(payload, accessTokenPayload),
     accessTokenExpiresAt: Date.now() + tokens.expires_in * 1000,
     createdAt: Date.now(),
   };

@@ -70,6 +70,7 @@ export default function PaymentsPage() {
         headers: {
           "Content-Type": "application/json",
           "x-csrf-token": csrfToken,
+          "Idempotency-Key": crypto.randomUUID(),
         },
         body: JSON.stringify({
           endToEndId: form.endToEndId,

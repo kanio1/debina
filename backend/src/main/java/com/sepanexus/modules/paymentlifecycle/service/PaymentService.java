@@ -6,9 +6,11 @@ import com.sepanexus.modules.paymentlifecycle.domain.PaymentLifecycleEvent;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyClaim;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyStore;
 import com.sepanexus.modules.paymentlifecycle.ingress.RawMessageArchive;
+import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.JsonDirectLineageRecorder;
 import com.sepanexus.modules.paymentlifecycle.repository.OutboxEventRepository;
 import com.sepanexus.modules.paymentlifecycle.repository.PaymentRepository;
+import com.sepanexus.shared.ClockPort;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -31,10 +33,13 @@ public class PaymentService {
     private final IdempotencyStore idempotencyStore;
     private final RawMessageArchive rawMessageArchive;
     private final JsonDirectLineageRecorder jsonDirectLineageRecorder;
+    private final ClockPort clockPort;
+    private final IsoIdentifierLookup isoIdentifierLookup;
 
     public PaymentService(PaymentRepository paymentRepository, OutboxEventRepository outboxEventRepository,
             TenantGucConfigurer tenantGucConfigurer, ObjectMapper objectMapper, IdempotencyStore idempotencyStore,
-            RawMessageArchive rawMessageArchive, JsonDirectLineageRecorder jsonDirectLineageRecorder) {
+            RawMessageArchive rawMessageArchive, JsonDirectLineageRecorder jsonDirectLineageRecorder,
+            ClockPort clockPort, IsoIdentifierLookup isoIdentifierLookup) {
         this.paymentRepository = paymentRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.tenantGucConfigurer = tenantGucConfigurer;
@@ -42,13 +47,15 @@ public class PaymentService {
         this.idempotencyStore = idempotencyStore;
         this.rawMessageArchive = rawMessageArchive;
         this.jsonDirectLineageRecorder = jsonDirectLineageRecorder;
+        this.clockPort = clockPort;
+        this.isoIdentifierLookup = isoIdentifierLookup;
     }
 
     @Transactional
     @PreAuthorize("hasRole('payment_submitter')")
     public PaymentEntity submitPayment(SubmitPaymentCommand command) {
         UUID tenantId = command.tenantId();
-        tenantGucConfigurer.apply(tenantId);
+        tenantGucConfigurer.apply(tenantId, command.branchId());
 
         byte[] requestPayload = canonicalRequestBytes(command);
         UUID rawMessageId = rawMessageArchive.archive("REST_JSON", tenantId,
@@ -70,12 +77,15 @@ public class PaymentService {
 
         PaymentEntity payment = paymentRepository.save(PaymentEntity.received(
                 tenantId,
+                command.branchId(),
                 command.endToEndId(),
                 command.amount(),
                 command.currency(),
                 command.debtorIban(),
-                command.creditorIban()));
-        outboxEventRepository.save(OutboxEvent.paymentSubmitted(payment.getId(), eventPayload(payment, tenantId), UUID.randomUUID()));
+                command.creditorIban(),
+                clockPort.now()));
+        outboxEventRepository.save(OutboxEvent.paymentSubmitted(payment.getId(), eventPayload(payment, tenantId),
+                UUID.randomUUID(), clockPort.now()));
         jsonDirectLineageRecorder.record(payment.getId(), rawMessageId, command.endToEndId());
         idempotencyStore.complete(tenantId, command.idempotencyKey(), payment.getId(), SUBMIT_RESPONSE_CODE);
 
@@ -101,6 +111,20 @@ public class PaymentService {
     public List<PaymentEntity> visiblePayments(String tenantIdClaim) {
         tenantGucConfigurer.apply(tenantIdClaim == null ? null : UUID.fromString(tenantIdClaim));
         return paymentRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('payment_submitter')")
+    public PaymentDetail paymentDetail(String tenantIdClaim, UUID paymentId) {
+        tenantGucConfigurer.apply(tenantIdClaim == null ? null : UUID.fromString(tenantIdClaim));
+        // RLS on payment.payments already scopes this lookup to the caller's tenant (and branch, if
+        // set) — a payment belonging to another tenant is indistinguishable from a non-existent one.
+        PaymentEntity payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new PaymentNotFoundException(paymentId));
+        return new PaymentDetail(payment, isoIdentifierLookup.findByPaymentId(paymentId));
+    }
+
+    public record PaymentDetail(PaymentEntity payment, List<IsoIdentifierLookup.IsoIdentifierView> isoIdentifiers) {
     }
 
     private String eventPayload(PaymentEntity payment, UUID tenantId) {

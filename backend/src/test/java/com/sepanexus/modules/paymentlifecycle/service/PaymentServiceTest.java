@@ -10,7 +10,10 @@ import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyClaim;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyStore;
 import com.sepanexus.modules.paymentlifecycle.ingress.RawMessageArchive;
+import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.JsonDirectLineageRecorder;
+import com.sepanexus.shared.ClockPort;
+import java.time.Instant;
 import com.sepanexus.modules.paymentlifecycle.repository.PaymentRepository;
 import com.sepanexus.modules.paymentlifecycle.repository.OutboxEventRepository;
 import tools.jackson.databind.ObjectMapper;
@@ -43,14 +46,22 @@ class PaymentServiceTest {
     @Mock
     private JsonDirectLineageRecorder jsonDirectLineageRecorder;
 
+    @Mock
+    private ClockPort clockPort;
+
+    @Mock
+    private IsoIdentifierLookup isoIdentifierLookup;
+
     @Test
     void submitsOneReceivedPayment() {
         UUID tenantId = UUID.randomUUID();
-        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, "E2E-1",
+        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, null, "E2E-1",
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 UUID.randomUUID().toString());
         PaymentService service = new PaymentService(paymentRepository, outboxEventRepository,
-                tenantGucConfigurer, new ObjectMapper(), idempotencyStore, rawMessageArchive, jsonDirectLineageRecorder);
+                tenantGucConfigurer, new ObjectMapper(), idempotencyStore, rawMessageArchive, jsonDirectLineageRecorder,
+                clockPort, isoIdentifierLookup);
+        when(clockPort.now()).thenReturn(Instant.now());
         when(rawMessageArchive.archive(any(), any(), any(), any())).thenReturn(UUID.randomUUID());
         when(idempotencyStore.claim(any(), any(), any())).thenReturn(IdempotencyClaim.claimed());
         when(paymentRepository.save(any(PaymentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));

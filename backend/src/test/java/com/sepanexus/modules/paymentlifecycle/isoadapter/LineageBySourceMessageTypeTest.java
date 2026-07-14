@@ -68,7 +68,7 @@ class LineageBySourceMessageTypeTest {
     @WithMockUser(roles = "payment_submitter")
     void secondSourceMessageTypeCoexistsWithJsonDirectLineage() throws Exception {
         UUID tenantId = UUID.randomUUID();
-        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, "e2e-lineage-multi-1",
+        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, null, "e2e-lineage-multi-1",
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 UUID.randomUUID().toString());
         UUID paymentId = paymentService.submitPayment(command).getId();
