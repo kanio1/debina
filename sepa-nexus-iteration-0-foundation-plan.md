@@ -32,7 +32,7 @@
 | PostgreSQL | **18** (stable baseline) | 19 is lab/experimental only — never in this plan |
 | Keycloak | **26.6.4** | pin exact patch; long CVE tail on older 26.x |
 | Maven | latest 3.9.x (via `mvnw` wrapper) | not Gradle |
-| Node.js | 20+ (required by Next.js 16) | |
+| Node.js | **24 LTS**, exact pin **24.18.0** | `[USER-DECISION 2026-07-13]`; replaces the previous Node.js 20 baseline |
 | Next.js | **16.2.10 LTS or newer** `[SECURITY-PIN]` | May 2026 security release fixed 13 advisories incl. middleware/proxy **authorization bypass** — our BFF's entire security model depends on middleware-enforced auth, so this pin is not optional |
 | React | 19.x (ships with Next.js 16) | |
 | TypeScript | 7.0 (GA 8 July 2026) `[RISK, dated]` | day(s)-old GA as of this plan; `typescript-eslint`/`ts-morph`/custom transformers may lag until 7.1 — pin 7.0 but watch tooling compat in Story 0.1 |
@@ -50,7 +50,7 @@
 
 - [ ] **Create the monorepo skeleton.** Three top-level dirs: `backend/` (Maven, Spring Boot), `frontend/` (Next.js), `infra/` (docker-compose, Keycloak realm export, Flyway migrations shared reference). Add root `.gitignore` (Java+Node+IDE), `.editorconfig` (UTF-8, LF, 2-space YAML/JSON/TS, 4-space Java).
   `verify: ls backend frontend infra` → all three exist, each with a `README.md` stub stating its one-sentence purpose.
-- [ ] **Pin Node via `.nvmrc`/`.node-version`.** Content: `20`. `verify: cat frontend/.node-version` → `20`.
+- [ ] **Pin Node via `.nvmrc`/`.node-version`.** Content: `24.18.0`. `[USER-DECISION 2026-07-13]` Node.js 24 LTS replaces the previous Node.js 20 baseline. `verify: test "$(tr -d '\r\n' < frontend/.node-version)" = "24.18.0"` → exact pin `24.18.0`.
 - [ ] **Confirm TypeScript 7 tooling compatibility before relying on it.** `[RISK, dated]` Check whether `typescript-eslint` and any planned custom transformer already support TS 7.0 GA; if not, pin TypeScript to the latest 5.x LTS for Iteration 0 and revisit at 7.1.
   `verify: cd frontend && npm view typescript-eslint peerDependencies` → confirm `typescript@^7` is listed before adopting 7.0; otherwise document the fallback pin in `frontend/README.md`.
 
@@ -168,6 +168,8 @@
 
 - [ ] **Mirror skills for Codex CLI.** Either symlink or copy `.claude/skills/` to `.codex/skills/` so both tools see identical files (per the open Agent Skills standard, this is copy/symlink only — no format conversion needed).
   `verify: diff -r .claude/skills .codex/skills` → no differences (symlink or exact copy).
+
+  > **2026-07-13 Codex CLI path update:** use the first safe writable supported location: root `.agents/skills`, user-scope `$HOME/.agents/skills`, or nested `tools/codex/.agents/skills`. In this environment root `.agents` is a system read-only tmpfs, so the verified fallback is `tools/codex/.agents/skills -> ../../../.claude/skills`; run `codex --cd tools/codex`. Verification: `test -e tools/codex/.agents/skills && diff -r .claude/skills tools/codex/.agents/skills`.
 
 ### Story 0.3 — Base Docker Compose (Postgres, Keycloak, Kafka)
 
@@ -554,7 +556,7 @@
 
 ### Story 7.2 — Frontend CI workflow
 
-- [ ] **`.github/workflows/frontend.yml`**: checkout → set up Node 20 → `npm ci` → `npm run lint` → `npm run build`. **No Playwright job in this workflow** — it is intentionally absent until Iteration 1 adds real Playwright tests.
+- [ ] **`.github/workflows/frontend.yml`**: checkout → set up Node 24 LTS, exact pin `24.18.0` → `npm ci` → `npm run lint` → `npm run build`. **No Playwright job in this workflow** — it is intentionally absent until Iteration 1 adds real Playwright tests.
   `verify: act -W .github/workflows/frontend.yml -j build` → job succeeds.
 
 ### Story 7.3 — Local CI parity via `nektos/act`
@@ -596,7 +598,7 @@ Before starting Iteration 1 (first three real screens + first real Playwright te
 - [ ] The Modulith `ModularityTest` passes and has been proven to actually fail on a deliberate boundary violation (Story 7.1).
 - [ ] Zero Playwright test files exist anywhere in the repository.
   `verify: find . -path ./node_modules -prune -o -iname "*.spec.ts" -print -o -iname "playwright.config.ts" -print | wc -l` → `0`.
-- [ ] `AGENTS.md` and all five `.claude/skills/*/SKILL.md` files exist and are mirrored (or symlinked) into `.codex/skills/`.
+- [ ] `AGENTS.md` and all five `.claude/skills/*/SKILL.md` files exist and are available through the first safe writable Codex location (`.agents/skills`, `$HOME/.agents/skills`, or `tools/codex/.agents/skills`).
 - [ ] Next.js is confirmed at `16.2.10` or newer (security pin).
 - [ ] A fresh clone of the repo, with only `docker compose up` + the two `mvnw`/`npm` run commands, reproduces the full manual walk-through (Story 8.2) with no undocumented manual step.
 

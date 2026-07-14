@@ -1,14 +1,12 @@
 # CLAUDE.md
 
-@AGENTS.md
-
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What this repository is
 
 This is the **analysis-phase documentation corpus for SEPA Nexus** (working title `Playwright-Learning-Development`), a synthetic, deterministic SEPA/ISO 20022 payments platform. Its sole purpose is to be a realistic, enterprise-grade testing ground for a Senior QA/SDET to master Playwright, TypeScript, and enterprise test architecture — multi-role auth (Keycloak), real asynchrony (SSE, queues, deferred settlement), and UI/API/data separation (BFF + GraphQL-read-only + REST-commands + SQL-level assertions). It is **not** a real bank, not a copy of any existing CSM/ACH/RTGS system, and makes no regulatory-compliance claims. Any piece of SEPA "realism" that doesn't produce a new, named testing lesson is a candidate for simplification, not depth.
 
-**Current state: first commit exists; monorepo skeleton created, no application code yet.** Most files in this repo are still Markdown design/decision documents, but Iteration 0 execution against `sepa-nexus-iteration-0-foundation-plan.md` has started: a `/planning/` catalog of epics/stories/tasks now exists, and EPIC-00 Story 0.1 created the `backend/`, `frontend/`, and `infra/` top-level directories (each with a one-sentence `README.md` stub) plus root `.gitignore`/`.editorconfig`. There is still no Spring Boot/Maven build in `backend/`, no Next.js app in `frontend/`, and no docker-compose stack in `infra/` — those directories currently hold only scaffolding, not a working build/lint/test toolchain. The active task is EPIC-00 Story 0.2 (`AGENTS.md` + the five project-local Claude Code / Codex CLI skills). Continue executing `sepa-nexus-iteration-0-foundation-plan.md` task-by-task via `/planning/`.
+**Current state: the first commit exists; the monorepo skeleton has no application code yet.** Most files in this repo are still Markdown design/decision documents. A `/planning/` catalog of epics/stories/tasks exists; EPIC-00 Story 0.1 created the `backend/`, `frontend/`, and `infra/` top-level directories, and Story 0.2 created `AGENTS.md` plus the project-local skills. There is still no Spring Boot/Maven build in `backend/`, no Next.js app in `frontend/`, and no docker-compose stack in `infra/` — those directories hold scaffolding only, not a working application build system. The active implementation scope remains EPIC-00; Story 0.3 is next. Continue executing `sepa-nexus-iteration-0-foundation-plan.md` task-by-task via `/planning/`.
 
 Do not add code, scaffolding, or new design documents speculatively. If asked to start implementation, start from `sepa-nexus-iteration-0-foundation-plan.md` (see below) rather than inventing structure.
 
@@ -77,10 +75,10 @@ Not yet installed anywhere in this repo — recorded here so implementation does
 
 - Backend: JDK 25, Spring Boot 4.1.x (Spring Framework 7.0.x), Spring Modulith 2.x, Spring Kafka 4.1.x, Maven via `./mvnw` (not Gradle).
 - Data/infra: PostgreSQL 18, Keycloak 26.6.4 (pin exact patch), Kafka in KRaft mode — all via `infra/docker-compose.yml`.
-- Frontend: Node 20+, Next.js 16.2.10+ (security-pinned — earlier 16.2.x has an unpatched middleware/proxy auth-bypass advisory the BFF security model depends on), React 19, TypeScript 7.0 (fall back to latest 5.x LTS if `typescript-eslint` lags 7.0 GA), shadcn/ui CLI v4 (Base UI, vendored components — never an npm dependency), Tailwind v4, TanStack Table.
+- Frontend: Node.js 24 LTS (exact pin `24.18.0`), Next.js 16.2.10+ (security-pinned — earlier 16.2.x has an unpatched middleware/proxy auth-bypass advisory the BFF security model depends on), React 19, TypeScript 7.0 (fall back to latest 5.x LTS if `typescript-eslint` lags 7.0 GA), shadcn/ui CLI v4 (Base UI, vendored components — never an npm dependency), Tailwind v4, TanStack Table.
 - Testing: JUnit 5 + Testcontainers for backend/integration; Playwright is explicitly **out of scope until Iteration 1+**, once real screens exist — do not scaffold Playwright during Iteration 0.
 
-Planned monorepo layout: `backend/` (Maven/Spring), `frontend/` (Next.js), `infra/` (compose, Keycloak realm export, Flyway reference). Iteration 0 also creates root `AGENTS.md` and five project-local Claude Code / Codex CLI skills under `.claude/skills/` (mirrored to `.codex/skills/`): `spring-modulith-module`, `postgres-rls-migration`, `keycloak-realm-config`, `nextjs-bff-route`, `shadcn-component-scaffold` — their exact required content is specified in Story 0.2 of the foundation plan.
+Planned monorepo layout: `backend/` (Maven/Spring), `frontend/` (Next.js), `infra/` (compose, Keycloak realm export, Flyway reference). Iteration 0 also created root `AGENTS.md` and five project-local Claude Code / Codex CLI skills under `.claude/skills/`. Because root `.agents/` is a system read-only mount in this environment, Codex uses the supported fallback `tools/codex/.agents/skills/` via `codex --cd tools/codex`: `spring-modulith-module`, `postgres-rls-migration`, `keycloak-realm-config`, `nextjs-bff-route`, `shadcn-component-scaffold` — their exact required content is specified in Story 0.2 of the foundation plan.
 
 ## Working conventions in this pre-code phase
 

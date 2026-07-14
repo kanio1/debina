@@ -11,5 +11,11 @@
 
 ## Repository map
 - `backend/` — Spring Boot 4.1 / Spring Modulith, JDK 25, Maven (`./mvnw`)
-- `frontend/` — Next.js 16.2.10+ BFF + React 19 UI
+- `frontend/` — Node.js 24 LTS (exact pin `24.18.0`), Next.js 16.2.10+ BFF + React 19 UI
 - `infra/` — docker-compose, Keycloak realm export, Flyway migrations reference
+- `planning/` — wykonywalny katalog epików, stories i tasków
+- `HANDOFF.md` — bieżący stan między sesjami
+
+## Planning workflow
+- Zacznij od `HANDOFF.md`, potem przeczytaj aktywny epik i wykonuj pierwszy nieodhaczony task.
+- Nie przechodź dalej bez pozytywnego `verify:`. Przed końcem sesji całkowicie nadpisz `HANDOFF.md`.
