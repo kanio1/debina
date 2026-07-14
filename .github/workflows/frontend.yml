@@ -1,0 +1,53 @@
+name: frontend
+
+on:
+  push:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # [PLANNING-DEFECT 2026-07-14]: source task text says "Node 20" — this
+      # repo pins Node 24.18.0 exactly (frontend/.node-version, CLAUDE.md).
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.node-version
+
+      # [PLANNING-DEFECT 2026-07-14]: source task text says "npm ci" — this
+      # repo uses pnpm only (no package-lock.json, see AGENTS.md).
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        working-directory: frontend
+        run: pnpm run lint
+
+      - name: Typecheck
+        working-directory: frontend
+        run: pnpm run typecheck
+
+      # No Playwright job here — [NO-PLAYWRIGHT] holds through Iteration 0.
+      - name: Build
+        working-directory: frontend
+        run: pnpm run build

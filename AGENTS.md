@@ -16,6 +16,9 @@
 - `planning/` — wykonywalny katalog epików, stories i tasków
 - `HANDOFF.md` — bieżący stan między sesjami
 
+## Next.js agent note (merged from `frontend/` scaffold, EPIC-05 Story 5.1)
+- This Next.js major version (16.2.10+) has breaking changes vs. older training data — APIs, conventions, and file structure may differ. Check `frontend/node_modules/next/dist/docs/` before writing App Router code, and heed deprecation notices.
+
 ## Planning workflow
 - Zacznij od `HANDOFF.md`, potem przeczytaj aktywny epik i wykonuj pierwszy nieodhaczony task.
 - Nie przechodź dalej bez pozytywnego `verify:`. Przed końcem sesji całkowicie nadpisz `HANDOFF.md`.

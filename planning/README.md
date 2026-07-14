@@ -22,9 +22,9 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-02 — Keycloak 26.6.4 Realm (4 role) | **done** | EPIC-00 | [epics/EPIC-02-keycloak-realm-iteration-0.md](epics/EPIC-02-keycloak-realm-iteration-0.md) |
 | EPIC-03 — Spring Boot/Modulith Backend Skeleton | **done** | EPIC-00, EPIC-01 | [epics/EPIC-03-spring-modulith-backend-skeleton.md](epics/EPIC-03-spring-modulith-backend-skeleton.md) |
 | EPIC-04 — Outbox/Inbox + Kafka (cienkie) | **done** | EPIC-01, EPIC-03 | [epics/EPIC-04-outbox-inbox-kafka-thin.md](epics/EPIC-04-outbox-inbox-kafka-thin.md) |
-| EPIC-05 — Next.js BFF | not-started | EPIC-02, EPIC-03 | [epics/EPIC-05-nextjs-bff.md](epics/EPIC-05-nextjs-bff.md) |
-| EPIC-06 — React/shadcn Frontend Skeleton | not-started | EPIC-05 | [epics/EPIC-06-react-shadcn-frontend-skeleton.md](epics/EPIC-06-react-shadcn-frontend-skeleton.md) |
-| EPIC-07 — CI/CD Foundation | not-started | EPIC-03, EPIC-06 | [epics/EPIC-07-ci-cd-foundation.md](epics/EPIC-07-ci-cd-foundation.md) |
+| EPIC-05 — Next.js BFF | **done** | EPIC-02, EPIC-03 | [epics/EPIC-05-nextjs-bff.md](epics/EPIC-05-nextjs-bff.md) |
+| EPIC-06 — React/shadcn Frontend Skeleton | **done** | EPIC-05 | [epics/EPIC-06-react-shadcn-frontend-skeleton.md](epics/EPIC-06-react-shadcn-frontend-skeleton.md) |
+| EPIC-07 — CI/CD Foundation | **in-progress** (blocked on pre-existing EPIC-03 Modulith module-boundary gap, see epic file) | EPIC-03, EPIC-06 | [epics/EPIC-07-ci-cd-foundation.md](epics/EPIC-07-ci-cd-foundation.md) |
 | EPIC-08 — Walking Skeleton Verification | not-started | EPIC-04, EPIC-05, EPIC-06, EPIC-07 | [epics/EPIC-08-walking-skeleton-verification.md](epics/EPIC-08-walking-skeleton-verification.md) |
 
 ## Faza 1 — Ownership / Architecture Enforcement (cross-cutting)

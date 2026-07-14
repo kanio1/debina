@@ -3,13 +3,18 @@ package com.sepanexus.modules.paymentlifecycle.web;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
+import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
 import com.sepanexus.security.SecurityConfig;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +47,26 @@ class PaymentControllerTest {
                         .content(validPaymentJson()))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/payments/" + paymentId));
+    }
+
+    @Test
+    void listsVisiblePaymentsForAuthenticatedTenant() throws Exception {
+        PaymentEntity payment = org.mockito.Mockito.mock(PaymentEntity.class);
+        UUID paymentId = UUID.randomUUID();
+        when(payment.getId()).thenReturn(paymentId);
+        when(payment.getEndToEndId()).thenReturn("E2E-1");
+        when(payment.getAmount()).thenReturn(new BigDecimal("10.00"));
+        when(payment.getCurrency()).thenReturn("EUR");
+        when(payment.getStatus()).thenReturn(PaymentStatus.RECEIVED);
+        when(paymentService.visiblePayments(any())).thenReturn(List.of(payment));
+
+        mockMvc.perform(get("/api/v1/payments")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_payment_submitter")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(paymentId.toString()))
+                .andExpect(jsonPath("$[0].endToEndId").value("E2E-1"))
+                .andExpect(jsonPath("$[0].status").value("RECEIVED"));
     }
 
     static String validPaymentJson() {
