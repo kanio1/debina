@@ -24,14 +24,14 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-04 — Outbox/Inbox + Kafka (cienkie) | **done** | EPIC-01, EPIC-03 | [epics/EPIC-04-outbox-inbox-kafka-thin.md](epics/EPIC-04-outbox-inbox-kafka-thin.md) |
 | EPIC-05 — Next.js BFF | **done** | EPIC-02, EPIC-03 | [epics/EPIC-05-nextjs-bff.md](epics/EPIC-05-nextjs-bff.md) |
 | EPIC-06 — React/shadcn Frontend Skeleton | **done** | EPIC-05 | [epics/EPIC-06-react-shadcn-frontend-skeleton.md](epics/EPIC-06-react-shadcn-frontend-skeleton.md) |
-| EPIC-07 — CI/CD Foundation | **in-progress** (blocked on pre-existing EPIC-03 Modulith module-boundary gap, see epic file) | EPIC-03, EPIC-06 | [epics/EPIC-07-ci-cd-foundation.md](epics/EPIC-07-ci-cd-foundation.md) |
-| EPIC-08 — Walking Skeleton Verification | not-started | EPIC-04, EPIC-05, EPIC-06, EPIC-07 | [epics/EPIC-08-walking-skeleton-verification.md](epics/EPIC-08-walking-skeleton-verification.md) |
+| EPIC-07 — CI/CD Foundation | done | EPIC-03, EPIC-06 | [epics/EPIC-07-ci-cd-foundation.md](epics/EPIC-07-ci-cd-foundation.md) |
+| EPIC-08 — Walking Skeleton Verification | done | EPIC-04, EPIC-05, EPIC-06, EPIC-07 | [epics/EPIC-08-walking-skeleton-verification.md](epics/EPIC-08-walking-skeleton-verification.md) |
 
 ## Faza 1 — Ownership / Architecture Enforcement (cross-cutting)
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-09 — Ownership: schema/grant enforcement | not-started | EPIC-03, EPIC-07 | [epics/EPIC-09-ownership-schema-grants.md](epics/EPIC-09-ownership-schema-grants.md) |
+| EPIC-09 — Ownership: schema/grant enforcement | done | EPIC-03, EPIC-07 | [epics/EPIC-09-ownership-schema-grants.md](epics/EPIC-09-ownership-schema-grants.md) |
 | EPIC-10 — Ownership: ISO lineage split | not-started | EPIC-09, EPIC-26, EPIC-21 | [epics/EPIC-10-iso-lineage-ownership.md](epics/EPIC-10-iso-lineage-ownership.md) |
 | EPIC-11 — Ownership: cienki wiersz payments | not-started | EPIC-09, EPIC-20 | [epics/EPIC-11-payment-slim-ownership.md](epics/EPIC-11-payment-slim-ownership.md) |
 | EPIC-12 — Ownership: katalogi reference-data | not-started | EPIC-09 | [epics/EPIC-12-reference-data-ownership.md](epics/EPIC-12-reference-data-ownership.md) |

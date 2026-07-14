@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 depends_on: [EPIC-03-spring-modulith-backend-skeleton, EPIC-06-react-shadcn-frontend-skeleton]
 source: "sepa-nexus-iteration-0-foundation-plan.md, EPIC 7 (Story 7.1-7.3), lines 544-564"
 ---
@@ -10,7 +10,7 @@ Te same komendy weryfikacyjne z Epików 1-6 uruchamiane bez nadzoru, odtwarzalne
 
 ## Story 7.1 — Workflow CI backendu
 
-status: in-progress
+status: done
 depends_on: [EPIC-03-spring-modulith-backend-skeleton/Story 3.1]
 
 Opis: `.github/workflows/backend.yml`, `ModularityTest` jako bramka blokująca — źródło: linie 548-553.
@@ -20,9 +20,21 @@ Kryterium ukończenia: job przechodzi lokalnie przez `act`, a celowe naruszenie 
 Taski:
 - [x] **`.github/workflows/backend.yml`**: checkout → JDK 25 → `./mvnw -f backend test` (Testcontainers potrzebuje Docker-in-Docker lub bloku `services:` Postgres+Kafka; preferuj natywne wsparcie Testcontainers dla Docker socket na hostowanym runnerze GitHub).
       `verify: act -W .github/workflows/backend.yml -j test --container-daemon-socket "unix://${XDG_RUNTIME_DIR}/podman/podman.sock" --container-options "--security-opt label=disable" --env TESTCONTAINERS_RYUK_DISABLED=true` → `BUILD SUCCESS`, `Tests run: 16, Failures: 0, Errors: 0` — PASS (2026-07-14). Zobacz notatkę o act+Podman niżej dla wyjaśnienia trzech dodatkowych flag ponad gołe `act -W ... -j test` z tekstu tasku.
-- [~] **Wywal build na teście architektury Modulith** — wykonano deliberate-violation próbę, ale **nie udało się jej wywołać** z obecną konfiguracją Modulith; patrz `[OPEN-QUESTION]` niżej. Task pozostaje częściowo zweryfikowany: workflow YAML faktycznie uruchamia `ModularityTest` jako część `mvn test` (bramka jest *podłączona*), ale nie potwierdzono namacalnie, że aktualna konfiguracja modułów faktycznie *coś* wywala.
+- [x] **Wywal build na teście architektury Modulith** — rozstrzygnięte w tej sesji, patrz `[PLANNING-DEFECT]` niżej (nie `[OPEN-QUESTION]` — poprzednia hipoteza o `Type.OPEN` była błędna, potwierdzono to dowodem, nie założeniem).
 
-`[OPEN-QUESTION 2026-07-14]`: Próba deliberate-violation (dwie, niezależne): (1) referencja z `com.sepanexus.security.SecurityConfig` do nowo utworzonej klasy w `com.sepanexus.modules.internal.InternalOnly` (test konwencji ukrywania pakietów `internal`), (2) prawdziwy cykl dwukierunkowy `modules↔security` (dodatkowo `PaymentController` → `SecurityConfig`). Diagnostyka (`ApplicationModules.of(SepaNexusApplication.class)` debug test): Modulith wykrywa dokładnie **dwa** moduły przez domyślną konwencję (bezpośrednie sub-pakiety `com.sepanexus`: `modules` i `security` — `paymentlifecycle` to tylko zagnieżdżony pakiet WEWNĄTRZ modułu "modules", nie osobny moduł). `modules.verify()` **nie zgłosił żadnej z dwóch prób naruszenia** — ani referencji do zagnieżdżonego "internal" pakietu, ani prawdziwego cyklu. Najbardziej prawdopodobna przyczyna (per dokumentacja Spring Modulith 2.x, `fundamentals.adoc`): bez jawnej deklaracji `@ApplicationModule`/`package-info.java` na którymkolwiek z dwóch pakietów, moduły domyślnie zachowują się jak w pełni otwarte (`Type.OPEN`) — nic tu jeszcze nie ustawia ich na zamknięte. **To pre-istniejący, rzeczywisty gap architektoniczny z EPIC-03 (nie utworzony przez tę sesję)**: `ModularityTest` jest podłączony i przechodzi, ale obecnie nie egzekwuje żadnych granic modułów poza wykryciem struktury. Nie naprawiono w tej sesji — to wymagałoby jawnego zaprojektowania modułów (`package-info.java` z `@ApplicationModule`, prawdopodobnie per-bounded-context zgodnie z mapą 16 modułów z `CLAUDE.md`), co jest poza zakresem EPIC-07 (CI/CD) i należy raczej do EPIC-09+ (epiki "ownership" w `planning/README.md`) lub do rewizji EPIC-03. Zapisane też w `HANDOFF.md`.
+`[PLANNING-DEFECT 2026-07-14, rozstrzygnięty]`: Poprzednia sesja zostawiła `[OPEN-QUESTION]`: "czy `ModularityTest` egzekwuje cokolwiek", z hipotezą, że oba moduły (`modules`, `security` — bezpośrednie sub-pakiety `com.sepanexus`, wykryte domyślną konwencją pakietową Modulith) są domyślnie `Type.OPEN`. Ta hipoteza była **błędna** — zweryfikowano bezpośrednio empirycznie w tej sesji: diagnostyczny test (`ApplicationModules.of(...).forEach(m -> ... m.isOpen() ...)`, usunięty po użyciu) pokazał `type/open=false` dla obu modułów; są domyślnie **zamknięte**.
+
+Prawdziwa przyczyna, dlaczego poprzednie próby deliberate-violation nie zostały złapane: bait-klasa użyta do testu (`InternalOnly.SECRET`, `public static final String`) jest kompilacyjną stałą Javy (compile-time constant). Javac inline'uje taką wartość bezpośrednio w bajtkodzie wołającej klasy (constant folding, JLS §13.1/§15.29) — nie generuje żadnego `getstatic`/`invokestatic` odniesienia do klasy źródłowej, tylko martwy wpis w constant poolu. ArchUnit (silnik pod spodem Modulith) analizuje rzeczywiste zależności bajtkodowe, więc taki "dowód naruszenia" nigdy nie mógł zostać wykryty — **to była wada eksperymentu, nie luka architektury**.
+
+Powtórzono eksperyment z poprawną, niestałą referencją (`InternalOnly.secret()` jako metoda instancyjna/statyczna zwracająca wartość w runtime, nie stała): `security.SecurityConfig` wołające `modules.internal.InternalOnly.secret()` (pakiet `internal` zagnieżdżony w module `modules`, więc nie jest częścią API modułu) →
+```
+org.springframework.modulith.core.Violations:
+- Module 'security' depends on non-exposed type com.sepanexus.modules.internal.InternalOnly within module 'modules'!
+Method <com.sepanexus.security.SecurityConfig.deliberateViolation()> calls method <com.sepanexus.modules.internal.InternalOnly.secret()> in (SecurityConfig.java:25)
+```
+→ `BUILD FAILURE`, dokładnie jak oczekiwano — **EXPECTED FAIL potwierdzony**. Po usunięciu eksperymentu (`modules/internal/`, diagnostyczny test, referencja w `SecurityConfig`) → `./mvnw -f backend test` → `Tests run: 16, Failures: 0, Errors: 0`, `BUILD SUCCESS` — PASS ponownie (2026-07-14). `git diff --check` i `git status --short` czyste (tylko pre-istniejący nieśledzony `.claude/skills/impeccable/`).
+
+Wniosek: `ModularityTest` **rzeczywiście egzekwuje granice modułów** już teraz, dla obu wykrytych modułów (`modules`, `security`), mimo braku jawnych `@ApplicationModule`/`package-info.java` — domyślna konwencja pakietowa Spring Modulith 2.x jest wystarczająca do zamkniętych (closed) modułów z ukrytymi pakietami wewnętrznymi. Docelowy podział na ~16 modułów z mapy w `CLAUDE.md` (`ingress`, `iso-adapter`, `payment-lifecycle`, `signature`, `routing`, ...) to osobna, świadomie odłożona praca (epiki "ownership", EPIC-09+), nie blokada CI/CD.
 
 ### Notatka: `act` + rootless Podman + SELinux (Fedora)
 

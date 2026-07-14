@@ -16,6 +16,16 @@ Node.js 24 LTS is pinned exactly to `24.18.0` in `.node-version` by `[USER-DECIS
 
 pnpm only (pinned via `packageManager` in `package.json`). Do not create `package-lock.json`.
 
+## Environment
+
+`.env.local` is git-ignored (it holds the dev-only Keycloak client secret) and is not part of a fresh clone. Copy the template before running the dev server or a local build:
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.example` documents the required variables (`KEYCLOAK_ISSUER`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`, `BFF_BASE_URL`, `BACKEND_API_BASE_URL`) and their default local values, matching `infra/keycloak/realm-export.json`'s `sepa-web` client.
+
 ## Scaffold
 
 Bootstrapped via `pnpm dlx create-next-app@16.2.10` (App Router, TypeScript, Tailwind v4, ESLint, `src/` dir) — EPIC-05 Story 5.1.
@@ -23,6 +33,7 @@ Bootstrapped via `pnpm dlx create-next-app@16.2.10` (App Router, TypeScript, Tai
 Get started:
 
 ```bash
+cp .env.example .env.local   # first time only
 pnpm install --frozen-lockfile
 pnpm dev
 ```
