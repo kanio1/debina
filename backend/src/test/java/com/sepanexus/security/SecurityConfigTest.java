@@ -44,6 +44,7 @@ class SecurityConfigTest {
         mockMvc.perform(post("/api/v1/payments")
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
                                 .authorities(() -> "ROLE_payment_submitter"))
+                        .header("Idempotency-Key", UUID.randomUUID().toString())
                         .contentType("application/json").content(paymentJson()))
                 .andExpect(status().isCreated());
     }

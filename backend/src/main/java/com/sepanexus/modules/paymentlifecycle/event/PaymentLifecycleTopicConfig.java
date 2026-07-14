@@ -8,7 +8,8 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class PaymentLifecycleTopicConfig {
 
-    public static final String TOPIC = "payment.lifecycle.events.v1";
+    /** Canonical name per §3.7 v2 Kafka Topic Catalog (ADR-N8) — the sole source of truth for topic names. */
+    public static final String TOPIC = "payment.validated";
 
     @Bean
     NewTopic paymentLifecycleEventsTopic() {

@@ -7,6 +7,10 @@ import static org.mockito.Mockito.when;
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
+import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyClaim;
+import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyStore;
+import com.sepanexus.modules.paymentlifecycle.ingress.RawMessageArchive;
+import com.sepanexus.modules.paymentlifecycle.isoadapter.JsonDirectLineageRecorder;
 import com.sepanexus.modules.paymentlifecycle.repository.PaymentRepository;
 import com.sepanexus.modules.paymentlifecycle.repository.OutboxEventRepository;
 import tools.jackson.databind.ObjectMapper;
@@ -30,13 +34,25 @@ class PaymentServiceTest {
     @Mock
     private OutboxEventRepository outboxEventRepository;
 
+    @Mock
+    private IdempotencyStore idempotencyStore;
+
+    @Mock
+    private RawMessageArchive rawMessageArchive;
+
+    @Mock
+    private JsonDirectLineageRecorder jsonDirectLineageRecorder;
+
     @Test
     void submitsOneReceivedPayment() {
         UUID tenantId = UUID.randomUUID();
         SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, "E2E-1",
-                new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189");
+                new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
+                UUID.randomUUID().toString());
         PaymentService service = new PaymentService(paymentRepository, outboxEventRepository,
-                tenantGucConfigurer, new ObjectMapper());
+                tenantGucConfigurer, new ObjectMapper(), idempotencyStore, rawMessageArchive, jsonDirectLineageRecorder);
+        when(rawMessageArchive.archive(any(), any(), any(), any())).thenReturn(UUID.randomUUID());
+        when(idempotencyStore.claim(any(), any(), any())).thenReturn(IdempotencyClaim.claimed());
         when(paymentRepository.save(any(PaymentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         PaymentEntity saved = service.submitPayment(command);

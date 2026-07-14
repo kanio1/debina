@@ -18,9 +18,8 @@
     <properties>
         <java.version>25</java.version>
         <flyway.version>12.11.0</flyway.version>
-        <junit.version>5.11.0</junit.version>
-        <spring-modulith.version>2.0.6</spring-modulith.version>
-        <postgresql.version>42.7.7</postgresql.version>
+        <spring-modulith.version>2.1.0</spring-modulith.version>
+        <postgresql.version>42.7.13</postgresql.version>
         <testcontainers.version>2.0.5</testcontainers.version>
     </properties>
 
@@ -80,7 +79,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: blocked
 depends_on: [EPIC-09-ownership-schema-grants]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-OWN-9, line 1265); sepa-nexus-blueprint-ownership-integration.md §9 (line 353); README.md (simulation przez normalne ścieżki, [FREEZE])"
 ---
@@ -7,6 +7,8 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-OWN-9, line 126
 # EPIC-17 — Ownership: wymuszenie ścieżki symulacji (EPIC-OWN-9)
 
 `[FREEZE]` symulacja wchodzi w ruch wyłącznie przez publiczne komendy `ingress` i topic `csm.response.received` — nigdy przez bezpośredni insert domenowy.
+
+`[PLANNING-DEFECT, potwierdzone 2026-07-14]`: `depends_on` (tylko `EPIC-09`, spełnione) nie ujawnia rzeczywistego blokera — moduł `simulation` **ma dziś zero kodu** (`[MVP]` Iteracja 3 per ADR-N6, jeszcze nie zbudowany). Wszystkie trzy story testują zachowanie modułu, który nie istnieje. Sam epik ma już własny `[OPEN-QUESTION]` (niżej) o braku osobnej rodziny epików budujących silnik symulacji. **Status `blocked`** (jedyna wartość dozwolona przez `.claude/skills/epic-story-task-catalog/SKILL.md`) — odblokuj, gdy moduł `simulation` faktycznie powstanie w Iteracji 3.
 
 ## Story 17.1 — Symulacja tylko przez publiczne komendy + `csm.response.received`
 

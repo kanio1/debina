@@ -6,11 +6,11 @@ Next.js BFF + React 19 UI serving the SEPA Nexus operator/reviewer workspaces.
 
 Node.js 24 LTS is pinned exactly to `24.18.0` in `.node-version` by `[USER-DECISION 2026-07-13]`.
 
-## TypeScript version pin (Iteration 0)
+## TypeScript version pin
 
-`typescript-eslint`'s current peer dependency range is `typescript: '>=4.8.4 <6.1.0'` — it does not list `typescript@^7` and does not yet support TypeScript 7.0 GA (checked via `npm view typescript-eslint peerDependencies`, 2026-07-13). Per the documented fallback rule, TypeScript is pinned to the latest 5.x LTS, `5.9.3`, for Iteration 0. Revisit the TypeScript 7.x pin once `typescript-eslint` publishes a release supporting it.
+Pinned exactly to `6.0.3` per the project's frozen baseline ("TypeScript 6.x — exact pin"), applied 2026-07-14 once a stable, compatible 6.x release was confirmed to exist (see below).
 
-`[PLANNING-DEFECT 2026-07-14]`: a later session-work-packet instruction asked for a "TypeScript 6.x exact pin". No stable TypeScript 6.x release exists — `npm view typescript versions` shows the registry goes straight from `5.9.3` (latest stable 5.x) to `6.0.0-beta`/dev builds and on to `7.x` dev builds; there was never a stable 6.0.0 GA. The pre-existing `5.9.3` fallback pin above remains correct and is unchanged.
+`[PLANNING-DEFECT 2026-07-14, corrected]`: an earlier session claimed "no stable TypeScript 6.x release exists" and fell back to `5.9.3`. That claim was **wrong** — re-checked directly against the npm registry (`npm view typescript versions --json`, `npm view typescript dist-tags --json`): `6.0.2` and `6.0.3` are real, non-prerelease, published GA versions (distinct from `6.0.0-beta`/`6.0.0-dev.*`/`6.0.1-rc`, which are prereleases). The registry's `latest` dist-tag has simply already moved past the 6.x line to `7.0.2`, which is why an incomplete check (e.g. only reading the `latest` tag) would miss 6.0.3 entirely. Compatibility confirmed before pinning: `typescript-eslint@8.64.0` (the version actually resolved, and npm's current latest) declares `peerDependencies.typescript: ">=4.8.4 <6.1.0"` — `6.0.3` is squarely inside that range; `eslint-config-next@16.2.10` only requires `typescript >=3.3.1`; `next@16.2.10` has no `typescript` peer dependency at all. No breaking change in the [TypeScript 6.0 release notes](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html) (removal of `moduleResolution: classic`, forced ESM interop) applies to this project's `tsconfig.json` (`moduleResolution: "bundler"`, `esModuleInterop: true` already). Full regression (`lint`/`typecheck`/`build`/`pnpm audit`) clean after the pin.
 
 ## Package manager
 

@@ -68,6 +68,7 @@ class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
                 .uri(URI.create("http://localhost:" + port + "/api/v1/payments"))
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
+                .header("Idempotency-Key", UUID.randomUUID().toString())
                 .POST(BodyPublishers.ofString(paymentJson(endToEndId)))
                 .build(), BodyHandlers.ofString());
     }

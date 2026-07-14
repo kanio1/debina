@@ -1,6 +1,7 @@
 package com.sepanexus.modules.paymentlifecycle.web;
 
 import com.sepanexus.modules.paymentlifecycle.service.DuplicatePaymentException;
+import com.sepanexus.modules.paymentlifecycle.service.IdempotencyConflictException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -13,6 +14,11 @@ public class PaymentProblemHandler {
 
     @ExceptionHandler(DuplicatePaymentException.class)
     ProblemDetail duplicate(DuplicatePaymentException exception, HttpServletRequest request) {
+        return problem(HttpStatus.CONFLICT, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(IdempotencyConflictException.class)
+    ProblemDetail idempotencyConflict(IdempotencyConflictException exception, HttpServletRequest request) {
         return problem(HttpStatus.CONFLICT, exception.getMessage(), request);
     }
 

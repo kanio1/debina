@@ -29,26 +29,34 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 ## Faza 1 — Ownership / Architecture Enforcement (cross-cutting)
 
+`[RECONCILIATION CHECKPOINT 2026-07-14]` **Faza 1 jest zamknięta w praktyce dla dzisiejszego stanu kodu.** Uzasadnienie: `EPIC-09` (mechanizm generyczny) jest w pełni `done`. Wszystkie pozostałe osiem epików tej fazy (`EPIC-10`, `EPIC-11`, `EPIC-12`, `EPIC-13`, `EPIC-14`, `EPIC-15`, `EPIC-16`, `EPIC-17`, `EPIC-18`) mają dziś swój **rzeczywisty pozostały zakres strukturalnie uzależniony od modułów domenowych z późniejszych faz/iteracji, które jeszcze nie istnieją** (`iso-adapter`, `payment-lifecycle`-FSM, `ledger`, `egress`, `reconciliation`, `simulation`, `reporting`, GraphQL) — nie od zaniedbania w tej fazie. Zgodnie z zasadą "nie traktuj jako blokady elementów zależnych od nieistniejącego jeszcze modułu późniejszej fazy", żaden z tych ośmiu epików nie jest twardą blokadą do rozpoczęcia Iteracji 1. Genuinie wykonalna dziś część każdego z nich została zrealizowana:
+- `EPIC-12` Story 12.1 (schemat `reference_data` + granty) — **done**; Story 12.2 — `blocked` do Iteracji 5.
+- `EPIC-15` Story 15.1+15.2 (generacja AsyncAPI z §3.7 v2 + test kontraktowy) — **done**; Story 15.3 — `blocked` do `egress`/`reconciliation`.
+- `EPIC-10`/`EPIC-11`/`EPIC-13`/`EPIC-14` — `not-started`, ich jedyne `depends_on` to epiki z Faz 2+ (ISO lineage, FSM, ledger, egress) — nic do zrobienia dziś bez uprzedniego zbudowania tych modułów.
+- `EPIC-16`/`EPIC-17`/`EPIC-18` — `blocked`, ukryte blokery (GraphQL/`reporting`/`simulation`/kolejne moduły) nieujęte w `depends_on`, ale rzeczywiste i udokumentowane w plikach epików.
+
+**Przejście do Iteracji 1 (Faza 2) jest odblokowane** — `EPIC-19` zależy tylko od `EPIC-08` (`done`). Wracaj do `EPIC-10`/`11`/`13`/`14`/`16`/`17`/`18` naturalnie, w miarę jak Iteracja 1+ buduje ich brakujące moduły (np. `EPIC-19`/`EPIC-20`/`EPIC-21` odblokują `EPIC-10`/`EPIC-11`).
+
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
 | EPIC-09 — Ownership: schema/grant enforcement | done | EPIC-03, EPIC-07 | [epics/EPIC-09-ownership-schema-grants.md](epics/EPIC-09-ownership-schema-grants.md) |
 | EPIC-10 — Ownership: ISO lineage split | not-started | EPIC-09, EPIC-26, EPIC-21 | [epics/EPIC-10-iso-lineage-ownership.md](epics/EPIC-10-iso-lineage-ownership.md) |
 | EPIC-11 — Ownership: cienki wiersz payments | not-started | EPIC-09, EPIC-20 | [epics/EPIC-11-payment-slim-ownership.md](epics/EPIC-11-payment-slim-ownership.md) |
-| EPIC-12 — Ownership: katalogi reference-data | not-started | EPIC-09 | [epics/EPIC-12-reference-data-ownership.md](epics/EPIC-12-reference-data-ownership.md) |
+| EPIC-12 — Ownership: katalogi reference-data | blocked (Story 12.1 done; Story 12.2 blocked do Iteracji 5 — ISO validation, `iso.iso_message_versions` §4.3c nie istnieje jeszcze; patrz epic file) | EPIC-09 | [epics/EPIC-12-reference-data-ownership.md](epics/EPIC-12-reference-data-ownership.md) |
 | EPIC-13 — Ownership: ledger | not-started | EPIC-09, EPIC-32 | [epics/EPIC-13-ledger-ownership.md](epics/EPIC-13-ledger-ownership.md) |
 | EPIC-14 — Ownership: granica egress | not-started | EPIC-09, EPIC-43 | [epics/EPIC-14-egress-boundary-ownership.md](epics/EPIC-14-egress-boundary-ownership.md) |
-| EPIC-15 — Ownership: topiki Kafka | not-started | EPIC-09, EPIC-04 | [epics/EPIC-15-kafka-topic-ownership.md](epics/EPIC-15-kafka-topic-ownership.md) |
-| EPIC-16 — Ownership: read modele/GraphQL read-only | not-started | EPIC-09 | [epics/EPIC-16-read-model-graphql-ownership.md](epics/EPIC-16-read-model-graphql-ownership.md) |
-| EPIC-17 — Ownership: wymuszenie ścieżki symulacji | not-started | EPIC-09 | [epics/EPIC-17-simulation-path-enforcement.md](epics/EPIC-17-simulation-path-enforcement.md) |
-| EPIC-18 — Ownership: rollout outbox/inbox (pozostałe moduły) | not-started | EPIC-09, EPIC-04 | [epics/EPIC-18-per-schema-outbox-inbox-rollout.md](epics/EPIC-18-per-schema-outbox-inbox-rollout.md) |
+| EPIC-15 — Ownership: topiki Kafka | blocked (Story 15.1/15.2 done; Story 15.3 blocked do istnienia `egress`/`reconciliation`; patrz epic file) | EPIC-09, EPIC-04 | [epics/EPIC-15-kafka-topic-ownership.md](epics/EPIC-15-kafka-topic-ownership.md) |
+| EPIC-16 — Ownership: read modele/GraphQL read-only | blocked (GraphQL/`reporting` nie istnieją; patrz epic file) | EPIC-09 | [epics/EPIC-16-read-model-graphql-ownership.md](epics/EPIC-16-read-model-graphql-ownership.md) |
+| EPIC-17 — Ownership: wymuszenie ścieżki symulacji | blocked (moduł `simulation` ma zero kodu; patrz epic file) | EPIC-09 | [epics/EPIC-17-simulation-path-enforcement.md](epics/EPIC-17-simulation-path-enforcement.md) |
+| EPIC-18 — Ownership: rollout outbox/inbox (pozostałe moduły) | blocked (brak kolejnych modułów z outbox/inbox; patrz epic file) | EPIC-09, EPIC-04 | [epics/EPIC-18-per-schema-outbox-inbox-rollout.md](epics/EPIC-18-per-schema-outbox-inbox-rollout.md) |
 
 ## Faza 2 — Payment Spine (Iteracja 1)
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-19 — Ingress: staging pipeline | not-started | EPIC-08 | [epics/EPIC-19-ingress-staging-pipeline.md](epics/EPIC-19-ingress-staging-pipeline.md) |
-| EPIC-20 — Payment Lifecycle: FSM | not-started | EPIC-19 | [epics/EPIC-20-payment-lifecycle-fsm.md](epics/EPIC-20-payment-lifecycle-fsm.md) |
-| EPIC-21 — Refaktor identyfikatorów ISO | not-started | EPIC-19 | [epics/EPIC-21-iso-identifier-refactor.md](epics/EPIC-21-iso-identifier-refactor.md) |
+| EPIC-19 — Ingress: staging pipeline | in-progress (Story 19.1/19.3 done; 19.2 blocked na EPIC-31-signature-module; 19.4 blocked na CanonicalMapper; patrz epic file) | EPIC-08 | [epics/EPIC-19-ingress-staging-pipeline.md](epics/EPIC-19-ingress-staging-pipeline.md) |
+| EPIC-20 — Payment Lifecycle: FSM | in-progress (Story 20.1/20.2 done; 20.3 blocked na EPIC-26; patrz epic file) | EPIC-19 | [epics/EPIC-20-payment-lifecycle-fsm.md](epics/EPIC-20-payment-lifecycle-fsm.md) |
+| EPIC-21 — Refaktor identyfikatorów ISO | in-progress (Story 21.1/21.3 done; 21.2 blocked — realny multi-part redesign, patrz epic file) | EPIC-19 | [epics/EPIC-21-iso-identifier-refactor.md](epics/EPIC-21-iso-identifier-refactor.md) |
 | EPIC-22 — Tożsamość i czas: cross-cutting | not-started | EPIC-02, EPIC-03 | [epics/EPIC-22-identity-time-crosscutting.md](epics/EPIC-22-identity-time-crosscutting.md) |
 | EPIC-23 — Frontend Foundation | not-started | EPIC-05, EPIC-06 | [epics/EPIC-23-frontend-foundation.md](epics/EPIC-23-frontend-foundation.md) |
 | EPIC-24 — Frontend Screens (**pierwsze testy Playwright tutaj**) | not-started | EPIC-23 | [epics/EPIC-24-frontend-screens.md](epics/EPIC-24-frontend-screens.md) |

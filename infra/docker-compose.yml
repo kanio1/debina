@@ -30,6 +30,12 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      # Single-broker dev cluster: Kafka's built-in default of 3 for internal topics
+      # (__consumer_offsets, __transaction_state) can never be satisfied here, silently
+      # breaking every consumer group (INVALID_REPLICATION_FACTOR on auto-create).
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
     ports:
       - "9092:9092"
 

@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: blocked
 depends_on: [EPIC-09-ownership-schema-grants, EPIC-04-outbox-inbox-kafka-thin]
 source: "sepa-nexus-blueprint-ownership-integration.md §9 (EPIC-OWN-11, line 355, [ADD, ADR-N5, closed] — nieobecne w MFB §8)"
 ---
@@ -7,6 +7,8 @@ source: "sepa-nexus-blueprint-ownership-integration.md §9 (EPIC-OWN-11, line 35
 # EPIC-18 — Ownership: rollout outbox/inbox per schemat na pozostałe moduły (EPIC-OWN-11)
 
 EPIC-01/EPIC-04 (Iteracja 0) zrealizowały wzorzec ADR-N5 tylko dla schematu `payment`. Ten epik rozszerza go na każdy pozostały publikujący/konsumujący schemat, w miarę jak dany moduł powstaje (nie wszystko naraz — `[DEFER]` z §3.6.3: schematy tworzone per moduł, per iteracja).
+
+`[PLANNING-DEFECT, potwierdzone 2026-07-14]`: dosłownie "w miarę jak dany moduł powstaje" — dziś **żaden kolejny moduł z outbox/inbox nie istnieje**. `reference_data` (EPIC-12, powstały w tej sesji) jest jedynym nowym schematem, ale per §3.6.3 jest czysto katalogowy (nie publikuje/konsumuje eventów), więc świadomie **nie dostaje** pary outbox/inbox — nie jest to przeoczenie. **Status `blocked`** (jedyna wartość dozwolona przez `.claude/skills/epic-story-task-catalog/SKILL.md`) — odblokuj przy pierwszej migracji pierwszego modułu spośród `iso-adapter`/`routing`/`settlement`/`egress`/`reconciliation`/`case`, każdy z których per §3.6.3 rzeczywiście potrzebuje własnej pary `<schema>.outbox_events`/`<schema>.inbox_events`.
 
 ## Story 18.1 — DDL `<schema>.outbox_events`/`<schema>.inbox_events` per moduł
 

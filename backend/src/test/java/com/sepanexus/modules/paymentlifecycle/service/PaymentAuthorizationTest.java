@@ -24,6 +24,7 @@ class PaymentAuthorizationTest {
     }
 
     private static SubmitPaymentCommand command() {
-        return new SubmitPaymentCommand(UUID.randomUUID(), "E2E-1", new BigDecimal("1.00"), "EUR", "DEBTOR", "CREDITOR");
+        return new SubmitPaymentCommand(UUID.randomUUID(), "E2E-1", new BigDecimal("1.00"), "EUR", "DEBTOR", "CREDITOR",
+                UUID.randomUUID().toString());
     }
 }

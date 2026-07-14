@@ -87,8 +87,7 @@ public class PaymentEntity {
     public PaymentStatus getStatus() { return status; }
 
     public void markValidated() {
-        if (status == PaymentStatus.RECEIVED) {
-            status = PaymentStatus.VALIDATED;
-        }
+        PaymentTransitionTable.requireLegal(status, PaymentStatus.VALIDATED);
+        status = PaymentStatus.VALIDATED;
     }
 }

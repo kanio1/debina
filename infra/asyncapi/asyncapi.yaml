@@ -1,0 +1,395 @@
+# generated from §3.7 v2 (sepa-nexus-message-flow-and-data-blueprint.md) — do not hand-edit.
+# Regenerate with: python3 infra/asyncapi/generate.py
+asyncapi: 3.0.0
+info:
+  title: SEPA Nexus — Kafka Topic Catalog v2
+  version: '1.0.0'
+  description: >-
+    Generated from §3.7 v2 (ADR-N8), the sole source of truth for every Kafka
+    topic in SEPA Nexus. Internal backbone only — never exposed externally.
+channels:
+  payment_received:
+    address: payment.received
+    messages:
+      payment_receivedEvent:
+        payload: {}
+    x-producer-owner: ingress
+    x-key: payment_id
+    x-consumers:
+      - "payment-lifecycle"
+      - "risk"
+    x-ordering-guarantee: "strict per payment"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: ingress
+    x-priority: MVP
+  payment_validated:
+    address: payment.validated
+    messages:
+      payment_validatedEvent:
+        payload: {}
+    x-producer-owner: payment-lifecycle
+    x-key: payment_id
+    x-consumers:
+      - "routing"
+    x-ordering-guarantee: "strict per payment"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: payment-lifecycle
+    x-priority: MVP
+  payment_routed:
+    address: payment.routed
+    messages:
+      payment_routedEvent:
+        payload: {}
+    x-producer-owner: routing
+    x-key: payment_id
+    x-consumers:
+      - "settlement"
+      - "egress (projection)"
+    x-ordering-guarantee: "strict per payment"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: routing
+    x-priority: MVP
+  route_failed:
+    address: route.failed
+    messages:
+      route_failedEvent:
+        payload: {}
+    x-producer-owner: routing
+    x-key: payment_id
+    x-consumers:
+      - "payment-lifecycle"
+      - "ops dashboard"
+    x-ordering-guarantee: "per payment"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: routing
+    x-priority: MVP
+  settlement_attempted:
+    address: settlement.attempted
+    messages:
+      settlement_attemptedEvent:
+        payload: {}
+    x-producer-owner: settlement
+    x-key: payment_id
+    x-consumers:
+      - "reporting/monitoring"
+    x-ordering-guarantee: "per payment"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: settlement
+    x-priority: MVP
+  settlement_completed:
+    address: settlement.completed
+    messages:
+      settlement_completedEvent:
+        payload: {}
+    x-producer-owner: settlement
+    x-key: payment_id/cycle_id
+    x-consumers:
+      - "payment-lifecycle"
+      - "egress"
+      - "reconciliation"
+      - "reporting"
+    x-ordering-guarantee: "per payment/cycle"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: settlement
+    x-priority: MVP
+  settlement_failed:
+    address: settlement.failed
+    messages:
+      settlement_failedEvent:
+        payload: {}
+    x-producer-owner: settlement
+    x-key: payment_id
+    x-consumers:
+      - "payment-lifecycle"
+      - "risk"
+      - "egress"
+    x-ordering-guarantee: "per payment"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: settlement
+    x-priority: MVP
+  csm_response_received:
+    address: csm.response.received
+    messages:
+      csm_response_receivedEvent:
+        payload: {}
+    x-producer-owner: simulation/CSM adapter
+    x-key: payment_id/orgnl_msg_id
+    x-consumers:
+      - "payment-lifecycle"
+      - "iso-adapter"
+    x-ordering-guarantee: "per payment/correlation"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: simulation
+    x-priority: MVP
+  payment_status_reported:
+    address: payment.status.reported
+    messages:
+      payment_status_reportedEvent:
+        payload: {}
+    x-producer-owner: payment-lifecycle
+    x-key: payment_id
+    x-consumers:
+      - "egress"
+      - "reporting"
+    x-ordering-guarantee: "strict per payment"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: payment-lifecycle
+    x-priority: MVP
+  egress_delivery_requested:
+    address: egress.delivery.requested
+    messages:
+      egress_delivery_requestedEvent:
+        payload: {}
+    x-producer-owner: egress
+    x-key: outbound_message_id
+    x-consumers:
+      - "monitoring/audit"
+    x-ordering-guarantee: "per outbound msg"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: egress
+    x-priority: MVP
+  egress_delivery_confirmed:
+    address: egress.delivery.confirmed
+    messages:
+      egress_delivery_confirmedEvent:
+        payload: {}
+    x-producer-owner: egress
+    x-key: outbound_message_id
+    x-consumers:
+      - "reporting/audit"
+    x-ordering-guarantee: "per outbound msg"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: egress
+    x-priority: MVP
+  egress_dead_lettered:
+    address: egress.dead_lettered
+    messages:
+      egress_dead_letteredEvent:
+        payload: {}
+    x-producer-owner: egress
+    x-key: outbound_message_id
+    x-consumers:
+      - "ops dashboard"
+      - "alerting"
+    x-ordering-guarantee: "per outbound msg"
+    x-dlq-rule: "terminal state — this is the DLQ signal"
+    x-contract-owner: egress
+    x-priority: MVP
+  egress_manual_intervention_required:
+    address: egress.manual_intervention_required
+    messages:
+      egress_manual_intervention_requiredEvent:
+        payload: {}
+    x-producer-owner: egress
+    x-key: outbound_message_id
+    x-consumers:
+      - "ops dashboard"
+      - "alerting"
+    x-ordering-guarantee: "per outbound msg"
+    x-dlq-rule: "terminal state — no further retry"
+    x-contract-owner: egress
+    x-priority: MVP
+  reconciliation_run_completed:
+    address: reconciliation.run.completed
+    messages:
+      reconciliation_run_completedEvent:
+        payload: {}
+    x-producer-owner: reconciliation
+    x-key: run_id/cycle_id
+    x-consumers:
+      - "reporting/dashboard"
+    x-ordering-guarantee: "per run/cycle"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: reconciliation
+    x-priority: MVP
+  reconciliation_run_failed:
+    address: reconciliation.run.failed
+    messages:
+      reconciliation_run_failedEvent:
+        payload: {}
+    x-producer-owner: reconciliation
+    x-key: run_id
+    x-consumers:
+      - "ops dashboard"
+      - "alerting"
+    x-ordering-guarantee: "per run"
+    x-dlq-rule: "terminal — triggers RETRY_REQUIRED/MANUAL_INVESTIGATION"
+    x-contract-owner: reconciliation
+    x-priority: MVP
+  reconciliation_exception_detected:
+    address: reconciliation.exception.detected
+    messages:
+      reconciliation_exception_detectedEvent:
+        payload: {}
+    x-producer-owner: reconciliation
+    x-key: exception_id
+    x-consumers:
+      - "investigation/dashboard"
+    x-ordering-guarantee: "per exception"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: reconciliation
+    x-priority: MVP
+  risk_signal_detected:
+    address: risk.signal.detected
+    messages:
+      risk_signal_detectedEvent:
+        payload: {}
+    x-producer-owner: risk
+    x-key: participant_id/corridor_id
+    x-consumers:
+      - "dashboard/security"
+    x-ordering-guarantee: "per participant"
+    x-dlq-rule: "best-effort"
+    x-contract-owner: risk
+    x-priority: P2
+  simulation_event_generated:
+    address: simulation.event.generated
+    messages:
+      simulation_event_generatedEvent:
+        payload: {}
+    x-producer-owner: simulation
+    x-key: scenario_run_id
+    x-consumers:
+      - "normal domain ingress/CSM paths only"
+    x-ordering-guarantee: "per scenario seq"
+    x-dlq-rule: "n/a (synthetic driver, not a domain fact)"
+    x-contract-owner: simulation
+    x-priority: MVP
+  audit_evidence_recorded:
+    address: audit.evidence.recorded
+    messages:
+      audit_evidence_recordedEvent:
+        payload: {}
+    x-producer-owner: evidence-audit
+    x-key: evidence_id
+    x-consumers:
+      - "evidence search/dashboard"
+    x-ordering-guarantee: "per evidence"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: evidence-audit
+    x-priority: MVP
+  iso_message_parsed:
+    address: iso.message.parsed
+    messages:
+      iso_message_parsedEvent:
+        payload: {}
+    x-producer-owner: iso-adapter
+    x-key: iso_message_id
+    x-consumers:
+      - "payment-lifecycle"
+      - "reporting"
+    x-ordering-guarantee: "per ISO message"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: iso-adapter
+    x-priority: MVP
+  iso_message_rejected:
+    address: iso.message.rejected
+    messages:
+      iso_message_rejectedEvent:
+        payload: {}
+    x-producer-owner: iso-adapter
+    x-key: raw_message_id
+    x-consumers:
+      - "ingress"
+      - "egress/reporting"
+    x-ordering-guarantee: "per raw message"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: iso-adapter
+    x-priority: MVP
+  iso_message_correlated:
+    address: iso.message.correlated
+    messages:
+      iso_message_correlatedEvent:
+        payload: {}
+    x-producer-owner: iso-adapter
+    x-key: payment_id
+    x-consumers:
+      - "payment-lifecycle"
+      - "reconciliation"
+    x-ordering-guarantee: "per correlation"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: iso-adapter
+    x-priority: MVP
+  iso_message_orphaned:
+    address: iso.message.orphaned
+    messages:
+      iso_message_orphanedEvent:
+        payload: {}
+    x-producer-owner: iso-adapter
+    x-key: iso_message_id
+    x-consumers:
+      - "ops dashboard"
+      - "DLQ handler"
+    x-ordering-guarantee: "per message"
+    x-dlq-rule: "terminal — operator queue"
+    x-contract-owner: iso-adapter
+    x-priority: MVP
+  case_opened:
+    address: case.opened
+    messages:
+      case_openedEvent:
+        payload: {}
+    x-producer-owner: case
+    x-key: case_id
+    x-consumers:
+      - "reporting/dashboard"
+    x-ordering-guarantee: "per case"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: case
+    x-priority: P1
+  case_resolved:
+    address: case.resolved
+    messages:
+      case_resolvedEvent:
+        payload: {}
+    x-producer-owner: case
+    x-key: case_id
+    x-consumers:
+      - "egress (renders camt.029)"
+      - "payment-lifecycle"
+      - "reporting"
+    x-ordering-guarantee: "per case"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: case
+    x-priority: P1
+  case_closed:
+    address: case.closed
+    messages:
+      case_closedEvent:
+        payload: {}
+    x-producer-owner: case
+    x-key: case_id
+    x-consumers:
+      - "reporting/dashboard"
+      - "reconciliation"
+    x-ordering-guarantee: "per case"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: case
+    x-priority: P1
+  case_escalated:
+    address: case.escalated
+    messages:
+      case_escalatedEvent:
+        payload: {}
+    x-producer-owner: case
+    x-key: case_id
+    x-consumers:
+      - "ops dashboard"
+      - "monitoring"
+    x-ordering-guarantee: "per case"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: case
+    x-priority: P1
+  case_return_payment_requested:
+    address: case.return_payment_requested
+    messages:
+      case_return_payment_requestedEvent:
+        payload: {}
+    x-producer-owner: case
+    x-key: case_id
+    x-consumers:
+      - "monitoring (return itself goes via normal payment path)"
+    x-ordering-guarantee: "per case"
+    x-dlq-rule: "per-consumer-group DLQ"
+    x-contract-owner: case
+    x-priority: P1

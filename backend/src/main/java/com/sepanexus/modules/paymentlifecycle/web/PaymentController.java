@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,11 +29,12 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<Void> submit(@Valid @RequestBody SubmitPaymentRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal Jwt jwt) {
         PaymentEntity payment = paymentService.submitPayment(new SubmitPaymentCommand(
                 UUID.fromString(jwt.getClaimAsString("tenant_id")),
                 request.endToEndId(), request.amount(), request.currency(), request.debtorIban(),
-                request.creditorIban()));
+                request.creditorIban(), idempotencyKey));
         return ResponseEntity.created(URI.create("/api/v1/payments/" + payment.getId())).build();
     }
 

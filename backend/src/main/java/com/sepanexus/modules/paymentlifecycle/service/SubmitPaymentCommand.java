@@ -9,5 +9,6 @@ public record SubmitPaymentCommand(
         BigDecimal amount,
         String currency,
         String debtorIban,
-        String creditorIban) {
+        String creditorIban,
+        String idempotencyKey) {
 }
