@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -30,6 +31,7 @@ interface AppShellProps {
 
 export function AppShell({ user, children }: AppShellProps) {
   const workspaces = visibleWorkspacesForRoles(user.roles);
+  const pathname = usePathname();
 
   return (
     <SidebarProvider>
@@ -42,15 +44,25 @@ export function AppShell({ user, children }: AppShellProps) {
             <SidebarGroupLabel>Workspace</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {workspaces.map((workspace) => (
-                  <SidebarMenuItem key={workspace.id}>
-                    <SidebarMenuButton
-                      render={<a href={workspace.path} data-testid={`app-shell.nav.${workspace.id}`} />}
-                    >
-                      {workspace.label}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {workspaces.map((workspace) => {
+                  const isActive = workspace.path != null && pathname.startsWith(workspace.path);
+                  return (
+                    <SidebarMenuItem key={workspace.id}>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        render={
+                          <a
+                            href={workspace.path}
+                            aria-current={isActive ? "page" : undefined}
+                            data-testid={`app-shell.nav.${workspace.id}`}
+                          />
+                        }
+                      >
+                        {workspace.label}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -76,7 +88,8 @@ export function AppShell({ user, children }: AppShellProps) {
             Log out
           </a>
         </header>
-        <main className="flex-1 p-4">{children}</main>
+        {/* SidebarInset already renders <main> — a second one here would be a duplicate landmark. */}
+        <div className="flex-1 p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

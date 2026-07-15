@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScreenStateContent } from "@/components/shared/screen-state";
+import { PaymentStatusBadge } from "@/components/payments/payment-status-badge";
+import { formatAmount } from "@/lib/format";
 
 export interface PaymentRow {
   id: string;
@@ -24,14 +26,26 @@ const columns: ColumnDef<PaymentRow>[] = [
     accessorKey: "endToEndId",
     header: "End-to-End ID",
     cell: ({ row }) => (
-      <a href={`/payments/${row.original.id}`} className="underline-offset-2 hover:underline">
+      <a
+        href={`/payments/${row.original.id}`}
+        data-testid="payments.list.end-to-end-id-link"
+        className="underline-offset-2 hover:underline"
+      >
         {row.original.endToEndId}
       </a>
     ),
   },
-  { accessorKey: "amount", header: "Amount" },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+    cell: ({ row }) => <span className="tabular-nums">{formatAmount(row.original.amount)}</span>,
+  },
   { accessorKey: "currency", header: "Currency" },
-  { accessorKey: "status", header: "Status" },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => <PaymentStatusBadge status={row.original.status} />,
+  },
 ];
 
 export type PaymentsTableStatus = "loading" | "error" | "ready";

@@ -6,9 +6,13 @@ import { applySecurityHeaders } from "@/lib/security-headers";
 // node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md.
 // Security headers only: session/CSRF/method/content-type validation is owned by
 // each state-changing route handler (per the nextjs-bff-route skill).
-export function proxy(_request: NextRequest) {
-  const response = NextResponse.next();
-  applySecurityHeaders(response.headers);
+export function proxy(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  applySecurityHeaders(response.headers, nonce);
   return response;
 }
 

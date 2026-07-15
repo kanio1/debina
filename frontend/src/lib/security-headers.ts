@@ -1,9 +1,12 @@
-export function applySecurityHeaders(headers: Headers): void {
+export function applySecurityHeaders(headers: Headers, nonce: string): void {
+  const isDev = process.env.NODE_ENV === "development";
   headers.set(
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self'",
+      // Next.js RSC bootstrap relies on inline <script> tags (self.__next_f/__next_r);
+      // 'strict-dynamic' + per-request nonce lets those run without 'unsafe-inline'.
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
       "connect-src 'self'",

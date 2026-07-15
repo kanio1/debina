@@ -11,6 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScreenState } from "@/components/shared/screen-state";
+import { PaymentStatusBadge } from "@/components/payments/payment-status-badge";
+import { formatAmount } from "@/lib/format";
 
 interface IsoIdentifierResponse {
   sourceMessageType: string;
@@ -85,17 +87,21 @@ export default function PaymentDetailPage({ params }: { params: Promise<{ id: st
     <div className="flex flex-col gap-6" data-testid="payment.detail.page">
       <Card>
         <CardHeader>
-          <CardTitle data-testid="payment.detail.end-to-end-id">{detail.endToEndId}</CardTitle>
+          <CardTitle data-testid="payment.detail.end-to-end-id">
+            <h1 className="m-0 text-base leading-snug font-medium">{detail.endToEndId}</h1>
+          </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <div className="text-muted-foreground">Status</div>
-            <div data-testid="payment.detail.status">{detail.status}</div>
+            <div data-testid="payment.detail.status">
+              <PaymentStatusBadge status={detail.status} />
+            </div>
           </div>
           <div>
             <div className="text-muted-foreground">Amount</div>
-            <div data-testid="payment.detail.amount">
-              {detail.amount} {detail.currency}
+            <div data-testid="payment.detail.amount" className="tabular-nums">
+              {formatAmount(detail.amount)} {detail.currency}
             </div>
           </div>
           <div>
