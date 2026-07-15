@@ -106,15 +106,18 @@ public class PaymentService {
         }
     }
 
+    private static final String PAYMENT_READ_ROLES =
+            "hasAnyRole('payment_viewer','payment_submitter','payment_approver','operator','auditor')";
+
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('payment_submitter')")
+    @PreAuthorize(PAYMENT_READ_ROLES)
     public List<PaymentEntity> visiblePayments(String tenantIdClaim) {
         tenantGucConfigurer.apply(tenantIdClaim == null ? null : UUID.fromString(tenantIdClaim));
         return paymentRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('payment_submitter')")
+    @PreAuthorize(PAYMENT_READ_ROLES)
     public PaymentDetail paymentDetail(String tenantIdClaim, UUID paymentId) {
         tenantGucConfigurer.apply(tenantIdClaim == null ? null : UUID.fromString(tenantIdClaim));
         // RLS on payment.payments already scopes this lookup to the caller's tenant (and branch, if

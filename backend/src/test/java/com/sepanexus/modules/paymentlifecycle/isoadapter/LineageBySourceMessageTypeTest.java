@@ -60,7 +60,7 @@ class LineageBySourceMessageTypeTest {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
             statement.execute("TRUNCATE payment.payments, payment.outbox_events, "
                     + "ingress.idempotency_keys, ingress.raw_inbound_messages, "
-                    + "iso.payment_iso_identifiers, iso.message_lineage, iso.iso_messages");
+                    + "iso.payment_iso_identifiers, iso.message_lineage, iso.iso_messages CASCADE");
         }
     }
 

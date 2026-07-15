@@ -25,16 +25,18 @@ Taski:
 
 ## Story 19.2 — Filtr signature-before-parse
 
-status: blocked
-depends_on: [EPIC-31-signature-module]
+status: done
+depends_on: [EPIC-31-signature-module/Story 31.1, EPIC-31-signature-module/Story 31.2]
 
 Opis: kolejność egzekwowana jako test na łańcuchu filtrów, nie tylko dokumentacja (G1).
 
-`depends_on` sam już wskazuje realny bloker: `EPIC-31-signature-module` jest `not-started`. Nie zaimplementowano — budowanie `SignatureVerificationPort` bez modułu `signature` byłoby wynajdywaniem architektury na wyrost.
+`[PLANNING-DEFECT 2026-07-14, naprawione 2026-07-15]`: `depends_on` wcześniej wskazywał cały `EPIC-31-signature-module` w sposób tworzący pozorny cykl z `EPIC-31` Story 31.2 (która z kolei zależała od `19.2`). Naprawione na granulację story-level: `19.2` (integracja kolejności filtrów w `ingress`) zależy od `31.1` **i** `31.2`, oba teraz `done`.
+
+`[2026-07-15 — zaimplementowane]`: `SignedChannelIngestionPipeline` (`com.sepanexus.modules.paymentlifecycle.ingress`) — nowy, minimalny komponent egzekwujący `archive → verify → parse`, wywołujący istniejący `RawMessageArchive` (Story 19.1) i `HardenedXmlFactory` (Story 19.3), oraz `SignaturePort` z modułu `signature` (nowa zależność deklarowana w `com.sepanexus.modules`' `package-info.java` — `allowedDependencies = {"shared", "signature"}`, zweryfikowana przez `ModularityTest`). `FAILED` werdykt zatrzymuje pipeline przed `HardenedXmlFactory.parse` — raw bytes archiwizowane niezależnie od werdyktu. To NIE jest pełny endpoint REST pain.001 (to Story 19.4, nadal blocked) — tylko komponent kolejności, dokładnie zakres tego story. Nie przeniesiono parsera do modułu `signature`, nie zbudowano drugiego raw archive.
 
 Taski:
-- [ ] **Wpięcie `SignatureVerificationPort` w łańcuch filtrów przed jakimkolwiek parsowaniem XML dla kanałów bankowych/plikowych.**
-      `verify: ./mvnw -f backend test -Dtest=*SignatureBeforeParseOrderingTest*` — `NOT RUN`, `blocked` do `EPIC-31-signature-module`.
+- [x] **Wpięcie `SignatureVerificationPort` w łańcuch filtrów przed jakimkolwiek parsowaniem XML dla kanałów bankowych/plikowych.**
+      `verify: ./mvnw -f backend test -Dtest=SignatureBeforeParseOrderingTest` → `Tests run: 4, Failures: 0` — PASS (2026-07-15). Cztery scenariusze: (1) poprawny podpis → `ARCHIVE→VERIFY→PARSE`, parser wywołany dokładnie raz (`InOrder` na trzech prawdziwych collaboratorach owiniętych `@MockitoSpyBean` — kryptografia Ed25519 działa naprawdę pod spy, nie zmockowana); (2) tampered signature → `ARCHIVE→VERIFY`, parser NIGDY nie wywołany (`never()`); (3) brak wymaganego podpisu → to samo; (4) kanał opcjonalny (jak JSON_DIRECT) bez podpisu → `NOT_APPLICABLE`, parser nadal wywołany (dowód, że JSON_DIRECT nie zostałby przypadkowo zablokowany, gdyby przechodził przez ten pipeline). Niepróżność testu potwierdzona mutacją (patrz EPIC-31.md Story 31.2). Regresja JSON_DIRECT: `JsonDirectIngestionTest`/`PaymentControllerTest`/`WalkingSkeletonIntegrationTest`/`InboxConsumerIdempotencyTest` — `10/10 PASS`, niezmienione (JSON_DIRECT nie przechodzi przez ten nowy pipeline, własna, nietknięta ścieżka z Story 19.1). Pełny regres backendu: `90/90 PASS` (było 73/73 przed tą sesją).
 
 ## Story 19.3 — Hartowanie XML
 
@@ -50,14 +52,14 @@ Taski:
 ## Story 19.4 — REST XML pain.001
 
 status: blocked
-depends_on: [Story 19.3]
+depends_on: [Story 19.3, EPIC-31-signature-module/Story 31.2 (teraz done), CanonicalMapper capability (brak własnego epika — patrz OQ-13 poniżej)]
 
 Opis: taksonomia błędów 422 dla nieprawidłowego pain.001.
 
-`[PLANNING-DEFECT 2026-07-14]`: `depends_on` (Story 19.3, teraz `done`) jest spełnione, ale realizacja wymaga faktycznego mapowania ISO 20022 pain.001 XML→canonical (parser `CanonicalMapper`, per §3.8 odpowiedzialność `iso-adapter`), którego nie ma w kodzie i który jest znacznie większym zadaniem niż "podłącz hartowanie do endpointu" — to osobna, poważna zdolność (schemat pain.001, mapowanie pól, 422 taxonomy per `iso_message_validation_results`), nie rozszerzenie o kilka linii. Nie zaimplementowano w tej sesji ze względu na budżet czasu — świadomie odłożone, nie przeoczone.
+`[PLANNING-DEFECT 2026-07-14]`: `depends_on` (Story 19.3, teraz `done`) jest spełnione, ale realizacja wymaga faktycznego mapowania ISO 20022 pain.001 XML→canonical (parser `CanonicalMapper`, per §3.8 odpowiedzialność `iso-adapter`), którego nie ma w kodzie i który jest znacznie większym zadaniem niż "podłącz hartowanie do endpointu" — to osobna, poważna zdolność (schemat pain.001, mapowanie pól, 422 taxonomy per `iso_message_validation_results`), nie rozszerzenie o kilka linii.
 
-`[AUDYT 2026-07-14, silniejszy powód blokady]`: poza rozmiarem zadania, istnieje architektoniczny, zamrożony powód, dla którego ten story NIE MOŻE być zbudowany dziś niezależnie od budżetu czasu: `CLAUDE.md` stwierdza wprost, że "`signature` verification runs before ISO XML parsing (verify-before-parse is an enforced ordering rule, not just documentation)". Moduł `signature` (`EPIC-31`) ma dziś zero kodu — każdy endpoint REST XML zbudowany teraz musiałby albo pominąć weryfikację podpisu (naruszenie zamrożonej reguły), albo czekać na `EPIC-31`. Story 19.4 jest więc transitywnie zależne od `EPIC-31`, nie tylko od Story 19.3 — dokładnie ta sama klasa blokady co Story 19.2 (`depends_on: EPIC-31-signature-module` wprost). **Status `blocked`** — odblokuj razem z `EPIC-31` (moduł signature), nie wcześniej, niezależnie od tego, czy `CanonicalMapper` sam w sobie zostanie zbudowany osobno.
+`[AUDYT 2026-07-14, doprecyzowane 2026-07-15 — OQ-13, częściowo rozwiązane]`: architektoniczny powód blokady (`CLAUDE.md`: "signature verification runs before ISO XML parsing") jest teraz **usunięty** — `EPIC-31` Story 31.2 (rzeczywista logika weryfikacji + test kolejności) jest `done` w tej sesji, i `SignedChannelIngestionPipeline` (Story 19.2) dowodzi, że sygnatura-przed-parsowaniem jest wykonalna i przetestowana. Story 19.4 pozostaje **`blocked`, ale wyłącznie na jeden pozostały bloker**: `CanonicalMapper` (pain.001→canonical mapping, brak własnego epika w katalogu — nie rozstrzygam samodzielnie który epik powinien go dostać, zob. `planning/README.md` uwaga do OQ-13). Nie zbudowano endpointu REST XML w tej sesji — `SignedChannelIngestionPipeline` udowadnia tylko kolejność (Story 19.2), nie mapuje sparsowanego dokumentu do komendy płatności (żaden `CanonicalMapper` nie istnieje), więc żaden zgodny z architekturą endpoint pain.001 nadal nie może powstać dziś.
 
 Taski:
 - [ ] **Endpoint REST XML pain.001 z taksonomią błędów 422 (XML hardening result → `iso_message_parse_errors`).**
-      `verify: ./mvnw -f backend test -Dtest=*Pain001XmlSubmissionTest*` — `NOT RUN`, `blocked` (patrz wyżej).
+      `verify: ./mvnw -f backend test -Dtest=*Pain001XmlSubmissionTest*` — `NOT RUN`, `blocked` na `CanonicalMapper` (jedyny pozostały bloker, patrz wyżej).
