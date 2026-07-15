@@ -1,16 +1,12 @@
 package com.sepanexus.modules.paymentlifecycle.service;
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
-import com.sepanexus.modules.paymentlifecycle.domain.OutboxEvent;
-import com.sepanexus.modules.paymentlifecycle.domain.PaymentLifecycleEvent;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyClaim;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyStore;
 import com.sepanexus.modules.paymentlifecycle.ingress.RawMessageArchive;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.JsonDirectLineageRecorder;
-import com.sepanexus.modules.paymentlifecycle.repository.OutboxEventRepository;
 import com.sepanexus.modules.paymentlifecycle.repository.PaymentRepository;
-import com.sepanexus.shared.ClockPort;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +15,6 @@ import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class PaymentService {
@@ -27,28 +22,24 @@ public class PaymentService {
     private static final int SUBMIT_RESPONSE_CODE = 201;
 
     private final PaymentRepository paymentRepository;
-    private final OutboxEventRepository outboxEventRepository;
     private final TenantGucConfigurer tenantGucConfigurer;
-    private final ObjectMapper objectMapper;
     private final IdempotencyStore idempotencyStore;
     private final RawMessageArchive rawMessageArchive;
     private final JsonDirectLineageRecorder jsonDirectLineageRecorder;
-    private final ClockPort clockPort;
     private final IsoIdentifierLookup isoIdentifierLookup;
+    private final PaymentCreationWriter paymentCreationWriter;
 
-    public PaymentService(PaymentRepository paymentRepository, OutboxEventRepository outboxEventRepository,
-            TenantGucConfigurer tenantGucConfigurer, ObjectMapper objectMapper, IdempotencyStore idempotencyStore,
-            RawMessageArchive rawMessageArchive, JsonDirectLineageRecorder jsonDirectLineageRecorder,
-            ClockPort clockPort, IsoIdentifierLookup isoIdentifierLookup) {
+    public PaymentService(PaymentRepository paymentRepository, TenantGucConfigurer tenantGucConfigurer,
+            IdempotencyStore idempotencyStore, RawMessageArchive rawMessageArchive,
+            JsonDirectLineageRecorder jsonDirectLineageRecorder, IsoIdentifierLookup isoIdentifierLookup,
+            PaymentCreationWriter paymentCreationWriter) {
         this.paymentRepository = paymentRepository;
-        this.outboxEventRepository = outboxEventRepository;
         this.tenantGucConfigurer = tenantGucConfigurer;
-        this.objectMapper = objectMapper;
         this.idempotencyStore = idempotencyStore;
         this.rawMessageArchive = rawMessageArchive;
         this.jsonDirectLineageRecorder = jsonDirectLineageRecorder;
-        this.clockPort = clockPort;
         this.isoIdentifierLookup = isoIdentifierLookup;
+        this.paymentCreationWriter = paymentCreationWriter;
     }
 
     @Transactional
@@ -75,17 +66,8 @@ public class PaymentService {
             throw new DuplicatePaymentException(command.endToEndId());
         }
 
-        PaymentEntity payment = paymentRepository.save(PaymentEntity.received(
-                tenantId,
-                command.branchId(),
-                command.endToEndId(),
-                command.amount(),
-                command.currency(),
-                command.debtorIban(),
-                command.creditorIban(),
-                clockPort.now()));
-        outboxEventRepository.save(OutboxEvent.paymentSubmitted(payment.getId(), eventPayload(payment, tenantId),
-                UUID.randomUUID(), clockPort.now()));
+        PaymentEntity payment = paymentCreationWriter.create(tenantId, command.branchId(), command.endToEndId(),
+                command.amount(), command.currency(), command.debtorIban(), command.creditorIban());
         jsonDirectLineageRecorder.record(payment.getId(), rawMessageId, command.endToEndId());
         idempotencyStore.complete(tenantId, command.idempotencyKey(), payment.getId(), SUBMIT_RESPONSE_CODE);
 
@@ -128,14 +110,5 @@ public class PaymentService {
     }
 
     public record PaymentDetail(PaymentEntity payment, List<IsoIdentifierLookup.IsoIdentifierView> isoIdentifiers) {
-    }
-
-    private String eventPayload(PaymentEntity payment, UUID tenantId) {
-        try {
-            return objectMapper.writeValueAsString(new PaymentLifecycleEvent(
-                    UUID.randomUUID(), payment.getId(), tenantId, OutboxEvent.PAYMENT_SUBMITTED));
-        } catch (RuntimeException exception) {
-            throw new IllegalStateException("Could not serialize payment lifecycle event", exception);
-        }
     }
 }

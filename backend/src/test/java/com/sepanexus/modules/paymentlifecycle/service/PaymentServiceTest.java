@@ -12,11 +12,7 @@ import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyStore;
 import com.sepanexus.modules.paymentlifecycle.ingress.RawMessageArchive;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.JsonDirectLineageRecorder;
-import com.sepanexus.shared.ClockPort;
-import java.time.Instant;
 import com.sepanexus.modules.paymentlifecycle.repository.PaymentRepository;
-import com.sepanexus.modules.paymentlifecycle.repository.OutboxEventRepository;
-import tools.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -35,9 +31,6 @@ class PaymentServiceTest {
     private TenantGucConfigurer tenantGucConfigurer;
 
     @Mock
-    private OutboxEventRepository outboxEventRepository;
-
-    @Mock
     private IdempotencyStore idempotencyStore;
 
     @Mock
@@ -47,10 +40,10 @@ class PaymentServiceTest {
     private JsonDirectLineageRecorder jsonDirectLineageRecorder;
 
     @Mock
-    private ClockPort clockPort;
+    private IsoIdentifierLookup isoIdentifierLookup;
 
     @Mock
-    private IsoIdentifierLookup isoIdentifierLookup;
+    private PaymentCreationWriter paymentCreationWriter;
 
     @Test
     void submitsOneReceivedPayment() {
@@ -58,20 +51,21 @@ class PaymentServiceTest {
         SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, null, "E2E-1",
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 UUID.randomUUID().toString());
-        PaymentService service = new PaymentService(paymentRepository, outboxEventRepository,
-                tenantGucConfigurer, new ObjectMapper(), idempotencyStore, rawMessageArchive, jsonDirectLineageRecorder,
-                clockPort, isoIdentifierLookup);
-        when(clockPort.now()).thenReturn(Instant.now());
+        PaymentService service = new PaymentService(paymentRepository, tenantGucConfigurer, idempotencyStore,
+                rawMessageArchive, jsonDirectLineageRecorder, isoIdentifierLookup, paymentCreationWriter);
         when(rawMessageArchive.archive(any(), any(), any(), any())).thenReturn(UUID.randomUUID());
         when(idempotencyStore.claim(any(), any(), any())).thenReturn(IdempotencyClaim.claimed());
-        when(paymentRepository.save(any(PaymentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        PaymentEntity created = PaymentEntity.received(tenantId, null, "E2E-1", new BigDecimal("10.00"), "EUR",
+                "DE89370400440532013000", "FR7630006000011234567890189", java.time.Instant.now());
+        when(paymentCreationWriter.create(any(), any(), any(), any(), any(), any(), any())).thenReturn(created);
 
         PaymentEntity saved = service.submitPayment(command);
 
-        ArgumentCaptor<PaymentEntity> payment = ArgumentCaptor.forClass(PaymentEntity.class);
-        verify(paymentRepository).save(payment.capture());
+        ArgumentCaptor<String> endToEndId = ArgumentCaptor.forClass(String.class);
+        verify(paymentCreationWriter).create(org.mockito.ArgumentMatchers.eq(tenantId), org.mockito.ArgumentMatchers.isNull(),
+                endToEndId.capture(), any(), any(), any(), any());
         assertThat(saved.getStatus()).isEqualTo(PaymentStatus.RECEIVED);
-        assertThat(payment.getValue().getTenantId()).isEqualTo(tenantId);
-        assertThat(payment.getValue().getEndToEndId()).isEqualTo("E2E-1");
+        assertThat(saved.getTenantId()).isEqualTo(tenantId);
+        assertThat(endToEndId.getValue()).isEqualTo("E2E-1");
     }
 }

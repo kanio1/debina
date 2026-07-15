@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 depends_on: [EPIC-08-walking-skeleton-verification]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-IN-1, line 1246); ADR-N7 (JSON_DIRECT)"
 ---
@@ -51,15 +51,59 @@ Taski:
 
 ## Story 19.4 — REST XML pain.001
 
-status: blocked
-depends_on: [Story 19.3, EPIC-31-signature-module/Story 31.2 (teraz done), CanonicalMapper capability (brak własnego epika — patrz OQ-13 poniżej)]
+status: done
+depends_on: [Story 19.3, EPIC-31-signature-module/Story 31.2 (done), CanonicalMapper capability (done, this session)]
 
 Opis: taksonomia błędów 422 dla nieprawidłowego pain.001.
 
-`[PLANNING-DEFECT 2026-07-14]`: `depends_on` (Story 19.3, teraz `done`) jest spełnione, ale realizacja wymaga faktycznego mapowania ISO 20022 pain.001 XML→canonical (parser `CanonicalMapper`, per §3.8 odpowiedzialność `iso-adapter`), którego nie ma w kodzie i który jest znacznie większym zadaniem niż "podłącz hartowanie do endpointu" — to osobna, poważna zdolność (schemat pain.001, mapowanie pól, 422 taxonomy per `iso_message_validation_results`), nie rozszerzenie o kilka linii.
+`[OQ-13 CLOSED 2026-07-15]` **`CanonicalMapper` owner resolved from source, not invented**:
+`sepa-nexus-message-flow-and-data-blueprint.md` §3.1 (line 221) lists the port explicitly —
+"Ports: `IdempotencyStore`, `RawMessageArchive`, `CanonicalMapper` (implemented by `iso-adapter`),
+`ClockPort`" — so no `[PLANNING-DEFECT]` was needed; the only judgment call was *where* to put it
+given `iso-adapter` is still a subpackage of `payment-lifecycle`, not its own Modulith module (same
+`[PLANNING-DEFECT 2026-07-14]` noted at the top of this file for Story 19.1/19.2) — resolved by
+placing it in the existing `com.sepanexus.modules.paymentlifecycle.isoadapter` subpackage,
+consistent with `JsonDirectLineageRecorder`/`IsoIdentifierLookup` already there.
 
-`[AUDYT 2026-07-14, doprecyzowane 2026-07-15 — OQ-13, częściowo rozwiązane]`: architektoniczny powód blokady (`CLAUDE.md`: "signature verification runs before ISO XML parsing") jest teraz **usunięty** — `EPIC-31` Story 31.2 (rzeczywista logika weryfikacji + test kolejności) jest `done` w tej sesji, i `SignedChannelIngestionPipeline` (Story 19.2) dowodzi, że sygnatura-przed-parsowaniem jest wykonalna i przetestowana. Story 19.4 pozostaje **`blocked`, ale wyłącznie na jeden pozostały bloker**: `CanonicalMapper` (pain.001→canonical mapping, brak własnego epika w katalogu — nie rozstrzygam samodzielnie który epik powinien go dostać, zob. `planning/README.md` uwaga do OQ-13). Nie zbudowano endpointu REST XML w tej sesji — `SignedChannelIngestionPipeline` udowadnia tylko kolejność (Story 19.2), nie mapuje sparsowanego dokumentu do komendy płatności (żaden `CanonicalMapper` nie istnieje), więc żaden zgodny z architekturą endpoint pain.001 nadal nie może powstać dziś.
+**Built this session:**
+- `CanonicalPaymentCommand`/`CanonicalMapper`/`Pain001CanonicalMapper` (`isoadapter` package): pure
+  mapping (no DB/HTTP/JPA), pinned to `pain.001.001.09` (blueprint names `pain.001` but does not pin
+  an exact SRU — resolved pragmatically as `[OPEN-QUESTION]`, same discipline as Story 31.2's Ed25519
+  pick: current real ISO 20022 SCT release, not a synthetic placeholder). Single-transaction only
+  (§2.1 channel matrix: `POST /api/v1/iso/pain001` is the single-payment REST channel; the batch file
+  rail — multiple `PmtInf`/`CdtTrfTxInf` — is a separate channel, EPIC-73, out of scope) — more than
+  one `PmtInf` or `CdtTrfTxInf` is a controlled `UNSUPPORTED_TRANSACTION_COUNT` rejection, never a
+  silent first-element pick.
+- `HardenedXmlFactory.HardenedParseResult` extended (additively) to carry the parsed `Document` so
+  the mapper consumes the already-hardened DOM instead of re-parsing.
+- Migration `V15__iso_pain001_identifier_fields.sql`: nullable `msg_id`/`cre_dt_tm` on
+  `iso.iso_messages`, nullable `msg_id`/`pmt_inf_id`/`instr_id`/`uetr` on
+  `iso.payment_iso_identifiers` — the richer §4.3c fields V11's own comment deferred "until real XML
+  channels... are built." `tx_id`/`orgnl_*` deliberately not added — pain.001 doesn't carry `TxId`
+  (that's a `pacs.008` concept) and `orgnl_*` is R-message correlation (EPIC-27), not this story's
+  scope. Verified on fresh Testcontainers DB and on the real long-running `infra_postgres_1` (13→15
+  via `flyway:migrate`).
+- `Pain001LineageRecorder` (`isoadapter`): writes `iso.iso_messages`/`iso.payment_iso_identifiers`
+  (with the new V15 columns)/`iso.message_lineage` for the pain.001 channel.
+- `Pain001IngestionService` + `Pain001PersistenceService` (two separate Spring beans, not one —
+  `@Transactional` only honors a proxy boundary from a *different* bean, so self-invocation would
+  have silently dropped the guarantee): the outer method (archive→verify→hardened-parse→canonical-map)
+  is deliberately **not** `@Transactional` so raw evidence and the signature verdict survive a later
+  rejection; only the idempotency+payment+identifiers+lineage+outbox tail is one atomic unit.
+  `PaymentCreationWriter` extracted from `PaymentService` (behavior-preserving refactor, still
+  covered by the full regression) so both the JSON and XML channels share the "insert payment +
+  write outbox" step instead of duplicating it.
+- `POST /api/v1/iso/pain001` on `PaymentController` (blueprint §3.1 names both paths on one
+  `PaymentSubmissionController`) — raw XML bytes, `Idempotency-Key`, and `X-Signer-Id`/`X-Signature`/
+  `X-Signature-Algo` headers (blueprint doesn't pin exact header names for the bank-XML channel —
+  `[OPEN-QUESTION]` resolved pragmatically, same pattern as the pain.001 version pin).
+- RFC 7807 taxonomy in `PaymentProblemHandler`: `SIGNATURE_FAILED`, `MALFORMED_XML`,
+  `UNSUPPORTED_MESSAGE_TYPE`/`UNSUPPORTED_MESSAGE_VERSION`/`MISSING_REQUIRED_ELEMENT`/
+  `INVALID_FIELD_FORMAT`/`UNSUPPORTED_TRANSACTION_COUNT`/`MAPPING_FAILED` — all HTTP 422, no raw
+  XML/signature/key material in the response body. `iso.iso_message_parse_errors` persistence is
+  deliberately **not** built here — that table/story is EPIC-28 Story 28.1's scope, not started this
+  session per the session's own stop rule.
 
 Taski:
-- [ ] **Endpoint REST XML pain.001 z taksonomią błędów 422 (XML hardening result → `iso_message_parse_errors`).**
-      `verify: ./mvnw -f backend test -Dtest=*Pain001XmlSubmissionTest*` — `NOT RUN`, `blocked` na `CanonicalMapper` (jedyny pozostały bloker, patrz wyżej).
+- [x] **Endpoint REST XML pain.001 z taksonomią błędów 422.**
+      `verify: export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"; ./mvnw -f backend test -Dtest=Pain001CanonicalMapperTest,Pain001SubmissionEndpointTest` → `Tests run: 22, Failures: 0` — PASS (2026-07-15). 13 mapper unit tests (valid minimal/realistic, missing MsgId/EndToEndId/amount/currency/debtor+creditor IBAN, unsupported version, unrecognized type, single- and multi-`PmtInf` transaction-count rejection, determinism) + 9 endpoint integration tests (real Testcontainers Postgres + real Ed25519 signing, no mocked crypto): happy path creates payment+identifiers+lineage+outbox+VERIFIED signature evidence; tampered signature and missing-required-signature both reject with zero payment rows while still archiving raw bytes + a FAILED signature-verification-event; XXE rejected as `MALFORMED_XML`; unsupported version rejected; missing required field rejected with zero payment/identifier/lineage/outbox rows (atomicity); idempotency replay returns the same `Location`; idempotency conflict (same key, different body) returns 409 without a second payment row; unauthorized role (`payment_viewer`) returns 403. Mutation non-vacuousness proven and reverted (swapped `EndToEndId`→`InstrId` mapping, 4 tests failed as expected, reverted, confirmed clean). Full backend regression: `112/112 PASS` (was `90/90` at session start — 90 baseline + 13 mapper + 9 endpoint = 112, exact).

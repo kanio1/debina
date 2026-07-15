@@ -30,14 +30,16 @@ Taski:
 
 ## Story 26.3 — Bogatsza ekstrakcja identyfikatorów
 
-status: blocked
-depends_on: [Story 26.1, EPIC-21-iso-identifier-refactor]
+status: done
+depends_on: [Story 26.1, EPIC-21-iso-identifier-refactor (Story 21.1/21.3 only — see below)]
 
-`[PLANNING-DEFECT 2026-07-14]`: "pełny zestaw pól" `iso.payment_iso_identifiers` per §4.3b/§4.3c to `MsgId`/`InstrId`/`EndToEndId`/`TxId`/`UETR`/`Orgnl*` — pola pochodzące z realnych wiadomości ISO XML (pacs.008 itp.). Kanał `JSON_DIRECT` (jedyny dziś realny kanał) ma tylko `endToEndId` w swoim DTO (`SubmitPaymentRequest`) — nie ma skąd wziąć `MsgId`/`TxId`/`UETR` bez albo (a) wymyślania syntetycznych wartości (fałszywe dane, zabronione), albo (b) czekania na realny kanał XML (`EPIC-19` Story 19.2/19.4, oba `blocked`). **Status `blocked`** — odblokuj razem z pierwszym realnym kanałem XML.
+`[UNBLOCKED 2026-07-15]`: ten story był jawnie warunkowy — "odblokuj razem z pierwszym realnym kanałem XML" — i ten kanał (`EPIC-19` Story 19.4, pain.001) powstał w tej sesji. Capability-first per `planning/README.md` zasada: `depends_on` wskazuje cały `EPIC-21`, ale rzeczywista potrzebna zdolność to wyłącznie schemat (Story 21.1, `done`) — Story 21.2 (usunięcie identyfikatorów z `payment.payments`, wciąż `blocked`) nie jest wymagana do rozszerzenia ekstrakcji identyfikatorów w `iso.payment_iso_identifiers`, więc nie blokuję tego story całym epikiem.
+
+`[ZAKRES, doprecyzowane]`: "pełny zestaw pól" per §4.3c to `MsgId`/`PmtInfId`/`InstrId`/`EndToEndId`/`TxId`/`UETR`/`Orgnl*`. Zbudowano wyłącznie pola, które kanał pain.001 rzeczywiście niesie: `MsgId` (GrpHdr), `PmtInfId`, `InstrId` (opcjonalne), `EndToEndId`, `UETR` (opcjonalne, pain.001.001.09+). `TxId` **nie jest polem pain.001** (`PaymentIdentification6` nie ma `TxId` — to koncept `pacs.008`); `Orgnl*` to korelacja R-message/status (`EPIC-27`, `not-started`). Żadne z tych dwóch nie zostało dodane jako puste/syntetyczne kolumny — czekają na kanał, który je rzeczywiście niesie (`pacs.008` dla `TxId`, `pacs.002`/R-message dla `Orgnl*`), zgodnie z zasadą "nie generuj brakujących identyfikatorów".
 
 Taski:
-- [ ] **Rozszerz ekstrakcję identyfikatorów o pełny zestaw pól `iso.payment_iso_identifiers`.**
-      `verify: ./mvnw -f backend test -Dtest=*IdentifierExtractionTest*` — `NOT RUN`, `blocked` (patrz wyżej).
+- [x] **Rozszerz ekstrakcję identyfikatorów o pełny zestaw pól `iso.payment_iso_identifiers` dostępny dla danego kanału.**
+      `verify: export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"; ./mvnw -f backend test -Dtest=Pain001SubmissionEndpointTest#validSignedPain001CreatesPaymentWithIdentifiersLineageAndOutbox` → PASS (2026-07-15) — asercja SQL bezpośrednio na `iso.payment_iso_identifiers` potwierdza `msg_id`/`pmt_inf_id`/`end_to_end_id` zapisane dla realnego, podpisanego kanału XML (migracja `V15__iso_pain001_identifier_fields.sql`, `Pain001LineageRecorder`).
 
 ## Story 26.4 — Panel lineage w GraphQL szczegółu płatności
 

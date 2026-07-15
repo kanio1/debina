@@ -6,6 +6,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
@@ -36,8 +37,8 @@ public class HardenedXmlFactory {
 
     public HardenedParseResult parse(byte[] xmlPayload) {
         try {
-            newHardenedDocumentBuilder().parse(new java.io.ByteArrayInputStream(xmlPayload));
-            return HardenedParseResult.ok();
+            Document document = newHardenedDocumentBuilder().parse(new java.io.ByteArrayInputStream(xmlPayload));
+            return HardenedParseResult.ok(document);
         } catch (SAXException exception) {
             return HardenedParseResult.rejected(exception.getMessage());
         } catch (IOException exception) {
@@ -45,13 +46,18 @@ public class HardenedXmlFactory {
         }
     }
 
-    public record HardenedParseResult(boolean accepted, String rejectionReason) {
-        static HardenedParseResult ok() {
-            return new HardenedParseResult(true, null);
+    /**
+     * {@code document} is the already-hardened, already-parsed DOM — {@code CanonicalMapper}
+     * (Story 19.4) maps from it directly rather than re-parsing, keeping hardening and mapping as
+     * two distinct stages over one parse pass. {@code null} when {@code accepted} is false.
+     */
+    public record HardenedParseResult(boolean accepted, String rejectionReason, Document document) {
+        static HardenedParseResult ok(Document document) {
+            return new HardenedParseResult(true, null, document);
         }
 
         static HardenedParseResult rejected(String reason) {
-            return new HardenedParseResult(false, reason);
+            return new HardenedParseResult(false, reason, null);
         }
     }
 }
