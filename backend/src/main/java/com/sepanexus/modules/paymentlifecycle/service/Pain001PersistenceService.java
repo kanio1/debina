@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
  * ISO identifiers/lineage, outbox, idempotency completion, all in one transaction. Deliberately a
  * separate Spring bean from {@link Pain001IngestionService}: the archive/verify/parse/map stages
  * that precede this must survive even when this transaction rolls back (raw evidence and signature
- * evidence are never lost just because mapping or a duplicate check fails), and a
+ * evidence are never lost just because mapping fails or an idempotency conflict is detected), and a
  * {@code @Transactional} method only honors that boundary when called through the Spring proxy —
  * i.e. from a different bean, never via self-invocation.
  */
@@ -58,11 +58,7 @@ public class Pain001PersistenceService {
                             "Idempotency replay points at a payment that no longer exists: " + claim.existingPaymentId()));
         }
 
-        if (paymentRepository.existsByTenantIdAndEndToEndId(tenantId, canonical.endToEndId())) {
-            throw new DuplicatePaymentException(canonical.endToEndId());
-        }
-
-        PaymentEntity payment = paymentCreationWriter.create(tenantId, branchId, canonical.endToEndId(),
+        PaymentEntity payment = paymentCreationWriter.create(tenantId, branchId,
                 canonical.amount(), canonical.currency(), canonical.debtorIban(), canonical.creditorIban());
 
         pain001LineageRecorder.record(payment.getId(), rawMessageId, canonical, clockPort.now());

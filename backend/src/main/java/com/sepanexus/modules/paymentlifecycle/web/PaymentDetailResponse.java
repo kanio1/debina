@@ -19,7 +19,7 @@ public record PaymentDetailResponse(
     static PaymentDetailResponse from(PaymentDetail detail) {
         return new PaymentDetailResponse(
                 detail.payment().getId(),
-                detail.payment().getEndToEndId(),
+                detail.endToEndId(),
                 detail.payment().getAmount(),
                 detail.payment().getCurrency(),
                 detail.payment().getStatus().name(),

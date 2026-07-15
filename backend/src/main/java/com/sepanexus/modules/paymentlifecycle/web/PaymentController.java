@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -87,5 +88,23 @@ public class PaymentController {
     @GetMapping("/api/v1/payments/{id}")
     public PaymentDetailResponse detail(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
         return PaymentDetailResponse.from(paymentService.paymentDetail(jwt.getClaimAsString("tenant_id"), id));
+    }
+
+    /**
+     * OQ-12 / EPIC-24 Story 24.2 — the ordered lifecycle timeline for one payment
+     * (sepa-nexus-first-3-screens-ui-spec.md §6, "Timeline tab": time, source, correlationId; here
+     * {@code eventRef}, since "correlationId" already names the unrelated HTTP-request concept in
+     * {@code CorrelationIdFilter} elsewhere in this codebase). A separate, paginatable endpoint —
+     * the source UI-spec names a distinct read model ({@code paymentTimeline(paymentId)}) but does
+     * not pin a REST path, so a dedicated sub-resource is the pragmatic choice over folding an
+     * unbounded, cursor-paginated list into the single-payment detail response.
+     */
+    @GetMapping("/api/v1/payments/{id}/timeline")
+    public PaymentTimelineResponse timeline(@PathVariable UUID id,
+            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) Integer afterSeq,
+            @AuthenticationPrincipal Jwt jwt) {
+        return PaymentTimelineResponse.from(
+                paymentService.paymentTimeline(jwt.getClaimAsString("tenant_id"), id, limit, afterSeq));
     }
 }

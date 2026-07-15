@@ -54,8 +54,8 @@ class SchemaGrantMatrixTest {
             try (Connection connection = ownerConnection(); Statement statement = connection.createStatement()) {
                 statement.execute("SELECT set_config('app.tenant_id', '11111111-1111-1111-1111-111111111111', false)");
                 statement.executeUpdate("""
-                        INSERT INTO payment.payments (tenant_id, end_to_end_id, amount, debtor_iban, creditor_iban)
-                        VALUES ('11111111-1111-1111-1111-111111111111', 'schema-grant-matrix-owner', 1.00,
+                        INSERT INTO payment.payments (tenant_id, amount, debtor_iban, creditor_iban)
+                        VALUES ('11111111-1111-1111-1111-111111111111', 1.00,
                                 'DE89370400440532013000', 'FR7630006000011234567890189')
                         """);
                 statement.executeUpdate("""
@@ -75,8 +75,8 @@ class SchemaGrantMatrixTest {
         assertInsufficientPrivilege(() -> {
             try (Connection connection = otherModuleConnection(); Statement statement = connection.createStatement()) {
                 statement.executeUpdate("""
-                        INSERT INTO payment.payments (tenant_id, end_to_end_id, amount, debtor_iban, creditor_iban)
-                        VALUES (gen_random_uuid(), 'schema-grant-matrix-intruder', 1.00,
+                        INSERT INTO payment.payments (tenant_id, amount, debtor_iban, creditor_iban)
+                        VALUES (gen_random_uuid(), 1.00,
                                 'DE89370400440532013000', 'FR7630006000011234567890189')
                         """);
             }

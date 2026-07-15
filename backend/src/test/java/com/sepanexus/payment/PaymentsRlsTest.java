@@ -48,8 +48,8 @@ class PaymentsRlsTest {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
             statement.execute("TRUNCATE payment.payments");
         }
-        insertPayment(TENANT_A, "e2e-tenant-a");
-        insertPayment(TENANT_B, "e2e-tenant-b");
+        insertPayment(TENANT_A);
+        insertPayment(TENANT_B);
     }
 
     @Test
@@ -65,8 +65,8 @@ class PaymentsRlsTest {
             setTenant(connection, TENANT_A);
 
             assertEquals(1, paymentCount(connection));
-            assertEquals(1, paymentCountForEndToEndId(connection, "e2e-tenant-a"));
-            assertEquals(0, paymentCountForEndToEndId(connection, "e2e-tenant-b"));
+            assertEquals(1, paymentCountForTenant(connection, TENANT_A));
+            assertEquals(0, paymentCountForTenant(connection, TENANT_B));
         }
     }
 
@@ -78,18 +78,17 @@ class PaymentsRlsTest {
         return DriverManager.getConnection(POSTGRES.getJdbcUrl(), "sepa_app", "dev-only-app");
     }
 
-    private void insertPayment(UUID tenantId, String endToEndId) throws Exception {
+    private void insertPayment(UUID tenantId) throws Exception {
         try (Connection connection = adminConnection();
              PreparedStatement statement = connection.prepareStatement("""
                      INSERT INTO payment.payments
-                         (tenant_id, end_to_end_id, amount, debtor_iban, creditor_iban)
-                     VALUES (?, ?, ?, ?, ?)
+                         (tenant_id, amount, debtor_iban, creditor_iban)
+                     VALUES (?, ?, ?, ?)
                      """)) {
             statement.setObject(1, tenantId);
-            statement.setString(2, endToEndId);
-            statement.setBigDecimal(3, new BigDecimal("10.00"));
-            statement.setString(4, "PL61109010140000071219812874");
-            statement.setString(5, "PL27114020040000300201355387");
+            statement.setBigDecimal(2, new BigDecimal("10.00"));
+            statement.setString(3, "PL61109010140000071219812874");
+            statement.setString(4, "PL27114020040000300201355387");
             statement.executeUpdate();
         }
     }
@@ -109,10 +108,10 @@ class PaymentsRlsTest {
         }
     }
 
-    private static int paymentCountForEndToEndId(Connection connection, String endToEndId) throws Exception {
+    private static int paymentCountForTenant(Connection connection, UUID tenantId) throws Exception {
         try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT count(*) FROM payment.payments WHERE end_to_end_id = ?")) {
-            statement.setString(1, endToEndId);
+                "SELECT count(*) FROM payment.payments WHERE tenant_id = ?")) {
+            statement.setObject(1, tenantId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 resultSet.next();
                 return resultSet.getInt(1);

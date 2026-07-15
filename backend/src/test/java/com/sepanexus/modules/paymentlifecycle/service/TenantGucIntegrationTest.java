@@ -47,7 +47,8 @@ class TenantGucIntegrationTest {
     @BeforeEach
     void seedTenantRows() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payments");
+            statement.execute("TRUNCATE payment.payments, iso.payment_iso_identifiers, iso.message_lineage, "
+                    + "iso.iso_messages CASCADE");
         }
         insertPayment(TENANT_A, "e2e-tenant-a");
         insertPayment(TENANT_B, "e2e-tenant-b");
@@ -57,10 +58,10 @@ class TenantGucIntegrationTest {
     @WithMockUser(roles = "payment_submitter")
     void twoConsecutiveTenantRequestsSeeOnlyTheirOwnRows() {
         assertThat(paymentService.visiblePayments(TENANT_A.toString()))
-                .extracting(payment -> payment.getEndToEndId())
+                .extracting(payment -> payment.endToEndId())
                 .containsExactly("e2e-tenant-a");
         assertThat(paymentService.visiblePayments(TENANT_B.toString()))
-                .extracting(payment -> payment.getEndToEndId())
+                .extracting(payment -> payment.endToEndId())
                 .containsExactly("e2e-tenant-b");
     }
 
@@ -84,16 +85,44 @@ class TenantGucIntegrationTest {
     }
 
     private static void insertPayment(UUID tenantId, String endToEndId) throws Exception {
-        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
-                INSERT INTO payment.payments (tenant_id, end_to_end_id, amount, debtor_iban, creditor_iban)
-                VALUES (?, ?, ?, ?, ?)
-                """)) {
-            statement.setObject(1, tenantId);
-            statement.setString(2, endToEndId);
-            statement.setBigDecimal(3, new BigDecimal("10.00"));
-            statement.setString(4, "DE89370400440532013000");
-            statement.setString(5, "FR7630006000011234567890189");
-            statement.executeUpdate();
+        UUID paymentId = UUID.randomUUID();
+        UUID isoMessageId = UUID.randomUUID();
+        try (Connection connection = adminConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO payment.payments (id, tenant_id, amount, debtor_iban, creditor_iban)
+                    VALUES (?, ?, ?, ?, ?)
+                    """)) {
+                statement.setObject(1, paymentId);
+                statement.setObject(2, tenantId);
+                statement.setBigDecimal(3, new BigDecimal("10.00"));
+                statement.setString(4, "DE89370400440532013000");
+                statement.setString(5, "FR7630006000011234567890189");
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO iso.iso_messages (id, direction, message_type, parse_status)
+                    VALUES (?, 'INBOUND', 'JSON_DIRECT', 'SKIPPED')
+                    """)) {
+                statement.setObject(1, isoMessageId);
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO iso.payment_iso_identifiers (payment_id, source_message_type, iso_message_id, end_to_end_id)
+                    VALUES (?, 'JSON_DIRECT', ?, ?)
+                    """)) {
+                statement.setObject(1, paymentId);
+                statement.setObject(2, isoMessageId);
+                statement.setString(3, endToEndId);
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO iso.message_lineage (lineage_role, iso_message_id, payment_id)
+                    VALUES ('ORIGINAL_INSTRUCTION', ?, ?)
+                    """)) {
+                statement.setObject(1, isoMessageId);
+                statement.setObject(2, paymentId);
+                statement.executeUpdate();
+            }
         }
     }
 

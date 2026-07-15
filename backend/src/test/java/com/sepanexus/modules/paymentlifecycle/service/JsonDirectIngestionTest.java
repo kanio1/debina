@@ -52,6 +52,7 @@ class JsonDirectIngestionTest {
     void cleanTables() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
             statement.execute("TRUNCATE payment.payments, payment.outbox_events, "
+                    + "payment.payment_status_history, payment.payment_events, "
                     + "ingress.idempotency_keys, ingress.raw_inbound_messages, "
                     + "iso.payment_iso_identifiers, iso.message_lineage, iso.iso_messages CASCADE");
         }
@@ -119,6 +120,82 @@ class JsonDirectIngestionTest {
             try (ResultSet result = statement.executeQuery()) {
                 result.next();
                 assertThat(result.getInt(1)).isEqualTo(1);
+            }
+        }
+    }
+
+    /**
+     * EPIC-21 Story 21.2: {@code EndToEndId} is an ISO lineage identifier, not a payment
+     * uniqueness key (sepa-nexus-message-flow-and-data-blueprint.md §4.3 v2 patch — the old
+     * {@code (tenant_id, end_to_end_id)} unique index is removed with no replacement). Two
+     * genuinely distinct requests (different {@code Idempotency-Key}) that happen to reuse the
+     * same business {@code EndToEndId} are two distinct payments, each with its own independent
+     * identifier/lineage row.
+     */
+    @Test
+    @WithMockUser(roles = "payment_submitter")
+    void twoDifferentIdempotencyKeysWithSameEndToEndIdCreateTwoPayments() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        String sharedEndToEndId = "e2e-reused-across-requests";
+        SubmitPaymentCommand first = new SubmitPaymentCommand(tenantId, null, sharedEndToEndId,
+                new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
+                UUID.randomUUID().toString());
+        SubmitPaymentCommand second = new SubmitPaymentCommand(tenantId, null, sharedEndToEndId,
+                new BigDecimal("20.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
+                UUID.randomUUID().toString());
+
+        PaymentEntitySnapshot firstPayment = snapshot(paymentService.submitPayment(first));
+        PaymentEntitySnapshot secondPayment = snapshot(paymentService.submitPayment(second));
+
+        assertThat(firstPayment.id()).isNotEqualTo(secondPayment.id());
+        assertThat(count("SELECT count(*) FROM payment.payments WHERE tenant_id = ?", tenantId)).isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = ?",
+                sharedEndToEndId)).isEqualTo(2);
+        assertThat(count("SELECT count(DISTINCT iso_message_id) FROM iso.payment_iso_identifiers WHERE end_to_end_id = ?",
+                sharedEndToEndId)).as("each payment gets its own iso_message_id, never shared").isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM iso.message_lineage WHERE payment_id IN (?, ?) "
+                + "AND lineage_role = 'ORIGINAL_INSTRUCTION'", firstPayment.id(), secondPayment.id())).isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id IN (?, ?)",
+                firstPayment.id(), secondPayment.id())).isEqualTo(2);
+    }
+
+    /**
+     * OQ-12 / EPIC-11 Story 11.1: creation records the {@code RECEIVED} baseline atomically with
+     * the payment row, sharing one domain event ID across {@code payment_events.id} and
+     * {@code payment_status_history.event_ref} (§35 "event identity").
+     */
+    @Test
+    @WithMockUser(roles = "payment_submitter")
+    void receivedHistoryAndEventRecordedForJsonDirectChannel() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, null, "e2e-json-direct-history",
+                new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
+                UUID.randomUUID().toString());
+
+        PaymentEntitySnapshot payment = snapshot(paymentService.submitPayment(command));
+
+        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", payment.id()))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ? "
+                + "AND seq = 1 AND from_status IS NULL AND to_status = 'RECEIVED' AND is_final = false "
+                + "AND source_type = 'INTERNAL' AND event_ref IS NOT NULL", payment.id())).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payment_events WHERE payment_id = ?", payment.id()))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payment_status_history h "
+                + "JOIN payment.payment_events e ON e.id = h.event_ref "
+                + "WHERE h.payment_id = ?", payment.id()))
+                .as("history.event_ref must resolve to the actual payment_events row, not a dangling id")
+                .isEqualTo(1);
+    }
+
+    private static int count(String sql, Object... params) throws Exception {
+        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+            try (ResultSet result = statement.executeQuery()) {
+                result.next();
+                return result.getInt(1);
             }
         }
     }

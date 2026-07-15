@@ -28,4 +28,11 @@ public final class PaymentTransitionTable {
             throw new IllegalPaymentTransitionException(from, to);
         }
     }
+
+    /** A status with zero legal outgoing transitions — the single source of truth for
+     * {@code payment_status_history.is_final}, never duplicated as a separate REJECTED/DISPATCHED
+     * literal list elsewhere in application code. */
+    public static boolean isTerminal(PaymentStatus status) {
+        return ALLOWED.getOrDefault(status, Set.of()).isEmpty();
+    }
 }

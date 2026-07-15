@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { ScreenState } from "@/components/shared/screen-state";
 import { PaymentStatusBadge } from "@/components/payments/payment-status-badge";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, formatTimestamp } from "@/lib/format";
 
 interface IsoIdentifierResponse {
   sourceMessageType: string;
@@ -31,12 +31,34 @@ interface PaymentDetailResponse {
   isoIdentifiers: IsoIdentifierResponse[];
 }
 
+interface TimelineEntryResponse {
+  seq: number;
+  fromStatus: string | null;
+  toStatus: string;
+  statusCode: string;
+  reasonCode: string | null;
+  sourceType: string;
+  actorType: string;
+  isFinal: boolean;
+  eventType: string;
+  eventRef: string | null;
+  at: string;
+}
+
+interface TimelineResponse {
+  items: TimelineEntryResponse[];
+  nextAfterSeq: number | null;
+}
+
 type LoadState = "loading" | "error" | "not-found" | "ready";
+type TimelineLoadState = "loading" | "error" | "ready";
 
 export default function PaymentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [state, setState] = useState<LoadState>("loading");
   const [payment, setPayment] = useState<PaymentDetailResponse | null>(null);
+  const [timelineState, setTimelineState] = useState<TimelineLoadState>("loading");
+  const [timeline, setTimeline] = useState<TimelineEntryResponse[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,6 +88,38 @@ export default function PaymentDetailPage({ params }: { params: Promise<{ id: st
     }
 
     void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    // A failed timeline load never blanks the rest of the detail page (§ Payment Detail /
+    // Timeline UI spec: "a failed [tab] does not blank the header or Timeline") — independent
+    // load state, independent request, from a separate BFF route.
+    async function loadTimeline() {
+      try {
+        const response = await fetch(`/api/payments/${id}/timeline`, { credentials: "same-origin" });
+        if (cancelled) {
+          return;
+        }
+        if (!response.ok) {
+          setTimelineState("error");
+          return;
+        }
+        const data = (await response.json()) as TimelineResponse;
+        setTimeline(data.items);
+        setTimelineState("ready");
+      } catch {
+        if (!cancelled) {
+          setTimelineState("error");
+        }
+      }
+    }
+
+    void loadTimeline();
     return () => {
       cancelled = true;
     };
@@ -112,6 +166,50 @@ export default function PaymentDetailPage({ params }: { params: Promise<{ id: st
             <div className="text-muted-foreground">Creditor IBAN</div>
             <div data-testid="payment.detail.creditor-iban">{detail.creditorIban}</div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Timeline</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {timelineState === "loading" && <ScreenState kind="loading" testIdPrefix="payment.detail.timeline" />}
+          {timelineState === "error" && (
+            <ScreenState kind="error" testIdPrefix="payment.detail.timeline" message="Timeline unavailable." />
+          )}
+          {timelineState === "ready" && timeline.length === 0 && (
+            <ScreenState kind="empty" testIdPrefix="payment.detail.timeline" message="No events yet." />
+          )}
+          {timelineState === "ready" && timeline.length > 0 && (
+            <ol className="flex flex-col gap-3" data-testid="payment.detail.timeline.list">
+              {timeline.map((entry) => (
+                <li key={entry.seq} data-testid="payment.detail.timeline.entry" className="border-l-2 pl-3">
+                  <div className="flex items-center gap-2">
+                    <PaymentStatusBadge status={entry.toStatus} />
+                    {entry.fromStatus && (
+                      <span className="text-muted-foreground text-xs">from {entry.fromStatus}</span>
+                    )}
+                  </div>
+                  <div className="text-muted-foreground text-xs" title={entry.at}>
+                    {entry.eventType === "MIGRATION_BASELINE"
+                      ? `Initial state imported during migration — observed ${formatTimestamp(entry.at)}`
+                      : formatTimestamp(entry.at)}
+                  </div>
+                  <div className="text-muted-foreground text-xs">
+                    Source: {entry.sourceType}
+                    {entry.reasonCode && ` · Reason: ${entry.reasonCode}`}
+                    {entry.eventRef && (
+                      <>
+                        {" · "}
+                        <span data-testid="payment.detail.timeline.entry.event-ref">{entry.eventRef}</span>
+                      </>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
         </CardContent>
       </Card>
 
