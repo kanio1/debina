@@ -111,3 +111,15 @@ Zawsze napisz/nadpisz `HANDOFF.md` w korzeniu repo, zgodnie z formatem opisanym 
 - Nie pisz, nie konfiguruj i nie scaffolduj testów Playwright, dopóki dokumentacja projektu (dokument wizji/pokrycia Playwright — `sepa-nexus-playwright-learning-vision-and-success-criteria.md`, `sepa-nexus-playwright-test-learning-business-development.md`) nie wskaże, że ten moment sekwencjonowania nadszedł. Iteracja 0 ma jawną regułę `[NO-PLAYWRIGHT]`.
 - Nie projektuj nowych modułów ani architektury. Jeśli artefakty nie odpowiadają na pytanie planistyczne — zapisz to jako otwarte pytanie w `HANDOFF.md` (lub w pliku epika) zamiast rozstrzygać je samodzielnie.
 - Nie zmieniaj, nie "ulepszaj" ani nie reinterpretuj żadnej decyzji oznaczonej `Frozen`/`[FREEZE]` — także wtedy, gdy wydaje się to lokalnie rozsądne. Zmiana wymaga nowego, nadrzędnego ADR napisanego przez użytkownika/zespół, nie przez Ciebie w locie.
+
+## Podman and Maven
+
+DOCKER_HOST is already configured through `.claude/settings.local.json`.
+
+Never prepend Maven commands with:
+
+`export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"`
+
+Run Maven directly or with selected tests:
+
+`./mvnw -f backend test`

@@ -98,8 +98,11 @@ class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
     }
 
     private static UUID paymentTenantId(String endToEndId) throws Exception {
-        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement(
-                "SELECT tenant_id FROM payment.payments WHERE end_to_end_id = ?")) {
+        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
+                SELECT p.tenant_id FROM payment.payments p
+                JOIN iso.payment_iso_identifiers pii ON pii.payment_id = p.id
+                WHERE pii.end_to_end_id = ?
+                """)) {
             statement.setString(1, endToEndId);
             try (ResultSet result = statement.executeQuery()) {
                 assertThat(result.next()).isTrue();
@@ -112,7 +115,8 @@ class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
         try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
                 SELECT o.published_at IS NOT NULL FROM payment.outbox_events o
                 JOIN payment.payments p ON p.id = o.aggregate_id
-                WHERE p.end_to_end_id = ?
+                JOIN iso.payment_iso_identifiers pii ON pii.payment_id = p.id
+                WHERE pii.end_to_end_id = ?
                 """)) {
             statement.setString(1, endToEndId);
             try (ResultSet result = statement.executeQuery()) {
@@ -123,8 +127,11 @@ class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
     }
 
     private static String paymentStatus(String endToEndId) throws Exception {
-        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement(
-                "SELECT status FROM payment.payments WHERE end_to_end_id = ?")) {
+        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
+                SELECT p.status FROM payment.payments p
+                JOIN iso.payment_iso_identifiers pii ON pii.payment_id = p.id
+                WHERE pii.end_to_end_id = ?
+                """)) {
             statement.setString(1, endToEndId);
             try (ResultSet result = statement.executeQuery()) {
                 assertThat(result.next()).isTrue();
@@ -135,7 +142,7 @@ class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
 
     private static boolean paymentExists(String endToEndId) throws Exception {
         try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement(
-                "SELECT count(*) FROM payment.payments WHERE end_to_end_id = ?")) {
+                "SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = ?")) {
             statement.setString(1, endToEndId);
             try (ResultSet result = statement.executeQuery()) {
                 result.next();
@@ -148,7 +155,8 @@ class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
         try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
                 SELECT count(*) FROM payment.outbox_events o
                 JOIN payment.payments p ON p.id = o.aggregate_id
-                WHERE p.end_to_end_id = ?
+                JOIN iso.payment_iso_identifiers pii ON pii.payment_id = p.id
+                WHERE pii.end_to_end_id = ?
                 """)) {
             statement.setString(1, endToEndId);
             try (ResultSet result = statement.executeQuery()) {

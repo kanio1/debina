@@ -15,8 +15,12 @@ import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup.Iso
 import com.sepanexus.modules.paymentlifecycle.service.PaymentNotFoundException;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentDetail;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentSummary;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentTimelinePage;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentTimelineLookup.TimelineEntry;
 import com.sepanexus.security.SecurityConfig;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -58,11 +62,10 @@ class PaymentControllerTest {
         PaymentEntity payment = org.mockito.Mockito.mock(PaymentEntity.class);
         UUID paymentId = UUID.randomUUID();
         when(payment.getId()).thenReturn(paymentId);
-        when(payment.getEndToEndId()).thenReturn("E2E-1");
         when(payment.getAmount()).thenReturn(new BigDecimal("10.00"));
         when(payment.getCurrency()).thenReturn("EUR");
         when(payment.getStatus()).thenReturn(PaymentStatus.RECEIVED);
-        when(paymentService.visiblePayments(any())).thenReturn(List.of(payment));
+        when(paymentService.visiblePayments(any())).thenReturn(List.of(new PaymentSummary(payment, "E2E-1")));
 
         mockMvc.perform(get("/api/v1/payments")
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
@@ -78,7 +81,6 @@ class PaymentControllerTest {
         PaymentEntity payment = org.mockito.Mockito.mock(PaymentEntity.class);
         UUID paymentId = UUID.randomUUID();
         when(payment.getId()).thenReturn(paymentId);
-        when(payment.getEndToEndId()).thenReturn("E2E-1");
         when(payment.getAmount()).thenReturn(new BigDecimal("10.00"));
         when(payment.getCurrency()).thenReturn("EUR");
         when(payment.getStatus()).thenReturn(PaymentStatus.RECEIVED);
@@ -86,7 +88,7 @@ class PaymentControllerTest {
         when(payment.getCreditorIban()).thenReturn("FR7630006000011234567890189");
         UUID isoMessageId = UUID.randomUUID();
         when(paymentService.paymentDetail(any(), org.mockito.ArgumentMatchers.eq(paymentId))).thenReturn(
-                new PaymentDetail(payment, List.of(new IsoIdentifierView("JSON_DIRECT", "E2E-1", isoMessageId))));
+                new PaymentDetail(payment, "E2E-1", List.of(new IsoIdentifierView("JSON_DIRECT", "E2E-1", isoMessageId))));
 
         mockMvc.perform(get("/api/v1/payments/" + paymentId)
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
@@ -106,6 +108,44 @@ class PaymentControllerTest {
         mockMvc.perform(get("/api/v1/payments/" + paymentId)
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
                                 .authorities(() -> "ROLE_payment_submitter")))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void returnsTimelineOrderedBySeq() throws Exception {
+        UUID paymentId = UUID.randomUUID();
+        UUID eventRef = UUID.randomUUID();
+        Instant now = Instant.parse("2026-07-15T10:00:00Z");
+        List<TimelineEntry> entries = List.of(
+                new TimelineEntry(1, null, "RECEIVED", "RECEIVED", null, "INTERNAL", "SYSTEM", false,
+                        "payment.submitted.v1", eventRef, now),
+                new TimelineEntry(2, "RECEIVED", "VALIDATED", "VALIDATED", null, "INTERNAL", "SYSTEM", false,
+                        "payment.submitted.v1", eventRef, now.plusSeconds(5)));
+        when(paymentService.paymentTimeline(any(), org.mockito.ArgumentMatchers.eq(paymentId), any(), any()))
+                .thenReturn(new PaymentTimelinePage(entries, null));
+
+        mockMvc.perform(get("/api/v1/payments/" + paymentId + "/timeline")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_payment_viewer")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].seq").value(1))
+                .andExpect(jsonPath("$.items[0].fromStatus").doesNotExist())
+                .andExpect(jsonPath("$.items[0].toStatus").value("RECEIVED"))
+                .andExpect(jsonPath("$.items[1].seq").value(2))
+                .andExpect(jsonPath("$.items[1].fromStatus").value("RECEIVED"))
+                .andExpect(jsonPath("$.items[1].toStatus").value("VALIDATED"))
+                .andExpect(jsonPath("$.nextAfterSeq").doesNotExist());
+    }
+
+    @Test
+    void returnsNotFoundForTimelineOfUnknownPayment() throws Exception {
+        UUID paymentId = UUID.randomUUID();
+        when(paymentService.paymentTimeline(any(), org.mockito.ArgumentMatchers.eq(paymentId), any(), any()))
+                .thenThrow(new PaymentNotFoundException(paymentId));
+
+        mockMvc.perform(get("/api/v1/payments/" + paymentId + "/timeline")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_payment_viewer")))
                 .andExpect(status().isNotFound());
     }
 

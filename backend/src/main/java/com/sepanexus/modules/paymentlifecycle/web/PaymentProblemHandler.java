@@ -3,7 +3,7 @@ package com.sepanexus.modules.paymentlifecycle.web;
 import com.sepanexus.modules.paymentlifecycle.ingress.SignatureVerificationFailedException;
 import com.sepanexus.modules.paymentlifecycle.ingress.XmlHardeningRejectedException;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.CanonicalMappingException;
-import com.sepanexus.modules.paymentlifecycle.service.DuplicatePaymentException;
+import com.sepanexus.modules.paymentlifecycle.isoadapter.MissingPrimaryIdentifierException;
 import com.sepanexus.modules.paymentlifecycle.service.IdempotencyConflictException;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class PaymentProblemHandler {
-
-    @ExceptionHandler(DuplicatePaymentException.class)
-    ProblemDetail duplicate(DuplicatePaymentException exception, HttpServletRequest request) {
-        return problem(HttpStatus.CONFLICT, exception.getMessage(), request);
-    }
 
     @ExceptionHandler(IdempotencyConflictException.class)
     ProblemDetail idempotencyConflict(IdempotencyConflictException exception, HttpServletRequest request) {
@@ -34,6 +29,13 @@ public class PaymentProblemHandler {
     @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
     ProblemDetail invalidRequest(Exception exception, HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "Invalid payment submission", request);
+    }
+
+    /** A data-integrity violation (EPIC-21 Story 21.2), never a normal client-facing outcome — no
+     * table name or internal identifier detail in the response, only a correlation ID to trace it. */
+    @ExceptionHandler(MissingPrimaryIdentifierException.class)
+    ProblemDetail missingPrimaryIdentifier(MissingPrimaryIdentifierException exception, HttpServletRequest request) {
+        return problem(HttpStatus.INTERNAL_SERVER_ERROR, "Payment data integrity error", request);
     }
 
     @ExceptionHandler(SignatureVerificationFailedException.class)

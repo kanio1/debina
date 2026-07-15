@@ -50,8 +50,8 @@ class BranchLevelRlsTest {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
             statement.execute("TRUNCATE payment.payments");
         }
-        insertPayment(BRANCH_A, "branch-rls-a");
-        insertPayment(BRANCH_B, "branch-rls-b");
+        insertPayment(BRANCH_A);
+        insertPayment(BRANCH_B);
     }
 
     @Test
@@ -59,7 +59,7 @@ class BranchLevelRlsTest {
         try (Connection connection = applicationConnection()) {
             setTenantAndBranch(connection, TENANT, BRANCH_A);
 
-            assertThat(endToEndIdsVisible(connection)).containsExactly("branch-rls-a");
+            assertThat(branchesVisible(connection)).containsExactly(BRANCH_A);
         }
     }
 
@@ -68,7 +68,7 @@ class BranchLevelRlsTest {
         try (Connection connection = applicationConnection()) {
             setTenantAndBranch(connection, TENANT, BRANCH_B);
 
-            assertThat(endToEndIdsVisible(connection)).containsExactly("branch-rls-b");
+            assertThat(branchesVisible(connection)).containsExactly(BRANCH_B);
         }
     }
 
@@ -77,17 +77,17 @@ class BranchLevelRlsTest {
         try (Connection connection = applicationConnection()) {
             setTenantOnly(connection, TENANT);
 
-            assertThat(endToEndIdsVisible(connection)).containsExactlyInAnyOrder("branch-rls-a", "branch-rls-b");
+            assertThat(branchesVisible(connection)).containsExactlyInAnyOrder(BRANCH_A, BRANCH_B);
         }
     }
 
-    private static java.util.List<String> endToEndIdsVisible(Connection connection) throws Exception {
+    private static java.util.List<UUID> branchesVisible(Connection connection) throws Exception {
         try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT end_to_end_id FROM payment.payments ORDER BY end_to_end_id");
+                "SELECT branch_id FROM payment.payments ORDER BY branch_id");
              ResultSet resultSet = statement.executeQuery()) {
-            java.util.List<String> rows = new java.util.ArrayList<>();
+            java.util.List<UUID> rows = new java.util.ArrayList<>();
             while (resultSet.next()) {
-                rows.add(resultSet.getString(1));
+                rows.add((UUID) resultSet.getObject(1));
             }
             return rows;
         }
@@ -101,17 +101,16 @@ class BranchLevelRlsTest {
         return DriverManager.getConnection(POSTGRES.getJdbcUrl(), "sepa_app", "dev-only-app");
     }
 
-    private static void insertPayment(UUID branchId, String endToEndId) throws Exception {
+    private static void insertPayment(UUID branchId) throws Exception {
         try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
-                INSERT INTO payment.payments (tenant_id, branch_id, end_to_end_id, amount, debtor_iban, creditor_iban)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO payment.payments (tenant_id, branch_id, amount, debtor_iban, creditor_iban)
+                VALUES (?, ?, ?, ?, ?)
                 """)) {
             statement.setObject(1, TENANT);
             statement.setObject(2, branchId);
-            statement.setString(3, endToEndId);
-            statement.setBigDecimal(4, new BigDecimal("10.00"));
-            statement.setString(5, "DE89370400440532013000");
-            statement.setString(6, "FR7630006000011234567890189");
+            statement.setBigDecimal(3, new BigDecimal("10.00"));
+            statement.setString(4, "DE89370400440532013000");
+            statement.setString(5, "FR7630006000011234567890189");
             statement.executeUpdate();
         }
     }

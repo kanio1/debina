@@ -45,6 +45,9 @@ class PaymentServiceTest {
     @Mock
     private PaymentCreationWriter paymentCreationWriter;
 
+    @Mock
+    private PaymentTimelineLookup paymentTimelineLookup;
+
     @Test
     void submitsOneReceivedPayment() {
         UUID tenantId = UUID.randomUUID();
@@ -52,18 +55,20 @@ class PaymentServiceTest {
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 UUID.randomUUID().toString());
         PaymentService service = new PaymentService(paymentRepository, tenantGucConfigurer, idempotencyStore,
-                rawMessageArchive, jsonDirectLineageRecorder, isoIdentifierLookup, paymentCreationWriter);
+                rawMessageArchive, jsonDirectLineageRecorder, isoIdentifierLookup, paymentCreationWriter,
+                paymentTimelineLookup);
         when(rawMessageArchive.archive(any(), any(), any(), any())).thenReturn(UUID.randomUUID());
         when(idempotencyStore.claim(any(), any(), any())).thenReturn(IdempotencyClaim.claimed());
-        PaymentEntity created = PaymentEntity.received(tenantId, null, "E2E-1", new BigDecimal("10.00"), "EUR",
+        PaymentEntity created = PaymentEntity.received(tenantId, null, new BigDecimal("10.00"), "EUR",
                 "DE89370400440532013000", "FR7630006000011234567890189", java.time.Instant.now());
-        when(paymentCreationWriter.create(any(), any(), any(), any(), any(), any(), any())).thenReturn(created);
+        when(paymentCreationWriter.create(any(), any(), any(), any(), any(), any())).thenReturn(created);
 
         PaymentEntity saved = service.submitPayment(command);
 
-        ArgumentCaptor<String> endToEndId = ArgumentCaptor.forClass(String.class);
         verify(paymentCreationWriter).create(org.mockito.ArgumentMatchers.eq(tenantId), org.mockito.ArgumentMatchers.isNull(),
-                endToEndId.capture(), any(), any(), any(), any());
+                any(), any(), any(), any());
+        ArgumentCaptor<String> endToEndId = ArgumentCaptor.forClass(String.class);
+        verify(jsonDirectLineageRecorder).record(any(), any(), endToEndId.capture());
         assertThat(saved.getStatus()).isEqualTo(PaymentStatus.RECEIVED);
         assertThat(saved.getTenantId()).isEqualTo(tenantId);
         assertThat(endToEndId.getValue()).isEqualTo("E2E-1");

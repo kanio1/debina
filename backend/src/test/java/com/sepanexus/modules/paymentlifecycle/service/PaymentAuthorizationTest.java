@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.UUID;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +53,8 @@ class PaymentAuthorizationTest {
     @BeforeEach
     void seedPayment() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payments");
+            statement.execute("TRUNCATE payment.payments, iso.payment_iso_identifiers, iso.message_lineage, "
+                    + "iso.iso_messages, payment.payment_status_history CASCADE");
         }
         paymentId = insertPayment(TENANT, "e2e-oq14");
     }
@@ -75,15 +77,15 @@ class PaymentAuthorizationTest {
     @ValueSource(strings = { "payment_viewer", "payment_submitter", "payment_approver", "operator", "auditor" })
     void workspaceTwoRolesCanListPayments(String role) {
         withRole(role, () -> assertThat(paymentService.visiblePayments(TENANT.toString()))
-                .extracting(payment -> payment.getEndToEndId())
+                .extracting(payment -> payment.endToEndId())
                 .containsExactly("e2e-oq14"));
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "payment_viewer", "payment_submitter", "payment_approver", "operator", "auditor" })
     void workspaceTwoRolesCanReadPaymentDetail(String role) {
-        withRole(role, () -> assertThat(paymentService.paymentDetail(TENANT.toString(), paymentId).payment()
-                .getEndToEndId()).isEqualTo("e2e-oq14"));
+        withRole(role, () -> assertThat(paymentService.paymentDetail(TENANT.toString(), paymentId)
+                .endToEndId()).isEqualTo("e2e-oq14"));
     }
 
     @Test
@@ -98,6 +100,63 @@ class PaymentAuthorizationTest {
     void rejectsRoleOutsideWorkspaceTwoForPaymentDetail() {
         assertThatThrownBy(() -> paymentService.paymentDetail(TENANT.toString(), paymentId))
                 .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "payment_viewer", "payment_submitter", "payment_approver", "operator", "auditor" })
+    void workspaceTwoRolesCanReadPaymentTimeline(String role) {
+        withRole(role, () -> {
+            PaymentService.PaymentTimelinePage page = paymentService.paymentTimeline(TENANT.toString(), paymentId,
+                    null, null);
+            assertThat(page.items()).extracting(item -> item.seq()).containsExactly(1, 2);
+            assertThat(page.items()).extracting(item -> item.toStatus()).containsExactly("RECEIVED", "VALIDATED");
+            assertThat(page.nextAfterSeq()).isNull();
+        });
+    }
+
+    @Test
+    @WithMockUser(roles = "settlement_operator")
+    void rejectsRoleOutsideWorkspaceTwoForPaymentTimeline() {
+        assertThatThrownBy(() -> paymentService.paymentTimeline(TENANT.toString(), paymentId, null, null))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    @WithMockUser(roles = "payment_viewer")
+    void otherTenantCannotReadPaymentTimeline() {
+        UUID otherTenant = UUID.fromString("00000000-0000-0000-0000-0000000000bb");
+        assertThatThrownBy(() -> paymentService.paymentTimeline(otherTenant.toString(), paymentId, null, null))
+                .isInstanceOf(PaymentNotFoundException.class);
+    }
+
+    @Test
+    @WithMockUser(roles = "payment_viewer")
+    void missingTenantClaimSeesNoPaymentsForTimeline() {
+        assertThatThrownBy(() -> paymentService.paymentTimeline(null, paymentId, null, null))
+                .isInstanceOf(PaymentNotFoundException.class);
+    }
+
+    @Test
+    @WithMockUser(roles = "payment_viewer")
+    void timelinePaginationCursorIsSeqNotOffset() {
+        withRole("payment_viewer", () -> {
+            PaymentService.PaymentTimelinePage firstPage = paymentService.paymentTimeline(TENANT.toString(),
+                    paymentId, 1, null);
+            assertThat(firstPage.items()).hasSize(1);
+            assertThat(firstPage.items().get(0).seq()).isEqualTo(1);
+            assertThat(firstPage.nextAfterSeq()).isEqualTo(1);
+
+            PaymentService.PaymentTimelinePage secondPage = paymentService.paymentTimeline(TENANT.toString(),
+                    paymentId, 1, firstPage.nextAfterSeq());
+            assertThat(secondPage.items()).hasSize(1);
+            assertThat(secondPage.items().get(0).seq()).isEqualTo(2);
+            assertThat(secondPage.nextAfterSeq()).isNull();
+
+            PaymentService.PaymentTimelinePage thirdPage = paymentService.paymentTimeline(TENANT.toString(),
+                    paymentId, 1, secondPage.items().get(0).seq());
+            assertThat(thirdPage.items()).isEmpty();
+            assertThat(thirdPage.nextAfterSeq()).isNull();
+        });
     }
 
     private void withRole(String role, Runnable assertion) {
@@ -143,17 +202,61 @@ class PaymentAuthorizationTest {
 
     private static UUID insertPayment(UUID tenantId, String endToEndId) throws Exception {
         UUID id = UUID.randomUUID();
-        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
-                INSERT INTO payment.payments (id, tenant_id, end_to_end_id, amount, debtor_iban, creditor_iban)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """)) {
-            statement.setObject(1, id);
-            statement.setObject(2, tenantId);
-            statement.setString(3, endToEndId);
-            statement.setBigDecimal(4, new BigDecimal("10.00"));
-            statement.setString(5, "DE89370400440532013000");
-            statement.setString(6, "FR7630006000011234567890189");
-            statement.executeUpdate();
+        UUID isoMessageId = UUID.randomUUID();
+        try (Connection connection = adminConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO payment.payments (id, tenant_id, amount, debtor_iban, creditor_iban)
+                    VALUES (?, ?, ?, ?, ?)
+                    """)) {
+                statement.setObject(1, id);
+                statement.setObject(2, tenantId);
+                statement.setBigDecimal(3, new BigDecimal("10.00"));
+                statement.setString(4, "DE89370400440532013000");
+                statement.setString(5, "FR7630006000011234567890189");
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO iso.iso_messages (id, direction, message_type, parse_status)
+                    VALUES (?, 'INBOUND', 'JSON_DIRECT', 'SKIPPED')
+                    """)) {
+                statement.setObject(1, isoMessageId);
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO iso.payment_iso_identifiers (payment_id, source_message_type, iso_message_id, end_to_end_id)
+                    VALUES (?, 'JSON_DIRECT', ?, ?)
+                    """)) {
+                statement.setObject(1, id);
+                statement.setObject(2, isoMessageId);
+                statement.setString(3, endToEndId);
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO iso.message_lineage (lineage_role, iso_message_id, payment_id)
+                    VALUES ('ORIGINAL_INSTRUCTION', ?, ?)
+                    """)) {
+                statement.setObject(1, isoMessageId);
+                statement.setObject(2, id);
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO payment.payment_status_history
+                        (payment_id, seq, from_status, to_status, status_code, source_type, event_type, at)
+                    VALUES (?, 1, NULL, 'RECEIVED', 'RECEIVED', 'INTERNAL', 'payment.submitted.v1', ?)
+                    """)) {
+                statement.setObject(1, id);
+                statement.setObject(2, java.sql.Timestamp.from(Instant.now()));
+                statement.executeUpdate();
+            }
+            try (PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO payment.payment_status_history
+                        (payment_id, seq, from_status, to_status, status_code, source_type, event_type, at)
+                    VALUES (?, 2, 'RECEIVED', 'VALIDATED', 'VALIDATED', 'INTERNAL', 'payment.submitted.v1', ?)
+                    """)) {
+                statement.setObject(1, id);
+                statement.setObject(2, java.sql.Timestamp.from(Instant.now().plusSeconds(1)));
+                statement.executeUpdate();
+            }
         }
         return id;
     }

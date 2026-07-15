@@ -86,8 +86,8 @@ class ReferenceDataOwnershipTest {
         assertInsufficientPrivilege(() -> {
             try (Connection connection = referenceDataConnection(); Statement statement = connection.createStatement()) {
                 statement.executeUpdate("""
-                        INSERT INTO payment.payments (tenant_id, end_to_end_id, amount, debtor_iban, creditor_iban)
-                        VALUES (gen_random_uuid(), 'reference-data-intruder', 1.00,
+                        INSERT INTO payment.payments (tenant_id, amount, debtor_iban, creditor_iban)
+                        VALUES (gen_random_uuid(), 1.00,
                                 'DE89370400440532013000', 'FR7630006000011234567890189')
                         """);
             }

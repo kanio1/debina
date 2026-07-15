@@ -27,9 +27,6 @@ public class PaymentEntity {
     @Column(name = "branch_id", updatable = false)
     private UUID branchId;
 
-    @Column(name = "end_to_end_id", nullable = false, updatable = false)
-    private String endToEndId;
-
     @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal amount;
 
@@ -56,11 +53,10 @@ public class PaymentEntity {
     protected PaymentEntity() {
     }
 
-    private PaymentEntity(UUID tenantId, UUID branchId, String endToEndId, BigDecimal amount, String currency,
+    private PaymentEntity(UUID tenantId, UUID branchId, BigDecimal amount, String currency,
             String debtorIban, String creditorIban, Instant createdAt) {
         this.tenantId = tenantId;
         this.branchId = branchId;
-        this.endToEndId = endToEndId;
         this.amount = amount;
         this.currency = currency;
         this.debtorIban = debtorIban;
@@ -69,15 +65,14 @@ public class PaymentEntity {
         this.createdAt = createdAt;
     }
 
-    public static PaymentEntity received(UUID tenantId, UUID branchId, String endToEndId, BigDecimal amount,
+    public static PaymentEntity received(UUID tenantId, UUID branchId, BigDecimal amount,
             String currency, String debtorIban, String creditorIban, Instant createdAt) {
-        return new PaymentEntity(tenantId, branchId, endToEndId, amount, currency, debtorIban, creditorIban, createdAt);
+        return new PaymentEntity(tenantId, branchId, amount, currency, debtorIban, creditorIban, createdAt);
     }
 
     public UUID getId() { return id; }
     public UUID getTenantId() { return tenantId; }
     public UUID getBranchId() { return branchId; }
-    public String getEndToEndId() { return endToEndId; }
     public BigDecimal getAmount() { return amount; }
     public String getCurrency() { return currency; }
     public String getDebtorIban() { return debtorIban; }
