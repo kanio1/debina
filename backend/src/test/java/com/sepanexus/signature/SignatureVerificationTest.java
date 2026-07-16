@@ -42,7 +42,7 @@ class SignatureVerificationTest {
     private static KeyPair otherKeyPair;
 
     @Autowired
-    private SignaturePort signaturePort;
+    private SignatureVerificationPort signaturePort;
 
     @Autowired
     private KeyRegistryPort keyRegistryPort;

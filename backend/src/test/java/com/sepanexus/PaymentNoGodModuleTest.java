@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
  * frozen rule "payment-lifecycle nie zapisuje bezpośrednio do: settlement; routing; egress". The rule
  * is package-boundary based (a module's {@code .internal} subpackage is its forbidden implementation
  * detail, its root package is its public port/contract — the same convention already established by
- * the real {@code signature} module, see {@link com.sepanexus.signature.SignaturePort} vs {@code
+ * the real {@code signature} module, see {@link com.sepanexus.signature.SignatureVerificationPort} vs {@code
  * com.sepanexus.signature.internal}), not a class-name match, so it survives a class rename.
  *
  * <p>None of {@code settlement}/{@code routing}/{@code egress} exist in this codebase yet (confirmed:

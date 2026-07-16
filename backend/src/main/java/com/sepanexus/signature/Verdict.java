@@ -3,7 +3,7 @@ package com.sepanexus.signature;
 import java.util.UUID;
 
 /**
- * The outcome of {@link SignaturePort#verify}. {@code FAILED} is data, not a decision — rejecting
+ * The outcome of {@link SignatureVerificationPort#verify}. {@code FAILED} is data, not a decision — rejecting
  * the payment is {@code ingress}'s action, driven by this verdict, never {@code signature}'s own
  * (sepa-nexus-signature-module-blueprint.md §1).
  */

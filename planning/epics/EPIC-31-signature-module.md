@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 depends_on: [EPIC-09-ownership-schema-grants]
 source: "sepa-nexus-full-blueprint-review-and-task-plan.md §12.1 line 339-348 (EPIC-SIG, SIG-S1..3); sepa-nexus-signature-module-blueprint.md (całość); sepa-nexus-blueprint-ownership-integration.md §9 line 354 (EPIC-OWN-10, ta sama granica modułu, wersja ownership-lens — połączona tu z EPIC-SIG, patrz otwarte pytanie)"
 ---
@@ -50,16 +50,30 @@ Taski:
 
 ## Story 31.3A — SIG-S3a: standalone signing capability (sign→verify)
 
-status: not-started
+status: done
 depends_on: [Story 31.1]
 
 `[SPLIT 2026-07-16 — dual-agent governance/backlog-redesign session, H1]`: was Story 31.3 ("SIG-S3: podpisywanie dla egress"), depends_on: `[Story 31.1, EPIC-43-egress-rail-outbound-dispatch]`. That declaration and `EPIC-43` Story 43.2's own `depends_on: [Story 43.1, EPIC-31-signature-module/Story 31.3]` formed a real cycle at the effective capability level (31.3 → all of EPIC-43 → 43.2 → 31.3) — the identical shape to a defect this same file already found and fixed once for Story 31.2 vs `EPIC-19`/Story 19.2 (see `[PLANNING-DEFECT 2026-07-15, naprawione]` above), but this pair had not been given the same treatment. Fixed by splitting along the boundary the story's own `Opis` already implied: a standalone `SignatureSigningPort` round-trip capability (this story, testable with a stub caller, no `egress` dependency) vs. the actual invocation from `egress`'s renderer (moved into `EPIC-43` Story 43.2, which already independently described "wywołanie `SignatureSigningPort`" as part of its own scope — the two stories were duplicating the same integration point, not just cyclically depending on each other). See `planning/BACKLOG-REDESIGN.md` for the full writeup and old→new mapping.
 
 Opis: stan `SIGNED` realny, podpis detached, signer-stub przez port, round-trip sign→verify — weryfikowalne samodzielnie, bez realnego callera z `egress`. `[MVP]` Iteracja 5.
 
+`[DONE 2026-07-16 — EPIC-31 Story 31.3A implementation session]`: readiness audit potwierdził, że źródło (`sepa-nexus-signature-module-blueprint.md` linie 60-61) już definiowało dwa ODRĘBNE porty — `SignatureVerificationPort`/`SignatureSigningPort` — a nie jeden połączony `SignaturePort`, którego `sign()` do tej pory rzucał `UnsupportedOperationException`. Jedynym prawdziwym callerem `SignaturePort` był `SignedChannelIngestionPipeline` (tylko `.verify()`) — mały, lokalny refaktor bez potrzeby warstwy kompatybilności: `SignaturePort` usunięty, zastąpiony `SignatureVerificationPort`(`Ed25519SignatureVerifier` — teraz implementuje wyłącznie ten port, `sign()` usunięty) + `SignatureSigningPort` (nowy, `Ed25519SignatureSigner`). `signature`'s `package-info.java` rozszerzony o `allowedDependencies = {"shared"}` (potrzebne dla `ClockPort` — publiczny port pozostaje minimalny, `Clock` nie trafia do sygnatury `sign()`, tylko do konstruktora internal klasy, zgodnie z promptem tej sesji).
+
+**Decyzje readiness (Część 6-7 promptu sesji, brak konfliktu ze źródłem/istniejącymi danymi testowymi — potwierdzone `grep`-em, że żaden istniejący test/seed używa `privateMaterialRef` jako czegoś więcej niż nieprzezroczystego placeholdera)**:
+- `signingKeyRef` = tekstowa reprezentacja `UUID` wiersza `signature.signature_keys.id` (nowy `SigningKeyLookup`, `com.sepanexus.signature.internal`, odczyt po dokładnym `id` — inny kształt niż publiczny `KeyRegistryPort.lookup(participantId, purpose, asOf)`). Signer wymaga `purpose IN (SIGN, BOTH)`, `status=ACTIVE`, `valid_from <= asOf < valid_to`, `algo=Ed25519`, `private_material_ref IS NOT NULL` — nigdy nie ufa materiałowi klucza dostarczonemu przez callera.
+- Syntetyczny prywatny materiał: konwencja `inline-pkcs8:<Base64 PKCS#8>` (nowy `PrivateKeyMaterialResolver`, `com.sepanexus.signature.internal`) — jedyny obsługiwany format, jawnie oznaczony jako lab-only, nigdy real HSM handle. Nigdy nie loguje ani nie umieszcza w komunikacie wyjątku.
+
+Nowe klasy produkcyjne: `SignatureVerificationPort`, `SignatureSigningPort`, `SigningException` (publiczne, `com.sepanexus.signature`); `SigningKeyRecord`, `SigningKeyLookup`, `PrivateKeyMaterialResolver`, `Ed25519SignatureSigner` (`com.sepanexus.signature.internal`). `Ed25519SignatureSigner.sign()`: waliduje `artifactBytes`/`signingKeyRef` → `SigningKeyLookup.findById` → purpose/status/validity/algo/private-material checks (każdy własny `SigningException` reason code: `INVALID_ARTIFACT_BYTES`, `INVALID_SIGNING_KEY_REF`, `SIGNING_KEY_NOT_FOUND`, `SIGNING_KEY_NOT_ACTIVE`, `SIGNING_KEY_WRONG_PURPOSE`, `UNSUPPORTED_SIGNING_ALGORITHM`, `PRIVATE_KEY_MATERIAL_UNAVAILABLE`, `INVALID_PRIVATE_KEY_MATERIAL`, `SIGNATURE_PERSISTENCE_FAILED`) → `PrivateKeyMaterialResolver.resolve` → real JCA `Signature.getInstance("Ed25519")` na dokładnych `artifactBytes` → jeden `INSERT` do `signature.message_signatures` (`direction=OUTBOUND`, `raw_message_id`/`outbound_artifact_id` oba `NULL` — brak inbound message i brak egress artifact w tej story, prawdziwe powiązanie to `EPIC-43` Story 43.2; `covered_sha256`=SHA-256 dokładnych `artifactBytes`; `created_at`=`ClockPort.now()`) → zwraca `DetachedSignature`. Insert-failure rzuca wyjątek PRZED zwróceniem podpisu (test: mutacja pomijająca insert poprawnie złapana). Decyzja: `artifactBytes=null` → odrzucony (`INVALID_ARTIFACT_BYTES`); `artifactBytes` puste (zero-length, nie-`null`) → **dozwolone**, nie wymyślono zakazu, którego nie ma ani w źródle, ani w JCA (`Signature.sign()` na pustej tablicy jest poprawne kryptograficznie).
+
+Żadna migracja nie była potrzebna — `V13`/`V14` już miały wszystkie kolumny (`message_signatures.outbound_artifact_id`/`direction` już istniały, `signature_keys.private_material_ref` już istniał).
+
+**Test-first**: RED potwierdzony przez fizyczne odłożenie na bok nowych plików produkcyjnych przed napisaniem testu (`./mvnw -f backend test -Dtest=*SigningRoundTripTest*` → `BUILD FAILURE`, `cannot find symbol` dla `Ed25519SignatureSigner`/`SigningException`/etc.) — potem przywrócone i zaimplementowane. GREEN: `15/15 PASS` od razu po przywróceniu. Mutation-proof 3x: (1) podpisanie innych bajtów niż `artifactBytes` → dokładnie `signThenVerifyRoundTripsToVerified` poprawnie FAIL → cofnięte; (2) pominięcie insertu evidence → dokładnie `signPersistsExactlyOneOutboundMessageSignatureRow` poprawnie FAIL → cofnięte; (3) usunięcie warunku purpose (SIGN/BOTH) → dokładnie `verifyOnlyKeyIsRejectedForSigningAndPersistsNoRow` poprawnie FAIL → cofnięte. Po każdym cofnięciu: `15/15 PASS`, `git diff --check` czyste.
+
+Regresja weryfikacji istniejącej (Story 31.2 niezmieniona zachowaniowo przez refaktor portów): `SignatureVerificationTest` (10/10), `SignatureBeforeParseOrderingTest` (4/4), `KeyRegistryLookupTest` (5/5), `SignatureNoForeignRepoAccessTest`, `NonSignatureRoleCannotWriteSignatureTest` — wszystkie nadal PASS (42 testy razem z nowym `SigningRoundTripTest`). Pełny regres backendu: `234/234 PASS` (było `219/219`), `BUILD SUCCESS`. Znany nieszkodliwy scheduler WARN (7x), zero nowych failures. Database review (skill `sepa-nexus-database-review`): **PASS**, zero blocking findings.
+
 Taski:
-- [ ] **`SignatureSigningPort`: podpis detached, round-trip sign→verify przez signer-stub (caller niezależny od `egress`).**
-      `verify: ./mvnw -f backend test -Dtest=*SigningRoundTripTest*`
+- [x] **`SignatureSigningPort`: podpis detached, round-trip sign→verify przez signer-stub (caller niezależny od `egress`).**
+      `verify: ./mvnw -f backend test -Dtest=*SigningRoundTripTest*` → `Tests run: 15, Failures: 0, Errors: 0` — PASS (2026-07-16).
 
 ## Story 31.4 — Rejestr kluczy (KeyRegistryPort)
 

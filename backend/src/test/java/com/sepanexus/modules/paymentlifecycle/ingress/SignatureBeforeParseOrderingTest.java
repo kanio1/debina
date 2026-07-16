@@ -10,7 +10,7 @@ import com.sepanexus.SepaNexusApplication;
 import com.sepanexus.signature.KeyPurpose;
 import com.sepanexus.signature.KeyRegistryPort;
 import com.sepanexus.signature.SignatureKeyRegistration;
-import com.sepanexus.signature.SignaturePort;
+import com.sepanexus.signature.SignatureVerificationPort;
 import com.sepanexus.signature.Verdict;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
@@ -61,7 +61,7 @@ class SignatureBeforeParseOrderingTest {
     private RawMessageArchive rawMessageArchive;
 
     @MockitoSpyBean
-    private SignaturePort signaturePort;
+    private SignatureVerificationPort signaturePort;
 
     @MockitoSpyBean
     private HardenedXmlFactory hardenedXmlFactory;

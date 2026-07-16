@@ -1,10 +1,9 @@
 package com.sepanexus.signature.internal;
 
-import com.sepanexus.signature.DetachedSignature;
 import com.sepanexus.signature.KeyPurpose;
 import com.sepanexus.signature.KeyRegistryPort;
 import com.sepanexus.signature.SignatureKeyView;
-import com.sepanexus.signature.SignaturePort;
+import com.sepanexus.signature.SignatureVerificationPort;
 import com.sepanexus.signature.SignatureVerificationRequest;
 import com.sepanexus.signature.Verdict;
 import java.security.GeneralSecurityException;
@@ -36,7 +35,7 @@ import org.springframework.stereotype.Component;
  * verdict additionally writes one {@code message_signatures} row, in the same transaction.
  */
 @Component
-public class Ed25519SignatureVerifier implements SignaturePort {
+public class Ed25519SignatureVerifier implements SignatureVerificationPort {
 
     private static final Set<String> ALLOWED_ALGORITHMS = Set.of("Ed25519");
 
@@ -80,11 +79,6 @@ public class Ed25519SignatureVerifier implements SignaturePort {
                 ? new Verdict(Verdict.Result.VERIFIED, activeKey.id(), activeKey.algo(), null)
                 : new Verdict(Verdict.Result.FAILED, activeKey.id(), activeKey.algo(), Verdict.REASON_TAMPERED_OR_INVALID);
         return recordAndReturn(request, verdict);
-    }
-
-    @Override
-    public DetachedSignature sign(byte[] artifactBytes, String signingKeyRef) {
-        throw new UnsupportedOperationException("Signing lands in Story 31.3 (egress) — not implemented yet");
     }
 
     private boolean verifySignatureBytes(SignatureKeyView key, SignatureVerificationRequest request) {

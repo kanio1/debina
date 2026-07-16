@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Everything {@link SignaturePort#verify} needs, and nothing more — deliberately excludes any
+ * Everything {@link SignatureVerificationPort#verify} needs, and nothing more — deliberately excludes any
  * parsed document, payment entity, status, or HTTP artifact (sepa-nexus-signature-module-blueprint.md
  * §2 "must not"). {@code rawMessageId} must already reference an archived row (archive-before-verify,
  * G1) so every verdict — including a failed one — can bind to the exact bytes it covers.

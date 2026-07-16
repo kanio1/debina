@@ -161,7 +161,7 @@
     },
     {
       "epic": "EPIC-31",
-      "status": "in-progress",
+      "status": "done",
       "source_file": "planning/epics/EPIC-31-signature-module.md"
     },
     {
@@ -2166,7 +2166,7 @@
       "epic": "EPIC-31",
       "story": "31.3A",
       "title": "SIG-S3a: standalone signing capability (sign→verify)",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 31.1"
       ],

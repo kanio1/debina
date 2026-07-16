@@ -49,7 +49,7 @@ flowchart TB
     GQLGATE -.blocks.-> E53[EPIC-53 not-started]
 
     subgraph P4["Phase 4 — Signature"]
-        E09 --> E31[EPIC-31 in-progress]
+        E09 --> E31[EPIC-31 done]
     end
 
     subgraph P5["Phase 5 — Ledger/Settlement"]
@@ -74,7 +74,7 @@ flowchart TB
     GATE -.blocks.-> E10
 
     %% --- Cycle 1 (H1, signature <-> egress) — FIXED 2026-07-16 ---
-    S313A["EPIC-31 / Story 31.3A\n(standalone signing capability —\ndepends only on 31.1, EPIC-43 edge REMOVED [FIXED])"]
+    S313A["EPIC-31 / Story 31.3A done 2026-07-16\n(standalone signing capability —\ndepends only on 31.1, EPIC-43 edge REMOVED [FIXED])"]
     S432["EPIC-43 / Story 43.2\n(renderer + SignatureSigningPort call)"]
     E31 --> S313A
     E43 --> S432

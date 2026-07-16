@@ -78,7 +78,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-31 — Moduł Signature | in-progress (Story 31.1/31.2/31.4 done — schemat/porty/ArchUnit/grant-test/weryfikacja Ed25519/KeyRegistryPort; 31.3 **split 2026-07-16** into 31.3A [standalone signing capability — fixed a real cycle with EPIC-43/43.2, **31.3A jest dziś READY**, depends only on 31.1 done]; patrz epic file i `BACKLOG-REDESIGN.md` H1) | EPIC-09 | [epics/EPIC-31-signature-module.md](epics/EPIC-31-signature-module.md) |
+| EPIC-31 — Moduł Signature | **done** 2026-07-16 (Story 31.1/31.2/31.4 done — schemat/porty/ArchUnit/grant-test/weryfikacja Ed25519/KeyRegistryPort; 31.3A **done** 2026-07-16 — standalone `SignatureSigningPort`/`Ed25519SignatureSigner`, `SigningRoundTripTest` 15/15; patrz epic file i `BACKLOG-REDESIGN.md` H1 dla split-rationale) | EPIC-09 | [epics/EPIC-31-signature-module.md](epics/EPIC-31-signature-module.md) |
 
 ## Faza 5 — Ledger / Settlement (Iteracja 2/4/5)
 
@@ -100,7 +100,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-43 — Egress: szyna wychodząca | not-started — Story 43.1 (`depends_on: []`) jest dziś READY; Story 43.2 dependency **repointed 2026-07-16** do `EPIC-31/Story 31.3A` (był `31.3`, cyklicznie zależny), patrz `BACKLOG-REDESIGN.md` H1 | EPIC-09 | [epics/EPIC-43-egress-rail-outbound-dispatch.md](epics/EPIC-43-egress-rail-outbound-dispatch.md) |
+| EPIC-43 — Egress: szyna wychodząca | not-started — Story 43.1 (`depends_on: []`) jest dziś READY; Story 43.2 depends on `[Story 43.1, EPIC-31/Story 31.3A]` — `31.3A` **done** 2026-07-16, ale `43.2` pozostaje zablokowana na nieukończonej `43.1` (nie oznaczaj automatycznie jako READY) | EPIC-09 | [epics/EPIC-43-egress-rail-outbound-dispatch.md](epics/EPIC-43-egress-rail-outbound-dispatch.md) |
 | EPIC-44 — Egress: profil i taksonomia artefaktów | not-started | EPIC-43 | [epics/EPIC-44-egress-profile-artifact-taxonomy.md](epics/EPIC-44-egress-profile-artifact-taxonomy.md) |
 | EPIC-45 — Egress: cykl życia wiadomości wychodzącej | not-started | EPIC-44 | [epics/EPIC-45-egress-outbound-message-lifecycle.md](epics/EPIC-45-egress-outbound-message-lifecycle.md) |
 | EPIC-46 — Egress: próby dostawy i retry | not-started | EPIC-45 | [epics/EPIC-46-egress-delivery-attempts-retry.md](epics/EPIC-46-egress-delivery-attempts-retry.md) |

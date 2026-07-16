@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 /**
  * EPIC-31 Story 31.1 (OWN-10 S2): {@code JdbcKeyRegistryStore} and any future signature internals
  * live in {@code com.sepanexus.signature.internal} — no class outside the {@code signature} module
- * may reference them directly; every caller goes through {@link SignaturePort}/{@link
- * KeyRegistryPort} instead.
+ * may reference them directly; every caller goes through {@link KeyRegistryPort}/{@link
+ * SignatureVerificationPort}/{@link SignatureSigningPort} instead.
  */
 class SignatureNoForeignRepoAccessTest {
 

@@ -1,6 +1,6 @@
 package com.sepanexus.modules.paymentlifecycle.ingress;
 
-import com.sepanexus.signature.SignaturePort;
+import com.sepanexus.signature.SignatureVerificationPort;
 import com.sepanexus.signature.SignatureVerificationRequest;
 import com.sepanexus.signature.Verdict;
 import java.time.Instant;
@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 public class SignedChannelIngestionPipeline {
 
     private final RawMessageArchive rawMessageArchive;
-    private final SignaturePort signaturePort;
+    private final SignatureVerificationPort signaturePort;
     private final HardenedXmlFactory hardenedXmlFactory;
 
-    public SignedChannelIngestionPipeline(RawMessageArchive rawMessageArchive, SignaturePort signaturePort,
+    public SignedChannelIngestionPipeline(RawMessageArchive rawMessageArchive, SignatureVerificationPort signaturePort,
             HardenedXmlFactory hardenedXmlFactory) {
         this.rawMessageArchive = rawMessageArchive;
         this.signaturePort = signaturePort;

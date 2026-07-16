@@ -57,7 +57,7 @@ public class PaymentController {
      * pin exact header names, so these are a pragmatic {@code [OPEN-QUESTION]} resolution, same
      * discipline as Story 31.2's Ed25519 pick. Absent {@code X-Signature} is a legitimate case (an
      * unsigned submission attempt on a channel that requires one) and must still reach
-     * {@code SignaturePort} as evidence, never be rejected earlier by validation.
+     * {@code SignatureVerificationPort} as evidence, never be rejected earlier by validation.
      */
     @PostMapping(path = "/api/v1/iso/pain001", consumes = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<Void> submitPain001(@RequestBody byte[] xmlBytes,
