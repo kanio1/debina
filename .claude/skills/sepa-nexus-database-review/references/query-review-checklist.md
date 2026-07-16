@@ -1,0 +1,10 @@
+# Query review checklist
+
+- [ ] Every new query is served by an existing index, or the migration adding the needed index is part of this same change set (no new N+1-shaped or full-table-scan query introduced without a stated, accepted reason).
+- [ ] `EXPLAIN`/`EXPLAIN ANALYZE` evidence exists for any query added specifically for performance reasons, run against representative Testcontainers data (not an empty table, which hides real cost).
+- [ ] Repository methods are schema-scoped and thin — no business logic inside a repository method, no cross-schema `JOIN` reaching into another module's tables (one-writer-per-schema applies to reads too, not just writes — cross-module reads go through a published port/event/read model).
+- [ ] No repository call from inside a `Controller` class (root `AGENTS.md`: controllers hold no business logic; this includes not calling a repository directly, bypassing the service layer's authorization decision).
+- [ ] Pagination (if present) doesn't rely on `size() == limit` alone to detect "more pages exist" — that heuristic silently breaks when the true count is an exact multiple of the page size (documented pitfall from prior sessions in this repo — check `HANDOFF.md` history/git-log for prior instances of this exact bug class).
+- [ ] Any query touching money aggregates uses `numeric`/`BigDecimal` arithmetic throughout, including any `SUM`/`AVG` at the SQL level (`numeric` columns aggregate correctly by default, but confirm no intermediate cast to `float`/`double` was introduced in application code consuming the result).
+- [ ] Transaction boundaries around the query match the intended atomicity — a read-then-write sequence that needs consistency is wrapped in one transaction, not split across two separate calls that could interleave with a concurrent write.
+- [ ] If the query is idempotency-check-adjacent (a lookup before insert), confirm it relies on a database-level unique constraint for the actual safety guarantee, not solely on the read-then-write ordering (`sepa-nexus-payments-data-integrity` skill's `idempotency.md`).
