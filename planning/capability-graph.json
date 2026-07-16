@@ -652,12 +652,12 @@
     {
       "id": "EPIC-27.27.3",
       "type": "STORY",
-      "status": "not-started"
+      "status": "blocked"
     },
     {
       "id": "EPIC-27.27.4",
       "type": "STORY",
-      "status": "not-started"
+      "status": "done"
     },
     {
       "id": "EPIC-27.27.5",

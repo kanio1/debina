@@ -1928,7 +1928,7 @@
       "epic": "EPIC-27",
       "story": "27.3",
       "title": "Duplikat i out-of-order",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 27.2C"
       ],
@@ -1942,7 +1942,7 @@
       "epic": "EPIC-27",
       "story": "27.4",
       "title": "Orphan → DLQ `[MVP]`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 27.2C"
       ],
@@ -1950,7 +1950,7 @@
         "./mvnw -f backend test -Dtest=*OrphanDlqTest*"
       ],
       "source_file": "planning/epics/EPIC-27-iso-correlation-engine.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 EPIC-27 Story 27.4 implementation session"
     },
     {
       "epic": "EPIC-27",

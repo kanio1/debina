@@ -65,23 +65,42 @@ Taski:
 
 ## Story 27.3 — Duplikat i out-of-order
 
-status: not-started
+status: blocked
 depends_on: [Story 27.2C]
+
+`[CAPABILITY-BLOCKED 2026-07-16 — EPIC-27 Story 27.4 session readiness correction]`: potwierdzone w repozytorium, że wszystkie poniższe braki są prawdziwe (nie założenie, nie zgadnięcie):
+1. nie istnieje żaden rzeczywisty konsument `csm.response.received` (`grep` po repo: brak `@KafkaListener`/klasy konsumenckiej dla tego topicu);
+2. `infra/asyncapi/asyncapi.yaml`'s `csm_response_received` channel ma `payload: {}` — nazwa topicu i metadane (`x-key`, `x-consumers`, `x-priority`) są zdefiniowane źródłowo, ale sam kontrakt payloadu nie jest;
+3. `iso.inbox_events` nie istnieje w żadnej migracji Flyway;
+4. `IsoMessageCorrelatedEvent` (produkcyjny rekord eventu `iso.message.correlated`) nie zawiera statusu ISO ani reason code — tylko `eventId`/`isoMessageId`/`paymentId`/`tenantId`/`matchedBy`;
+5. out-of-order/late/weaker jest jawnie udokumentowane jako decyzja `payment-lifecycle` (FSM), nie `iso-adapter` — patrz `sepa-nexus-payments-data-integrity` skill's `correlation-integrity.md` i blueprint §2.4's własny podział "iso-adapter decides... payment-lifecycle decides...".
+
+Brakujące, jeszcze nie istniejące capabilities niezbędne przed startem tej story:
+- źródłowo zdefiniowany kontrakt payloadu `csm.response.received` (dziś tylko nazwa topicu/klucz/konsumenci w AsyncAPI, bez pól);
+- rzeczywisty inbound `@KafkaListener` konsument tego topicu w `iso-adapter`;
+- tabela `iso.inbox_events` (per-schema inbox, wzorzec §4.4, dziś nie istnieje w żadnym schemacie `iso`);
+- ekstrakcja `message_id` z tego kanału do celów dedupe (dziś `IsoMessageCorrelatedEvent`/`IsoMessageOrphanedEvent` nie niosą go — nie mylić z `isoMessageId`, źródło nie definiuje ich jako tej samej wartości);
+- ekstrakcja statusu ISO / reason code z pacs.002 do przekazania dalej;
+- jawnie zaprojektowane przekazanie tego wyniku do `payment-lifecycle` (dziś nie istnieje żaden port/event niosący status+reason do FSM).
+
+Nie implementuj sztucznego kontraktu eventu ani `iso.inbox_events` w tej story bez uprzedniego źródłowego rozstrzygnięcia — patrz `[OPEN-QUESTION]`.
 
 Taski:
 - [ ] **Test: duplikat → `IGNORED_DUPLICATE`; wiadomość out-of-order → polityka FSM, nie błąd.**
-      `verify: ./mvnw -f backend test -Dtest=*DuplicateAndOutOfOrderTest*`
+      `verify: ./mvnw -f backend test -Dtest=*DuplicateAndOutOfOrderTest*` — `NOT RUN`, `[CAPABILITY-BLOCKED]` do czasu powyższych brakujących capabilities.
 
 ## Story 27.4 — Orphan → DLQ `[MVP]`
 
-status: not-started
+status: done
 depends_on: [Story 27.2C]
 
 `[SPLIT 2026-07-16 — dual-agent governance/backlog-redesign session, H6]`: was "Orphan → DLQ + read model operatora", one task/verify mixing an `[MVP]` deliverable (DLQ write) with a `[P1]` deliverable (manual-correlation operator read model) via a mid-sentence priority-tag split. Scope narrowed to the `[MVP]` half only; the `[P1]` half moved to the new Story 27.5 below, per ADR-N6's one-priority-taxonomy rule (iteration number primary, tag secondary — these two halves belong to different waves).
 
+`[DONE 2026-07-16]`: `ORPHANED` now publishes exactly one `iso.outbox_events` row (`event_type=iso.message.orphaned.v1`, `aggregate_id=iso_message_id`, `correlation_id=eventId`) in the same `@Transactional` unit as the `iso.iso_message_correlation` insert (`Pacs002CorrelationService`, unchanged transaction boundary from Story 27.2C, `MATCHED`/`ORPHANED`/`AMBIGUOUS` all handled in one method). New production classes: `IsoOutboxEventType` (controlled `event_type` → topic enum — `MESSAGE_CORRELATED`→`iso.message.correlated`, `MESSAGE_ORPHANED`→`iso.message.orphaned`; no implicit `topic = eventType.replace(...)` rule, no default topic for an unresolved type), `IsoMessageOrphanedEvent` (`eventId`/`isoMessageId`/`tenantId` only — no payment ID, no amount/currency/participant, no raw XML). Fixed a real pre-existing defect found by the session's own audit: `IsoOutboxDispatcher` previously didn't select `event_type` at all and published every unpublished row to the single hardcoded `iso.message.correlated` topic — it now resolves each row's topic via `IsoOutboxEventType.fromEventType(...)` and leaves any unresolved `event_type` unpublished (logged by id/event_type only, never payload). `IsoCorrelationTopicConfig` now registers both topics, both names sourced from the enum. `AMBIGUOUS` publishes neither event (unchanged from 27.2C, now with an explicit test). 9 new tests: `OrphanDlqTest` (5, isolated PostgreSQL Testcontainer — orphan persistence+outbox row, orphan payload contains no payment ID/amount/currency, MATCHED still publishes only correlated, AMBIGUOUS publishes neither, serialization-failure rollback proof via a real `DataSourceTransactionManager`+`TransactionTemplate` sharing the JDBC `DataSource` with the service's `JdbcTemplate`s) and `IsoOutboxTopicRoutingTest` (4, real Kafka Testcontainer — correlated-only routing, orphaned-only routing with `iso_message_id` key, unknown `event_type` never published and stays unpublished, broker-failure-leaves-unpublished-for-retry using a dedicated isolated PostgreSQL Testcontainer with no Spring context, to avoid racing the shared context's live `@Scheduled` dispatcher against a healthy broker). Mutation-proofed 3x (orphan topic misrouted to `iso.message.correlated` → 2/4 routing tests correctly failed; orphan event published for `AMBIGUOUS` too → 1/5 `OrphanDlqTest` correctly failed; `published_at` set before broker success → the dedicated failure/retry test correctly failed) — all three reverted, `git diff --check` clean. Full backend regression: `214/214 PASS`, `BUILD SUCCESS` (up from `205/205` at the end of the prior session). Database review: `PASS`, zero blocking findings.
+
 Taski:
-- [ ] **Nierozpoznany status → DLQ.**
-      `verify: ./mvnw -f backend test -Dtest=*OrphanDlqTest*`
+- [x] **Nierozpoznany status → DLQ.**
+      `verify: ./mvnw -f backend test -Dtest=*OrphanDlqTest*` → `Tests run: 5, Failures: 0, Errors: 0` — PASS (2026-07-16).
 
 ## Story 27.5 — Read model operatora do ręcznej korelacji `[P1]`
 

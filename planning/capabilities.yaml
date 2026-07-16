@@ -300,15 +300,26 @@ capabilities:
         produces: cap.iso.correlation-engine
       - id: 27.3
         title: "Duplicate and out-of-order semantics"
-        status: not-started
+        status: blocked
         requires: ["27.2C"]
+        note: >
+          2026-07-16 (Story 27.4 session) readiness correction: confirmed no real
+          csm.response.received consumer, no source-defined payload contract for that
+          event, no iso.inbox_events table, and no status/reason-code carrying event —
+          [CAPABILITY-BLOCKED], see EPIC-27-iso-correlation-engine.md Story 27.3 for the
+          full missing-capability list. Not implemented via guessing.
       - id: 27.4
         title: "Orphan -> DLQ"
-        status: not-started
+        status: done
         requires: ["27.2C"]
         note: >
           H6: split from a single task/verify that mixed [MVP] DLQ write with [P1]
-          manual-correlation read model — the [P1] half moved to 27.5.
+          manual-correlation read model — the [P1] half moved to 27.5. 2026-07-16: done
+          — ORPHANED publishes iso.message.orphaned (key=iso_message_id) via a
+          controlled event_type->topic routing enum (IsoOutboxEventType), same
+          transaction as the correlation-row insert; fixed a real pre-existing defect
+          where IsoOutboxDispatcher published every row to one hardcoded topic
+          regardless of event_type.
       - id: 27.5
         title: "Operator read model for manual correlation over the orphan DLQ [P1]"
         status: not-started
