@@ -37,6 +37,9 @@ jobs:
       - name: Agent instruction hierarchy
         run: bash tools/agent-config/validate-agent-instructions.sh
 
+      - name: Story inventory reproducibility
+        run: python3 tools/agent-config/generate-story-inventory.py --check
+
       - name: Story inventory
         run: python3 tools/agent-config/validate-story-inventory.py
 

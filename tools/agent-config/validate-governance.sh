@@ -15,21 +15,27 @@ bash tools/agent-config/validate-agent-instructions.sh
 
 echo
 echo "###############################################################"
-echo "# 2/4 — story inventory"
+echo "# 2/5 — story inventory reproducibility"
+echo "###############################################################"
+python3 tools/agent-config/generate-story-inventory.py --check
+
+echo
+echo "###############################################################"
+echo "# 3/5 — story inventory"
 echo "###############################################################"
 python3 tools/agent-config/validate-story-inventory.py
 
 echo
 echo "###############################################################"
-echo "# 3/4 — capability graph"
+echo "# 4/5 — capability graph"
 echo "###############################################################"
 python3 tools/agent-config/validate-capability-graph.py
 
 echo
 echo "###############################################################"
-echo "# 4/4 — database skills"
+echo "# 5/5 — database skills"
 echo "###############################################################"
 bash tools/agent-config/validate-database-skills.sh
 
 echo
-echo "RESULT: PASS (all 4 governance validators passed)"
+echo "RESULT: PASS (all 5 governance validators passed)"
