@@ -35,9 +35,11 @@ Taski:
 - [ ] **Zbuduj S-02 Ops Overview** zasilany przez pojedynczy endpoint SSE własności `reporting` (ADR-N4), kafelki wg `sepa-nexus-first-3-screens-ui-spec.md` §4.4 (System status, Payments today, Pending settlement, Failed deliveries, Open exceptions, Latest failed events).
       `verify: npm run test:e2e -- --grep "@smoke.*control-room"` — `NOT RUN`, `blocked` (patrz wyżej).
 
-## Story 24.2 — Workspace 2: Payments & Files (S-03, S-04)
+## Story 24.2A — Workspace 2 feature: list, detail, ISO panel, timeline
 
-status: in-progress
+`[SPLIT 2026-07-16 — dual-agent governance/backlog-redesign session, H4]`: was Story 24.2 ("Workspace 2: Payments & Files"), which bundled feature implementation (list+detail+ISO panel+timeline — both original tasks, both already checked `[x]` and independently verified via `pnpm run build` plus real browser/live-infra smoke tests) with a separate, unchecked, no-dedicated-task acceptance requirement ("1 happy-path + 1 negatywny test Playwright") that alone kept the whole story `in-progress` instead of `done`. Split into 24.2A (feature — now `done`, all its own tasks already were) and 24.2B (Playwright acceptance — `blocked` on the sequencing rule, unchanged). This does not change when Playwright may start; it only stops a fully-delivered feature from reading as incomplete.
+
+status: **done**
 depends_on: [EPIC-20-payment-lifecycle-fsm, EPIC-21-iso-identifier-refactor]
 
 Opis: lista płatności + szczegóły/timeline z panelem identyfikatorów ISO (`iso.payment_iso_identifiers`, w tym wiersze `JSON_DIRECT` per ADR-N7). `[MVP]` Iteracja 1 — to jest jeden z pierwszych 3 ekranów z komponent-foundation §9 kroku 8.
@@ -46,7 +48,7 @@ Opis: lista płatności + szczegóły/timeline z panelem identyfikatorów ISO (`
 
 **Realny bug znaleziony i naprawiony podczas weryfikacji tej story** (nie część pierwotnego zakresu, ale blokował realną weryfikację end-to-end): (1) `frontend/src/app/api/payments/route.ts` POST nigdy nie przekazywał nagłówka `Idempotency-Key` do backendu — realny submit płatności przez przeglądarkę zwracał `400` od EPIC-19/22 (odkąd nagłówek stał się wymagany na backendzie), ekran "Submit payment" z EPIC-06 Story 6.4 był **faktycznie zepsuty** w całej ścieżce UI. Naprawiono: `payments/page.tsx` generuje `crypto.randomUUID()` per próba submitu, BFF wymaga i przekazuje nagłówek dalej. (2) `frontend/src/app/api/auth/callback/route.ts` odczytywał `realm_access.roles` z **ID tokenu**, który w tym realmie nigdy nie niesie tego claimu (potwierdzone dekodowaniem: ID token ma `tenant_id`/`branch_id`/`preferred_username`, ale nie `realm_access`) — `SessionClaims.roles` było **zawsze puste** dla każdego realnego logowania przez przeglądarkę, co czyniłoby mapę rola→workspace (Story 23.3) martwą w praktyce. Naprawiono: role odczytywane z access tokenu (zweryfikowanego osobno przez `jwtVerify` bez `audience`, bo access token w tym realmie nie ma `aud`, tylko `azp` — dokładnie jak weryfikuje go backend). Oba potwierdzone realnym przebiegiem authorization-code+PKCE przez `curl` (nie mock): logowanie → `/api/session` → `roles: ["payment_submitter"]` (było `[]`) → HTML `/payments` faktycznie zawiera `app-shell.nav.payments`.
 
-Kryterium ukończenia: 1 happy-path + 1 negatywny test Playwright, dane z `iso.payment_iso_identifiers` widoczne w panelu. `[NIE DOTYCZY tej sesji]` — Playwright pozostaje bramkowany do czasu zbudowania wszystkich pierwszych 3 ekranów (patrz nota na górze pliku).
+Kryterium ukończenia: lista + szczegół + panel identyfikatorów ISO + timeline zbudowane i zweryfikowane (build + real smoke test). Met — Playwright acceptance is a separate deliverable, see Story 24.2B below.
 
 `[REEWALUACJA 2026-07-15]`: `EPIC-21` Story 21.2 (drugi z dwóch `depends_on`) jest teraz `done` — `payment.payments.end_to_end_id` usunięty, read model `PaymentService.visiblePayments`/`paymentDetail` przepięty na `iso.payment_iso_identifiers`/`iso.message_lineage`. JSON response shape (`PaymentSummaryResponse`/`PaymentDetailResponse`) **niezmieniony** — pole `endToEndId` ta sama nazwa, ten sam typ. `pnpm run lint`/`typecheck`/`build` wszystkie PASS bez żadnej zmiany w `frontend/`. Nie wykonano świeżego ręcznego przeglądarkowego przebiegu w tej sesji (tylko strukturalna weryfikacja: kontrakt JSON identyczny + `WalkingSkeletonIntegrationTest`, który idzie przez prawdziwy HTTP+Keycloak+DB, dalej przechodzi) — realny browser click-through z poprzedniej sesji (Story 24.2's własna notatka) pozostaje jedynym bezpośrednim dowodem end-to-end, ale nic w tej sesji nie zmieniło ścieżkę, którą on wtedy zweryfikował.
 
@@ -56,7 +58,20 @@ Taski:
 - [x] **Zbuduj listę płatności + szczegół** (bez timeline — patrz wyżej), panel identyfikatorów zasilany z `iso.payment_iso_identifiers`.
       `verify: pnpm run build` → PASS (2026-07-14). Nowy backend `GET /api/v1/payments/{id}` (`PaymentController.detail`, `PaymentService.paymentDetail`, `IsoIdentifierLookup` — czyta wyłącznie przez `iso.payment_iso_identifiers`, nigdy przez pole spłaszczone na `payment.payments`, G4), `PaymentNotFoundException`→404 RFC7807. Nowe testy `PaymentControllerTest.returnsPaymentDetailWithIsoIdentifiers`/`returnsNotFoundForUnknownPayment` (`./mvnw -f backend test` → `49/49`, było 47). Nowy BFF `GET /api/payments/[id]/route.ts`, nowy `frontend/src/app/payments/[id]/page.tsx` (używa `ScreenState` z Story 23.3), link z listy (`payments-table.tsx` `endToEndId` → `<a href="/payments/{id}">`). **Realny smoke-test pełnego przeglądarkowego przepływu** (authorization code + PKCE przez `curl`, prawdziwy Keycloak, prawdziwy Next.js `next start`, prawdziwy backend): login → submit z prawdziwym `Idempotency-Key` → `201 Created` → `GET /api/payments/{id}` przez BFF → prawdziwy JSON z `isoIdentifiers: [{sourceMessageType: "JSON_DIRECT", ...}]` czytany z żywej bazy.
 - [x] **Timeline** (historia przejść statusu).
-      `verify: pnpm run build` → PASS (2026-07-15, patrz `[TIMELINE DOSTARCZONY]` wyżej). `./mvnw -f backend test` → `137/137 PASS` (było 118 po EPIC-21). Playwright acceptance (formalne domknięcie tej story) pozostaje `[NIE DOTYCZY tej sesji]`, bramkowany zgodnie z notą u góry pliku — funkcjonalna dostawa nie zmienia tej sekwencji.
+      `verify: pnpm run build` → PASS (2026-07-15, patrz `[TIMELINE DOSTARCZONY]` wyżej). `./mvnw -f backend test` → `137/137 PASS` (było 118 po EPIC-21).
+
+## Story 24.2B — Workspace 2 Playwright acceptance
+
+status: blocked
+depends_on: [Story 24.2A, Story 24.1]
+
+`[SPLIT 2026-07-16 — see Story 24.2A note above]`. `depends_on` includes `Story 24.1` (Control Room) because the file-level `[SEKWENCJONOWANIE — NIE ŁAMAĆ]` rule gates all Playwright on the first 3 screens existing, not just this workspace's own feature work.
+
+Kryterium ukończenia: 1 happy-path + 1 negatywny test Playwright, dane z `iso.payment_iso_identifiers` widoczne w panelu.
+
+Taski:
+- [ ] **Playwright: happy-path submit→list→detail, i negatywny (np. brakujący identyfikator ISO renderuje stan błędu, nie 500).**
+      `verify: npm run test:e2e -- --grep "@smoke.*payments"` — `NOT RUN`, `blocked` do czasu zbudowania wszystkich pierwszych 3 ekranów (patrz nota na górze pliku).
 
 ## Story 24.3 — Workspace 3: Settlement & Liquidity (S-08, S-09, S-10)
 

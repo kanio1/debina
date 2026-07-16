@@ -1,0 +1,2014 @@
+{
+  "version": 2,
+  "generated": "2026-07-16",
+  "session": "dual-agent governance and backlog redesign (Part D/E/F, post-split revision)",
+  "note": "Two granularities: EPIC nodes (epic-only) use the epic-level depends_on already in planning/README.md; EPIC_AGGREGATE nodes additionally have STORY children for the 12 epics deep-dived this session (plus EPIC-14/39/45/46, evidenced individually). An epic-aggregate node always REQUIRES all of its own story children (an epic isn't done until its stories are). This revision reflects the story splits and dependency narrowings actually applied to planning/epics/*.md this session (see planning/BACKLOG-REDESIGN.md) -- both detected cycles are now resolved.",
+  "decision_gates": [
+    {
+      "id": "gate.EPIC-10.10_1.security-definer",
+      "blocks": [
+        "EPIC-10.10.1A",
+        "EPIC-10.10.1B",
+        "EPIC-10.10.1C",
+        "EPIC-10.10.1D",
+        "EPIC-10.10.2"
+      ],
+      "requires": "User acceptance of the SECURITY DEFINER recommendation in /EPIC-10-transaction-coordination-decision-memo.md (or a request for further proof / an alternative)",
+      "status": "OPEN"
+    }
+  ],
+  "resolved_cycles": [
+    {
+      "id": "cycle.signature-egress",
+      "hypothesis": "H1",
+      "path_before_fix": [
+        "EPIC-31.31.3",
+        "EPIC-43",
+        "EPIC-43.43.2",
+        "EPIC-31.31.3"
+      ],
+      "root_cause": "EPIC-31 Story 31.3 depended on the whole EPIC-43 epic (unqualified); EPIC-43 Story 43.2 depended specifically on Story 31.3. Same precedent (31.2<->EPIC-19/19.2) was already found and fixed once in this corpus by re-granulating to story level, but this pair was not.",
+      "resolution_applied": "Story 31.3 split into 31.3A (standalone sign/verify capability, depends only on 31.1, no EPIC-43 dependency). EPIC-43 Story 43.2 now depends on 31.3A instead of the old whole-epic-reaching 31.3, and absorbed the egress-invocation task detail. See planning/BACKLOG-REDESIGN.md and the epic files themselves."
+    },
+    {
+      "id": "cycle.egress-transport-status-vs-finality",
+      "hypothesis": null,
+      "path_before_fix": [
+        "EPIC-14.14.3",
+        "EPIC-39",
+        "EPIC-14.14.3"
+      ],
+      "root_cause": "EPIC-14 Story 14.3 depended on the whole EPIC-39 epic (unqualified, per source); EPIC-39 Story 39.4 depended specifically on EPIC-14 Story 14.3. Discovered incidentally while building this graph, not one of the ten named hypotheses.",
+      "resolution_applied": "EPIC-14 Story 14.3 now depends on EPIC-39/Story 39.2 specifically (the FinalityPolicy/settlement_finality_records capability it actually reads). EPIC-39 Story 39.4 no longer references EPIC-14/14.3 as a dependency at all -- both stories assert the identical shared test (DeliveredNotFinalTest) and now carry a shared-test note instead of a blocking cross-reference."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "EPIC-00",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-01",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-02",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-03",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-04",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-05",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-06",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-07",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-08",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-09",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-10",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-11",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-12",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-13",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-14",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-15",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-16",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-17",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-18",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-19",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-20",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-21",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-22",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-23",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-24",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-25",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-26",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-27",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-28",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-29",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-30",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-31",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-32",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-33",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-34",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-35",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-36",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-37",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-38",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-39",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-40",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-41",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-42",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-43",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-44",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-45",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-46",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-47",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-48",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-49",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-50",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-51",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-52",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-53",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-54",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-55",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-56",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-57",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-58",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-59",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-60",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-61",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-62",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-63",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-64",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-65",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-66",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-67",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-68",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-69",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-70",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-71",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-72",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-73",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-74",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-75",
+      "type": "EPIC",
+      "granularity": "epic-only"
+    },
+    {
+      "id": "EPIC-10.10.1A",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-10.10.1B",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-10.10.1C",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-10.10.1D",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-10.10.1E",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-10.10.2",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-10.10.3",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-12.12.1",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-12.12.2",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-20.20.1",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-20.20.2",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-20.20.3",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-23.23.1A",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-23.23.1B",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-23.23.2",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-23.23.3",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-23.23.4",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-24.24.1",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.2A",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-24.24.2B",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.3",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.4",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.5",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.6",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.7",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.8",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.9",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-25.25.1",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-25.25.2",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-25.25.3A",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-25.25.3B",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-25.25.3C",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-25.25.3D",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-25.25.3E",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-25.25.4",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-26.26.1",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-26.26.2",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-26.26.3",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-26.26.4",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-27.27.1",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-27.27.2",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-27.27.3",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-27.27.4",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-27.27.5",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-28.28.1",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-28.28.2",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-28.28.3",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-28.28.4",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-31.31.1",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-31.31.2",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-31.31.3A",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-31.31.4",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-35.35.1",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-35.35.2",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-35.35.3",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-43.43.1",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-43.43.2",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-43.43.3",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-43.43.4",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-43.43.5",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-14.14.1",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-14.14.2",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-14.14.3",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-39.39.2",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-39.39.4",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-21.21.1_21.3",
+      "type": "STORY",
+      "status": "done"
+    }
+  ],
+  "edges": [
+    {
+      "from": "EPIC-01",
+      "to": "EPIC-00",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-02",
+      "to": "EPIC-00",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-03",
+      "to": "EPIC-00",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-03",
+      "to": "EPIC-01",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-04",
+      "to": "EPIC-01",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-04",
+      "to": "EPIC-03",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-05",
+      "to": "EPIC-02",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-05",
+      "to": "EPIC-03",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-06",
+      "to": "EPIC-05",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-07",
+      "to": "EPIC-03",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-07",
+      "to": "EPIC-06",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-08",
+      "to": "EPIC-04",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-08",
+      "to": "EPIC-05",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-08",
+      "to": "EPIC-06",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-08",
+      "to": "EPIC-07",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-09",
+      "to": "EPIC-03",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-09",
+      "to": "EPIC-07",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-10.10.1A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-10.10.1B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-10.10.1C",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-10.10.1D",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-10.10.1E",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-10.10.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-10.10.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-21",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10",
+      "to": "EPIC-26",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10.10.1B",
+      "to": "EPIC-10.10.1A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10.10.1C",
+      "to": "EPIC-10.10.1B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10.10.1D",
+      "to": "EPIC-10.10.1B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10.10.2",
+      "to": "EPIC-10.10.1B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-10.10.3",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-11",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-11",
+      "to": "EPIC-20",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-12",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-12",
+      "to": "EPIC-12.12.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-12",
+      "to": "EPIC-12.12.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-12.12.2",
+      "to": "EPIC-12.12.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-13",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-13",
+      "to": "EPIC-32",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14",
+      "to": "EPIC-14.14.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14",
+      "to": "EPIC-14.14.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14",
+      "to": "EPIC-14.14.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14",
+      "to": "EPIC-43",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14.14.1",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14.14.1",
+      "to": "EPIC-46",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14.14.3",
+      "to": "EPIC-39.39.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-15",
+      "to": "EPIC-04",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-15",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-16",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-17",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-18",
+      "to": "EPIC-04",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-18",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-19",
+      "to": "EPIC-08",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20",
+      "to": "EPIC-19",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20",
+      "to": "EPIC-20.20.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20",
+      "to": "EPIC-20.20.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20",
+      "to": "EPIC-20.20.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20.20.2",
+      "to": "EPIC-04",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20.20.2",
+      "to": "EPIC-20.20.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20.20.3",
+      "to": "EPIC-20.20.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-20.20.3",
+      "to": "EPIC-27.27.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-21",
+      "to": "EPIC-19",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-22",
+      "to": "EPIC-02",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-22",
+      "to": "EPIC-03",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23",
+      "to": "EPIC-05",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23",
+      "to": "EPIC-06",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23",
+      "to": "EPIC-23.23.1A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23",
+      "to": "EPIC-23.23.1B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23",
+      "to": "EPIC-23.23.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23",
+      "to": "EPIC-23.23.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23",
+      "to": "EPIC-23.23.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23.23.1A",
+      "to": "EPIC-07",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23.23.1B",
+      "to": "EPIC-07",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-23.23.4",
+      "to": "EPIC-06",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-23",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.2A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.2B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.5",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.6",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.7",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.8",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.9",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.1",
+      "to": "EPIC-25.25.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.2A",
+      "to": "EPIC-20",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.2A",
+      "to": "EPIC-21",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.2B",
+      "to": "EPIC-24.24.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.2B",
+      "to": "EPIC-24.24.2A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.3",
+      "to": "EPIC-32",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.3",
+      "to": "EPIC-33",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.4",
+      "to": "EPIC-44",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.5",
+      "to": "EPIC-57",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.5",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.7",
+      "to": "EPIC-12",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.9",
+      "to": "EPIC-24.24.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24.24.9",
+      "to": "EPIC-68",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-07",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.3A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.3B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.3C",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.3D",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.3E",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25",
+      "to": "EPIC-25.25.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.2",
+      "to": "EPIC-19",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.2",
+      "to": "EPIC-25.25.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.3A",
+      "to": "EPIC-04",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.3A",
+      "to": "EPIC-25.25.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.3B",
+      "to": "EPIC-25.25.3A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.3C",
+      "to": "EPIC-25.25.3A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.3D",
+      "to": "EPIC-25.25.3A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.3E",
+      "to": "EPIC-25.25.3C",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.4",
+      "to": "EPIC-25.25.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.4",
+      "to": "EPIC-25.25.3D",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-25.25.4",
+      "to": "EPIC-25.25.3E",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26",
+      "to": "EPIC-19",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26",
+      "to": "EPIC-26.26.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26",
+      "to": "EPIC-26.26.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26",
+      "to": "EPIC-26.26.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26",
+      "to": "EPIC-26.26.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26.26.2",
+      "to": "EPIC-26.26.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26.26.3",
+      "to": "EPIC-21.21.1_21.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26.26.3",
+      "to": "EPIC-26.26.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26.26.4",
+      "to": "EPIC-26.26.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-26.26.4",
+      "to": "EPIC-26.26.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-26.26.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-27.27.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-27.27.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-27.27.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-27.27.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-27.27.5",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27.27.2",
+      "to": "EPIC-27.27.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27.27.3",
+      "to": "EPIC-27.27.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27.27.4",
+      "to": "EPIC-27.27.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27.27.5",
+      "to": "EPIC-27.27.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28",
+      "to": "EPIC-19",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28",
+      "to": "EPIC-28.28.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28",
+      "to": "EPIC-28.28.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28",
+      "to": "EPIC-28.28.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28",
+      "to": "EPIC-28.28.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28.28.2",
+      "to": "EPIC-12.12.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28.28.2",
+      "to": "EPIC-28.28.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28.28.3",
+      "to": "EPIC-28.28.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-28.28.4",
+      "to": "EPIC-28.28.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-29",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-29",
+      "to": "EPIC-44",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-30",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31",
+      "to": "EPIC-31.31.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31",
+      "to": "EPIC-31.31.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31",
+      "to": "EPIC-31.31.3A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31",
+      "to": "EPIC-31.31.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31.31.2",
+      "to": "EPIC-31.31.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31.31.3A",
+      "to": "EPIC-31.31.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-31.31.4",
+      "to": "EPIC-31.31.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-32",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-33",
+      "to": "EPIC-32",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-33",
+      "to": "EPIC-35",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-33",
+      "to": "EPIC-39",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-34",
+      "to": "EPIC-32",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-34",
+      "to": "EPIC-37",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-34",
+      "to": "EPIC-61",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-35",
+      "to": "EPIC-12",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-35",
+      "to": "EPIC-35.35.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-35",
+      "to": "EPIC-35.35.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-35",
+      "to": "EPIC-35.35.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-35.35.1",
+      "to": "EPIC-12.12.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-35.35.2",
+      "to": "EPIC-35.35.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-35.35.3",
+      "to": "EPIC-35.35.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-36",
+      "to": "EPIC-13",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-36",
+      "to": "EPIC-35",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-37",
+      "to": "EPIC-35",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-38",
+      "to": "EPIC-35",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-39",
+      "to": "EPIC-35",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-39",
+      "to": "EPIC-39.39.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-39",
+      "to": "EPIC-39.39.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-39.39.4",
+      "to": "EPIC-39.39.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-40",
+      "to": "EPIC-35",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-41",
+      "to": "EPIC-35",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-42",
+      "to": "EPIC-39",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43",
+      "to": "EPIC-43.43.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43",
+      "to": "EPIC-43.43.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43",
+      "to": "EPIC-43.43.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43",
+      "to": "EPIC-43.43.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43",
+      "to": "EPIC-43.43.5",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43.43.2",
+      "to": "EPIC-31.31.3A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43.43.2",
+      "to": "EPIC-43.43.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43.43.3",
+      "to": "EPIC-43.43.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43.43.4",
+      "to": "EPIC-43.43.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-43.43.5",
+      "to": "EPIC-43.43.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-44",
+      "to": "EPIC-43",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-45",
+      "to": "EPIC-14.14.2",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-45",
+      "to": "EPIC-31.31.3A",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-45",
+      "to": "EPIC-44",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-46",
+      "to": "EPIC-14.14.2",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-46",
+      "to": "EPIC-45",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-47",
+      "to": "EPIC-46",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-48",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-48",
+      "to": "EPIC-43",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-49",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-49",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-50",
+      "to": "EPIC-17",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-50",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-50",
+      "to": "EPIC-43",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-51",
+      "to": "EPIC-12",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-52",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-52",
+      "to": "EPIC-51",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-53",
+      "to": "EPIC-52",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-54",
+      "to": "EPIC-53",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-55",
+      "to": "EPIC-37",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-55",
+      "to": "EPIC-53",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-56",
+      "to": "EPIC-17",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-56",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-56",
+      "to": "EPIC-53",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-56",
+      "to": "EPIC-54",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-57",
+      "to": "EPIC-12",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-58",
+      "to": "EPIC-57",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-59",
+      "to": "EPIC-58",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-60",
+      "to": "EPIC-39",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-60",
+      "to": "EPIC-58",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-61",
+      "to": "EPIC-59",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-61",
+      "to": "EPIC-60",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-62",
+      "to": "EPIC-61",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-62",
+      "to": "EPIC-63",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-63",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-63",
+      "to": "EPIC-58",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-63",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-63",
+      "to": "EPIC-66",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-64",
+      "to": "EPIC-17",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-64",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-64",
+      "to": "EPIC-57",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-65",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-65",
+      "to": "EPIC-27",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-66",
+      "to": "EPIC-42",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-66",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-67",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-68",
+      "to": "EPIC-66",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-69",
+      "to": "EPIC-49",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-70",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-71",
+      "to": "EPIC-62",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-71",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-72",
+      "to": "EPIC-24",
+      "type": "REQUIRES-UNDECLARED"
+    },
+    {
+      "from": "EPIC-72",
+      "to": "EPIC-65",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-73",
+      "to": "EPIC-19",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-74",
+      "to": "EPIC-02",
+      "type": "REQUIRES"
+    }
+  ]
+}

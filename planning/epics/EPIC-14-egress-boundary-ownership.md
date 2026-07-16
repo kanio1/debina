@@ -29,8 +29,10 @@ Taski:
 ## Story 14.3 — Asercja delivered ≠ final
 
 status: not-started
-depends_on: [Story 14.1, EPIC-39-settlement-finality-model]
+depends_on: [Story 14.1, EPIC-39-settlement-finality-model/Story 39.2]
+
+`[CYCLE-DETECTED, naprawione 2026-07-16 — dual-agent governance/backlog-redesign session]`: `depends_on` narrowed from the whole `EPIC-39-settlement-finality-model` epic to `Story 39.2` specifically (`FinalityPolicy` + `settlement_finality_records` — the actual capability this story's assertion reads). The unqualified whole-epic reference, combined with `EPIC-39` Story 39.4's own `depends_on` pointing specifically back at this story, formed a real cycle (14.3 → all of EPIC-39 → 39.4 → 14.3) — the same shape as the `EPIC-31`/`EPIC-43` cycle (H1), found incidentally while building `planning/capability-graph.json`, not one of the ten named hypotheses. `Story 14.3` and `EPIC-39` Story 39.4 assert the exact same thing (`DeliveredNotFinalTest`, explicitly marked "współdzielony z EPIC-14" in `EPIC-39`'s own file) — they are a shared-test pair like `CycleCloseRaceTest` (EPIC-34/EPIC-37) or `SignatureBeforeParseOrderingTest` (EPIC-19/EPIC-31), not a blocking dependency of one on the other's completion. See `planning/BACKLOG-REDESIGN.md` for the full writeup.
 
 Taski:
 - [ ] **Test: dostarczenie (`DELIVERED`) nie zmienia `settlement_finality_records` — finalność ustawia wyłącznie `settlement`.**
-      `verify: ./mvnw -f backend test -Dtest=*DeliveredNotFinalTest*`
+      `verify: ./mvnw -f backend test -Dtest=*DeliveredNotFinalTest*` (współdzielony z `EPIC-39` Story 39.4 — jedna implementacja, dowolna strona może zbudować pierwsza).

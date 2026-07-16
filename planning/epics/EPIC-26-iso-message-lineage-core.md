@@ -48,6 +48,8 @@ depends_on: [Story 26.2, Story 26.3]
 
 `[PLANNING-DEFECT 2026-07-14]`: GraphQL **nie istnieje w ogóle** w tym repo (potwierdzone wcześniej w `EPIC-16`: brak `spring-graphql`/`graphql-java` w `backend/pom.xml`) — budowanie panelu GraphQL teraz byłoby wynajdywaniem architektury na wyrost, w dodatku Story 26.3 (od którego to zależy) też jest `blocked`. **Status `blocked`** — odblokuj razem z pierwszym epikiem budującym warstwę GraphQL (prawdopodobnie `EPIC-16`/frontend-owy epik read-model).
 
+`[H8, 2026-07-16 — dual-agent governance/backlog-redesign session]`: this story's own deliverable (a read-model/GraphQL/frontend-facing lineage panel) is a different kind of work than its three sibling stories in this epic (26.1–26.3, all DB-migration/lineage-write concerns) — noted, not moved, since renumbering it into another epic file is a bigger structural change than this session's scope covers. Surfaced a real, previously-untracked planning gap while checking this: **`[OPEN-QUESTION]` — no epic in `/planning/` currently owns *building* the GraphQL layer itself.** `EPIC-16` only covers *ownership enforcement* of a GraphQL layer once one exists (grants/RLS on read models), and `EPIC-23` Story 23.1B only covers *codegen* once a GraphQL schema exists. Nothing currently specifies who writes the first `spring-graphql` schema/resolver. Not resolved here — recorded for `HANDOFF.md`/a future planning session, per this repo's own "don't invent architecture, record open questions" rule.
+
 Taski:
 - [ ] **Read model GraphQL: timeline lineage + panel identyfikatorów na szczególe płatności.**
       `verify: ./mvnw -f backend test -Dtest=*PaymentLineageGraphQLTest*` — `NOT RUN`, `blocked` (patrz wyżej).

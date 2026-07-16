@@ -1,0 +1,392 @@
+# SEPA Nexus — capability registry (human-readable companion to capability-graph.json)
+#
+# This file is the authoring/reading source for the capability model built during the
+# 2026-07-16 dual-agent governance and backlog redesign session. The machine-checked graph
+# (nodes + edges + cycle detection) lives in capability-graph.json and is validated by
+# tools/agent-config/validate-capability-graph.py — this YAML does not need its own parser
+# and is not read by any script; keep the two in sync by hand when either changes.
+#
+# POST-SPLIT NOTE (2026-07-16): the `capabilities:` section below documents the state as
+# inventoried BEFORE this session's story splits were applied to planning/epics/*.md, for
+# traceability (it's the evidence the splits were based on). The epic files themselves and
+# capability-graph.json (regenerated after the splits, 0 cycles) are the current source of
+# truth for story IDs (31.3 -> 31.3A, 10.1 -> 10.1A-E, 23.1 -> 23.1A/B, 24.2 -> 24.2A/B,
+# 25.3 -> 25.3A-E, 27.4 -> 27.4+27.5) and dependency narrowings (35.1, 20.3) — see
+# planning/BACKLOG-REDESIGN.md "Old-to-new mapping" for the authoritative table.
+#
+# Two granularities, by design (see planning/BACKLOG-REDESIGN.md for why):
+#   - EPIC nodes: the 66 epics not deep-dived this session keep the epic-level depends_on
+#     already recorded in planning/README.md (confirmed to match each file's own
+#     frontmatter, zero mismatches found).
+#   - EPIC_AGGREGATE nodes: the 12 epics deep-dived this session (plus targeted individual
+#     stories in EPIC-14/45/46, evidenced by name) get real story-level nodes. An
+#     aggregate always REQUIRES all of its own story children.
+#
+# A story->epic (rather than story->story) dependency is a smell, not automatically a
+# defect — but every one of them should be a deliberate choice, not an accident, because
+# an unqualified epic reference silently pulls in every story inside that epic, including
+# ones added later. Two of these silent pulls turned out to close real cycles (see below).
+
+version: 1
+generated: "2026-07-16"
+
+status_vocabulary:
+  formal: [not-started, in-progress, blocked, done]
+  readiness: [READY, DECISION-BLOCKED, CAPABILITY-BLOCKED, SOURCE-BLOCKED,
+              ITERATION-BLOCKED, INFRASTRUCTURE-BLOCKED, IMPLEMENTED-BUT-UNVERIFIED,
+              DOCUMENTATION-STALE, DONE]
+
+decision_gates:
+  - id: gate.EPIC-10.10_1.security-definer
+    blocks: [EPIC-10.10.1, EPIC-10.10.2]
+    requires: >
+      User acceptance of the SECURITY DEFINER recommendation recorded in
+      /EPIC-10-transaction-coordination-decision-memo.md (status: PROPOSED — REQUIRES
+      USER ACCEPTANCE), or a request for further proof / an alternative mechanism.
+    evidence: >
+      Two full local, reversible proof suites already exist and pass (SET LOCAL ROLE:
+      9/9 across two classes, rejected for a proven JPA flush-timing hazard; SECURITY
+      DEFINER: 18/18 across five classes, including a real executed-and-defended
+      CVE-2007-2138-class search_path attack). Nothing is blocked by missing evidence —
+      only by the pending human decision.
+    status: OPEN
+
+resolved_cycles:
+  - id: cycle.signature-egress
+    hypothesis: H1
+    members: [EPIC-31/Story 31.3 (now 31.3A), EPIC-43/Story 43.2]
+    shape: "Story A depends on the whole of Epic B (unqualified); a story inside Epic B depends specifically back on Story A."
+    precedent: >
+      The identical shape (Story 31.2 <-> EPIC-19/Story 19.2) was already found and fixed
+      once in this same file by re-granulating to story level — this pair was not given
+      the same treatment until now.
+    resolution_applied: >
+      Story 31.3 split into 31.3A (standalone signing capability, depends only on 31.1) and
+      the egress-invocation detail absorbed into EPIC-43 Story 43.2, which now depends on
+      31.3A. Applied directly to planning/epics/EPIC-31-signature-module.md and
+      EPIC-43-egress-rail-outbound-dispatch.md. Verified cycle-free by
+      tools/agent-config/validate-capability-graph.py.
+  - id: cycle.egress-transport-status-vs-finality
+    hypothesis: null  # discovered incidentally while building the graph, not one of H1-H10
+    members: [EPIC-14/Story 14.3, EPIC-39/Story 39.4]
+    shape: "Same shape as H1: Story 14.3 -> whole EPIC-39 (unqualified); Story 39.4 -> EPIC-14/Story 14.3 (specific)."
+    resolution_applied: >
+      EPIC-14 Story 14.3 narrowed to depend on EPIC-39/Story 39.2 specifically. EPIC-39
+      Story 39.4 no longer depends on EPIC-14/14.3 at all — both assert the identical
+      shared test (DeliveredNotFinalTest, already marked "współdzielony" in EPIC-39's own
+      file) and now carry a shared-test note instead of a blocking cross-reference. Applied
+      to planning/epics/EPIC-14-egress-boundary-ownership.md and
+      EPIC-39-settlement-finality-model.md. Verified cycle-free.
+
+capabilities:
+  - epic: EPIC-10
+    title: "Ownership: ISO lineage split"
+    granularity: story-backed
+    stories:
+      - id: 10.1
+        title: "iso.payment_iso_identifiers + message_lineage as iso-adapter's own schema"
+        status: blocked
+        requires: [gate.EPIC-10.10_1.security-definer]
+        produces: cap.iso.own-schema-role
+        note: "Blocked on a pending user decision, not on missing code or a missing capability."
+      - id: 10.2
+        title: "pacs.002 correlation via lineage"
+        status: not-started
+        requires: ["10.1"]
+      - id: 10.3
+        title: "iso-adapter makes no business decision (ArchUnit)"
+        status: done
+        requires: [EPIC-09]
+        produces: cap.iso.no-business-decision-guard
+
+  - epic: EPIC-12
+    title: "Ownership: reference-data catalogs"
+    granularity: story-backed
+    stories:
+      - id: 12.1
+        title: "Catalogs owned by reference-data (schema + grants)"
+        status: done
+        produces: cap.reference-data.schema-and-grants
+      - id: 12.2
+        title: "Validation/mapping/rendering catalogs (R-09)"
+        status: blocked
+        requires: ["12.1"]
+        note: "SOURCE-BLOCKED: source doc tags this [NO-CODE] until Iteration 5 (ISO validation), not a code gap."
+
+  - epic: EPIC-20
+    title: "Payment Lifecycle: FSM"
+    granularity: story-backed
+    stories:
+      - id: 20.1
+        title: "Transition table + guards"
+        status: done
+      - id: 20.2
+        title: "Kafka consumer + inbox"
+        status: done
+        requires: ["20.1", EPIC-04]
+      - id: 20.3
+        title: "Status-inbound correlation (G4)"
+        status: blocked
+        requires: ["20.1", cap.iso.correlation-engine]
+        note: >
+          Literal depends_on is EPIC-26 (done), but EPIC-26's own file states the real
+          blocking capability is EPIC-27 (correlation engine, not-started) — see H3.
+
+  - epic: EPIC-23
+    title: "Frontend Foundation"
+    granularity: story-backed
+    stories:
+      - id: 23.1
+        title: "OpenAPI + GraphQL TS codegen wired into CI"
+        status: blocked
+        note: >
+          H7: one task bundles REST/OpenAPI codegen and GraphQL SDL codegen together;
+          blocked because neither springdoc-openapi nor spring-graphql exist in the
+          backend yet — two independent capability gaps hidden inside one task.
+      - id: 23.2
+        title: "data-testid + deep-link convention as project standard"
+        status: done
+      - id: 23.3
+        title: "Role-to-screen map + loading/error/empty states"
+        status: done
+      - id: 23.4
+        title: "A11y checklist + component preview step"
+        status: done
+
+  - epic: EPIC-24
+    title: "Frontend Screens"
+    granularity: story-backed
+    note: "[SEKWENCJONOWANIE — NIE ŁAMAĆ]: Playwright may only start once Workspaces 1+2+3 core screens exist."
+    stories:
+      - id: 24.1
+        title: "Workspace 1: Ops Control Room"
+        status: blocked
+        requires: [EPIC-25/25.2]
+      - id: 24.2
+        title: "Workspace 2: Payments & Files"
+        status: in-progress
+        requires: [EPIC-20, EPIC-21]
+        note: >
+          H4: both feature tasks are done and independently verified (pnpm run build +
+          real browser smoke tests); the story stays in-progress only because its
+          completion criterion additionally requires Playwright acceptance tests, gated
+          by the sequencing rule above — feature delivery and acceptance automation are
+          two independently verifiable deliverables bundled into one story.
+      - id: 24.3
+        title: "Workspace 3: Settlement & Liquidity"
+        status: blocked
+        requires: [EPIC-33, EPIC-32]
+      - id: 24.4
+        title: "Workspace 4: Egress & Delivery"
+        status: blocked
+        requires: [EPIC-44]
+      - id: 24.5
+        title: "Workspace 5: Reconciliation & Cases"
+        status: blocked
+        requires: [EPIC-57, EPIC-65]
+      - id: 24.6
+        title: "Workspace 6: Simulation Lab"
+        status: blocked
+        note: "depends_on: [] in the frontmatter is misleading — real blocker is the simulation module (zero code, no dedicated epic family, open question #4)."
+      - id: 24.7
+        title: "Workspace 7: Reference Data / Admin"
+        status: blocked
+        requires: [EPIC-12]
+        note: "Flagged in-file as closest-to-unblockable of the remaining workspaces — 12.1 is done, only CRUD write endpoints remain."
+      - id: 24.8
+        title: "Evidence/Audit drawer + workspace auditor"
+        status: blocked
+        note: "PII-gating/export format explicitly requires a governance decision, unresolved."
+      - id: 24.9
+        title: "Operator worklist (S-01, [P1])"
+        status: blocked
+        requires: ["24.1", EPIC-68]
+
+  - epic: EPIC-25
+    title: "Observability consolidation"
+    granularity: story-backed
+    stories:
+      - id: 25.1
+        title: "Observability inventory (Iteration 0/1)"
+        status: done
+      - id: 25.2
+        title: "Segmented latency budget (Iteration 1-2)"
+        status: blocked
+        requires: ["25.1", EPIC-19]
+      - id: 25.3
+        title: "Kafka lag + DLQ board (Iteration 3)"
+        status: in-progress
+        requires: ["25.1", EPIC-04]
+        note: >
+          H5: task 2 bundles retry-count metric, DLQ-depth metric, correlation-header
+          propagation, AND DLQ>0 alerting into one checkbox/verify. Task 1
+          (consumer-group lag) is separately done with its own dedicated test.
+      - id: 25.4
+        title: "Alert rules"
+        status: blocked
+        requires: ["25.2", "25.3"]
+
+  - epic: EPIC-26
+    title: "ISO: message lineage core"
+    granularity: story-backed
+    stories:
+      - id: 26.1
+        title: "iso.iso_messages + iso_message_versions"
+        status: done
+      - id: 26.2
+        title: "iso.message_lineage"
+        status: done
+        requires: ["26.1"]
+      - id: 26.3
+        title: "Richer identifier extraction"
+        status: done
+        requires: ["26.1", "EPIC-21/Story 21.1+21.3"]
+        note: "Positive counter-example: this story already narrows its own EPIC-21 dependency to two specific stories inline, rather than the whole epic."
+      - id: 26.4
+        title: "Lineage panel in payment-detail GraphQL"
+        status: blocked
+        requires: ["26.2", "26.3"]
+        produces: cap.iso.lineage-core
+        note: "H8: a read-model/GraphQL/frontend concern, unlike its sibling lineage-write stories — blocked because GraphQL doesn't exist anywhere in the repo yet."
+
+  - epic: EPIC-27
+    title: "ISO: correlation engine"
+    granularity: story-backed
+    stories:
+      - id: 27.1
+        title: "pacs.002 identifier extraction"
+        status: not-started
+      - id: 27.2
+        title: "9-step correlation policy -> iso.iso_message_correlation"
+        status: not-started
+        requires: ["27.1"]
+        produces: cap.iso.correlation-engine
+      - id: 27.3
+        title: "Duplicate and out-of-order semantics"
+        status: not-started
+        requires: ["27.2"]
+      - id: 27.4
+        title: "Orphan -> DLQ + operator read model"
+        status: not-started
+        requires: ["27.2"]
+        note: >
+          H6: one task, one verify, explicitly split by priority tag mid-sentence — DLQ
+          write is [MVP], the manual-correlation operator action is [P1].
+
+  - epic: EPIC-28
+    title: "ISO: validation boundaries"
+    granularity: story-backed
+    stories:
+      - id: 28.1
+        title: "Hardening/parse failure -> iso_message_parse_errors"
+        status: done
+      - id: 28.2
+        title: "Schema/structural/profile/mapping validation results"
+        status: blocked
+        requires: ["28.1", "EPIC-12/Story 12.2"]
+        note: "Positive counter-example: narrows to Story 12.2 specifically, not all of EPIC-12."
+      - id: 28.3
+        title: "ISO-reject vs business-reject split"
+        status: blocked
+        requires: ["28.2"]
+      - id: 28.4
+        title: "Reason/status catalog integration"
+        status: blocked
+        requires: ["28.2"]
+
+  - epic: EPIC-31
+    title: "Signature module"
+    granularity: story-backed
+    stories:
+      - id: 31.1
+        title: "Boundary + schema"
+        status: done
+      - id: 31.2
+        title: "Verify-before-parse"
+        status: done
+        requires: ["31.1"]
+        note: "[PLANNING-DEFECT, already fixed this corpus]: previously cyclic against EPIC-19/19.2 at epic level, re-granulated to story level."
+      - id: 31.3
+        title: "Signing for egress"
+        status: not-started
+        requires: ["31.1", EPIC-43]
+        note: "H1 / cycle.signature-egress — see known_cycles above. TO BE SPLIT (31.3A/31.3B) per BACKLOG-REDESIGN.md."
+      - id: 31.4
+        title: "Key registry (KeyRegistryPort)"
+        status: done
+        requires: ["31.1"]
+
+  - epic: EPIC-35
+    title: "Settlement: strategy resolver"
+    granularity: story-backed
+    stories:
+      - id: 35.1
+        title: "SettlementStrategyResolver"
+        status: not-started
+        requires: [EPIC-12]
+        note: "H2: whole-epic EPIC-12 dependency, not narrowed to a specific reference-data capability by any story body. Same pattern as EPIC-51, EPIC-57."
+      - id: 35.2
+        title: "ArchUnit ban on switching by profile name"
+        status: not-started
+        requires: ["35.1"]
+      - id: 35.3
+        title: "Frozen profile snapshot per attempt"
+        status: not-started
+        requires: ["35.1"]
+
+  - epic: EPIC-43
+    title: "Egress: outbound rail"
+    granularity: story-backed
+    stories:
+      - id: 43.1
+        title: "outbound_messages + SKIP LOCKED dispatcher"
+        status: not-started
+      - id: 43.2
+        title: "Renderer (Prowide) + signer"
+        status: not-started
+        requires: ["43.1", "EPIC-31/Story 31.3"]
+        note: "H1 / cycle.signature-egress — correctly story-scoped on this side, but the target (31.3) points back at the whole of this epic."
+      - id: 43.3
+        title: "Retry/backoff/ABANDONED + DLQ"
+        status: not-started
+        requires: ["43.1"]
+      - id: 43.4
+        title: "Batch collector + outbound files"
+        status: not-started
+        requires: ["43.1"]
+      - id: 43.5
+        title: "Delivery-confirmation correlation"
+        status: not-started
+        requires: ["43.1"]
+
+dependency_granularity_candidates:
+  # Whole-epic references flagged as candidates for narrowing (not verdicts) — see
+  # BACKLOG-REDESIGN.md "Dependencies narrowed" for which of these were actually acted on.
+  - { from: EPIC-35/35.1, to: EPIC-12, note: "H2 primary example" }
+  - { from: EPIC-51, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35" }
+  - { from: EPIC-57, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35" }
+  - { from: EPIC-65, to: EPIC-27, note: "consumes iso.message.correlated (27.2's output), not all of EPIC-27 including the [P1] 27.4 manual-action half" }
+  - { from: EPIC-14/14.1, to: EPIC-46, note: "currently a hidden blocker (no edge at all) — 14.1 needs egress.transport_attempts, created in EPIC-46; see cycle.egress-transport-status-vs-finality writeup for why this must be added narrowly, not at whole-epic granularity" }
+
+undeclared_story_level_cross_links_found:
+  # Real per source text, not rolled up into the owning epic's frontmatter depends_on.
+  # None of these were found to close a cycle except the two in known_cycles above.
+  - { from: EPIC-29/29.4, to: EPIC-24 }
+  - { from: EPIC-48/48.3, to: EPIC-24 }
+  - { from: EPIC-49/49.3, to: EPIC-24 }
+  - { from: EPIC-50/50.3, to: EPIC-17 }
+  - { from: EPIC-50/50.4, to: EPIC-24 }
+  - { from: EPIC-52/52.4, to: EPIC-24 }
+  - { from: EPIC-56/56.4, to: [EPIC-17, EPIC-24] }
+  - { from: EPIC-63/63.3, to: EPIC-66 }
+  - { from: EPIC-63/63.4, to: EPIC-24 }
+  - { from: EPIC-64/64.2, to: EPIC-24 }
+  - { from: EPIC-64/64.3, to: EPIC-17 }
+  - { from: EPIC-72/72.2, to: EPIC-24 }
+  - { from: EPIC-33/33.4, to: EPIC-39 }
+  - { from: EPIC-45/45.2, to: "EPIC-31/31.3" }
+  - { from: EPIC-45/45.4, to: "EPIC-14/14.2" }
+  - { from: EPIC-46/46.3, to: "EPIC-14/14.2" }
+  - { from: EPIC-60/60.3, to: EPIC-39 }
+  - { from: EPIC-34/34.4, to: EPIC-61 }
+  - { from: EPIC-62/62.4, to: EPIC-63, note: "checked, confirmed non-circular (EPIC-63 does not depend back on EPIC-62)" }

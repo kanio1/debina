@@ -38,8 +38,10 @@ Taski:
 ## Story 39.4 — Test: dostawa ≠ finalność
 
 status: not-started
-depends_on: [Story 39.2, EPIC-14-egress-boundary-ownership/Story 14.3]
+depends_on: [Story 39.2]
+
+`[CYCLE-DETECTED, naprawione 2026-07-16 — dual-agent governance/backlog-redesign session]`: `depends_on` no longer references `EPIC-14-egress-boundary-ownership/Story 14.3`. That back-reference, combined with `EPIC-14` Story 14.3's own (unqualified, whole-epic) dependency on `EPIC-39`, formed a real cycle (39.4 → 14.3 → all of EPIC-39 → 39.4). This story and `EPIC-14` Story 14.3 assert the exact same thing (`DeliveredNotFinalTest`) — a shared-test pair, not a blocking dependency in either direction; whichever side is built first implements the shared class. See `planning/BACKLOG-REDESIGN.md` for the full writeup.
 
 Taski:
 - [ ] **Test: dostarczenie (`DELIVERED`) nie ustawia finalności.**
-      `verify: ./mvnw -f backend test -Dtest=*DeliveredNotFinalTest*` (współdzielony z EPIC-14).
+      `verify: ./mvnw -f backend test -Dtest=*DeliveredNotFinalTest*` (współdzielony z `EPIC-14` Story 14.3 — jedna implementacja, dowolna strona może zbudować pierwsza, patrz nota tam).

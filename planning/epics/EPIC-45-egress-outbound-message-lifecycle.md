@@ -18,7 +18,9 @@ Taski:
 ## Story 45.2 — Render→sign→deliver
 
 status: not-started
-depends_on: [Story 45.1, EPIC-31-signature-module/Story 31.3]
+depends_on: [Story 45.1, EPIC-31-signature-module/Story 31.3A]
+
+`[REPOINTED 2026-07-16]`: `EPIC-31-signature-module/Story 31.3` was split into `31.3A`/the egress-integration detail (see `EPIC-31-signature-module.md`, `planning/BACKLOG-REDESIGN.md`) — this reference updated to the surviving story ID, minimally, without re-deriving this epic's own scope (not one of this session's deep-dived epics).
 
 Taski:
 - [ ] **Łańcuch render→sign→deliver.**

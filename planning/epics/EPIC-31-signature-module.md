@@ -48,15 +48,17 @@ Taski:
 - [x] **Test kolejności: parsowanie XML nie wykonuje się przed weryfikacją na kanałach podpisywanych** (G1, jako test kolejności filtrów, nie tylko opis).
       `verify: ./mvnw -f backend test -Dtest=SignatureBeforeParseOrderingTest` → `Tests run: 4, Failures: 0` — PASS (2026-07-15, współdzielony z EPIC-19 Story 19.2 — ten sam test, patrz EPIC-19.md dla pełnego opisu). Niepróżność potwierdzona mutacją: tymczasowe wyłączenie guardu "FAILED zatrzymuje pipeline" w `SignedChannelIngestionPipeline` powodowało zawodzenie dokładnie dwóch testów negatywnych (`tamperedSignatureStopsBeforeParsingButStillArchivesAndVerifies`, `missingRequiredSignatureStopsBeforeParsingButStillArchives`) — mutacja odwrócona przed commitem (working tree nadal niecommitowany).
 
-## Story 31.3 — SIG-S3: podpisywanie dla egress
+## Story 31.3A — SIG-S3a: standalone signing capability (sign→verify)
 
 status: not-started
-depends_on: [Story 31.1, EPIC-43-egress-rail-outbound-dispatch]
+depends_on: [Story 31.1]
 
-Opis: stan `SIGNED` realny, podpis detached, signer-stub przez port, round-trip sign→verify. `[MVP]` Iteracja 5.
+`[SPLIT 2026-07-16 — dual-agent governance/backlog-redesign session, H1]`: was Story 31.3 ("SIG-S3: podpisywanie dla egress"), depends_on: `[Story 31.1, EPIC-43-egress-rail-outbound-dispatch]`. That declaration and `EPIC-43` Story 43.2's own `depends_on: [Story 43.1, EPIC-31-signature-module/Story 31.3]` formed a real cycle at the effective capability level (31.3 → all of EPIC-43 → 43.2 → 31.3) — the identical shape to a defect this same file already found and fixed once for Story 31.2 vs `EPIC-19`/Story 19.2 (see `[PLANNING-DEFECT 2026-07-15, naprawione]` above), but this pair had not been given the same treatment. Fixed by splitting along the boundary the story's own `Opis` already implied: a standalone `SignatureSigningPort` round-trip capability (this story, testable with a stub caller, no `egress` dependency) vs. the actual invocation from `egress`'s renderer (moved into `EPIC-43` Story 43.2, which already independently described "wywołanie `SignatureSigningPort`" as part of its own scope — the two stories were duplicating the same integration point, not just cyclically depending on each other). See `planning/BACKLOG-REDESIGN.md` for the full writeup and old→new mapping.
+
+Opis: stan `SIGNED` realny, podpis detached, signer-stub przez port, round-trip sign→verify — weryfikowalne samodzielnie, bez realnego callera z `egress`. `[MVP]` Iteracja 5.
 
 Taski:
-- [ ] **`SignatureSigningPort` wywoływany z `egress`, guardowany flagą `signing_required`, podpis detached przechowany.**
+- [ ] **`SignatureSigningPort`: podpis detached, round-trip sign→verify przez signer-stub (caller niezależny od `egress`).**
       `verify: ./mvnw -f backend test -Dtest=*SigningRoundTripTest*`
 
 ## Story 31.4 — Rejestr kluczy (KeyRegistryPort)

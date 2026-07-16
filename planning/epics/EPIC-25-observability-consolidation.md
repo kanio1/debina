@@ -30,27 +30,71 @@ Taski:
 - [ ] **Wpięcie histogramów per etap + jednej ciągłej trasy trace + alertu na p95 e2e.**
       `verify: ./mvnw -f backend test -Dtest=*SegmentedLatencyMetricsTest*` — `NOT RUN`, `blocked` (patrz wyżej).
 
-## Story 25.3 — Lag Kafka + tablica DLQ (Iteracja 3)
+## Story 25.3A — Lag Kafka per consumer group (Iteracja 3)
 
-status: in-progress
+status: **done**
 depends_on: [Story 25.1, EPIC-04-outbox-inbox-kafka-thin]
 
-`[PLANNING-DEFECT 2026-07-14, częściowo rozwiązane]`: "lag-per-consumer-group" jest zbudowane i zweryfikowane (patrz niżej) — jedyny realny consumer group, `payment-lifecycle-inbox`, ma teraz realną metrykę. "Retry count", "DLQ depth", "propagacja nagłówków" i "alert na DLQ>0 dla `csm.response`/topiców rekoncyliacji" **pozostają `blocked`**: nie istnieje żaden mechanizm DLQ w tym kodzie (`InboxConsumer` nie ma dead-letter routingu), a `csm.response`/topiki rekoncyliacji celują w moduły `simulation`/`reconciliation`, oba zero kodu. Budowanie DLQ/retry-infrastruktury bez realnego producenta błędów do obserwowania byłoby wynajdywaniem architektury na wyrost — nie zrobiono.
+`[SPLIT 2026-07-16 — dual-agent governance/backlog-redesign session, H5]`: was Story 25.3 ("Lag Kafka + tablica DLQ"), whose second task bundled retry-count metric, DLQ-depth metric, correlation-header propagation, and DLQ>0 alerting behind one checkbox/verify. Split into 25.3A (this story — lag, already done, unaffected) and four independently-blocked successors (25.3B–25.3E) below, so each concern can unblock on its own schedule instead of all four waiting on the slowest one.
 
 Taski:
 - [x] **Metryka lag-per-consumer-group jako obywatel pierwszej klasy.**
       `verify: ./mvnw -f backend test -Dtest=KafkaConsumerGroupLagGaugeTest` → `Tests run: 1, Failures: 0` — PASS (2026-07-14). Nowy `backend/src/main/java/com/sepanexus/modules/paymentlifecycle/event/KafkaConsumerGroupLagGauge.java` — gauge Micrometer `kafka.consumer.lag{group="payment-lifecycle-inbox",topic="payment.validated"}`, obliczany na żądanie przez `AdminClient` (`describeTopics`+`listConsumerGroupOffsets`+`listOffsets`, suma `max(0, endOffset-committedOffset)` po partycjach). `InboxConsumer`'s `@KafkaListener` otrzymał jawne `id` (potrzebne, by test mógł zatrzymać/wznowić dokładnie ten kontener). Nowy `KafkaConsumerGroupLagGaugeTest` — **nie-próżny dowód**: zatrzymuje kontener, produkuje realną wiadomość przez surowy `KafkaProducer` (Testcontainers Kafka), potwierdza `lag > 0`, wznawia kontener, potwierdza `lag` spada do `0` po realnej konsumpcji. `management.endpoints.web.exposure.include` rozszerzone o `metrics` (było tylko `health`) — bez tego metryka istniałaby, ale byłaby niewidoczna dla nikogo, sprzecznie z "obywatel pierwszej klasy". **Realny smoke-test przeciw żywemu stackowi**: `GET /actuator/metrics/kafka.consumer.lag` (z prawdziwym tokenem Keycloak — endpoint wymaga auth, tylko `health` jest publiczne) → `{"measurements":[{"statistic":"VALUE","value":0.0}], "availableTags":[{"tag":"topic","values":["payment.validated"]},{"tag":"group","values":["payment-lifecycle-inbox"]}]}` — realna wartość z żywej infrastruktury, nie mock.
-- [ ] **Licznik retry, głębokość DLQ, propagacja nagłówków, alert na DLQ>0 dla `csm.response`/topiców rekoncyliacji.**
-      `verify: ./mvnw -f backend test -Dtest=*KafkaLagDlqBoardTest*` — `NOT RUN`, `blocked` (patrz wyżej — brak mechanizmu DLQ i brak topiców do alarmowania).
+
+## Story 25.3B — Licznik retry
+
+status: blocked
+depends_on: [Story 25.3A]
+
+`[SPLIT 2026-07-16 — see Story 25.3A above]`. Blocked: no retry mechanism exists in `InboxConsumer` yet to count.
+
+Taski:
+- [ ] **Metryka liczby retry per consumer/topic.**
+      `verify: ./mvnw -f backend test -Dtest=*KafkaRetryCounterTest*` — `NOT RUN`, `blocked`.
+
+## Story 25.3C — Głębokość DLQ
+
+status: blocked
+depends_on: [Story 25.3A]
+
+`[SPLIT 2026-07-16 — see Story 25.3A above]`. Blocked: no DLQ mechanism exists anywhere in this code (`InboxConsumer` has no dead-letter routing).
+
+Taski:
+- [ ] **Metryka głębokości DLQ per topic.**
+      `verify: ./mvnw -f backend test -Dtest=*KafkaDlqDepthGaugeTest*` — `NOT RUN`, `blocked`.
+
+## Story 25.3D — Propagacja nagłówków korelacyjnych
+
+status: blocked
+depends_on: [Story 25.3A]
+
+`[SPLIT 2026-07-16 — see Story 25.3A above]`. Blocked: no correlation-header convention wired through consumer/producer yet.
+
+Taski:
+- [ ] **Nagłówki korelacyjne propagowane i widoczne w metrykach/logach.**
+      `verify: ./mvnw -f backend test -Dtest=*CorrelationHeaderPropagationTest*` — `NOT RUN`, `blocked`.
+
+## Story 25.3E — Alert na DLQ>0
+
+status: blocked
+depends_on: [Story 25.3C]
+
+`[SPLIT 2026-07-16 — see Story 25.3A above]`. Blocked: depends on 25.3C's DLQ-depth metric existing; `csm.response`/reconciliation topics it would alert on target the `simulation`/`reconciliation` modules, both zero code.
+
+Taski:
+- [ ] **Alert na DLQ>0 dla `csm.response`/topiców rekoncyliacji.**
+      `verify: ./mvnw -f backend test -Dtest=*DlqAlertRuleTest*` — `NOT RUN`, `blocked`.
 
 ## Story 25.4 — Reguły alertów (Iteracja 4)
 
 status: blocked
-depends_on: [Story 25.2, Story 25.3]
+depends_on: [Story 25.2, Story 25.3D, Story 25.3E]
+
+`[NARROWED 2026-07-16]`: was `[Story 25.2, Story 25.3]` — repointed at the two specific successor stories from the 25.3 split (25.3D header propagation, 25.3E DLQ alert) this generalized alert-rule set actually builds on, instead of the whole pre-split 25.3.
 
 Opis: generalizacja alertów per-obszar już wskazanych w §17 (illegal-transition>0, drift≠0=CRITICAL, cycle-close-overdue, dead-letter>0/status-out>5s, CRITICAL-exception-immediate, expired-cases, audit-write-failure=page, queue-depth-thresholds).
 
-`depends_on` (Story 25.2, 25.3) już wskazuje realny bloker — oba `blocked`. **Status `blocked`** transitively.
+`depends_on` już wskazuje realny bloker — wszystkie trzy `blocked`. **Status `blocked`** transitively.
 
 Taski:
 - [ ] **Wdroż ogólną warstwę reguł alertów ponad metrykami z 25.2/25.3, pokrywającą listę z §17.**

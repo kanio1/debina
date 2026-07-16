@@ -10,16 +10,31 @@ Decyzje fundamentu do zamrożenia przed pierwszym prawdziwym ekranem: BFF (ADR-N
 
 `[AUDYT 2026-07-14]`: przed budową sprawdzono realny stan frontendu (`find frontend/src`, `grep -rn data-testid`) — EPIC-05/06 dostarczyły więcej niż "goły szkielet": pełny BFF (sesja server-side, CSRF double-submit, PKCE), ekran `/payments` (lista+submit) z konwencją `data-testid` już częściowo w użyciu. Story 23.2/23.3/23.4 formalizują/rozszerzają to, co już istnieje — nie zaczynają od zera.
 
-## Story 23.1 — Codegen OpenAPI+GraphQL w CI
+## Story 23.1A — Codegen REST/OpenAPI w CI
 
 status: blocked
 depends_on: [EPIC-07-ci-cd-foundation]
 
-`[PLANNING-DEFECT 2026-07-14]`: `depends_on` (EPIC-07, done) jest spełnione, ale rzeczywista zdolność do wygenerowania czegokolwiek nie istnieje: (1) brak `springdoc-openapi`/`swagger` w `backend/pom.xml` — nie ma endpointu `/v3/api-docs`, więc nie ma źródła OpenAPI do wygenerowania; (2) brak `spring-graphql`/`graphql-java` w `backend/pom.xml` — GraphQL nie istnieje w ogóle (potwierdzone ponownie, ta sama luka co w EPIC-16). `npm run codegen`/`frontend/generated/` nie mają dziś żadnego wejścia. Zbudowanie samego `codegen` npm-script bez żadnego z tych dwóch źródeł byłoby generowaniem pustki — nie zrobiono. **Status `blocked`** — odblokuj, gdy backend faktycznie eksponuje OpenAPI (dowolny moduł REST) i/lub GraphQL schema istnieje.
+`[SPLIT 2026-07-16 — dual-agent governance/backlog-redesign session, H7]`: was Story 23.1 ("Codegen OpenAPI+GraphQL w CI"), one task bundling REST-derived and GraphQL-SDL-derived TypeScript codegen behind a single `verify:`. These are two independent capability gaps (backend has neither `springdoc-openapi` nor `spring-graphql`) that will very likely close on different schedules — bundling them means the whole story stays `blocked` even after just one half becomes buildable. Split at the same boundary the original `[PLANNING-DEFECT 2026-07-14]` note already identified as two separate missing sources. `pnpm` (not `npm`, per `frontend/AGENTS.md`) — verify command corrected accordingly.
+
+`[PLANNING-DEFECT 2026-07-14, still open for this half]`: no `springdoc-openapi`/`swagger` in `backend/pom.xml` — no `/v3/api-docs` endpoint, so no OpenAPI source to generate from. Unblock when any backend REST module exposes OpenAPI.
 
 Taski:
-- [ ] **Wpięcie generowania typów TS z OpenAPI (backend REST) i GraphQL SDL do pipeline'u CI frontendu.**
-      `verify: npm run codegen && git diff --exit-code frontend/generated/` — `NOT RUN`, `blocked` (patrz wyżej).
+- [ ] **Wpięcie generowania typów TS z OpenAPI (backend REST) do pipeline'u CI frontendu.**
+      `verify: pnpm run codegen:openapi && git diff --exit-code frontend/generated/rest/` — `NOT RUN`, `blocked` (patrz wyżej).
+
+## Story 23.1B — Codegen GraphQL SDL w CI
+
+status: blocked
+depends_on: [EPIC-07-ci-cd-foundation]
+
+`[SPLIT 2026-07-16 — see Story 23.1A above for the split rationale]`.
+
+`[PLANNING-DEFECT 2026-07-14, still open for this half]`: GraphQL nie istnieje w ogóle w tym repo (brak `spring-graphql`/`graphql-java` w `backend/pom.xml`, ta sama luka co w `EPIC-16`). Zobacz też `EPIC-26` Story 26.4's `[OPEN-QUESTION]` — nie istnieje dziś żaden epik, który buduje samą warstwę GraphQL (tylko `EPIC-16`, jej *ownership enforcement* po fakcie). Unblock when a GraphQL schema exists.
+
+Taski:
+- [ ] **Wpięcie generowania typów TS z GraphQL SDL do pipeline'u CI frontendu.**
+      `verify: pnpm run codegen:graphql && git diff --exit-code frontend/generated/graphql/` — `NOT RUN`, `blocked` (patrz wyżej).
 
 ## Story 23.2 — Konwencja `data-testid` i deep-linki jako standard projektu
 

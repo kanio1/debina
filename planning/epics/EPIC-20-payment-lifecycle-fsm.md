@@ -31,12 +31,12 @@ Taski:
 ## Story 20.3 — Korelacja status-inbound (G4)
 
 status: blocked
-depends_on: [Story 20.1, EPIC-26-iso-message-lineage-core]
+depends_on: [Story 20.1, EPIC-27-iso-correlation-engine/Story 27.2]
 
 Opis: lookup przez `iso.payment_iso_identifiers`, orphan → DLQ.
 
-`depends_on` już wskazuje realny bloker: `EPIC-26-iso-message-lineage-core` jest `not-started`. Nie zaimplementowano — status-inbound correlation bez pełnego modułu `iso-adapter`/lineage core byłoby wynajdywaniem architektury na wyrost.
+`[CORRECTED 2026-07-16 — dual-agent governance/backlog-redesign session, H3]`: `depends_on` was `EPIC-26-iso-message-lineage-core`, with this file's own note claiming "`depends_on` już wskazuje realny bloker: EPIC-26... jest `not-started`." Both parts of that claim are now stale: `EPIC-26` is mostly `done` (Stories 26.1–26.3), and `EPIC-26`'s own file explicitly says the real blocking capability for this story is `EPIC-27` (correlation engine), not `EPIC-26` itself — quoted verbatim there: *"literalne `depends_on: EPIC-26` jest spełnione, ale rzeczywista zdolność potrzebna do korelacji statusu przychodzącego ... należy do `EPIC-27`."* Repointed at `EPIC-27-iso-correlation-engine/Story 27.2` specifically (the 9-step correlation policy that actually produces matchable correlation results), not the whole epic (which also includes the `[P1]` manual-correlation half, Story 27.5, irrelevant to this story). `EPIC-27` remains `not-started` — this story is still genuinely blocked, just on the correct dependency now.
 
 Taski:
 - [ ] **Korelacja statusu przychodzącego przez `iso.payment_iso_identifiers`; brak dopasowania → DLQ, nie cichy no-op.**
-      `verify: ./mvnw -f backend test -Dtest=*StatusInboundCorrelationTest*` — `NOT RUN`, `blocked` do `EPIC-26-iso-message-lineage-core`.
+      `verify: ./mvnw -f backend test -Dtest=*StatusInboundCorrelationTest*` — `NOT RUN`, `blocked` do `EPIC-27-iso-correlation-engine/Story 27.2`.

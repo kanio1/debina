@@ -1,0 +1,93 @@
+%% SEPA Nexus — capability graph (curated view)
+%% Full machine graph: planning/capability-graph.json (129 nodes / 226 edges).
+%% This file is a curated subgraph for human reading — phase heads, the two detected
+%% cycles, and the one open decision gate. It is not regenerated automatically; keep it
+%% in sync by hand with capability-graph.json when either changes materially.
+flowchart TB
+
+    subgraph P0["Phase 0 — Platform Skeleton (done)"]
+        E00[EPIC-00] --> E01[EPIC-01] & E02[EPIC-02]
+        E01 --> E03[EPIC-03]
+        E00 --> E03
+        E03 --> E04[EPIC-04] & E07[EPIC-07]
+        E02 --> E05[EPIC-05]
+        E03 --> E05
+        E05 --> E06[EPIC-06]
+        E06 --> E07
+        E04 & E05 & E06 & E07 --> E08[EPIC-08]
+    end
+
+    subgraph P1["Phase 1 — Ownership enforcement"]
+        E03 --> E09[EPIC-09 done]
+        E07 --> E09
+    end
+
+    subgraph P2["Phase 2 — Payment spine (Iteration 1)"]
+        E08 --> E19[EPIC-19 done]
+        E19 --> E20[EPIC-20 in-progress]
+        E19 --> E21[EPIC-21 done]
+        E19 --> E23[EPIC-23 in-progress]
+        E23 --> E24[EPIC-24 in-progress]
+    end
+
+    subgraph P3["Phase 3 — ISO lineage/correlation"]
+        E19 --> E26[EPIC-26 in-progress]
+        E26 --> E27[EPIC-27 not-started]
+        E19 --> E28[EPIC-28 in-progress]
+    end
+
+    subgraph P4["Phase 4 — Signature"]
+        E09 --> E31[EPIC-31 in-progress]
+    end
+
+    subgraph P5["Phase 5 — Ledger/Settlement"]
+        E09 --> E32[EPIC-32 not-started]
+        E12[EPIC-12 blocked] --> E35[EPIC-35 not-started]
+        E09 --> E13[EPIC-13 not-started]
+        E09 --> E12
+    end
+
+    subgraph P6["Phase 6 — Egress/Outbound"]
+        E09 --> E43[EPIC-43 not-started]
+        E43 --> E44[EPIC-44] --> E45[EPIC-45] --> E46[EPIC-46]
+        E43 --> E14[EPIC-14 not-started]
+    end
+
+    %% Ownership graph (EPIC-09) fans out to most other Phase-1 epics
+    E09 --> E10[EPIC-10 in-progress — decision-blocked]
+    E09 --> E11[EPIC-11 in-progress]
+
+    %% --- EPIC-10 decision gate ---
+    GATE{{"gate.EPIC-10.10_1\nSECURITY DEFINER\nuser acceptance — OPEN"}}
+    GATE -.blocks.-> E10
+
+    %% --- Cycle 1 (H1, signature <-> egress) — FIXED 2026-07-16 ---
+    S313A["EPIC-31 / Story 31.3A\n(standalone signing capability —\ndepends only on 31.1, EPIC-43 edge REMOVED [FIXED])"]
+    S432["EPIC-43 / Story 43.2\n(renderer + SignatureSigningPort call)"]
+    E31 --> S313A
+    E43 --> S432
+    S432 -- "depends on Story 31.3A specifically" --> S313A
+
+    %% --- Cycle 2 (discovered incidentally, same shape) — FIXED 2026-07-16 ---
+    S143["EPIC-14 / Story 14.3\n(finality/transport status)"]
+    S394["EPIC-39 / Story 39.4\n(return vs reversal)"]
+    S392["EPIC-39 / Story 39.2\n(FinalityPolicy)"]
+    E14 --> S143
+    E39[EPIC-39 not-started] --> S394
+    E39 --> S392
+    E35 --> E39
+    S143 -- "narrowed to Story 39.2 specifically [FIXED]" --> S392
+    S394 -- "depends on Story 39.2 — EPIC-14 back-edge REMOVED [FIXED]" --> S392
+    S143 -. "shared test DeliveredNotFinalTest, no blocking edge" .- S394
+
+    classDef done fill:#2f7d4f,color:#fff,stroke:#1e5236
+    classDef inprogress fill:#c98a1f,color:#fff,stroke:#8a5e12
+    classDef blocked fill:#8a3a3a,color:#fff,stroke:#5c2626
+    classDef notstarted fill:#4a5568,color:#fff,stroke:#2d3748
+    classDef gate fill:#7c3aed,color:#fff,stroke:#4c1d95
+
+    class E00,E01,E02,E03,E04,E05,E06,E07,E08,E09,E19,E21,E26,E31,E28 done
+    class E10,E11,E20,E23,E24 inprogress
+    class E12,E39 blocked
+    class E13,E14,E27,E32,E35,E43,E44,E45,E46,S313A,S432,S143,S394,S392 notstarted
+    class GATE gate

@@ -1,3 +1,5 @@
+> **2026-07-16 backlog redesign**: a dual-agent governance session audited the agent instruction hierarchy, built a capability dependency graph (`planning/capabilities.yaml` / `planning/capability-graph.json` / `planning/capability-graph.mmd`), found and fixed two real execution cycles, and split several stories that bundled independently-verifiable deliverables. Full findings and rationale: **[`planning/BACKLOG-REDESIGN.md`](BACKLOG-REDESIGN.md)**. Epic rows below for `EPIC-10`, `14`, `20`, `23`, `24`, `25`, `26`, `27`, `31`, `35`, `39`, `43`, `45` reflect the resulting story renumbering; consult the epic files themselves for the authoritative current story IDs.
+
 # Planning Index — SEPA Nexus
 
 Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/suso/debina/*.md`) zgodnie ze skillami `artifact-derived-planning` i `epic-story-task-catalog`. **Nic tu nie jest wymyślone** — każdy epik ma pole `source` wskazujące dokładny plik/sekcję, z której wynika jego zakres. Priorytety (`[MVP]`/`[P1]`/`[P2]`) i zależności są tymi już ustalonymi w dokumentacji (ADR-N6 — jedna taksonomia), nie nową priorytetyzacją.
@@ -40,11 +42,11 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
 | EPIC-09 — Ownership: schema/grant enforcement | done | EPIC-03, EPIC-07 | [epics/EPIC-09-ownership-schema-grants.md](epics/EPIC-09-ownership-schema-grants.md) |
-| EPIC-10 — Ownership: ISO lineage split | in-progress (Story 10.3 **done** 2026-07-15 — ArchUnit guard; 10.1 blocked pending user acceptance of `SECURITY DEFINER` recommendation, transaction-coordination memo zaktualizowany 2026-07-16; 10.2 not-started; patrz epic file) | EPIC-09, EPIC-26, EPIC-21 | [epics/EPIC-10-iso-lineage-ownership.md](epics/EPIC-10-iso-lineage-ownership.md) |
+| EPIC-10 — Ownership: ISO lineage split | in-progress (Story 10.3 **done**; 10.1 **split 2026-07-16** into 10.1A–10.1E — 10.1E [proof verification] **done**, 10.1A–D blocked pending user acceptance of `SECURITY DEFINER` recommendation; 10.2 not-started, depends on 10.1B; patrz epic file i `BACKLOG-REDESIGN.md`) | EPIC-09, EPIC-26, EPIC-21 | [epics/EPIC-10-iso-lineage-ownership.md](epics/EPIC-10-iso-lineage-ownership.md) |
 | EPIC-11 — Ownership: cienki wiersz payments | in-progress (Story 11.1 **done** 2026-07-15 — `payment_status_history`/`payment_events` zbudowane, OQ-12 rozstrzygnięte; 11.2 blocked na katalogi status/reason; 11.3 not-started; patrz epic file) | EPIC-09, EPIC-20 | [epics/EPIC-11-payment-slim-ownership.md](epics/EPIC-11-payment-slim-ownership.md) |
 | EPIC-12 — Ownership: katalogi reference-data | blocked (Story 12.1 done; Story 12.2 blocked do Iteracji 5 — ISO validation, `iso.iso_message_versions` §4.3c nie istnieje jeszcze; patrz epic file) | EPIC-09 | [epics/EPIC-12-reference-data-ownership.md](epics/EPIC-12-reference-data-ownership.md) |
 | EPIC-13 — Ownership: ledger | not-started | EPIC-09, EPIC-32 | [epics/EPIC-13-ledger-ownership.md](epics/EPIC-13-ledger-ownership.md) |
-| EPIC-14 — Ownership: granica egress | not-started | EPIC-09, EPIC-43 | [epics/EPIC-14-egress-boundary-ownership.md](epics/EPIC-14-egress-boundary-ownership.md) |
+| EPIC-14 — Ownership: granica egress | not-started (Story 14.3 dependency **narrowed 2026-07-16** to `EPIC-39/Story 39.2`, fixing a real cycle with `EPIC-39` Story 39.4 — patrz `BACKLOG-REDESIGN.md`; Story 14.1 has a known, not-yet-fixed hidden blocker on `EPIC-46`, see same doc) | EPIC-09, EPIC-43 | [epics/EPIC-14-egress-boundary-ownership.md](epics/EPIC-14-egress-boundary-ownership.md) |
 | EPIC-15 — Ownership: topiki Kafka | blocked (Story 15.1/15.2 done; Story 15.3 blocked do istnienia `egress`/`reconciliation`; patrz epic file) | EPIC-09, EPIC-04 | [epics/EPIC-15-kafka-topic-ownership.md](epics/EPIC-15-kafka-topic-ownership.md) |
 | EPIC-16 — Ownership: read modele/GraphQL read-only | blocked (GraphQL/`reporting` nie istnieją; patrz epic file) | EPIC-09 | [epics/EPIC-16-read-model-graphql-ownership.md](epics/EPIC-16-read-model-graphql-ownership.md) |
 | EPIC-17 — Ownership: wymuszenie ścieżki symulacji | blocked (moduł `simulation` ma zero kodu; patrz epic file) | EPIC-09 | [epics/EPIC-17-simulation-path-enforcement.md](epics/EPIC-17-simulation-path-enforcement.md) |
@@ -55,19 +57,19 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
 | EPIC-19 — Ingress: staging pipeline | **done** (Story 19.1/19.2/19.3/19.4 wszystkie done — CanonicalMapper/pain.001 endpoint zbudowane 2026-07-15; patrz epic file) | EPIC-08 | [epics/EPIC-19-ingress-staging-pipeline.md](epics/EPIC-19-ingress-staging-pipeline.md) |
-| EPIC-20 — Payment Lifecycle: FSM | in-progress (Story 20.1/20.2 done; 20.3 blocked na EPIC-26; patrz epic file) | EPIC-19 | [epics/EPIC-20-payment-lifecycle-fsm.md](epics/EPIC-20-payment-lifecycle-fsm.md) |
+| EPIC-20 — Payment Lifecycle: FSM | in-progress (Story 20.1/20.2 done; 20.3 dependency **corrected 2026-07-16** from stale `EPIC-26` to `EPIC-27/Story 27.2` — still blocked, but on the right thing now; patrz epic file i `BACKLOG-REDESIGN.md` H3) | EPIC-19 | [epics/EPIC-20-payment-lifecycle-fsm.md](epics/EPIC-20-payment-lifecycle-fsm.md) |
 | EPIC-21 — Refaktor identyfikatorów ISO | **done** (Story 21.1/21.2/21.3 wszystkie done — `payment.payments.end_to_end_id` usunięty 2026-07-15, read model przepięty na `iso.payment_iso_identifiers`; patrz epic file dla decyzji o konflikcie źródeł ws. uniqueness) | EPIC-19 | [epics/EPIC-21-iso-identifier-refactor.md](epics/EPIC-21-iso-identifier-refactor.md) |
 | EPIC-22 — Tożsamość i czas: cross-cutting | done | EPIC-02, EPIC-03 | [epics/EPIC-22-identity-time-crosscutting.md](epics/EPIC-22-identity-time-crosscutting.md) |
-| EPIC-23 — Frontend Foundation | in-progress (Story 23.2/23.3/23.4 done; 23.1 blocked — brak OpenAPI/GraphQL w backendzie; patrz epic file) | EPIC-05, EPIC-06 | [epics/EPIC-23-frontend-foundation.md](epics/EPIC-23-frontend-foundation.md) |
-| EPIC-24 — Frontend Screens (**pierwsze testy Playwright tutaj**) | in-progress (Story 24.2 funkcjonalnie kompletna 2026-07-15 — lista+szczegół+panel ISO+timeline; formalnie `in-progress` bo Playwright wciąż bramkowany do czasu Control Room; 24.1/24.3-24.9 blocked; patrz epic file) | EPIC-23 | [epics/EPIC-24-frontend-screens.md](epics/EPIC-24-frontend-screens.md) |
-| EPIC-25 — Konsolidacja obserwowalności | in-progress (Story 25.1 done; 25.3 częściowo — lag-per-consumer-group done, DLQ/retry/alert blocked; 25.2/25.4 blocked; patrz epic file) | EPIC-07 | [epics/EPIC-25-observability-consolidation.md](epics/EPIC-25-observability-consolidation.md) |
+| EPIC-23 — Frontend Foundation | in-progress (Story 23.2/23.3/23.4 done; 23.1 **split 2026-07-16** into 23.1A [REST/OpenAPI] / 23.1B [GraphQL] — both blocked, independently, on their respective missing backend source; patrz epic file i `BACKLOG-REDESIGN.md` H7) | EPIC-05, EPIC-06 | [epics/EPIC-23-frontend-foundation.md](epics/EPIC-23-frontend-foundation.md) |
+| EPIC-24 — Frontend Screens (**pierwsze testy Playwright tutaj**) | in-progress (Story 24.2 **split 2026-07-16** into 24.2A [feature — now formally **done**] / 24.2B [Playwright acceptance — blocked do czasu Control Room]; 24.1/24.3-24.9 blocked; patrz epic file i `BACKLOG-REDESIGN.md` H4) | EPIC-23 | [epics/EPIC-24-frontend-screens.md](epics/EPIC-24-frontend-screens.md) |
+| EPIC-25 — Konsolidacja obserwowalności | in-progress (Story 25.1 done; 25.3 **split 2026-07-16** into 25.3A [lag, done] / 25.3B-E [retry/DLQ/headers/alert, każdy niezależnie blocked]; 25.2/25.4 blocked; patrz epic file i `BACKLOG-REDESIGN.md` H5) | EPIC-07 | [epics/EPIC-25-observability-consolidation.md](epics/EPIC-25-observability-consolidation.md) |
 
 ## Faza 3 — ISO lineage/korelacja (Iteracja 1-5)
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-26 — ISO: rdzeń lineage wiadomości | in-progress (Story 26.1/26.2/26.3 done — 26.3 odblokowana i zbudowana 2026-07-15 razem z pain.001 (EPIC-19 Story 19.4); 26.4 blocked na GraphQL, nie istnieje; patrz epic file) | EPIC-19 | [epics/EPIC-26-iso-message-lineage-core.md](epics/EPIC-26-iso-message-lineage-core.md) |
-| EPIC-27 — ISO: silnik korelacji | not-started | EPIC-26 | [epics/EPIC-27-iso-correlation-engine.md](epics/EPIC-27-iso-correlation-engine.md) |
+| EPIC-26 — ISO: rdzeń lineage wiadomości | in-progress (Story 26.1/26.2/26.3 done — 26.3 odblokowana i zbudowana 2026-07-15 razem z pain.001 (EPIC-19 Story 19.4); 26.4 blocked na GraphQL, nie istnieje — **2026-07-16: `[OPEN-QUESTION]` dodane, żaden epik dziś nie buduje samej warstwy GraphQL**, patrz `BACKLOG-REDESIGN.md` H8; patrz epic file) | EPIC-19 | [epics/EPIC-26-iso-message-lineage-core.md](epics/EPIC-26-iso-message-lineage-core.md) |
+| EPIC-27 — ISO: silnik korelacji | not-started — **dependency narrowed 2026-07-16 do `EPIC-26/Story 26.3`; epik jest dziś READY** (26.1-26.3 done, tylko niezwiązana 26.4 blocked), patrz `BACKLOG-REDESIGN.md` "Ready queue" | EPIC-26/Story 26.3 | [epics/EPIC-27-iso-correlation-engine.md](epics/EPIC-27-iso-correlation-engine.md) |
 | EPIC-28 — ISO: granice walidacji | in-progress (Story 28.1 done — `iso.iso_message_parse_errors` zbudowane i wpięte w pain.001 pipeline 2026-07-15; 28.2 blocked na EPIC-12 Story 12.2 (`[NO-CODE]`, Iteracja 5), 28.3/28.4 transytywnie blocked; patrz epic file) | EPIC-19 | [epics/EPIC-28-iso-validation-boundaries.md](epics/EPIC-28-iso-validation-boundaries.md) |
 | EPIC-29 — ISO: lineage artefaktów wychodzących `[P1]` | not-started | EPIC-44 | [epics/EPIC-29-iso-outbound-artifact-lineage.md](epics/EPIC-29-iso-outbound-artifact-lineage.md) |
 | EPIC-30 — ISO: lineage R-message `[P1]` | not-started | EPIC-65 | [epics/EPIC-30-iso-r-message-lineage.md](epics/EPIC-30-iso-r-message-lineage.md) |
@@ -76,7 +78,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-31 — Moduł Signature | in-progress (Story 31.1/31.2/31.4 done — schemat/porty/ArchUnit/grant-test/weryfikacja Ed25519/KeyRegistryPort; 31.3 blocked na egress, nie zaczęte; patrz epic file) | EPIC-09 | [epics/EPIC-31-signature-module.md](epics/EPIC-31-signature-module.md) |
+| EPIC-31 — Moduł Signature | in-progress (Story 31.1/31.2/31.4 done — schemat/porty/ArchUnit/grant-test/weryfikacja Ed25519/KeyRegistryPort; 31.3 **split 2026-07-16** into 31.3A [standalone signing capability — fixed a real cycle with EPIC-43/43.2, **31.3A jest dziś READY**, depends only on 31.1 done]; patrz epic file i `BACKLOG-REDESIGN.md` H1) | EPIC-09 | [epics/EPIC-31-signature-module.md](epics/EPIC-31-signature-module.md) |
 
 ## Faza 5 — Ledger / Settlement (Iteracja 2/4/5)
 
@@ -85,11 +87,11 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-32 — Ledger | not-started | EPIC-09 | [epics/EPIC-32-ledger-core.md](epics/EPIC-32-ledger-core.md) |
 | EPIC-33 — Rozliczenie natychmiastowe | not-started | EPIC-32, EPIC-35 | [epics/EPIC-33-instant-settlement.md](epics/EPIC-33-instant-settlement.md) |
 | EPIC-34 — Rozliczenie odroczone | not-started | EPIC-32, EPIC-37 | [epics/EPIC-34-deferred-settlement.md](epics/EPIC-34-deferred-settlement.md) |
-| EPIC-35 — Settlement: resolver strategii | not-started | EPIC-12 | [epics/EPIC-35-settlement-strategy-resolver.md](epics/EPIC-35-settlement-strategy-resolver.md) |
+| EPIC-35 — Settlement: resolver strategii | not-started — **dependency narrowed 2026-07-16 do `EPIC-12/Story 12.1` (done); epik jest dziś READY**, patrz `BACKLOG-REDESIGN.md` H2 i "Ready queue" | EPIC-12/Story 12.1 | [epics/EPIC-35-settlement-strategy-resolver.md](epics/EPIC-35-settlement-strategy-resolver.md) |
 | EPIC-36 — Settlement: gross instant + LedgerPort | not-started | EPIC-35, EPIC-13 | [epics/EPIC-36-settlement-gross-instant.md](epics/EPIC-36-settlement-gross-instant.md) |
 | EPIC-37 — Settlement: netting odroczony i cykle | not-started | EPIC-35 | [epics/EPIC-37-settlement-deferred-net-cycles.md](epics/EPIC-37-settlement-deferred-net-cycles.md) |
 | EPIC-38 — Settlement: book wewnętrzny i wsad plikowy | not-started | EPIC-35 | [epics/EPIC-38-settlement-internal-book-file-batch.md](epics/EPIC-38-settlement-internal-book-file-batch.md) |
-| EPIC-39 — Settlement: model finalności | not-started | EPIC-35 | [epics/EPIC-39-settlement-finality-model.md](epics/EPIC-39-settlement-finality-model.md) |
+| EPIC-39 — Settlement: model finalności | not-started (Story 39.4 dependency **narrowed 2026-07-16** — no longer references `EPIC-14/14.3` back, fixing a real cycle; patrz `BACKLOG-REDESIGN.md`) | EPIC-35 | [epics/EPIC-39-settlement-finality-model.md](epics/EPIC-39-settlement-finality-model.md) |
 | EPIC-40 — Settlement: niewystarczająca płynność | not-started | EPIC-35 | [epics/EPIC-40-settlement-insufficient-liquidity.md](epics/EPIC-40-settlement-insufficient-liquidity.md) |
 | EPIC-41 — Settlement: CGS i prefunded `[P1]` | not-started | EPIC-35 | [epics/EPIC-41-settlement-cgs-prefunded.md](epics/EPIC-41-settlement-cgs-prefunded.md) |
 | EPIC-42 — Settlement: zwrot vs reversal | not-started | EPIC-39 | [epics/EPIC-42-settlement-return-vs-reversal.md](epics/EPIC-42-settlement-return-vs-reversal.md) |
@@ -98,7 +100,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-43 — Egress: szyna wychodząca | not-started | EPIC-09 | [epics/EPIC-43-egress-rail-outbound-dispatch.md](epics/EPIC-43-egress-rail-outbound-dispatch.md) |
+| EPIC-43 — Egress: szyna wychodząca | not-started — Story 43.1 (`depends_on: []`) jest dziś READY; Story 43.2 dependency **repointed 2026-07-16** do `EPIC-31/Story 31.3A` (był `31.3`, cyklicznie zależny), patrz `BACKLOG-REDESIGN.md` H1 | EPIC-09 | [epics/EPIC-43-egress-rail-outbound-dispatch.md](epics/EPIC-43-egress-rail-outbound-dispatch.md) |
 | EPIC-44 — Egress: profil i taksonomia artefaktów | not-started | EPIC-43 | [epics/EPIC-44-egress-profile-artifact-taxonomy.md](epics/EPIC-44-egress-profile-artifact-taxonomy.md) |
 | EPIC-45 — Egress: cykl życia wiadomości wychodzącej | not-started | EPIC-44 | [epics/EPIC-45-egress-outbound-message-lifecycle.md](epics/EPIC-45-egress-outbound-message-lifecycle.md) |
 | EPIC-46 — Egress: próby dostawy i retry | not-started | EPIC-45 | [epics/EPIC-46-egress-delivery-attempts-retry.md](epics/EPIC-46-egress-delivery-attempts-retry.md) |
