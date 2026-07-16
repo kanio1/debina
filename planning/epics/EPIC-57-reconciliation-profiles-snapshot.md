@@ -1,10 +1,12 @@
 ---
 status: not-started
-depends_on: [EPIC-12-reference-data-ownership]
+depends_on: [EPIC-12-reference-data-ownership/Story 12.1]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-RECON-1, line 1312), [MVP]"
 ---
 
 # EPIC-57 — Reconciliation: profile i model snapshotu (EPIC-RECON-1)
+
+`[NARROWED 2026-07-16 — dependency-inventory deep-dive session]`: `depends_on` narrowed from the whole `EPIC-12-reference-data-ownership` epic to `Story 12.1` specifically. Source text parenthesizes `reconciliation_profile` as `(reference-data)` (§8 EPIC-RECON-1) and treats reconciliation profile/mismatch-taxonomy/severity rules as static `reference-data` content (§ "Config vs runtime") — this epic's four stories (57.1–57.4) need the `reference_data` schema/role/grant infrastructure Story 12.1 built, not Story 12.2's validation/mapping/render catalogs, which none of them reference.
 
 ## Story 57.1 — Katalog `reconciliation_profile`
 

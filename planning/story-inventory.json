@@ -1,0 +1,4216 @@
+{
+  "generated_by": "tools/agent-config/generate-story-inventory.py (one-off, not committed as a validator)",
+  "generated_note": "Programmatically extracted from planning/epics/*.md -- no invented data.",
+  "epic_count": 76,
+  "story_count": 277,
+  "epics": [
+    {
+      "epic": "EPIC-00",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-00-repository-agent-foundation.md"
+    },
+    {
+      "epic": "EPIC-01",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-01-postgresql-foundation.md"
+    },
+    {
+      "epic": "EPIC-02",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-02-keycloak-realm-iteration-0.md"
+    },
+    {
+      "epic": "EPIC-03",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-03-spring-modulith-backend-skeleton.md"
+    },
+    {
+      "epic": "EPIC-04",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-04-outbox-inbox-kafka-thin.md"
+    },
+    {
+      "epic": "EPIC-05",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-05-nextjs-bff.md"
+    },
+    {
+      "epic": "EPIC-06",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-06-react-shadcn-frontend-skeleton.md"
+    },
+    {
+      "epic": "EPIC-07",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-07-ci-cd-foundation.md"
+    },
+    {
+      "epic": "EPIC-08",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-08-walking-skeleton-verification.md"
+    },
+    {
+      "epic": "EPIC-09",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md"
+    },
+    {
+      "epic": "EPIC-10",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md"
+    },
+    {
+      "epic": "EPIC-11",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-11-payment-slim-ownership.md"
+    },
+    {
+      "epic": "EPIC-12",
+      "status": "blocked",
+      "source_file": "planning/epics/EPIC-12-reference-data-ownership.md"
+    },
+    {
+      "epic": "EPIC-13",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-13-ledger-ownership.md"
+    },
+    {
+      "epic": "EPIC-14",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-14-egress-boundary-ownership.md"
+    },
+    {
+      "epic": "EPIC-15",
+      "status": "blocked",
+      "source_file": "planning/epics/EPIC-15-kafka-topic-ownership.md"
+    },
+    {
+      "epic": "EPIC-16",
+      "status": "blocked",
+      "source_file": "planning/epics/EPIC-16-read-model-graphql-ownership.md"
+    },
+    {
+      "epic": "EPIC-17",
+      "status": "blocked",
+      "source_file": "planning/epics/EPIC-17-simulation-path-enforcement.md"
+    },
+    {
+      "epic": "EPIC-18",
+      "status": "blocked",
+      "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md"
+    },
+    {
+      "epic": "EPIC-19",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-19-ingress-staging-pipeline.md"
+    },
+    {
+      "epic": "EPIC-20",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-20-payment-lifecycle-fsm.md"
+    },
+    {
+      "epic": "EPIC-21",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-21-iso-identifier-refactor.md"
+    },
+    {
+      "epic": "EPIC-22",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-22-identity-time-crosscutting.md"
+    },
+    {
+      "epic": "EPIC-23",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-23-frontend-foundation.md"
+    },
+    {
+      "epic": "EPIC-24",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md"
+    },
+    {
+      "epic": "EPIC-25",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md"
+    },
+    {
+      "epic": "EPIC-26",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-26-iso-message-lineage-core.md"
+    },
+    {
+      "epic": "EPIC-27",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-27-iso-correlation-engine.md"
+    },
+    {
+      "epic": "EPIC-28",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-28-iso-validation-boundaries.md"
+    },
+    {
+      "epic": "EPIC-29",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-29-iso-outbound-artifact-lineage.md"
+    },
+    {
+      "epic": "EPIC-30",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-30-iso-r-message-lineage.md"
+    },
+    {
+      "epic": "EPIC-31",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-31-signature-module.md"
+    },
+    {
+      "epic": "EPIC-32",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-32-ledger-core.md"
+    },
+    {
+      "epic": "EPIC-33",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-33-instant-settlement.md"
+    },
+    {
+      "epic": "EPIC-34",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-34-deferred-settlement.md"
+    },
+    {
+      "epic": "EPIC-35",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-35-settlement-strategy-resolver.md"
+    },
+    {
+      "epic": "EPIC-36",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-36-settlement-gross-instant.md"
+    },
+    {
+      "epic": "EPIC-37",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md"
+    },
+    {
+      "epic": "EPIC-38",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-38-settlement-internal-book-file-batch.md"
+    },
+    {
+      "epic": "EPIC-39",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-39-settlement-finality-model.md"
+    },
+    {
+      "epic": "EPIC-40",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-40-settlement-insufficient-liquidity.md"
+    },
+    {
+      "epic": "EPIC-41",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-41-settlement-cgs-prefunded.md"
+    },
+    {
+      "epic": "EPIC-42",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-42-settlement-return-vs-reversal.md"
+    },
+    {
+      "epic": "EPIC-43",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md"
+    },
+    {
+      "epic": "EPIC-44",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-44-egress-profile-artifact-taxonomy.md"
+    },
+    {
+      "epic": "EPIC-45",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-45-egress-outbound-message-lifecycle.md"
+    },
+    {
+      "epic": "EPIC-46",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-46-egress-delivery-attempts-retry.md"
+    },
+    {
+      "epic": "EPIC-47",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-47-egress-delivery-receipts-five-status.md"
+    },
+    {
+      "epic": "EPIC-48",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-48-egress-batch-result-file-delivery.md"
+    },
+    {
+      "epic": "EPIC-49",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-49-egress-case-r-message-outbound.md"
+    },
+    {
+      "epic": "EPIC-50",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-50-egress-observability-test-lab.md"
+    },
+    {
+      "epic": "EPIC-51",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-51-routing-candidate-profile-resolution.md"
+    },
+    {
+      "epic": "EPIC-52",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md"
+    },
+    {
+      "epic": "EPIC-53",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md"
+    },
+    {
+      "epic": "EPIC-54",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-54-routing-fallback-rules.md"
+    },
+    {
+      "epic": "EPIC-55",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md"
+    },
+    {
+      "epic": "EPIC-56",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-56-routing-test-lab.md"
+    },
+    {
+      "epic": "EPIC-57",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-57-reconciliation-profiles-snapshot.md"
+    },
+    {
+      "epic": "EPIC-58",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-58-reconciliation-evidence-collection.md"
+    },
+    {
+      "epic": "EPIC-59",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-59-reconciliation-settlement-vs-ledger.md"
+    },
+    {
+      "epic": "EPIC-60",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-60-reconciliation-balance-drift-detection.md"
+    },
+    {
+      "epic": "EPIC-61",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-61-reconciliation-mismatch-taxonomy.md"
+    },
+    {
+      "epic": "EPIC-62",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-62-reconciliation-exception-lifecycle.md"
+    },
+    {
+      "epic": "EPIC-63",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-63-reconciliation-egress-iso-case-recon.md"
+    },
+    {
+      "epic": "EPIC-64",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-64-reconciliation-observability-test-lab.md"
+    },
+    {
+      "epic": "EPIC-65",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-65-case-r-message-catalog.md"
+    },
+    {
+      "epic": "EPIC-66",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-66-case-reject-return-recall-rules.md"
+    },
+    {
+      "epic": "EPIC-67",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-67-case-evidence-bundles.md"
+    },
+    {
+      "epic": "EPIC-68",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-68-case-decisions-action-requests.md"
+    },
+    {
+      "epic": "EPIC-69",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-69-case-egress-iso-outbound-responses.md"
+    },
+    {
+      "epic": "EPIC-70",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-70-case-duplicate-conflicting-r-messages.md"
+    },
+    {
+      "epic": "EPIC-71",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-71-case-reconciliation-linked-cases.md"
+    },
+    {
+      "epic": "EPIC-72",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-72-case-observability-test-lab.md"
+    },
+    {
+      "epic": "EPIC-73",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-73-ingress-file-rail.md"
+    },
+    {
+      "epic": "EPIC-74",
+      "status": "not-started",
+      "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md"
+    },
+    {
+      "epic": "EPIC-75",
+      "status": "done",
+      "source_file": "planning/epics/EPIC-75-documentation-hygiene.md"
+    }
+  ],
+  "stories": [
+    {
+      "epic": "EPIC-00",
+      "story": "0.1",
+      "title": "Monorepo structure & tooling baseline",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "ls backend frontend infra",
+        "test \"$(tr -d '\\r\\n' < frontend/.node-version)\" = \"24.18.0\"",
+        "cd frontend && npm view typescript-eslint peerDependencies"
+      ],
+      "source_file": "planning/epics/EPIC-00-repository-agent-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-00",
+      "story": "0.2",
+      "title": "`AGENTS.md` i pięć projektowych Skills dla Claude Code / Codex CLI",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "test -f AGENTS.md && grep -q \"no Playwright\" AGENTS.md",
+        "test -f .claude/skills/spring-modulith-module/SKILL.md && grep -q \"@ApplicationModuleListener\" .claude/skills/spring-modulith-module/SKILL.md",
+        "test -f .claude/skills/postgres-rls-migration/SKILL.md && grep -q \"FORCE ROW LEVEL SECURITY\" .claude/skills/postgres-rls-migration/SKILL.md",
+        "test -f .claude/skills/keycloak-realm-config/SKILL.md && grep -q \"sepa-web\" .claude/skills/keycloak-realm-config/SKILL.md",
+        "test -f .claude/skills/nextjs-bff-route/SKILL.md && grep -q \"HttpOnly\" .claude/skills/nextjs-bff-route/SKILL.md",
+        "test -f .claude/skills/shadcn-component-scaffold/SKILL.md && grep -q \"data-testid\" .claude/skills/shadcn-component-scaffold/SKILL.md",
+        "test -e tools/codex/.agents/skills && diff -r .claude/skills tools/codex/.agents/skills && grep -q \"codex --cd tools/codex\" tools/codex/README.md"
+      ],
+      "source_file": "planning/epics/EPIC-00-repository-agent-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-00",
+      "story": "0.3",
+      "title": "Base Docker Compose (Postgres, Keycloak, Kafka)",
+      "status": "done",
+      "depends_on": [
+        "Story 0.1"
+      ],
+      "verify": [
+        "podman compose -f infra/docker-compose.yml config",
+        "podman compose -f infra/docker-compose.yml up -d"
+      ],
+      "source_file": "planning/epics/EPIC-00-repository-agent-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-01",
+      "story": "1.1",
+      "title": "Flyway setup & dwie role DB",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend flyway:info",
+        "podman compose -f infra/docker-compose.yml exec -T postgres psql -U sepa_migration -d sepa_nexus -c \"\\du\" | grep -E \"sepa_migration|sepa_app\""
+      ],
+      "source_file": "planning/epics/EPIC-01-postgresql-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-01",
+      "story": "1.2",
+      "title": "schemat `payment`, tabela `payments`, RLS",
+      "status": "done",
+      "depends_on": [
+        "Story 1.1"
+      ],
+      "verify": [
+        "podman compose -f infra/docker-compose.yml exec -T postgres psql -U sepa_migration -d sepa_nexus -c \"\\dn payment\"",
+        "podman compose -f infra/docker-compose.yml exec -T postgres psql -U sepa_migration -d sepa_nexus -c \"\\d payment.payments\"",
+        "podman compose -f infra/docker-compose.yml exec -T postgres psql -U sepa_migration -d sepa_nexus -c \"SELECT relrowsecurity, relforcerowsecurity FROM pg_class WHERE relname='payments'\"",
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=PaymentsRlsTest"
+      ],
+      "source_file": "planning/epics/EPIC-01-postgresql-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-01",
+      "story": "1.3",
+      "title": "tabele outbox/inbox per schemat (ADR-N5)",
+      "status": "done",
+      "depends_on": [
+        "Story 1.2"
+      ],
+      "verify": [
+        "podman compose -f infra/docker-compose.yml exec -T postgres psql -U sepa_migration -d sepa_nexus -c \"\\d payment.outbox_events\"",
+        "podman compose -f infra/docker-compose.yml exec -T postgres psql -U sepa_migration -d sepa_nexus -c \"\\d payment.inbox_events\"",
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=OutboxOwnershipTest"
+      ],
+      "source_file": "planning/epics/EPIC-01-postgresql-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-02",
+      "story": "2.1",
+      "title": "Realm-as-code",
+      "status": "done",
+      "depends_on": [
+        "EPIC-00-repository-agent-foundation/Story 0.3"
+      ],
+      "verify": [
+        "podman compose -f infra/docker-compose.yml up -d keycloak && curl -fsS http://localhost:8080/realms/sepa-nexus/.well-known/openid-configuration",
+        "curl -fsS http://localhost:8080/realms/sepa-nexus/.well-known/openid-configuration | jq '.token_endpoint'; podman compose -f infra/docker-compose.yml exec -T keycloak kcadm.sh get clients -r sepa-nexus",
+        "for u in operator submitter approver refdata; do curl -fsS -X POST http://localhost:8080/realms/sepa-nexus/protocol/openid-connect/token -d 'client_id=sepa-web' -d 'client_secret=dev-only-sepa-web-secret' -d 'grant_type=password' -d \"username=$u\" -d \"password=dev-only-$u\" | jq -e '.access_token' > /dev/null; done"
+      ],
+      "source_file": "planning/epics/EPIC-02-keycloak-realm-iteration-0.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-02",
+      "story": "2.2",
+      "title": "Weryfikacja kształtu tokena",
+      "status": "done",
+      "depends_on": [
+        "Story 2.1"
+      ],
+      "verify": [
+        "TOKEN=\"$(curl -fsS -X POST http://localhost:8080/realms/sepa-nexus/protocol/openid-connect/token -d 'client_id=sepa-web' -d 'client_secret=dev-only-sepa-web-secret' -d 'grant_type=password' -d 'username=operator' -d 'password=dev-only-operator' | jq -r .access_token)\"; printf '%s' \"$TOKEN\" | cut -d. -f2 | tr '_-' '/+' | base64 -d | jq -e '.tenant_id and .branch_id and .realm_access.roles and .sub and .sid and (has(\"address\") | not) and (has(\"phone_number\") | not) and (has(\"groups\") | not)'"
+      ],
+      "source_file": "planning/epics/EPIC-02-keycloak-realm-iteration-0.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-03",
+      "story": "3.1",
+      "title": "Szkielet projektu Maven",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend -q compile",
+        "./mvnw -f backend -q spring-boot:run",
+        "find backend/src/main/java -type d -name paymentlifecycle -exec sh -c 'test -d \"$1/web\" && test -d \"$1/service\" && test -d \"$1/repository\" && test -d \"$1/domain\"' _ {} \\;",
+        "./mvnw -f backend test -Dtest=ModularityTest"
+      ],
+      "source_file": "planning/epics/EPIC-03-spring-modulith-backend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-03",
+      "story": "3.2",
+      "title": "moduł `payment-lifecycle`: Controller → Service → Repository",
+      "status": "done",
+      "depends_on": [
+        "Story 3.1"
+      ],
+      "verify": [
+        "./mvnw -f backend -q compile",
+        "./mvnw -f backend -q compile",
+        "./mvnw -f backend -q compile",
+        "./mvnw -f backend test -Dtest=PaymentServiceTest",
+        "./mvnw -f backend test -Dtest=PaymentControllerTest",
+        "./mvnw -f backend test -Dtest=PaymentControllerErrorTest"
+      ],
+      "source_file": "planning/epics/EPIC-03-spring-modulith-backend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-03",
+      "story": "3.3",
+      "title": "Spring Security Resource Server",
+      "status": "done",
+      "depends_on": [
+        "Story 3.2",
+        "EPIC-02-keycloak-realm-iteration-0"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=SecurityConfigTest",
+        "./mvnw -f backend test -Dtest=PaymentAuthorizationTest",
+        "./mvnw -f backend -q compile"
+      ],
+      "source_file": "planning/epics/EPIC-03-spring-modulith-backend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-03",
+      "story": "3.4",
+      "title": "RLS GUC-setting",
+      "status": "done",
+      "depends_on": [
+        "Story 3.3",
+        "EPIC-01-postgresql-foundation/Story 1.2"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=TenantGucIntegrationTest",
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=MissingTenantClaimTest"
+      ],
+      "source_file": "planning/epics/EPIC-03-spring-modulith-backend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-04",
+      "story": "4.1",
+      "title": "Topic Kafka i konfiguracja producenta",
+      "status": "done",
+      "depends_on": [
+        "EPIC-00-repository-agent-foundation/Story 0.3"
+      ],
+      "verify": [
+        "./mvnw -f backend -q compile",
+        "podman compose -f infra/docker-compose.yml exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list | grep -Fx payment.lifecycle.events.v1"
+      ],
+      "source_file": "planning/epics/EPIC-04-outbox-inbox-kafka-thin.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-04",
+      "story": "4.2",
+      "title": "Dyspozytor outbox (scheduled poller)",
+      "status": "done",
+      "depends_on": [
+        "Story 4.1",
+        "EPIC-01-postgresql-foundation/Story 1.3"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=OutboxDispatcherTest"
+      ],
+      "source_file": "planning/epics/EPIC-04-outbox-inbox-kafka-thin.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-04",
+      "story": "4.3",
+      "title": "Szkielet konsumenta inbox",
+      "status": "done",
+      "depends_on": [
+        "Story 4.2"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=InboxConsumerIdempotencyTest"
+      ],
+      "source_file": "planning/epics/EPIC-04-outbox-inbox-kafka-thin.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-05",
+      "story": "5.1",
+      "title": "Szkielet projektu",
+      "status": "done",
+      "depends_on": [],
+      "verify": null,
+      "source_file": "planning/epics/EPIC-05-nextjs-bff.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-05",
+      "story": "5.2",
+      "title": "OIDC Authorization Code + PKCE, sesja HttpOnly",
+      "status": "done",
+      "depends_on": [
+        "Story 5.1",
+        "EPIC-02-keycloak-realm-iteration-0"
+      ],
+      "verify": [
+        "curl -c cookies.txt -sI http://localhost:3000/api/auth/login | grep -i location",
+        "pełny browser-equivalent login (curl z jarem cookie przez Keycloak login form dla usera 'operator'/'dev-only-operator', realny code+state+PKCE roundtrip) → curl -b cookies.txt http://localhost:3000/api/session",
+        "curl -b cookies.txt -c cookies.txt http://localhost:3000/api/auth/logout && curl -b cookies.txt http://localhost:3000/api/session"
+      ],
+      "source_file": "planning/epics/EPIC-05-nextjs-bff.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-05",
+      "story": "5.3",
+      "title": "Nagłówki bezpieczeństwa i CSRF",
+      "status": "done",
+      "depends_on": [
+        "Story 5.2"
+      ],
+      "verify": [
+        "curl -sI http://localhost:3000/ | grep -iE \"content-security-policy|strict-transport-security|x-frame-options\"",
+        "po realnym loginie, curl -b cookies.txt -X POST http://localhost:3000/api/payments -d '{}' -H \"Content-Type: application/json\""
+      ],
+      "source_file": "planning/epics/EPIC-05-nextjs-bff.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-05",
+      "story": "5.4",
+      "title": "Proxy server-side do `sepa-api`",
+      "status": "done",
+      "depends_on": [
+        "Story 5.3",
+        "EPIC-03-spring-modulith-backend-skeleton/Story 3.2"
+      ],
+      "verify": [
+        "pełny browser-equivalent login jako 'submitter'/'dev-only-submitter' (rola payment_submitter, wymagana przez @PreAuthorize w PaymentService), backend uruchomiony (./mvnw -f backend spring-boot:run), curl -b cookies.txt -X POST http://localhost:3000/api/payments -H \"x-csrf-token: $CSRF\" -d '{\"endToEndId\":\"e2e-verify-1784017444\",\"amount\":123.45,\"currency\":\"EUR\",\"debtorIban\":\"DE89370400440532013000\",\"creditorIban\":\"FR1420041010050500013M02606\"}' -H \"Content-Type: application/json\""
+      ],
+      "source_file": "planning/epics/EPIC-05-nextjs-bff.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-06",
+      "story": "6.1",
+      "title": "Inicjalizacja shadcn/ui + Tailwind v4",
+      "status": "done",
+      "depends_on": [
+        "EPIC-00-repository-agent-foundation/Story 0.2"
+      ],
+      "verify": [
+        "pnpm dlx shadcn@4.13.0 init -y -b base --no-monorepo -p nova",
+        "pnpm dlx shadcn@4.13.0 add table button input field card sonner sidebar -y"
+      ],
+      "source_file": "planning/epics/EPIC-06-react-shadcn-frontend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-06",
+      "story": "6.2",
+      "title": "Konfiguracja TanStack Table",
+      "status": "done",
+      "depends_on": [
+        "Story 6.1"
+      ],
+      "verify": [
+        "pnpm add @tanstack/react-table (8.21.3)"
+      ],
+      "source_file": "planning/epics/EPIC-06-react-shadcn-frontend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-06",
+      "story": "6.3",
+      "title": "Minimalny `AppShell`",
+      "status": "done",
+      "depends_on": [
+        "Story 6.1"
+      ],
+      "verify": [
+        "pnpm run build && pnpm run dev"
+      ],
+      "source_file": "planning/epics/EPIC-06-react-shadcn-frontend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-06",
+      "story": "6.4",
+      "title": "Cienki ekran Payments (lista + submit)",
+      "status": "done",
+      "depends_on": [
+        "Story 6.2",
+        "Story 6.3",
+        "EPIC-05-nextjs-bff/Story 5.4"
+      ],
+      "verify": [
+        "pnpm run build",
+        "grep -c \"data-testid\" frontend/src/app/payments/page.tsx",
+        "kod (src/app/payments/page.tsx handleSubmit) — lista jest refetchowana z GET /api/payments dopiero po pomyślnej odpowiedzi POST (await loadPayments() po response.ok), przycisk disabled+\"Submitting…\" w trakcie (submitting state); brak jakiegokolwiek lokalnego appendu wiersza przed odpowiedzią serwera",
+        "login → POST /api/payments {endToEndId:\"e2e-6-4-1784021267\",...} → 201; GET /api/payments → zawiera nowy wiersz; podman exec -i infra_postgres_1 psql -U sepa_migration -d sepa_nexus -c \"select end_to_end_id, status from payment.payments where end_to_end_id='e2e-6-4-1784021267';\""
+      ],
+      "source_file": "planning/epics/EPIC-06-react-shadcn-frontend-skeleton.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-07",
+      "story": "7.1",
+      "title": "Workflow CI backendu",
+      "status": "done",
+      "depends_on": [
+        "EPIC-03-spring-modulith-backend-skeleton/Story 3.1"
+      ],
+      "verify": [
+        "act -W .github/workflows/backend.yml -j test --container-daemon-socket \"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\" --container-options \"--security-opt label=disable\" --env TESTCONTAINERS_RYUK_DISABLED=true"
+      ],
+      "source_file": "planning/epics/EPIC-07-ci-cd-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-07",
+      "story": "7.2",
+      "title": "Workflow CI frontendu",
+      "status": "done",
+      "depends_on": [
+        "EPIC-06-react-shadcn-frontend-skeleton/Story 6.4"
+      ],
+      "verify": [
+        "act -W .github/workflows/frontend.yml -j build"
+      ],
+      "source_file": "planning/epics/EPIC-07-ci-cd-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-07",
+      "story": "7.3",
+      "title": "Lokalna parytet CI przez `nektos/act`",
+      "status": "done",
+      "depends_on": [
+        "Story 7.1",
+        "Story 7.2"
+      ],
+      "verify": [
+        "act -l"
+      ],
+      "source_file": "planning/epics/EPIC-07-ci-cd-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-08",
+      "story": "8.1",
+      "title": "Pełnołańcuchowy test integracyjny Testcontainers",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=WalkingSkeletonIntegrationTest",
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=WalkingSkeletonIntegrationTest#deniedRoleProducesNoSideEffects"
+      ],
+      "source_file": "planning/epics/EPIC-08-walking-skeleton-verification.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-08",
+      "story": "8.2",
+      "title": "Ręczny, prowadzony przez człowieka runbook weryfikacyjny",
+      "status": "done",
+      "depends_on": [
+        "Story 8.1"
+      ],
+      "verify": [
+        "curl -s http://localhost:8081/actuator/health",
+        "ręczne (skryptowane curl) — każdy krok powyżej zakończony oczekiwanym kodem HTTP; przeszukano ",
+        "` → jeden wiersz, "
+      ],
+      "source_file": "planning/epics/EPIC-08-walking-skeleton-verification.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-08",
+      "story": "8.3",
+      "title": "Checklist wyjścia z Iteracji 0",
+      "status": "done",
+      "depends_on": [
+        "Story 8.2"
+      ],
+      "verify": [
+        "for f in planning/epics/EPIC-0{0,1,2,3,4,5,6,7}*.md; do grep -n '^\\s*- \\[ \\]\\|^\\s*- \\[~\\]' \"$f\"; done",
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=WalkingSkeletonIntegrationTest",
+        "./mvnw -f backend test -Dtest=PaymentsRlsTest,MissingTenantClaimTest",
+        "./mvnw -f backend test -Dtest=ModularityTest",
+        "find . -path ./node_modules -prune -o -path ./frontend/node_modules -prune -o -iname \"*.spec.ts\" -print -o -iname \"playwright.config.ts\" -print | wc -l",
+        "test -f AGENTS.md && diff -r .claude/skills .codex/skills",
+        "cd frontend && pnpm list next | grep 16.2.1",
+        "git clone /home/suso/debina <scratch-dir>"
+      ],
+      "source_file": "planning/epics/EPIC-08-walking-skeleton-verification.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-09",
+      "story": "9.1",
+      "title": "Jedna rola DB per moduł + granty/odbieranie uprawnień",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=SchemaGrantMatrixTest"
+      ],
+      "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-09",
+      "story": "9.2",
+      "title": "Flyway folder-per-module + granice pakietów repository",
+      "status": "done",
+      "depends_on": [
+        "Story 9.1"
+      ],
+      "verify": [
+        "find backend/src/main/resources/db/migration -mindepth 1 -maxdepth 1 -type d"
+      ],
+      "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-09",
+      "story": "9.3",
+      "title": "Bramka Modulith `allowedDependencies`+`verify()`",
+      "status": "done",
+      "depends_on": [
+        "EPIC-03-spring-modulith-backend-skeleton/Story 3.1"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=ModularityTest"
+      ],
+      "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-09",
+      "story": "9.4",
+      "title": "Reguły ArchUnit dot. ownership",
+      "status": "done",
+      "depends_on": [
+        "Story 9.3"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=OwnershipArchRulesTest"
+      ],
+      "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-10",
+      "story": "10.1A",
+      "title": "User decision gate: SECURITY DEFINER acceptance",
+      "status": "blocked",
+      "depends_on": [],
+      "verify": null,
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-10",
+      "story": "10.1B",
+      "title": "Narrow ISO command-API design + DB role/functions + migration",
+      "status": "blocked",
+      "depends_on": [
+        "Story 10.1A"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*IsoSchemaOwnershipTest*"
+      ],
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-10",
+      "story": "10.1C",
+      "title": "`JSON_DIRECT` integration through the new command API",
+      "status": "blocked",
+      "depends_on": [
+        "Story 10.1B"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*JsonDirectCommandApiIntegrationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-10",
+      "story": "10.1D",
+      "title": "pain.001 integration through the new command API",
+      "status": "blocked",
+      "depends_on": [
+        "Story 10.1B"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Pain001CommandApiIntegrationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-10",
+      "story": "10.1E",
+      "title": "Privilege/search_path/rollback/pool verification",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=SetLocalRoleSqlProofTest,SetLocalRoleJpaFlushProofTest",
+        "./mvnw -f backend test -Dtest=SecurityDefinerPrivilegeProofTest,SecurityDefinerTransactionProofTest,SecurityDefinerSearchPathProofTest,SecurityDefinerPoolIsolationProofTest,SecurityDefinerJpaFlushProofTest"
+      ],
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-10",
+      "story": "10.2",
+      "title": "Korelacja pacs.002 przez lineage",
+      "status": "not-started",
+      "depends_on": [
+        "Story 10.1B"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*IsoCorrelationOwnershipTest*"
+      ],
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-10",
+      "story": "10.3",
+      "title": "`iso-adapter` nie podejmuje decyzji biznesowej (arch test)",
+      "status": "done",
+      "depends_on": [
+        "EPIC-09-ownership-schema-grants/Story 9.4"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=IsoAdapterNoBusinessDecisionTest"
+      ],
+      "source_file": "planning/epics/EPIC-10-iso-lineage-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-11",
+      "story": "11.1",
+      "title": "`payment-lifecycle` jako jedyny writer",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=PaymentHistoryOwnershipTest",
+        "` ("
+      ],
+      "source_file": "planning/epics/EPIC-11-payment-slim-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-11",
+      "story": "11.2",
+      "title": "Status/reason przez FK do katalogu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 11.1"
+      ],
+      "verify": [
+        "psql -c \"\\d payment.payments\""
+      ],
+      "source_file": "planning/epics/EPIC-11-payment-slim-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-11",
+      "story": "11.3",
+      "title": "Test strażnika God-Module",
+      "status": "not-started",
+      "depends_on": [
+        "EPIC-09-ownership-schema-grants/Story 9.4"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*PaymentNoGodModuleTest*"
+      ],
+      "source_file": "planning/epics/EPIC-11-payment-slim-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-12",
+      "story": "12.1",
+      "title": "Katalogi jako własność `reference-data`",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=ReferenceDataOwnershipTest"
+      ],
+      "source_file": "planning/epics/EPIC-12-reference-data-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-12",
+      "story": "12.2",
+      "title": "Katalogi walidacji/mapowania/renderowania (R-09)",
+      "status": "blocked",
+      "depends_on": [
+        "Story 12.1"
+      ],
+      "verify": null,
+      "source_file": "planning/epics/EPIC-12-reference-data-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-13",
+      "story": "13.1",
+      "title": "`ledger_role` jedynym writerem",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*LedgerSchemaOwnershipTest*"
+      ],
+      "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-13",
+      "story": "13.2",
+      "title": "`LedgerPort` jako jedyna droga zapisu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 13.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementNoDirectLedgerWriteTest*"
+      ],
+      "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-13",
+      "story": "13.3",
+      "title": "Test: `settlement` bez grantu `ledger`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 13.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementRoleNoLedgerGrantTest*"
+      ],
+      "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-13",
+      "story": "13.4",
+      "title": "Testy deferred trigger + niemutowalność + reversal",
+      "status": "not-started",
+      "depends_on": [
+        "Story 13.1",
+        "EPIC-32-ledger-core"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*UnbalancedJournalEntryRejectedAtCommitTest*",
+        "./mvnw -f backend test -Dtest=*JournalLinesImmutabilityTest*"
+      ],
+      "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-14",
+      "story": "14.1",
+      "title": "`CLAIMED` + `transport_attempts`/`delivery_receipts`",
+      "status": "not-started",
+      "depends_on": [
+        "EPIC-46-egress-delivery-attempts-retry/Story 46.1",
+        "EPIC-47-egress-delivery-receipts-five-status/Story 47.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressSchemaOwnershipTest*"
+      ],
+      "source_file": "planning/epics/EPIC-14-egress-boundary-ownership.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-14",
+      "story": "14.2",
+      "title": "Test: egress nie pisze `payment.status`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 14.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressCannotWritePaymentStatusTest*"
+      ],
+      "source_file": "planning/epics/EPIC-14-egress-boundary-ownership.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-14",
+      "story": "14.3",
+      "title": "Asercja delivered ≠ final",
+      "status": "not-started",
+      "depends_on": [
+        "Story 14.1",
+        "EPIC-39-settlement-finality-model/Story 39.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DeliveredNotFinalTest*"
+      ],
+      "source_file": "planning/epics/EPIC-14-egress-boundary-ownership.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-15",
+      "story": "15.1",
+      "title": "Generacja AsyncAPI z §3.7 v2",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "test -f infra/asyncapi/asyncapi.yaml && grep -q \"generated from §3.7 v2\" infra/asyncapi/asyncapi.yaml"
+      ],
+      "source_file": "planning/epics/EPIC-15-kafka-topic-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-15",
+      "story": "15.2",
+      "title": "Jeden producent na topic + testy kontraktowe",
+      "status": "done",
+      "depends_on": [
+        "Story 15.1"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=KafkaTopicContractTest"
+      ],
+      "source_file": "planning/epics/EPIC-15-kafka-topic-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-15",
+      "story": "15.3",
+      "title": "Trzy topiki terminalne (ADR-N8 delta)",
+      "status": "blocked",
+      "depends_on": [
+        "Story 15.1"
+      ],
+      "verify": [
+        "docker exec <kafka-container> kafka-topics.sh --bootstrap-server localhost:9092 --list | grep -E \"egress.dead_lettered|egress.manual_intervention_required|reconciliation.run.failed\""
+      ],
+      "source_file": "planning/epics/EPIC-15-kafka-topic-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-16",
+      "story": "16.1",
+      "title": "Read modele własnością modułu źródłowego",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReadModelOwnershipTest*"
+      ],
+      "source_file": "planning/epics/EPIC-16-read-model-graphql-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-16",
+      "story": "16.2",
+      "title": "Wymuszenie GraphQL read-only",
+      "status": "not-started",
+      "depends_on": [
+        "Story 16.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*GraphQLReadOnlyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-16-read-model-graphql-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-16",
+      "story": "16.3",
+      "title": "Odświeżanie projekcji dashboardu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 16.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DashboardProjectionRefreshTest*"
+      ],
+      "source_file": "planning/epics/EPIC-16-read-model-graphql-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-17",
+      "story": "17.1",
+      "title": "Symulacja tylko przez publiczne komendy + `csm.response.received`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SimulationPublicPathOnlyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-17-simulation-path-enforcement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-17",
+      "story": "17.2",
+      "title": "Grant-test: brak insertu domenowego z symulacji",
+      "status": "not-started",
+      "depends_on": [
+        "Story 17.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SimulationNoDomainWriteTest*"
+      ],
+      "source_file": "planning/epics/EPIC-17-simulation-path-enforcement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-17",
+      "story": "17.3",
+      "title": "Deterministyczny replay z seeda",
+      "status": "not-started",
+      "depends_on": [
+        "Story 17.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DeterministicSeedReplayTest*"
+      ],
+      "source_file": "planning/epics/EPIC-17-simulation-path-enforcement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-18",
+      "story": "18.1",
+      "title": "DDL `<schema>.outbox_events`/`<schema>.inbox_events` per moduł",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "dla każdego nowego modułu M: psql -c \"\\d M.outbox_events\" i \"\\d M.inbox_events\""
+      ],
+      "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-18",
+      "story": "18.2",
+      "title": "`outbox_dispatcher_role` grant + negatywny sweep",
+      "status": "not-started",
+      "depends_on": [
+        "Story 18.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*OutboxDispatcherNoDomainWriteSweepTest*"
+      ],
+      "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-18",
+      "story": "18.3",
+      "title": "Test: writer modułu nie pisze cudzego outbox",
+      "status": "not-started",
+      "depends_on": [
+        "Story 18.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CrossModuleOutboxWriteDeniedTest*"
+      ],
+      "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-18",
+      "story": "18.4",
+      "title": "Dedup inbox + replay-safe",
+      "status": "not-started",
+      "depends_on": [
+        "Story 18.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*InboxReplayDoesNotDuplicateTest*"
+      ],
+      "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-19",
+      "story": "19.1",
+      "title": "REST JSON submit + idempotencja (JSON_DIRECT, ADR-N7)",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=JsonDirectIngestionTest"
+      ],
+      "source_file": "planning/epics/EPIC-19-ingress-staging-pipeline.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-19",
+      "story": "19.2",
+      "title": "Filtr signature-before-parse",
+      "status": "done",
+      "depends_on": [
+        "EPIC-31-signature-module/Story 31.1",
+        "EPIC-31-signature-module/Story 31.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=SignatureBeforeParseOrderingTest"
+      ],
+      "source_file": "planning/epics/EPIC-19-ingress-staging-pipeline.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-19",
+      "story": "19.3",
+      "title": "Hartowanie XML",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=XmlHardeningTest"
+      ],
+      "source_file": "planning/epics/EPIC-19-ingress-staging-pipeline.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-19",
+      "story": "19.4",
+      "title": "REST XML pain.001",
+      "status": "done",
+      "depends_on": [
+        "Story 19.3",
+        "EPIC-31-signature-module/Story 31.2 (done)",
+        "CanonicalMapper capability (done",
+        "this session)"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=Pain001CanonicalMapperTest,Pain001SubmissionEndpointTest"
+      ],
+      "source_file": "planning/epics/EPIC-19-ingress-staging-pipeline.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-20",
+      "story": "20.1",
+      "title": "Tabela przejść + guardy",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=PaymentFsmTransitionTest"
+      ],
+      "source_file": "planning/epics/EPIC-20-payment-lifecycle-fsm.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-20",
+      "story": "20.2",
+      "title": "Konsument Kafka + inbox",
+      "status": "done",
+      "depends_on": [
+        "Story 20.1",
+        "EPIC-04-outbox-inbox-kafka-thin"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=InboxConsumerIdempotencyTest"
+      ],
+      "source_file": "planning/epics/EPIC-20-payment-lifecycle-fsm.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-20",
+      "story": "20.3",
+      "title": "Korelacja status-inbound (G4)",
+      "status": "blocked",
+      "depends_on": [
+        "Story 20.1",
+        "EPIC-27-iso-correlation-engine/Story 27.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*StatusInboundCorrelationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-20-payment-lifecycle-fsm.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-21",
+      "story": "21.1",
+      "title": "Schemat + migracja `iso.payment_iso_identifiers`",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "podman exec -i infra_postgres_1 psql -U sepa_migration -d sepa_nexus -c \"\\d iso.payment_iso_identifiers\""
+      ],
+      "source_file": "planning/epics/EPIC-21-iso-identifier-refactor.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-21",
+      "story": "21.2",
+      "title": "Przekierowanie zapytań korelacyjnych",
+      "status": "done",
+      "depends_on": [
+        "Story 21.1"
+      ],
+      "verify": [
+        "pnpm run build (frontend) && ./mvnw -f backend test"
+      ],
+      "source_file": "planning/epics/EPIC-21-iso-identifier-refactor.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-21",
+      "story": "21.3",
+      "title": "Test lineage per `source_message_type`",
+      "status": "done",
+      "depends_on": [
+        "Story 21.1"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=LineageBySourceMessageTypeTest"
+      ],
+      "source_file": "planning/epics/EPIC-21-iso-identifier-refactor.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-22",
+      "story": "22.1",
+      "title": "Filtr claim→GUC + selektywne dwupoziomowe RLS",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=BranchLevelRlsTest"
+      ],
+      "source_file": "planning/epics/EPIC-22-identity-time-crosscutting.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-22",
+      "story": "22.2",
+      "title": "Granty ownership na tabelach queue/ledger (bez RLS)",
+      "status": "done",
+      "depends_on": [
+        "Story 22.1"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=BackgroundWorkerScopeTest"
+      ],
+      "source_file": "planning/epics/EPIC-22-identity-time-crosscutting.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-22",
+      "story": "22.3",
+      "title": "`ClockPort` wszędzie",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=ClockPortEnforcementTest"
+      ],
+      "source_file": "planning/epics/EPIC-22-identity-time-crosscutting.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-23",
+      "story": "23.1A",
+      "title": "Codegen REST/OpenAPI w CI",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-07-ci-cd-foundation"
+      ],
+      "verify": [
+        "`. These are two independent capability gaps (backend has neither ",
+        "pnpm run codegen:openapi && git diff --exit-code frontend/generated/rest/"
+      ],
+      "source_file": "planning/epics/EPIC-23-frontend-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-23",
+      "story": "23.1B",
+      "title": "Codegen GraphQL SDL w CI",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-07-ci-cd-foundation"
+      ],
+      "verify": [
+        "pnpm run codegen:graphql && git diff --exit-code frontend/generated/graphql/"
+      ],
+      "source_file": "planning/epics/EPIC-23-frontend-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-23",
+      "story": "23.2",
+      "title": "Konwencja `data-testid` i deep-linki jako standard projektu",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "test -f frontend/CONVENTIONS.md && grep -q \"data-testid\" frontend/CONVENTIONS.md"
+      ],
+      "source_file": "planning/epics/EPIC-23-frontend-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-23",
+      "story": "23.3",
+      "title": "Mapa rola→ekran + stany loading/error/empty",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "npm run build"
+      ],
+      "source_file": "planning/epics/EPIC-23-frontend-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-23",
+      "story": "23.4",
+      "title": "Krok 6-7 adoption planu: checklist a11y + podgląd komponentów",
+      "status": "done",
+      "depends_on": [
+        "EPIC-06-react-shadcn-frontend-skeleton"
+      ],
+      "verify": [
+        "test -f frontend/A11Y-CHECKLIST.md"
+      ],
+      "source_file": "planning/epics/EPIC-23-frontend-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.1",
+      "title": "Workspace 1: Ops Control Room (S-00…S-02)",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-25-observability-consolidation/Story 25.2"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*control-room\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.2A",
+      "title": "Workspace 2 feature: list, detail, ISO panel, timeline",
+      "status": "done",
+      "depends_on": [
+        "EPIC-20-payment-lifecycle-fsm",
+        "EPIC-21-iso-identifier-refactor"
+      ],
+      "verify": [
+        "pnpm run build",
+        "pnpm run build"
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.2B",
+      "title": "Workspace 2 Playwright acceptance",
+      "status": "blocked",
+      "depends_on": [
+        "Story 24.2A",
+        "Story 24.1"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*payments\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.3",
+      "title": "Workspace 3: Settlement & Liquidity (S-08, S-09, S-10)",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-33-instant-settlement",
+        "EPIC-32-ledger-core"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*settlement\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.4",
+      "title": "Workspace 4: Egress & Delivery (S-11, S-12)",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-44-egress-profile-artifact-taxonomy"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*egress\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.5",
+      "title": "Workspace 5: Reconciliation & Cases (S-13, S-14, S-15)",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-57-reconciliation-profiles-snapshot",
+        "EPIC-65-case-r-message-catalog"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*reconciliation\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.6",
+      "title": "Workspace 6: Simulation Lab (S-17)",
+      "status": "blocked",
+      "depends_on": [],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*simulation\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.7",
+      "title": "Workspace 7: Reference Data / Admin (S-16)",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-12-reference-data-ownership/Story 12.1"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*reference-data\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.8",
+      "title": "Evidence/Audit drawer + workspace auditor (S-18)",
+      "status": "blocked",
+      "depends_on": [],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*evidence-drawer\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.9",
+      "title": "Operator worklist (S-01, `[P1]`)",
+      "status": "blocked",
+      "depends_on": [
+        "Story 24.1",
+        "EPIC-68-case-decisions-action-requests"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*worklist\""
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.1",
+      "title": "Inwentarz obserwowalności (Iteracja 0/1)",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "test -f docs/observability-inventory.md"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.2",
+      "title": "Segmentowany budżet latencji (Iteracja 1-2)",
+      "status": "blocked",
+      "depends_on": [
+        "Story 25.1",
+        "EPIC-19-ingress-staging-pipeline"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SegmentedLatencyMetricsTest*"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.3A",
+      "title": "Lag Kafka per consumer group (Iteracja 3)",
+      "status": "done",
+      "depends_on": [
+        "Story 25.1",
+        "EPIC-04-outbox-inbox-kafka-thin"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=KafkaConsumerGroupLagGaugeTest"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.3B",
+      "title": "Licznik retry",
+      "status": "blocked",
+      "depends_on": [
+        "Story 25.3A"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*KafkaRetryCounterTest*"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.3C",
+      "title": "Głębokość DLQ",
+      "status": "blocked",
+      "depends_on": [
+        "Story 25.3A"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*KafkaDlqDepthGaugeTest*"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.3D",
+      "title": "Propagacja nagłówków korelacyjnych",
+      "status": "blocked",
+      "depends_on": [
+        "Story 25.3A"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CorrelationHeaderPropagationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.3E",
+      "title": "Alert na DLQ>0",
+      "status": "blocked",
+      "depends_on": [
+        "Story 25.3C"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DlqAlertRuleTest*"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-25",
+      "story": "25.4",
+      "title": "Reguły alertów (Iteracja 4)",
+      "status": "blocked",
+      "depends_on": [
+        "Story 25.2",
+        "Story 25.3D",
+        "Story 25.3E"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*AlertRulesCoverageTest*"
+      ],
+      "source_file": "planning/epics/EPIC-25-observability-consolidation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-26",
+      "story": "26.1",
+      "title": "`iso.iso_messages` + `iso_message_versions`",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "podman exec -i infra_postgres_1 psql -U sepa_migration -d sepa_nexus -c \"\\dt iso.iso_message*\""
+      ],
+      "source_file": "planning/epics/EPIC-26-iso-message-lineage-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-26",
+      "story": "26.2",
+      "title": "`iso.message_lineage`",
+      "status": "done",
+      "depends_on": [
+        "Story 26.1"
+      ],
+      "verify": [
+        "podman exec -i infra_postgres_1 psql -U sepa_migration -d sepa_nexus -c \"\\d iso.message_lineage\""
+      ],
+      "source_file": "planning/epics/EPIC-26-iso-message-lineage-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-26",
+      "story": "26.3",
+      "title": "Bogatsza ekstrakcja identyfikatorów",
+      "status": "done",
+      "depends_on": [
+        "Story 26.1",
+        "EPIC-21-iso-identifier-refactor (Story 21.1/21.3 only — see below)"
+      ],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=Pain001SubmissionEndpointTest#validSignedPain001CreatesPaymentWithIdentifiersLineageAndOutbox"
+      ],
+      "source_file": "planning/epics/EPIC-26-iso-message-lineage-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-26",
+      "story": "26.4",
+      "title": "Panel lineage w GraphQL szczegółu płatności",
+      "status": "blocked",
+      "depends_on": [
+        "Story 26.2",
+        "Story 26.3"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*PaymentLineageGraphQLTest*"
+      ],
+      "source_file": "planning/epics/EPIC-26-iso-message-lineage-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-27",
+      "story": "27.1",
+      "title": "Ekstrakcja identyfikatorów pacs.002",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Pacs002IdentifierExtractionTest*"
+      ],
+      "source_file": "planning/epics/EPIC-27-iso-correlation-engine.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 EPIC-27 Story 27.1 implementation session"
+    },
+    {
+      "epic": "EPIC-27",
+      "story": "27.2",
+      "title": "9-krokowa korelacja → `iso.iso_message_correlation`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 27.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Pacs002CorrelationPolicyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-27-iso-correlation-engine.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-27",
+      "story": "27.3",
+      "title": "Duplikat i out-of-order",
+      "status": "not-started",
+      "depends_on": [
+        "Story 27.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DuplicateAndOutOfOrderTest*"
+      ],
+      "source_file": "planning/epics/EPIC-27-iso-correlation-engine.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-27",
+      "story": "27.4",
+      "title": "Orphan → DLQ `[MVP]`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 27.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*OrphanDlqTest*"
+      ],
+      "source_file": "planning/epics/EPIC-27-iso-correlation-engine.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-27",
+      "story": "27.5",
+      "title": "Read model operatora do ręcznej korelacji `[P1]`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 27.4"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*OrphanOperatorReadModelTest*"
+      ],
+      "source_file": "planning/epics/EPIC-27-iso-correlation-engine.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-28",
+      "story": "28.1",
+      "title": "Wynik hartowania XML → `iso_message_parse_errors`",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=IsoMessageParseErrorOwnershipTest,Pain001SubmissionEndpointTest"
+      ],
+      "source_file": "planning/epics/EPIC-28-iso-validation-boundaries.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-28",
+      "story": "28.2",
+      "title": "Wyniki walidacji schema/structural/profile/mapping",
+      "status": "blocked",
+      "depends_on": [
+        "Story 28.1 (done)",
+        "EPIC-12-reference-data-ownership/Story 12.2 (blocked)"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ValidationLevelsTest*"
+      ],
+      "source_file": "planning/epics/EPIC-28-iso-validation-boundaries.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-28",
+      "story": "28.3",
+      "title": "Rozdział ISO-reject vs business-reject",
+      "status": "blocked",
+      "depends_on": [
+        "Story 28.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*IsoRejectVsBusinessRejectTest*"
+      ],
+      "source_file": "planning/epics/EPIC-28-iso-validation-boundaries.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-28",
+      "story": "28.4",
+      "title": "Integracja katalogu reason/status",
+      "status": "blocked",
+      "depends_on": [
+        "Story 28.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReasonStatusCatalogIntegrationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-28-iso-validation-boundaries.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-29",
+      "story": "29.1",
+      "title": "`iso.iso_outbound_artifacts`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d iso.iso_outbound_artifacts\""
+      ],
+      "source_file": "planning/epics/EPIC-29-iso-outbound-artifact-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-29",
+      "story": "29.2",
+      "title": "Snapshot render-profile/version",
+      "status": "not-started",
+      "depends_on": [
+        "Story 29.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RenderProfileSnapshotTest*"
+      ],
+      "source_file": "planning/epics/EPIC-29-iso-outbound-artifact-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-29",
+      "story": "29.3",
+      "title": "Rozdział lineage pacs.002/result-file od transportu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 29.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*OutboundLineageVsTransportSeparationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-29-iso-outbound-artifact-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-29",
+      "story": "29.4",
+      "title": "Panel evidence wychodzącego (Playwright)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 29.1",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*outbound-evidence\""
+      ],
+      "source_file": "planning/epics/EPIC-29-iso-outbound-artifact-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-30",
+      "story": "30.1",
+      "title": "Korelacja zwrotu pacs.004",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Pacs004ReturnCorrelationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-30-iso-r-message-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-30",
+      "story": "30.2",
+      "title": "Powiązanie recall camt.056 → case",
+      "status": "not-started",
+      "depends_on": [
+        "Story 30.1",
+        "EPIC-65-case-r-message-catalog"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Camt056CaseLinkTest*"
+      ],
+      "source_file": "planning/epics/EPIC-30-iso-r-message-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-30",
+      "story": "30.3",
+      "title": "Powiązanie rozstrzygnięcia camt.029",
+      "status": "not-started",
+      "depends_on": [
+        "Story 30.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Camt029ResolutionLinkTest*"
+      ],
+      "source_file": "planning/epics/EPIC-30-iso-r-message-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-30",
+      "story": "30.4",
+      "title": "Dashboard śledztwa",
+      "status": "not-started",
+      "depends_on": [
+        "Story 30.1",
+        "Story 30.2",
+        "Story 30.3"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*r-message-investigation\""
+      ],
+      "source_file": "planning/epics/EPIC-30-iso-r-message-lineage.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-31",
+      "story": "31.1",
+      "title": "SIG-S1: granica + schemat",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "podman exec -i infra_postgres_1 psql -U sepa_migration -d sepa_nexus -c \"\\dt signature.*\"",
+        "./mvnw -f backend test -Dtest=SignatureNoForeignRepoAccessTest",
+        "./mvnw -f backend test -Dtest=NonSignatureRoleCannotWriteSignatureTest"
+      ],
+      "source_file": "planning/epics/EPIC-31-signature-module.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-31",
+      "story": "31.2",
+      "title": "SIG-S2: weryfikacja przed parsowaniem (kanały bankowe/plikowe)",
+      "status": "done",
+      "depends_on": [
+        "Story 31.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=SignatureVerificationTest",
+        "./mvnw -f backend test -Dtest=SignatureBeforeParseOrderingTest"
+      ],
+      "source_file": "planning/epics/EPIC-31-signature-module.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-31",
+      "story": "31.3A",
+      "title": "SIG-S3a: standalone signing capability (sign→verify)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 31.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SigningRoundTripTest*"
+      ],
+      "source_file": "planning/epics/EPIC-31-signature-module.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-31",
+      "story": "31.4",
+      "title": "Rejestr kluczy (KeyRegistryPort)",
+      "status": "done",
+      "depends_on": [
+        "Story 31.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=KeyRegistryLookupTest"
+      ],
+      "source_file": "planning/epics/EPIC-31-signature-module.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-32",
+      "story": "32.1",
+      "title": "DDL kont + dziennika + granty",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\dt ledger.*\""
+      ],
+      "source_file": "planning/epics/EPIC-32-ledger-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-32",
+      "story": "32.2",
+      "title": "Niezmienniki reserve/post/release",
+      "status": "not-started",
+      "depends_on": [
+        "Story 32.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*NoDoubleReserveConcurrencyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-32-ledger-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-32",
+      "story": "32.3",
+      "title": "Deferred constraint trigger + niemutowalność",
+      "status": "not-started",
+      "depends_on": [
+        "Story 32.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*UnbalancedEntryAtCommitTest*"
+      ],
+      "source_file": "planning/epics/EPIC-32-ledger-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-32",
+      "story": "32.4",
+      "title": "Przepływ reversal",
+      "status": "not-started",
+      "depends_on": [
+        "Story 32.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*LedgerReversalFlowTest*"
+      ],
+      "source_file": "planning/epics/EPIC-32-ledger-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-33",
+      "story": "33.1",
+      "title": "`GrossInstantStrategy` jedna transakcja",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*"
+      ],
+      "source_file": "planning/epics/EPIC-33-instant-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-33",
+      "story": "33.2",
+      "title": "Ścieżka niewystarczającej płynności",
+      "status": "not-started",
+      "depends_on": [
+        "Story 33.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*InsufficientLiquidityInstantTest*"
+      ],
+      "source_file": "planning/epics/EPIC-33-instant-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-33",
+      "story": "33.3",
+      "title": "Timer SLA + zdarzenie breach",
+      "status": "not-started",
+      "depends_on": [
+        "Story 33.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SlaBreachTimerTest*"
+      ],
+      "source_file": "planning/epics/EPIC-33-instant-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-33",
+      "story": "33.4",
+      "title": "Atrybuty finalności/timeout",
+      "status": "not-started",
+      "depends_on": [
+        "Story 33.1",
+        "EPIC-39-settlement-finality-model"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FinalityTimeoutAttributesTest*"
+      ],
+      "source_file": "planning/epics/EPIC-33-instant-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-34",
+      "story": "34.1",
+      "title": "FSM cyklu + blokada G6",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CycleCloseRaceTest*"
+      ],
+      "source_file": "planning/epics/EPIC-34-deferred-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-34",
+      "story": "34.2",
+      "title": "Netting → pozycje",
+      "status": "not-started",
+      "depends_on": [
+        "Story 34.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*NettingSqlTest*"
+      ],
+      "source_file": "planning/epics/EPIC-34-deferred-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-34",
+      "story": "34.3",
+      "title": "Wpis dziennika wsadowy + fan-out statusów",
+      "status": "not-started",
+      "depends_on": [
+        "Story 34.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*BatchJournalFanOutTest*"
+      ],
+      "source_file": "planning/epics/EPIC-34-deferred-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-34",
+      "story": "34.4",
+      "title": "Run rekoncyliacji (REPEATABLE READ) + severity",
+      "status": "not-started",
+      "depends_on": [
+        "Story 34.3",
+        "EPIC-61-reconciliation-mismatch-taxonomy"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CycleReconciliationRunTest*"
+      ],
+      "source_file": "planning/epics/EPIC-34-deferred-settlement.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-35",
+      "story": "35.1",
+      "title": "`SettlementStrategyResolver`",
+      "status": "not-started",
+      "depends_on": [
+        "EPIC-12-reference-data-ownership/Story 12.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementStrategyResolverTest*"
+      ],
+      "source_file": "planning/epics/EPIC-35-settlement-strategy-resolver.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-35",
+      "story": "35.2",
+      "title": "Zakaz przełączania po nazwie profilu (ArchUnit)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 35.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*NoProfileNameSwitchTest*"
+      ],
+      "source_file": "planning/epics/EPIC-35-settlement-strategy-resolver.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-35",
+      "story": "35.3",
+      "title": "Zamrożony snapshot profilu na attempt",
+      "status": "not-started",
+      "depends_on": [
+        "Story 35.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementProfileSnapshotTest*"
+      ],
+      "source_file": "planning/epics/EPIC-35-settlement-strategy-resolver.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-36",
+      "story": "36.1",
+      "title": "`GrossInstantStrategy` reserve→post→FINAL",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*GrossInstantLedgerPortTest*"
+      ],
+      "source_file": "planning/epics/EPIC-36-settlement-gross-instant.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-36",
+      "story": "36.2",
+      "title": "`settlement_liquidity_checks`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 36.1"
+      ],
+      "verify": [
+        "psql -c \"\\d settlement.settlement_liquidity_checks\""
+      ],
+      "source_file": "planning/epics/EPIC-36-settlement-gross-instant.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-36",
+      "story": "36.3",
+      "title": "Test: `settlement_role` bez zapisu `ledger.*`",
+      "status": "not-started",
+      "depends_on": [
+        "EPIC-13-ledger-ownership/Story 13.3"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementRoleNoLedgerGrantTest*"
+      ],
+      "source_file": "planning/epics/EPIC-36-settlement-gross-instant.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-37",
+      "story": "37.1",
+      "title": "`NetDeferredStrategy`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*NetDeferredStrategyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-37",
+      "story": "37.2",
+      "title": "FSM cyklu (blokada G6)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 37.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CycleCloseRaceTest*"
+      ],
+      "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-37",
+      "story": "37.3",
+      "title": "Netting → pozycje",
+      "status": "not-started",
+      "depends_on": [
+        "Story 37.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*NettingSqlTest*"
+      ],
+      "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-37",
+      "story": "37.4",
+      "title": "`ON_CYCLE_SETTLED`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 37.3"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*OnCycleSettledEventTest*"
+      ],
+      "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-38",
+      "story": "38.1",
+      "title": "`InternalBookStrategy`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*InternalBookStrategyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-38-settlement-internal-book-file-batch.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-38",
+      "story": "38.2",
+      "title": "`FileBatchStrategy` podstawowa",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FileBatchStrategyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-38-settlement-internal-book-file-batch.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-39",
+      "story": "39.1",
+      "title": "Katalog `finality_rule`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d reference_data.finality_rule\""
+      ],
+      "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-39",
+      "story": "39.2",
+      "title": "`FinalityPolicy` + `settlement_finality_records`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 39.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FinalityPolicyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-39",
+      "story": "39.3",
+      "title": "Test: accepted/posted ≠ final",
+      "status": "not-started",
+      "depends_on": [
+        "Story 39.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*AcceptedPostedNotFinalTest*"
+      ],
+      "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-39",
+      "story": "39.4",
+      "title": "Test: dostawa ≠ finalność",
+      "status": "not-started",
+      "depends_on": [
+        "Story 39.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DeliveredNotFinalTest*"
+      ],
+      "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-40",
+      "story": "40.1",
+      "title": "Odrzucenie (`[MVP]`)",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*InsufficientLiquidityRejectTest*"
+      ],
+      "source_file": "planning/epics/EPIC-40-settlement-insufficient-liquidity.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-40",
+      "story": "40.2",
+      "title": "Wynik zależny od basis+mode+cutoff",
+      "status": "not-started",
+      "depends_on": [
+        "Story 40.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*LiquidityOutcomeByBasisModeTest*"
+      ],
+      "source_file": "planning/epics/EPIC-40-settlement-insufficient-liquidity.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-40",
+      "story": "40.3",
+      "title": "`settlement_queue_items` + next-cycle (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 40.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementQueueNextCycleTest*"
+      ],
+      "source_file": "planning/epics/EPIC-40-settlement-insufficient-liquidity.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-41",
+      "story": "41.1",
+      "title": "`BulkCgsLikeStrategy`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*BulkCgsLikeStrategyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-41-settlement-cgs-prefunded.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-41",
+      "story": "41.2",
+      "title": "`PrefundedInstantStrategy`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*PrefundedInstantStrategyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-41-settlement-cgs-prefunded.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-42",
+      "story": "42.1",
+      "title": "Reafirmacja: zwrot = nowa płatność",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReturnAfterFinalityIsNewPaymentTest*"
+      ],
+      "source_file": "planning/epics/EPIC-42-settlement-return-vs-reversal.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-42",
+      "story": "42.2",
+      "title": "Reversal tylko pre-finality",
+      "status": "not-started",
+      "depends_on": [
+        "Story 42.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReversalOnlyPreFinalityTest*"
+      ],
+      "source_file": "planning/epics/EPIC-42-settlement-return-vs-reversal.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-42",
+      "story": "42.3",
+      "title": "Read model wyjaśnienia + Playwright",
+      "status": "not-started",
+      "depends_on": [
+        "Story 42.1"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*return-vs-reversal\""
+      ],
+      "source_file": "planning/epics/EPIC-42-settlement-return-vs-reversal.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-43",
+      "story": "43.1",
+      "title": "`outbound_messages` + dispatcher SKIP LOCKED",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DoubleDispatcherTest*"
+      ],
+      "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-43",
+      "story": "43.2",
+      "title": "Renderer (Prowide) + integracja z SignatureSigningPort",
+      "status": "not-started",
+      "depends_on": [
+        "Story 43.1",
+        "EPIC-31-signature-module/Story 31.3A"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressRendererSignerTest*"
+      ],
+      "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-43",
+      "story": "43.3",
+      "title": "Retry/backoff/ABANDONED + DLQ",
+      "status": "not-started",
+      "depends_on": [
+        "Story 43.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressRetryBackoffDlqTest*"
+      ],
+      "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-43",
+      "story": "43.4",
+      "title": "Kolektor wsadowy + pliki wychodzące",
+      "status": "not-started",
+      "depends_on": [
+        "Story 43.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*BatchCollectorTest*"
+      ],
+      "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-43",
+      "story": "43.5",
+      "title": "Korelacja potwierdzenia dostawy",
+      "status": "not-started",
+      "depends_on": [
+        "Story 43.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DeliveryConfirmationCorrelationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-44",
+      "story": "44.1",
+      "title": "Katalog `egress_profile` + snapshoty",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d egress.egress_profile\""
+      ],
+      "source_file": "planning/epics/EPIC-44-egress-profile-artifact-taxonomy.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-44",
+      "story": "44.2",
+      "title": "`outbound_artifacts` + klucz idempotencji",
+      "status": "not-started",
+      "depends_on": [
+        "Story 44.1"
+      ],
+      "verify": [
+        "psql -c \"\\d egress.outbound_artifacts\""
+      ],
+      "source_file": "planning/epics/EPIC-44-egress-profile-artifact-taxonomy.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-44",
+      "story": "44.3",
+      "title": "Mapa typ-artefaktu→trigger",
+      "status": "not-started",
+      "depends_on": [
+        "Story 44.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ArtifactTriggerMapTest*"
+      ],
+      "source_file": "planning/epics/EPIC-44-egress-profile-artifact-taxonomy.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-45",
+      "story": "45.1",
+      "title": "Ujednolicony cykl życia REQUESTED→…→CLOSED",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*OutboundMessageLifecycleFsmTest*"
+      ],
+      "source_file": "planning/epics/EPIC-45-egress-outbound-message-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-45",
+      "story": "45.2",
+      "title": "Render→sign→deliver",
+      "status": "not-started",
+      "depends_on": [
+        "Story 45.1",
+        "EPIC-31-signature-module/Story 31.3A"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RenderSignDeliverChainTest*"
+      ],
+      "source_file": "planning/epics/EPIC-45-egress-outbound-message-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-45",
+      "story": "45.3",
+      "title": "Dispatcher SKIP LOCKED",
+      "status": "not-started",
+      "depends_on": [
+        "Story 45.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DoubleDispatcherTest*"
+      ],
+      "source_file": "planning/epics/EPIC-45-egress-outbound-message-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-45",
+      "story": "45.4",
+      "title": "Asercja tylko-transport",
+      "status": "not-started",
+      "depends_on": [
+        "Story 45.1",
+        "EPIC-14-egress-boundary-ownership/Story 14.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressTransportOnlyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-45-egress-outbound-message-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-46",
+      "story": "46.1",
+      "title": "`transport_attempts`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d egress.transport_attempts\""
+      ],
+      "source_file": "planning/epics/EPIC-46-egress-delivery-attempts-retry.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-46",
+      "story": "46.2",
+      "title": "Polityka retry per profil + dead-letter",
+      "status": "not-started",
+      "depends_on": [
+        "Story 46.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressProfileRetryPolicyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-46-egress-delivery-attempts-retry.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-46",
+      "story": "46.3",
+      "title": "Test: nieudana dostawa nie dotyka upstream",
+      "status": "not-started",
+      "depends_on": [
+        "Story 46.1",
+        "EPIC-14-egress-boundary-ownership/Story 14.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FailedDeliveryDoesNotTouchUpstreamTest*"
+      ],
+      "source_file": "planning/epics/EPIC-46-egress-delivery-attempts-retry.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-47",
+      "story": "47.1",
+      "title": "`delivery_receipts` + korelacja z artefaktem",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d egress.delivery_receipts\""
+      ],
+      "source_file": "planning/epics/EPIC-47-egress-delivery-receipts-five-status.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-47",
+      "story": "47.2",
+      "title": "`transport_receipts_in` (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 47.1"
+      ],
+      "verify": [
+        "psql -c \"\\d egress.transport_receipts_in\""
+      ],
+      "source_file": "planning/epics/EPIC-47-egress-delivery-receipts-five-status.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-47",
+      "story": "47.3",
+      "title": "Testy pięcioosiowego rozdziału statusów",
+      "status": "not-started",
+      "depends_on": [
+        "Story 47.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FiveStatusSeparationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-47-egress-delivery-receipts-five-status.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-48",
+      "story": "48.1",
+      "title": "Kolektor",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*BatchCollectorTest*"
+      ],
+      "source_file": "planning/epics/EPIC-48-egress-batch-result-file-delivery.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-48",
+      "story": "48.2",
+      "title": "Plik wynikowy pain.002-style, jeden artefakt per plik",
+      "status": "not-started",
+      "depends_on": [
+        "Story 48.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ResultFileOneArtifactPerFileTest*"
+      ],
+      "source_file": "planning/epics/EPIC-48-egress-batch-result-file-delivery.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-48",
+      "story": "48.3",
+      "title": "Dashboard plików wynikowych (Playwright)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 48.2",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*result-file\""
+      ],
+      "source_file": "planning/epics/EPIC-48-egress-batch-result-file-delivery.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-49",
+      "story": "49.1",
+      "title": "Renderowanie camt.029/pacs.004 z eventów case",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseOutboundRenderTest*"
+      ],
+      "source_file": "planning/epics/EPIC-49-egress-case-r-message-outbound.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-49",
+      "story": "49.2",
+      "title": "Lineage artefaktu wychodzącego",
+      "status": "not-started",
+      "depends_on": [
+        "Story 49.1",
+        "EPIC-29-iso-outbound-artifact-lineage"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseOutboundLineageTest*"
+      ],
+      "source_file": "planning/epics/EPIC-49-egress-case-r-message-outbound.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-49",
+      "story": "49.3",
+      "title": "Dashboard case-outbound",
+      "status": "not-started",
+      "depends_on": [
+        "Story 49.1",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*case-outbound\""
+      ],
+      "source_file": "planning/epics/EPIC-49-egress-case-r-message-outbound.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-50",
+      "story": "50.1",
+      "title": "Read modele",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressReadModelTest*"
+      ],
+      "source_file": "planning/epics/EPIC-50-egress-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-50",
+      "story": "50.2",
+      "title": "Komenda `manual_delivery_actions` (resend)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 50.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ManualResendCommandTest*"
+      ],
+      "source_file": "planning/epics/EPIC-50-egress-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-50",
+      "story": "50.3",
+      "title": "Trasa awarii egress w symulacji",
+      "status": "not-started",
+      "depends_on": [
+        "Story 50.1",
+        "EPIC-17-simulation-path-enforcement"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SimulationEgressFailureTraceTest*"
+      ],
+      "source_file": "planning/epics/EPIC-50-egress-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-50",
+      "story": "50.4",
+      "title": "Dashboardy nieudanej dostawy + manual-resend",
+      "status": "not-started",
+      "depends_on": [
+        "Story 50.2",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*egress-failure-dashboard\""
+      ],
+      "source_file": "planning/epics/EPIC-50-egress-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-51",
+      "story": "51.1",
+      "title": "Kandydaci z scheme/service/currency",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RouteCandidateResolutionTest*"
+      ],
+      "source_file": "planning/epics/EPIC-51-routing-candidate-profile-resolution.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-51",
+      "story": "51.2",
+      "title": "Filtr wg okna aktywności profilu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 51.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ProfileActiveWindowFilterTest*"
+      ],
+      "source_file": "planning/epics/EPIC-51-routing-candidate-profile-resolution.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-51",
+      "story": "51.3",
+      "title": "Filtr kompatybilności zestawu wiadomości",
+      "status": "not-started",
+      "depends_on": [
+        "Story 51.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*MessageSetCompatibilityFilterTest*"
+      ],
+      "source_file": "planning/epics/EPIC-51-routing-candidate-profile-resolution.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-51",
+      "story": "51.4",
+      "title": "Kandydaci w read modelu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 51.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RouteCandidatesReadModelTest*"
+      ],
+      "source_file": "planning/epics/EPIC-51-routing-candidate-profile-resolution.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-52",
+      "story": "52.1",
+      "title": "`reference_data.participant_capabilities`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d reference_data.participant_capabilities\""
+      ],
+      "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-52",
+      "story": "52.2",
+      "title": "`participant_eligibility_rules`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 52.1"
+      ],
+      "verify": [
+        "psql -c \"\\d reference_data.participant_eligibility_rules\""
+      ],
+      "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-52",
+      "story": "52.3",
+      "title": "Osiągalność runtime per profil",
+      "status": "not-started",
+      "depends_on": [
+        "Story 52.1"
+      ],
+      "verify": [
+        "psql -c \"\\d routing.participant_reachability\""
+      ],
+      "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-52",
+      "story": "52.4",
+      "title": "Dashboard osiągalności",
+      "status": "not-started",
+      "depends_on": [
+        "Story 52.3",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*reachability\""
+      ],
+      "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-53",
+      "story": "53.1",
+      "title": "Niemutowalne `route_decisions`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RouteDecisionsImmutableTest*"
+      ],
+      "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-53",
+      "story": "53.2",
+      "title": "`route_candidate_results`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 53.1"
+      ],
+      "verify": [
+        "psql -c \"\\d routing.route_candidate_results\""
+      ],
+      "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-53",
+      "story": "53.3",
+      "title": "Niemutowalny snapshot wyjaśnienia (MVP-blocker)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 53.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RouteExplanationSnapshotImmutabilityTest*"
+      ],
+      "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-53",
+      "story": "53.4",
+      "title": "Wyjaśnienie trasy w GraphQL",
+      "status": "not-started",
+      "depends_on": [
+        "Story 53.3"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RouteExplanationGraphQLTest*"
+      ],
+      "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-54",
+      "story": "54.1",
+      "title": "Jawne `profile_fallback_rules`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d reference_data.profile_fallback_rules\""
+      ],
+      "source_file": "planning/epics/EPIC-54-routing-fallback-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-54",
+      "story": "54.2",
+      "title": "Wynik `FALLBACK_SELECTED`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 54.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FallbackSelectedOutcomeTest*"
+      ],
+      "source_file": "planning/epics/EPIC-54-routing-fallback-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-54",
+      "story": "54.3",
+      "title": "Test: brak niejawnego fallbacku instant→batch",
+      "status": "not-started",
+      "depends_on": [
+        "Story 54.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*NoImplicitInstantToBatchFallbackTest*"
+      ],
+      "source_file": "planning/epics/EPIC-54-routing-fallback-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-54",
+      "story": "54.4",
+      "title": "Fallback wielo-CSM (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 54.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*MultiCsmFallbackTest*"
+      ],
+      "source_file": "planning/epics/EPIC-54-routing-fallback-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-55",
+      "story": "55.1",
+      "title": "Port `CutoffStateReader`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CutoffStateReaderPortTest*"
+      ],
+      "source_file": "planning/epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-55",
+      "story": "55.2",
+      "title": "Wyniki `CUTOFF_REACHED`/`CYCLE_CLOSED`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 55.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CutoffCycleOutcomeTest*"
+      ],
+      "source_file": "planning/epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-55",
+      "story": "55.3",
+      "title": "`LiquidityModePrecheckPort` (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 55.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*LiquidityPrecheckPortTest*"
+      ],
+      "source_file": "planning/epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-55",
+      "story": "55.4",
+      "title": "Zachowanie routingu przy zamkniętym cyklu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 55.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RoutingBehaviorOnCycleClosedTest*"
+      ],
+      "source_file": "planning/epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-56",
+      "story": "56.1",
+      "title": "Deterministyczne fixture'y routingu",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RoutingFixturesTest*"
+      ],
+      "source_file": "planning/epics/EPIC-56-routing-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-56",
+      "story": "56.2",
+      "title": "Testy parami (pairwise) profili",
+      "status": "not-started",
+      "depends_on": [
+        "Story 56.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RoutingPairwiseProfileTest*"
+      ],
+      "source_file": "planning/epics/EPIC-56-routing-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-56",
+      "story": "56.3",
+      "title": "Testy granic kwota/waluta",
+      "status": "not-started",
+      "depends_on": [
+        "Story 56.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RoutingBoundaryAmountCurrencyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-56-routing-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-56",
+      "story": "56.4",
+      "title": "Dashboard routingu + scenariusze awarii w symulacji (Playwright)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 56.1",
+        "EPIC-17-simulation-path-enforcement",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*routing\""
+      ],
+      "source_file": "planning/epics/EPIC-56-routing-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-57",
+      "story": "57.1",
+      "title": "Katalog `reconciliation_profile`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d reconciliation.reconciliation_profile\""
+      ],
+      "source_file": "planning/epics/EPIC-57-reconciliation-profiles-snapshot.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-57",
+      "story": "57.2",
+      "title": "`reconciliation_profiles_snapshot`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 57.1"
+      ],
+      "verify": [
+        "psql -c \"\\d reconciliation.reconciliation_profiles_snapshot\""
+      ],
+      "source_file": "planning/epics/EPIC-57-reconciliation-profiles-snapshot.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-57",
+      "story": "57.3",
+      "title": "Deterministyczny `as_of` + `reconciliation_run_sources`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 57.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DeterministicAsOfTest*"
+      ],
+      "source_file": "planning/epics/EPIC-57-reconciliation-profiles-snapshot.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-57",
+      "story": "57.4",
+      "title": "Cykl życia runa",
+      "status": "not-started",
+      "depends_on": [
+        "Story 57.3"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReconciliationRunLifecycleTest*"
+      ],
+      "source_file": "planning/epics/EPIC-57-reconciliation-profiles-snapshot.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-58",
+      "story": "58.1",
+      "title": "Read-only `EvidenceCollector` per źródło",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EvidenceCollectorReadOnlyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-58-reconciliation-evidence-collection.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-58",
+      "story": "58.2",
+      "title": "`evidence_bundles` + `evidence_pointers`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 58.1"
+      ],
+      "verify": [
+        "psql -c \"\\dt reconciliation.evidence_*\""
+      ],
+      "source_file": "planning/epics/EPIC-58-reconciliation-evidence-collection.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-58",
+      "story": "58.3",
+      "title": "Test: brak zapisu do źródła",
+      "status": "not-started",
+      "depends_on": [
+        "Story 58.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReconciliationNoSourceWriteTest*"
+      ],
+      "source_file": "planning/epics/EPIC-58-reconciliation-evidence-collection.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-59",
+      "story": "59.1",
+      "title": "Silnik porównawczy",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementVsLedgerComparisonTest*"
+      ],
+      "source_file": "planning/epics/EPIC-59-reconciliation-settlement-vs-ledger.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-59",
+      "story": "59.2",
+      "title": "Taksonomia mismatch: MISSING/DUPLICATE_LEDGER_POSTING/MONEY_MISMATCH/FINALITY_MISMATCH",
+      "status": "not-started",
+      "depends_on": [
+        "Story 59.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SettlementLedgerMismatchTaxonomyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-59-reconciliation-settlement-vs-ledger.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-59",
+      "story": "59.3",
+      "title": "Natychmiastowa eskalacja, brak auto-naprawy",
+      "status": "not-started",
+      "depends_on": [
+        "Story 59.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*NoAutoFixEscalationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-59-reconciliation-settlement-vs-ledger.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-60",
+      "story": "60.1",
+      "title": "Ledger vs balance-snapshot",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*LedgerVsBalanceSnapshotTest*"
+      ],
+      "source_file": "planning/epics/EPIC-60-reconciliation-balance-drift-detection.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-60",
+      "story": "60.2",
+      "title": "`SILENT_MONEY_DRIFT`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 60.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SilentMoneyDriftTest*"
+      ],
+      "source_file": "planning/epics/EPIC-60-reconciliation-balance-drift-detection.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-60",
+      "story": "60.3",
+      "title": "Status vs finalność",
+      "status": "not-started",
+      "depends_on": [
+        "Story 60.1",
+        "EPIC-39-settlement-finality-model"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*StatusVsFinalityMismatchTest*"
+      ],
+      "source_file": "planning/epics/EPIC-60-reconciliation-balance-drift-detection.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-61",
+      "story": "61.1",
+      "title": "Taksonomia + severity w reference-data",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\d reference_data.mismatch_taxonomy\""
+      ],
+      "source_file": "planning/epics/EPIC-61-reconciliation-mismatch-taxonomy.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-61",
+      "story": "61.2",
+      "title": "Deterministyczny klasyfikator + testy polityki severity",
+      "status": "not-started",
+      "depends_on": [
+        "Story 61.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*MismatchSeverityClassifierTest*"
+      ],
+      "source_file": "planning/epics/EPIC-61-reconciliation-mismatch-taxonomy.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-62",
+      "story": "62.1",
+      "title": "Cykl życia wyjątku + `exception_events`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ExceptionLifecycleTest*"
+      ],
+      "source_file": "planning/epics/EPIC-62-reconciliation-exception-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-62",
+      "story": "62.2",
+      "title": "Assign/comment/resolve (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 62.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*TwoOperatorsExceptionAssignmentRaceTest*"
+      ],
+      "source_file": "planning/epics/EPIC-62-reconciliation-exception-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-62",
+      "story": "62.3",
+      "title": "Action-request jako request, nie mutacja (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 62.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ActionRequestIsRequestNotMutationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-62-reconciliation-exception-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-62",
+      "story": "62.4",
+      "title": "Port eskalacji do case (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 62.1",
+        "EPIC-63-reconciliation-egress-iso-case-recon"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseEscalationPortTest*"
+      ],
+      "source_file": "planning/epics/EPIC-62-reconciliation-exception-lifecycle.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-63",
+      "story": "63.1",
+      "title": "Rekoncyliacja artefaktu egress+potwierdzenia dostawy",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*EgressArtifactReconciliationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-63-reconciliation-egress-iso-case-recon.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-63",
+      "story": "63.2",
+      "title": "Rekoncyliacja orphan lineage ISO",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*IsoLineageOrphanReconciliationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-63-reconciliation-egress-iso-case-recon.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-63",
+      "story": "63.3",
+      "title": "Case-return vs return-payment",
+      "status": "not-started",
+      "depends_on": [
+        "EPIC-66-case-reject-return-recall-rules"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseReturnVsReturnPaymentTest*"
+      ],
+      "source_file": "planning/epics/EPIC-63-reconciliation-egress-iso-case-recon.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-63",
+      "story": "63.4",
+      "title": "Dashboardy",
+      "status": "not-started",
+      "depends_on": [
+        "Story 63.1",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*recon-egress-iso-case\""
+      ],
+      "source_file": "planning/epics/EPIC-63-reconciliation-egress-iso-case-recon.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-64",
+      "story": "64.1",
+      "title": "Read modele",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReconciliationReadModelTest*"
+      ],
+      "source_file": "planning/epics/EPIC-64-reconciliation-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-64",
+      "story": "64.2",
+      "title": "Dashboardy Playwright (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 64.1",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*reconciliation-dashboard\""
+      ],
+      "source_file": "planning/epics/EPIC-64-reconciliation-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-64",
+      "story": "64.3",
+      "title": "Trasa rekoncyliacji w symulacji",
+      "status": "not-started",
+      "depends_on": [
+        "Story 64.1",
+        "EPIC-17-simulation-path-enforcement"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SimulationReconciliationTraceTest*"
+      ],
+      "source_file": "planning/epics/EPIC-64-reconciliation-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-64",
+      "story": "64.4",
+      "title": "Duplicate-suppression/false-positive (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 64.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*DuplicateSuppressionFalsePositiveTest*"
+      ],
+      "source_file": "planning/epics/EPIC-64-reconciliation-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-65",
+      "story": "65.1",
+      "title": "Schemat `case` + ownership",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\dt case.*\""
+      ],
+      "source_file": "planning/epics/EPIC-65-case-r-message-catalog.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-65",
+      "story": "65.2",
+      "title": "Katalogi case-type i reguł R-message w reference-data",
+      "status": "not-started",
+      "depends_on": [
+        "Story 65.1"
+      ],
+      "verify": [
+        "psql -c \"\\d reference_data.case_type_catalog\""
+      ],
+      "source_file": "planning/epics/EPIC-65-case-r-message-catalog.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-65",
+      "story": "65.3",
+      "title": "`CaseTypeResolver`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 65.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseTypeResolverTest*"
+      ],
+      "source_file": "planning/epics/EPIC-65-case-r-message-catalog.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-65",
+      "story": "65.4",
+      "title": "Konsumpcja `iso.message.correlated` dla R-message",
+      "status": "not-started",
+      "depends_on": [
+        "Story 65.1",
+        "EPIC-27-iso-correlation-engine/Story 27.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*RMessageCaseConsumerTest*"
+      ],
+      "source_file": "planning/epics/EPIC-65-case-r-message-catalog.md",
+      "capability_analysis": "DEEP_DIVED: 2026-07-16 dependency-narrowing session (see BACKLOG-REDESIGN.md)"
+    },
+    {
+      "epic": "EPIC-66",
+      "story": "66.1",
+      "title": "Cztery koncepty reguł (reject/return/recall/internal-reversal)",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FourRMessageConceptsTest*"
+      ],
+      "source_file": "planning/epics/EPIC-66-case-reject-return-recall-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-66",
+      "story": "66.2",
+      "title": "Macierz timingu + `PaymentStateValidator(as_of)`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 66.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseTimingMatrixTest*"
+      ],
+      "source_file": "planning/epics/EPIC-66-case-reject-return-recall-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-66",
+      "story": "66.3",
+      "title": "`ResolveRecall` bramkowany rolą",
+      "status": "not-started",
+      "depends_on": [
+        "Story 66.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ResolveRecallAuthorizationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-66-case-reject-return-recall-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-66",
+      "story": "66.4",
+      "title": "Flagowy test: return-as-new-payment po finalności",
+      "status": "not-started",
+      "depends_on": [
+        "Story 66.2",
+        "EPIC-42-settlement-return-vs-reversal/Story 42.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReturnAfterFinalityIsNewPaymentTest*"
+      ],
+      "source_file": "planning/epics/EPIC-66-case-reject-return-recall-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-66",
+      "story": "66.5",
+      "title": "pacs.004 inbound → oryginał `RETURNED`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 66.4"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Pacs004InboundReturnedTest*"
+      ],
+      "source_file": "planning/epics/EPIC-66-case-reject-return-recall-rules.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-67",
+      "story": "67.1",
+      "title": "`case_evidence_bundles` + `case_evidence_pointers`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "psql -c \"\\dt case.case_evidence*\""
+      ],
+      "source_file": "planning/epics/EPIC-67-case-evidence-bundles.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-67",
+      "story": "67.2",
+      "title": "`case_r_message_links`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 67.1"
+      ],
+      "verify": [
+        "psql -c \"\\d case.case_r_message_links\""
+      ],
+      "source_file": "planning/epics/EPIC-67-case-evidence-bundles.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-67",
+      "story": "67.3",
+      "title": "FSM case + `case_events`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 67.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseFsmTest*"
+      ],
+      "source_file": "planning/epics/EPIC-67-case-evidence-bundles.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-68",
+      "story": "68.1",
+      "title": "Wyniki decyzji",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseDecisionOutcomeTest*"
+      ],
+      "source_file": "planning/epics/EPIC-68-case-decisions-action-requests.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-68",
+      "story": "68.2",
+      "title": "`case_action_requests` (request-only)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 68.1"
+      ],
+      "verify": [
+        "psql -c \"\\d case.case_action_requests\""
+      ],
+      "source_file": "planning/epics/EPIC-68-case-decisions-action-requests.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-68",
+      "story": "68.3",
+      "title": "Komendy administracyjne bramkowane rolą (REST, nie GraphQL)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 68.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseCommandNotGraphQLMutationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-68-case-decisions-action-requests.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-69",
+      "story": "69.1",
+      "title": "Żądanie renderowania+dostawy camt.029/pacs.004/pacs.028",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseRequestsEgressRenderTest*"
+      ],
+      "source_file": "planning/epics/EPIC-69-case-egress-iso-outbound-responses.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-69",
+      "story": "69.2",
+      "title": "Lineage artefaktu wychodzącego",
+      "status": "not-started",
+      "depends_on": [
+        "Story 69.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseOutboundLineageTest*"
+      ],
+      "source_file": "planning/epics/EPIC-69-case-egress-iso-outbound-responses.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-69",
+      "story": "69.3",
+      "title": "Test granicy: case nigdy nie renderuje/wysyła",
+      "status": "not-started",
+      "depends_on": [
+        "Story 69.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseNeverRendersOrSendsTest*"
+      ],
+      "source_file": "planning/epics/EPIC-69-case-egress-iso-outbound-responses.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-70",
+      "story": "70.1",
+      "title": "Tłumienie duplikatów",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseDuplicateSuppressedTest*"
+      ],
+      "source_file": "planning/epics/EPIC-70-case-duplicate-conflicting-r-messages.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-70",
+      "story": "70.2",
+      "title": "Eskalacja konfliktu (nigdy auto-rozwiązanie)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 70.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ConflictingRMessageEscalatesTest*"
+      ],
+      "source_file": "planning/epics/EPIC-70-case-duplicate-conflicting-r-messages.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-70",
+      "story": "70.3",
+      "title": "`case_duplicate_links`",
+      "status": "not-started",
+      "depends_on": [
+        "Story 70.1"
+      ],
+      "verify": [
+        "psql -c \"\\d case.case_duplicate_links\""
+      ],
+      "source_file": "planning/epics/EPIC-70-case-duplicate-conflicting-r-messages.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-71",
+      "story": "71.1",
+      "title": "`RECONCILIATION_LINKED_CASE`",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ReconciliationLinkedCaseTest*"
+      ],
+      "source_file": "planning/epics/EPIC-71-case-reconciliation-linked-cases.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-72",
+      "story": "72.1",
+      "title": "Read modele",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*CaseReadModelTest*"
+      ],
+      "source_file": "planning/epics/EPIC-72-case-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-72",
+      "story": "72.2",
+      "title": "Dashboard case + rozstrzyganie komend admin (Playwright)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 72.1",
+        "EPIC-24-frontend-screens"
+      ],
+      "verify": [
+        "npm run test:e2e -- --grep \"@smoke.*case-dashboard\""
+      ],
+      "source_file": "planning/epics/EPIC-72-case-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-72",
+      "story": "72.3",
+      "title": "Trasa case w symulacji",
+      "status": "not-started",
+      "depends_on": [
+        "Story 72.1",
+        "EPIC-17-simulation-path-enforcement"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*SimulationCaseTraceTest*"
+      ],
+      "source_file": "planning/epics/EPIC-72-case-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-72",
+      "story": "72.4",
+      "title": "pacs.028/pain.002 (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 72.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Pacs028Pain002CaseTest*"
+      ],
+      "source_file": "planning/epics/EPIC-72-case-observability-test-lab.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-73",
+      "story": "73.1",
+      "title": "Przyjęcie pliku + idempotencja per nadawca",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FileIngestionIdempotencyTest*"
+      ],
+      "source_file": "planning/epics/EPIC-73-ingress-file-rail.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-73",
+      "story": "73.2",
+      "title": "Job Spring Batch (SkipPolicy, test restartu)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 73.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*BatchJobSkipPolicyRestartTest*"
+      ],
+      "source_file": "planning/epics/EPIC-73-ingress-file-rail.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-73",
+      "story": "73.3",
+      "title": "Dane wyniku częściowej akceptacji",
+      "status": "not-started",
+      "depends_on": [
+        "Story 73.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FilePartialAcceptTest*"
+      ],
+      "source_file": "planning/epics/EPIC-73-ingress-file-rail.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-73",
+      "story": "73.4",
+      "title": "Renderowanie i dostawa pliku wynikowego",
+      "status": "not-started",
+      "depends_on": [
+        "Story 73.3",
+        "EPIC-48-egress-batch-result-file-delivery"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ResultFileDeliveryTest*"
+      ],
+      "source_file": "planning/epics/EPIC-73-ingress-file-rail.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-74",
+      "story": "74.1",
+      "title": "Realm design + pełny seed (Organizacje, 12 ról)",
+      "status": "not-started",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FullRoleModelRealmTest*",
+        "./mvnw -f backend test -Dtest=*MakerCheckerSeedHygieneTest*"
+      ],
+      "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-74",
+      "story": "74.2",
+      "title": "FGAP v2 dla planu admin (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 74.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*FgapV2AdminPermissionTest*"
+      ],
+      "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-74",
+      "story": "74.3",
+      "title": "FAPI-2 dla `sepa-integration` + passkeys (`[P1]`)",
+      "status": "not-started",
+      "depends_on": [
+        "Story 74.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Fapi2DpopClientTest*"
+      ],
+      "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-74",
+      "story": "74.4",
+      "title": "Step-up authentication dla czterech komend wysokiego ryzyka",
+      "status": "not-started",
+      "depends_on": [
+        "Story 74.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*StepUpAuthenticationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-74",
+      "story": "74.5",
+      "title": "Osobna baza Keycloak w skrypcie backupu",
+      "status": "not-started",
+      "depends_on": [
+        "Story 74.1"
+      ],
+      "verify": [
+        "test -f infra/scripts/backup-keycloak.sh"
+      ],
+      "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-75",
+      "story": "75.1",
+      "title": "Adnotacje supersession + §3.7 v2",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "grep -n \"3.7.*v2\\|Topic Catalog v2\" sepa-nexus-message-flow-and-data-blueprint.md"
+      ],
+      "source_file": "planning/epics/EPIC-75-documentation-hygiene.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    }
+  ]
+}

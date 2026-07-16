@@ -128,11 +128,13 @@ Taski:
 ## Story 24.7 — Workspace 7: Reference Data / Admin (S-16)
 
 status: blocked
-depends_on: [EPIC-12-reference-data-ownership]
+depends_on: [EPIC-12-reference-data-ownership/Story 12.1]
 
 Opis: edytory katalogów. `[MVP]` cienki / `[P1]` pełny (rejestr kluczy).
 
 `[AUDYT 2026-07-14]`: `EPIC-12` Story 12.1 (schemat+granty `reference_data`, tabele `scheme_profiles`/`business_calendars`/`settlement_cutoff_calendar`) jest `done` — **najbliższy do odblokowania z pozostałych 8 workspace'ów**, gdyby ktoś chciał budować edytor CRUD nad tymi trzema katalogami. Nie podjęto w tej sesji — poza wybranym zakresem 3 epików (EPIC-23/24-Story24.2/25), a CRUD z optimistic locking na wersjach jest realną, nietrywialną pracą backendową (endpointy write) wykraczającą poza budżet tej sesji. **Status `blocked`** dla tej sesji, ale odnotowane jako najsłabszy blocker z całego epika — dobry kandydat na następną.
+
+`[NARROWED + OPEN QUESTION 2026-07-16 — dependency-inventory deep-dive session]`: `depends_on` narrowed from the whole `EPIC-12` epic to `Story 12.1` specifically (the only part this story's frontend work actually reads — `Story 12.2`'s validation/mapping/render catalogs are unrelated and `[NO-CODE]`-gated to Iteration 5). Narrowing alone does **not** make this story `READY`: re-checked the actual capability required — a backend REST CRUD endpoint for `reference_data.*` (`POST/PUT /api/v1/reference-data/{catalog}`, per `sepa-nexus-message-flow-and-data-blueprint.md` §7.2, which documents this exact endpoint shape as MVP-thin/P1-full) — and confirmed **no epic or story anywhere in `/planning/` owns building it**. `EPIC-12` covers only schema/grants (DDL), never write endpoints. This is a genuine missing-owner gap, not a dependency-narrowing fix; recording as `[OPEN-QUESTION]` rather than marking `READY`. A future session should either add a new story under `EPIC-12` (or a sibling epic) for the reference-data write-endpoint capability, or confirm via user/team decision that this frontend story itself is meant to include the backend endpoints (scope-widening, not assumed here).
 
 Taski:
 - [ ] **Zbuduj cienkie edytory katalogów reference-data** z optimistic locking na konfliktach wersji.

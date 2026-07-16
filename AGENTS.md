@@ -59,7 +59,13 @@ Backlog work is tracked as capabilities (what a piece of work *produces* and *re
 
 1. If `HANDOFF.md` exists at repo root, read it first — it is the memory of the previous session (see skill `session-handoff`).
 2. If `/planning/` does not exist, your first job is a full artifact-derived planning build (skills `artifact-derived-planning`, `epic-story-task-catalog`).
-3. If `/planning/` exists, continue from the first `not-started`/`in-progress` task in dependency order, starting from `planning/README.md` as the index.
+3. If `/planning/` exists:
+   1. read `planning/README.md`;
+   2. check `planning/BACKLOG-REDESIGN.md` and `planning/capabilities.yaml`;
+   3. pick the highest-priority story classified `READY` (analytical readiness, not the formal `not-started`/`in-progress` frontmatter status — see `planning/AGENTS.md`);
+   4. before starting, re-check that story's direct dependencies, decision gates, ownership, and `verify:` executability.
+
+   Do not pick up work solely because it carries a formal `not-started` or `in-progress` status — that status alone does not imply readiness.
 4. Before finishing the session, **always** overwrite `HANDOFF.md` per the `session-handoff` skill format — not optional, regardless of session length. `HANDOFF.md` (volatile per-session state) and this file (stable rules) are deliberately separate; never merge them.
 
 ## Git and worktree safety

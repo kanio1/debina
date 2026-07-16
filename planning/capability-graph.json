@@ -15,6 +15,17 @@
       ],
       "requires": "User acceptance of the SECURITY DEFINER recommendation in /EPIC-10-transaction-coordination-decision-memo.md (or a request for further proof / an alternative)",
       "status": "OPEN"
+    },
+    {
+      "id": "gate.graphql-owner",
+      "blocks": [
+        "EPIC-26.26.4",
+        "EPIC-16",
+        "EPIC-23.23.1B",
+        "EPIC-53"
+      ],
+      "requires": "A user/team decision on who owns building the first GraphQL schema/resolver layer -- see planning/decisions/GRAPHQL-OWNER-DECISION.md for the three candidate ownership options and consequences.",
+      "status": "OPEN"
     }
   ],
   "resolved_cycles": [
@@ -621,7 +632,7 @@
     {
       "id": "EPIC-27.27.1",
       "type": "STORY",
-      "status": "not-started"
+      "status": "done"
     },
     {
       "id": "EPIC-27.27.2",
@@ -1242,7 +1253,7 @@
     },
     {
       "from": "EPIC-24.24.7",
-      "to": "EPIC-12",
+      "to": "EPIC-12.12.1",
       "type": "REQUIRES"
     },
     {
@@ -1807,7 +1818,7 @@
     },
     {
       "from": "EPIC-51",
-      "to": "EPIC-12",
+      "to": "EPIC-12.12.1",
       "type": "REQUIRES"
     },
     {
@@ -1862,7 +1873,7 @@
     },
     {
       "from": "EPIC-57",
-      "to": "EPIC-12",
+      "to": "EPIC-12.12.1",
       "type": "REQUIRES"
     },
     {
@@ -1947,7 +1958,7 @@
     },
     {
       "from": "EPIC-65",
-      "to": "EPIC-27",
+      "to": "EPIC-27.27.2",
       "type": "REQUIRES"
     },
     {
@@ -2008,6 +2019,11 @@
     {
       "from": "EPIC-74",
       "to": "EPIC-02",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-14.14.1",
+      "to": "EPIC-47",
       "type": "REQUIRES"
     }
   ]

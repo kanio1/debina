@@ -8,6 +8,12 @@ Local development infrastructure: `docker-compose.yml` (PostgreSQL 18, Keycloak 
 - Never run `podman compose ... down -v`, `podman volume rm`, or `podman volume prune` / `podman system prune` — named volumes hold the local Postgres/Keycloak state across sessions and are not disposable. These are hard-denied in `.claude/settings.local.json`; do not attempt to route around that.
 - `podman compose ... down` (without `-v`) is `ask`-gated — confirm with the user before running it.
 
+## Compose vs. Testcontainers
+
+Persistent local Compose infrastructure (this directory's `docker-compose.yml`) is intended for manual development, inspection, and long-lived local state.
+
+Automated backend integration tests should prefer isolated Testcontainers instances rather than depending on the long-lived Compose database. Do not make tests depend on data left in `infra_postgres_1`. A test may additionally check a migration against the long-lived local Compose database as extra upgrade-path evidence, but that never replaces an isolated Testcontainers test.
+
 ## PostgreSQL
 
 - Flyway migrations are append-only — never edit an already-applied migration; add a new one.
@@ -22,3 +28,11 @@ Realm-as-code in `infra/keycloak/realm-export.json`; changes go through the `key
 ## Kafka
 
 Topic catalog is generated from `sepa-nexus-message-flow-and-data-blueprint.md` §3.7 v2 — that table is the sole AsyncAPI source (ADR-N8); no other document restates or renames a topic.
+
+## Database skill routing
+
+- RLS / role isolation → `postgres-rls-migration`
+- Flyway / DDL → `sepa-nexus-flyway-safe-change`
+- payment identifiers / idempotency / ledger / correlation → `sepa-nexus-payments-data-integrity`
+- PostgreSQL/Kafka integration tests → `sepa-nexus-database-testing`
+- final DB change review → `sepa-nexus-database-review`

@@ -11,7 +11,9 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-OWN-6, line 126
 ## Story 14.1 — `CLAIMED` + `transport_attempts`/`delivery_receipts`
 
 status: not-started
-depends_on: []
+depends_on: [EPIC-46-egress-delivery-attempts-retry/Story 46.1, EPIC-47-egress-delivery-receipts-five-status/Story 47.1]
+
+`[ADD MISSING EDGE 2026-07-16 — dependency-inventory deep-dive session]`: this story's own grant-test asserts `egress` is the sole writer of three tables — `outbound_messages`, `transport_attempts`, `delivery_receipts` — but only `outbound_messages` was reachable from the previously-declared dependencies (`EPIC-09`, `EPIC-43` at epic level). `transport_attempts` is created by `EPIC-46-egress-delivery-attempts-retry.md` Story 46.1's migration; `delivery_receipts` is created by `EPIC-47-egress-delivery-receipts-five-status.md` Story 47.1's migration. Neither was linked at any granularity before this session — a genuinely missing edge, not merely an over-broad one, so both are added at story level (not whole-epic) to avoid manufacturing a false epic-level cycle. Checked for cycles: `EPIC-46` Story 46.3 and `EPIC-45` Story 45.4 depend back on `EPIC-14` Story 14.2 (not 14.1), and both `Story 46.1`/`Story 47.1` have `depends_on: []` — no story-level cycle introduced.
 
 Taski:
 - [ ] **Grant-test: `egress` jedynym writerem `outbound_messages`/`transport_attempts`/`delivery_receipts`.**

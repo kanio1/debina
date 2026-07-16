@@ -46,7 +46,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-11 — Ownership: cienki wiersz payments | in-progress (Story 11.1 **done** 2026-07-15 — `payment_status_history`/`payment_events` zbudowane, OQ-12 rozstrzygnięte; 11.2 blocked na katalogi status/reason; 11.3 not-started; patrz epic file) | EPIC-09, EPIC-20 | [epics/EPIC-11-payment-slim-ownership.md](epics/EPIC-11-payment-slim-ownership.md) |
 | EPIC-12 — Ownership: katalogi reference-data | blocked (Story 12.1 done; Story 12.2 blocked do Iteracji 5 — ISO validation, `iso.iso_message_versions` §4.3c nie istnieje jeszcze; patrz epic file) | EPIC-09 | [epics/EPIC-12-reference-data-ownership.md](epics/EPIC-12-reference-data-ownership.md) |
 | EPIC-13 — Ownership: ledger | not-started | EPIC-09, EPIC-32 | [epics/EPIC-13-ledger-ownership.md](epics/EPIC-13-ledger-ownership.md) |
-| EPIC-14 — Ownership: granica egress | not-started (Story 14.3 dependency **narrowed 2026-07-16** to `EPIC-39/Story 39.2`, fixing a real cycle with `EPIC-39` Story 39.4 — patrz `BACKLOG-REDESIGN.md`; Story 14.1 has a known, not-yet-fixed hidden blocker on `EPIC-46`, see same doc) | EPIC-09, EPIC-43 | [epics/EPIC-14-egress-boundary-ownership.md](epics/EPIC-14-egress-boundary-ownership.md) |
+| EPIC-14 — Ownership: granica egress | not-started (Story 14.3 dependency **narrowed 2026-07-16** to `EPIC-39/Story 39.2`, fixing a real cycle with `EPIC-39` Story 39.4; Story 14.1's hidden blocker on `EPIC-46` **fixed 2026-07-16** (second session) — `depends_on` now explicitly `EPIC-46/Story 46.1` + `EPIC-47/Story 47.1` — patrz `BACKLOG-REDESIGN.md`) | EPIC-09, EPIC-43 | [epics/EPIC-14-egress-boundary-ownership.md](epics/EPIC-14-egress-boundary-ownership.md) |
 | EPIC-15 — Ownership: topiki Kafka | blocked (Story 15.1/15.2 done; Story 15.3 blocked do istnienia `egress`/`reconciliation`; patrz epic file) | EPIC-09, EPIC-04 | [epics/EPIC-15-kafka-topic-ownership.md](epics/EPIC-15-kafka-topic-ownership.md) |
 | EPIC-16 — Ownership: read modele/GraphQL read-only | blocked (GraphQL/`reporting` nie istnieją; patrz epic file) | EPIC-09 | [epics/EPIC-16-read-model-graphql-ownership.md](epics/EPIC-16-read-model-graphql-ownership.md) |
 | EPIC-17 — Ownership: wymuszenie ścieżki symulacji | blocked (moduł `simulation` ma zero kodu; patrz epic file) | EPIC-09 | [epics/EPIC-17-simulation-path-enforcement.md](epics/EPIC-17-simulation-path-enforcement.md) |
@@ -61,7 +61,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-21 — Refaktor identyfikatorów ISO | **done** (Story 21.1/21.2/21.3 wszystkie done — `payment.payments.end_to_end_id` usunięty 2026-07-15, read model przepięty na `iso.payment_iso_identifiers`; patrz epic file dla decyzji o konflikcie źródeł ws. uniqueness) | EPIC-19 | [epics/EPIC-21-iso-identifier-refactor.md](epics/EPIC-21-iso-identifier-refactor.md) |
 | EPIC-22 — Tożsamość i czas: cross-cutting | done | EPIC-02, EPIC-03 | [epics/EPIC-22-identity-time-crosscutting.md](epics/EPIC-22-identity-time-crosscutting.md) |
 | EPIC-23 — Frontend Foundation | in-progress (Story 23.2/23.3/23.4 done; 23.1 **split 2026-07-16** into 23.1A [REST/OpenAPI] / 23.1B [GraphQL] — both blocked, independently, on their respective missing backend source; patrz epic file i `BACKLOG-REDESIGN.md` H7) | EPIC-05, EPIC-06 | [epics/EPIC-23-frontend-foundation.md](epics/EPIC-23-frontend-foundation.md) |
-| EPIC-24 — Frontend Screens (**pierwsze testy Playwright tutaj**) | in-progress (Story 24.2 **split 2026-07-16** into 24.2A [feature — now formally **done**] / 24.2B [Playwright acceptance — blocked do czasu Control Room]; 24.1/24.3-24.9 blocked; patrz epic file i `BACKLOG-REDESIGN.md` H4) | EPIC-23 | [epics/EPIC-24-frontend-screens.md](epics/EPIC-24-frontend-screens.md) |
+| EPIC-24 — Frontend Screens (**pierwsze testy Playwright tutaj**) | in-progress (Story 24.2 **split 2026-07-16** into 24.2A [feature — now formally **done**] / 24.2B [Playwright acceptance — blocked do czasu Control Room]; 24.1/24.3-24.9 blocked; Story 24.7 dependency **narrowed 2026-07-16** (second session) to `EPIC-12/Story 12.1`, but **not** made `READY` — genuine missing owner found for reference-data CRUD backend endpoints, recorded as `[OPEN-QUESTION]`; patrz epic file i `BACKLOG-REDESIGN.md` H4) | EPIC-23 | [epics/EPIC-24-frontend-screens.md](epics/EPIC-24-frontend-screens.md) |
 | EPIC-25 — Konsolidacja obserwowalności | in-progress (Story 25.1 done; 25.3 **split 2026-07-16** into 25.3A [lag, done] / 25.3B-E [retry/DLQ/headers/alert, każdy niezależnie blocked]; 25.2/25.4 blocked; patrz epic file i `BACKLOG-REDESIGN.md` H5) | EPIC-07 | [epics/EPIC-25-observability-consolidation.md](epics/EPIC-25-observability-consolidation.md) |
 
 ## Faza 3 — ISO lineage/korelacja (Iteracja 1-5)
@@ -69,7 +69,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
 | EPIC-26 — ISO: rdzeń lineage wiadomości | in-progress (Story 26.1/26.2/26.3 done — 26.3 odblokowana i zbudowana 2026-07-15 razem z pain.001 (EPIC-19 Story 19.4); 26.4 blocked na GraphQL, nie istnieje — **2026-07-16: `[OPEN-QUESTION]` dodane, żaden epik dziś nie buduje samej warstwy GraphQL**, patrz `BACKLOG-REDESIGN.md` H8; patrz epic file) | EPIC-19 | [epics/EPIC-26-iso-message-lineage-core.md](epics/EPIC-26-iso-message-lineage-core.md) |
-| EPIC-27 — ISO: silnik korelacji | not-started — **dependency narrowed 2026-07-16 do `EPIC-26/Story 26.3`; epik jest dziś READY** (26.1-26.3 done, tylko niezwiązana 26.4 blocked), patrz `BACKLOG-REDESIGN.md` "Ready queue" | EPIC-26/Story 26.3 | [epics/EPIC-27-iso-correlation-engine.md](epics/EPIC-27-iso-correlation-engine.md) |
+| EPIC-27 — ISO: silnik korelacji | in-progress (Story 27.1 **done** 2026-07-16 — ekstrakcja `OrgnlMsgId`/`OrgnlEndToEndId` z pacs.002, test-first z mutation-proof, `178/178` pełna regresja backendu; Story 27.2 [9-krokowa korelacja] jest następnym krokiem, celowo nierozpoczętym w tej sesji) | EPIC-26/Story 26.3 | [epics/EPIC-27-iso-correlation-engine.md](epics/EPIC-27-iso-correlation-engine.md) |
 | EPIC-28 — ISO: granice walidacji | in-progress (Story 28.1 done — `iso.iso_message_parse_errors` zbudowane i wpięte w pain.001 pipeline 2026-07-15; 28.2 blocked na EPIC-12 Story 12.2 (`[NO-CODE]`, Iteracja 5), 28.3/28.4 transytywnie blocked; patrz epic file) | EPIC-19 | [epics/EPIC-28-iso-validation-boundaries.md](epics/EPIC-28-iso-validation-boundaries.md) |
 | EPIC-29 — ISO: lineage artefaktów wychodzących `[P1]` | not-started | EPIC-44 | [epics/EPIC-29-iso-outbound-artifact-lineage.md](epics/EPIC-29-iso-outbound-artifact-lineage.md) |
 | EPIC-30 — ISO: lineage R-message `[P1]` | not-started | EPIC-65 | [epics/EPIC-30-iso-r-message-lineage.md](epics/EPIC-30-iso-r-message-lineage.md) |
@@ -113,7 +113,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-51 — Routing: rozwiązywanie kandydatów | not-started | EPIC-12 | [epics/EPIC-51-routing-candidate-profile-resolution.md](epics/EPIC-51-routing-candidate-profile-resolution.md) |
+| EPIC-51 — Routing: rozwiązywanie kandydatów | not-started — **dependency narrowed 2026-07-16 do `EPIC-12/Story 12.1`** (schema+granty `done`, epik nie potrzebuje `Story 12.2`) | EPIC-12/Story 12.1 | [epics/EPIC-51-routing-candidate-profile-resolution.md](epics/EPIC-51-routing-candidate-profile-resolution.md) |
 | EPIC-52 — Routing: kwalifikowalność i osiągalność | not-started | EPIC-51 | [epics/EPIC-52-routing-eligibility-reachability.md](epics/EPIC-52-routing-eligibility-reachability.md) |
 | EPIC-53 — Routing: decyzja i wyjaśnienie | not-started | EPIC-52 | [epics/EPIC-53-routing-decision-explanation.md](epics/EPIC-53-routing-decision-explanation.md) |
 | EPIC-54 — Routing: reguły fallback | not-started | EPIC-53 | [epics/EPIC-54-routing-fallback-rules.md](epics/EPIC-54-routing-fallback-rules.md) |
@@ -124,7 +124,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-57 — Reconciliation: profile i snapshot | not-started | EPIC-12 | [epics/EPIC-57-reconciliation-profiles-snapshot.md](epics/EPIC-57-reconciliation-profiles-snapshot.md) |
+| EPIC-57 — Reconciliation: profile i snapshot | not-started — **dependency narrowed 2026-07-16 do `EPIC-12/Story 12.1`** | EPIC-12/Story 12.1 | [epics/EPIC-57-reconciliation-profiles-snapshot.md](epics/EPIC-57-reconciliation-profiles-snapshot.md) |
 | EPIC-58 — Reconciliation: zbieranie evidence | not-started | EPIC-57 | [epics/EPIC-58-reconciliation-evidence-collection.md](epics/EPIC-58-reconciliation-evidence-collection.md) |
 | EPIC-59 — Reconciliation: settlement vs ledger | not-started | EPIC-58 | [epics/EPIC-59-reconciliation-settlement-vs-ledger.md](epics/EPIC-59-reconciliation-settlement-vs-ledger.md) |
 | EPIC-60 — Reconciliation: dryf salda | not-started | EPIC-58 | [epics/EPIC-60-reconciliation-balance-drift-detection.md](epics/EPIC-60-reconciliation-balance-drift-detection.md) |
@@ -137,7 +137,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-65 — Case: katalog R-message | not-started | EPIC-09, EPIC-27 | [epics/EPIC-65-case-r-message-catalog.md](epics/EPIC-65-case-r-message-catalog.md) |
+| EPIC-65 — Case: katalog R-message | not-started — **dependency narrowed 2026-07-16 do `EPIC-27/Story 27.2`** (konsumuje `iso.message.correlated`, nie potrzebuje `[P1]` Story 27.5) | EPIC-09, EPIC-27/Story 27.2 | [epics/EPIC-65-case-r-message-catalog.md](epics/EPIC-65-case-r-message-catalog.md) |
 | EPIC-66 — Case: reguły reject/return/recall | not-started | EPIC-65, EPIC-42 | [epics/EPIC-66-case-reject-return-recall-rules.md](epics/EPIC-66-case-reject-return-recall-rules.md) |
 | EPIC-67 — Case: bundle evidence | not-started | EPIC-65 | [epics/EPIC-67-case-evidence-bundles.md](epics/EPIC-67-case-evidence-bundles.md) |
 | EPIC-68 — Case: decyzje i action requests | not-started | EPIC-66 | [epics/EPIC-68-case-decisions-action-requests.md](epics/EPIC-68-case-decisions-action-requests.md) |

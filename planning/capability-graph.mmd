@@ -1,8 +1,9 @@
 %% SEPA Nexus — capability graph (curated view)
-%% Full machine graph: planning/capability-graph.json (129 nodes / 226 edges).
-%% This file is a curated subgraph for human reading — phase heads, the two detected
-%% cycles, and the one open decision gate. It is not regenerated automatically; keep it
-%% in sync by hand with capability-graph.json when either changes materially.
+%% Full machine graph: planning/capability-graph.json (142 nodes / 251 edges).
+%% This file is a curated subgraph for human reading — phase heads, the two resolved
+%% cycles, and the two open decision gates (EPIC-10 SECURITY DEFINER, GraphQL owner). It
+%% is not regenerated automatically; keep it in sync by hand with capability-graph.json
+%% when either changes materially.
 flowchart TB
 
     subgraph P0["Phase 0 — Platform Skeleton (done)"]
@@ -35,6 +36,17 @@ flowchart TB
         E26 --> E27[EPIC-27 not-started]
         E19 --> E28[EPIC-28 in-progress]
     end
+
+    %% --- GraphQL owner decision gate (added 2026-07-16) ---
+    S2664["EPIC-26 / Story 26.4\n(lineage GraphQL panel)"]
+    S231B["EPIC-23 / Story 23.1B\n(GraphQL SDL codegen)"]
+    E26 --> S2664
+    E23 --> S231B
+    GQLGATE{{"gate.graphql-owner\nwho builds the first GraphQL\nschema/resolver — OPEN"}}
+    GQLGATE -.blocks.-> S2664
+    GQLGATE -.blocks.-> E16[EPIC-16 blocked]
+    GQLGATE -.blocks.-> S231B
+    GQLGATE -.blocks.-> E53[EPIC-53 not-started]
 
     subgraph P4["Phase 4 — Signature"]
         E09 --> E31[EPIC-31 in-progress]
@@ -88,6 +100,6 @@ flowchart TB
 
     class E00,E01,E02,E03,E04,E05,E06,E07,E08,E09,E19,E21,E26,E31,E28 done
     class E10,E11,E20,E23,E24 inprogress
-    class E12,E39 blocked
-    class E13,E14,E27,E32,E35,E43,E44,E45,E46,S313A,S432,S143,S394,S392 notstarted
-    class GATE gate
+    class E12,E39,E16 blocked
+    class E13,E14,E27,E32,E35,E43,E44,E45,E46,E53,S313A,S432,S143,S394,S392,S2664,S231B notstarted
+    class GATE,GQLGATE gate

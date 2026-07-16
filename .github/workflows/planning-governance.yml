@@ -1,0 +1,73 @@
+name: planning-governance
+
+on:
+  push:
+    paths:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "**/AGENTS.md"
+      - "**/CLAUDE.md"
+      - "planning/**"
+      - "tools/agent-config/**"
+      - ".claude/skills/**"
+      - ".github/workflows/planning-governance.yml"
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "**/AGENTS.md"
+      - "**/CLAUDE.md"
+      - "planning/**"
+      - "tools/agent-config/**"
+      - ".claude/skills/**"
+      - ".github/workflows/planning-governance.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Agent instruction hierarchy
+        run: bash tools/agent-config/validate-agent-instructions.sh
+
+      - name: Story inventory
+        run: python3 tools/agent-config/validate-story-inventory.py
+
+      - name: Capability graph
+        run: python3 tools/agent-config/validate-capability-graph.py
+
+      - name: Database skills
+        run: bash tools/agent-config/validate-database-skills.sh
+
+      # git diff --check flags trailing whitespace / conflict markers left in
+      # the changed range. The range differs by event: for a pull_request we
+      # diff against the PR's actual base SHA (not just "main", which can
+      # drift); for a push we diff before->after, handling the first-commit
+      # case where `before` is the all-zeros SHA (nothing to diff against).
+      - name: git diff --check (changed range only)
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+            echo "pull_request: checking $base..$head"
+            git diff --check "$base...$head"
+          else
+            before="${{ github.event.before }}"
+            after="${{ github.event.after }}"
+            zero_sha="0000000000000000000000000000000000000000"
+            if [ "$before" = "$zero_sha" ] || [ -z "$before" ]; then
+              echo "push: no prior commit (first push on this ref) -- checking $after alone"
+              git diff --check "$(git hash-object -t tree /dev/null)" "$after"
+            else
+              echo "push: checking $before..$after"
+              git diff --check "$before..$after"
+            fi
+          fi

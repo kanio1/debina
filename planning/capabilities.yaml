@@ -50,6 +50,22 @@ decision_gates:
       CVE-2007-2138-class search_path attack). Nothing is blocked by missing evidence —
       only by the pending human decision.
     status: OPEN
+  - id: gate.graphql-owner
+    blocks: [EPIC-26.26.4, EPIC-16, EPIC-23.23.1B, EPIC-53]
+    requires: >
+      A user/team decision on who owns building the first GraphQL schema/resolver layer —
+      see planning/decisions/GRAPHQL-OWNER-DECISION.md for the problem statement, the three
+      candidate ownership options (extend EPIC-16, extend EPIC-23, or a new dedicated epic),
+      and the consequences of each. Not an architecture decision this session is authorized
+      to make on its own.
+    evidence: >
+      No spring-graphql/graphql-java dependency exists in backend/pom.xml (confirmed by
+      grep). EPIC-16 only covers ownership enforcement of a schema once one exists; EPIC-23
+      Story 23.1B only covers codegen once an SDL exists. Neither epic's own source
+      citation describes building the schema itself. First surfaced as an [OPEN-QUESTION]
+      inside EPIC-26 Story 26.4 (2026-07-16 backlog-redesign session); this decision gate
+      formalizes it with a dedicated writeup and links it into the capability graph.
+    status: OPEN
 
 resolved_cycles:
   - id: cycle.signature-egress
@@ -362,11 +378,66 @@ capabilities:
 dependency_granularity_candidates:
   # Whole-epic references flagged as candidates for narrowing (not verdicts) — see
   # BACKLOG-REDESIGN.md "Dependencies narrowed" for which of these were actually acted on.
-  - { from: EPIC-35/35.1, to: EPIC-12, note: "H2 primary example" }
-  - { from: EPIC-51, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35" }
-  - { from: EPIC-57, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35" }
-  - { from: EPIC-65, to: EPIC-27, note: "consumes iso.message.correlated (27.2's output), not all of EPIC-27 including the [P1] 27.4 manual-action half" }
-  - { from: EPIC-14/14.1, to: EPIC-46, note: "currently a hidden blocker (no edge at all) — 14.1 needs egress.transport_attempts, created in EPIC-46; see cycle.egress-transport-status-vs-finality writeup for why this must be added narrowly, not at whole-epic granularity" }
+  # STATUS: all five below were re-verified with full source reads and resolved
+  # 2026-07-16 (governance/database-skills/EPIC-27.1 session) — see
+  # resolved_dependency_narrowings_2026_07_16 below for the applied decisions.
+  - { from: EPIC-35/35.1, to: EPIC-12, note: "H2 primary example — resolved in the prior 2026-07-16 backlog-redesign session" }
+  - { from: EPIC-51, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35 — RESOLVED, see below" }
+  - { from: EPIC-57, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35 — RESOLVED, see below" }
+  - { from: EPIC-65, to: EPIC-27, note: "consumes iso.message.correlated (27.2's output), not all of EPIC-27 including the [P1] 27.4/27.5 manual-action half — RESOLVED, see below" }
+  - { from: EPIC-14/14.1, to: EPIC-46, note: "currently a hidden blocker (no edge at all) — 14.1 needs egress.transport_attempts, created in EPIC-46; see cycle.egress-transport-status-vs-finality writeup for why this must be added narrowly, not at whole-epic granularity — RESOLVED, see below (also found: 14.1 needs EPIC-47's delivery_receipts too, a second missing edge not previously flagged)" }
+
+resolved_dependency_narrowings_2026_07_16:
+  # Applied by a dedicated research pass (dependency-inventory deep-dive) this session.
+  # Full evidence quotes: agent research transcript folded into
+  # planning/BACKLOG-REDESIGN.md "Second dependency-narrowing pass (2026-07-16)".
+  - candidate: EPIC-14/Story 14.1
+    decision: ADD MISSING EDGE
+    from: "depends_on: [] (no edge to EPIC-46 or EPIC-47 at any granularity)"
+    to: "depends_on: [EPIC-46-egress-delivery-attempts-retry/Story 46.1, EPIC-47-egress-delivery-receipts-five-status/Story 47.1]"
+    reason: >
+      Story 14.1's own grant-test asserts egress is sole writer of three tables
+      (outbound_messages, transport_attempts, delivery_receipts); only outbound_messages
+      was reachable before. transport_attempts is created by EPIC-46/46.1,
+      delivery_receipts by EPIC-47/47.1 — both previously unlinked. Not a narrowing (no
+      prior edge existed to narrow), a genuinely missing edge. No cycle: 46.1/47.1 both
+      have depends_on: [], and EPIC-46/45's back-references point at Story 14.2, not 14.1.
+  - candidate: EPIC-24/Story 24.7
+    decision: OPEN QUESTION
+    from: "depends_on: [EPIC-12-reference-data-ownership]"
+    to: "depends_on: [EPIC-12-reference-data-ownership/Story 12.1] + [OPEN-QUESTION] note (not READY)"
+    reason: >
+      EPIC-12/12.1 narrowing is correct but insufficient — this story also needs a
+      reference-data CRUD write-endpoint capability (POST/PUT /api/v1/reference-data/
+      {catalog}, per sepa-nexus-message-flow-and-data-blueprint.md §7.2) that no epic or
+      story in /planning/ currently owns building. Recorded as an open question, not
+      marked READY, per the "don't invent architecture" rule.
+  - candidate: EPIC-51
+    decision: NARROW
+    from: "depends_on: [EPIC-12-reference-data-ownership]"
+    to: "depends_on: [EPIC-12-reference-data-ownership/Story 12.1]"
+    reason: >
+      All four of EPIC-51's stories only read reference_data.scheme_profiles (Story
+      12.1, done). Story 12.2's validation/mapping/render catalogs are untouched.
+      EPIC-52 depends on EPIC-51, not the reverse, confirming no back-dependency risk.
+  - candidate: EPIC-57
+    decision: NARROW
+    from: "depends_on: [EPIC-12-reference-data-ownership]"
+    to: "depends_on: [EPIC-12-reference-data-ownership/Story 12.1]"
+    reason: >
+      Source text parenthesizes reconciliation_profile as "(reference-data)" — needs the
+      reference_data schema/grant infrastructure Story 12.1 built, not Story 12.2's
+      catalogs, which none of EPIC-57's four stories reference.
+  - candidate: EPIC-65
+    decision: NARROW
+    from: "depends_on: [EPIC-09-ownership-schema-grants, EPIC-27-iso-correlation-engine] (epic-level, also Story 65.4 story-level)"
+    to: "depends_on: [EPIC-09-ownership-schema-grants, EPIC-27-iso-correlation-engine/Story 27.2] (both epic-level and Story 65.4)"
+    reason: >
+      Story 65.4 consumes iso.message.correlated, which the blueprint ties directly to
+      Story 27.2's MATCHED branch. EPIC-27's [P1] Story 27.5 (manual-correlation read
+      model) is irrelevant to this epic. Precedent: EPIC-20/20.3 already narrowed the
+      identical dependency for the identical reason. No cycle: EPIC-27 file has no
+      reference back to EPIC-65.
 
 undeclared_story_level_cross_links_found:
   # Real per source text, not rolled up into the owning epic's frontmatter depends_on.

@@ -17,9 +17,20 @@ Spring Boot 4.1 / Spring Framework 7.0 / Spring Modulith 2.x monolith, JDK 25, M
 - `signature` verification runs before ISO XML parsing (verify-before-parse is an enforced ordering rule, not just documentation) and never writes to any other module's schema.
 - Money only ever moves through `ledger` via `LedgerPort` — `settlement` never writes `ledger.journal_*` directly.
 
-## Testing
+## Test execution model
 
-JUnit 5 + Testcontainers for integration tests. `act` + Testcontainers does not work in this environment (Docker-in-Docker is unavailable) — a Testcontainers failure surfaced only under `act` is an environment limitation, not a regression; confirm against `./mvnw -f backend test` directly before concluding otherwise.
+- Run backend tests directly with Maven: `./mvnw -f backend test`.
+- Integration dependencies (PostgreSQL, Kafka) are created by Testcontainers — do not start them manually when an existing Testcontainers test fixture can provide the required dependency.
+- Do not use `act` to run backend tests, and do not treat an `act` failure as part of the supported local verification path.
+- A backend task is verified by direct targeted Maven tests (`-Dtest=<ClassName>`) followed by the full Maven regression (`./mvnw -f backend test`) before marking it `done`.
+
+## Database skill routing
+
+- RLS / role isolation → `postgres-rls-migration`
+- Flyway / DDL → `sepa-nexus-flyway-safe-change`
+- payment identifiers / idempotency / ledger / correlation → `sepa-nexus-payments-data-integrity`
+- PostgreSQL/Kafka integration tests → `sepa-nexus-database-testing`
+- final DB change review → `sepa-nexus-database-review`
 
 ## What's out of scope here
 
