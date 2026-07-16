@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: in-progress
 depends_on: [EPIC-26-iso-message-lineage-core/Story 26.3]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-ISO-2, line 1269), [MVP]"
 ---
@@ -12,12 +12,14 @@ Wiążąca zasada: adapter koreluje, payment-lifecycle przechodzi FSM. 9-krokowa
 
 ## Story 27.1 — Ekstrakcja identyfikatorów pacs.002
 
-status: not-started
+status: done
 depends_on: []
 
+`[DONE 2026-07-16]`: zaimplementowano jako czysta ekstrakcja (bez korelacji, bez zapisu DB, bez decyzji biznesowej) w `com.sepanexus.modules.paymentlifecycle.isoadapter` (tymczasowa lokalizacja, ta sama co pozostałe klasy `iso-adapter` do czasu `EPIC-10`). Pinned na `pacs.002.001.10` (rzeczywista, aktualna wersja ISO 20022 FIToFIPaymentStatusReport, parowana z `pacs.008.001.08`/`pain.001.001.09`) — ta sama metoda rozstrzygnięcia niedopiętej wersji co `Pain001CanonicalMapper` dla pain.001. Nowe klasy: `Pacs002IdentifierExtractor` (ekstrakcja), `Pacs002OriginalIdentifiers` (rekord `orgnlMsgId`+`orgnlEndToEndId` per `TxInfAndSts`), `Pacs002IdentifierExtractionResult` (sukces/porażka, reużywa `MappingError`/`MappingErrorCode` z pain.001). Obsługuje wiele `TxInfAndSts` w jednym dokumencie (każdy dostaje własny `OrgnlEndToEndId`, dzieląc wspólny `OrgnlMsgId` z `OrgnlGrpInfAndSts`), whitespace/namespace zgodnie z istniejącym `HardenedXmlFactory`, malformed XML odrzucany przez granicę hardening przed dotarciem do ekstraktora.
+
 Taski:
-- [ ] **Ekstrakcja `OrgnlMsgId`/`OrgnlEndToEndId` z pacs.002.**
-      `verify: ./mvnw -f backend test -Dtest=*Pacs002IdentifierExtractionTest*`
+- [x] **Ekstrakcja `OrgnlMsgId`/`OrgnlEndToEndId` z pacs.002.**
+      `verify: ./mvnw -f backend test -Dtest=*Pacs002IdentifierExtractionTest*` → `Tests run: 11, Failures: 0, Errors: 0` — PASS (2026-07-16). Test-first: RED (compile failure, production classes nie istniały) → GREEN (11/11) → mutation-proof (zamiana tagu `OrgnlMsgId` na nieistniejący → 7/11 testów poprawnie zawiodło → mutacja cofnięta → 11/11 ponownie PASS, brak pozostałości w `git diff --check`). Pełny regresja backendu: `./mvnw -f backend test` → `Tests run: 178, Failures: 0, Errors: 0` — PASS.
 
 ## Story 27.2 — 9-krokowa korelacja → `iso.iso_message_correlation`
 
