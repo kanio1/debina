@@ -994,7 +994,7 @@
       "epic": "EPIC-11",
       "story": "11.2",
       "title": "Status/reason przez FK do katalogu",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 11.1"
       ],
@@ -1008,7 +1008,7 @@
       "epic": "EPIC-11",
       "story": "11.3",
       "title": "Test strażnika God-Module",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "EPIC-09-ownership-schema-grants/Story 9.4"
       ],
