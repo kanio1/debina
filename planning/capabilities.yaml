@@ -146,7 +146,10 @@ capabilities:
         requires: ["20.1", cap.iso.correlation-engine]
         note: >
           Literal depends_on is EPIC-26 (done), but EPIC-26's own file states the real
-          blocking capability is EPIC-27 (correlation engine, not-started) — see H3.
+          blocking capability is EPIC-27 (correlation engine) — see H3. cap.iso.correlation-engine
+          is now produced (27.2C done, 2026-07-16); this story remains blocked pending
+          20.3's own remaining scope (MATCHED-result consumption into the FSM), not on
+          EPIC-27 anymore.
 
   - epic: EPIC-23
     title: "Frontend Foundation"
@@ -271,23 +274,45 @@ capabilities:
     stories:
       - id: 27.1
         title: "pacs.002 identifier extraction"
-        status: not-started
-      - id: 27.2
-        title: "9-step correlation policy -> iso.iso_message_correlation"
-        status: not-started
+        status: done
+      - id: 27.2A
+        title: "Source-backed correlation input model (Pacs002CorrelationInput)"
+        status: done
         requires: ["27.1"]
+        note: >
+          2026-07-16 readiness/implementation session: Story 27.2 ("9-step correlation
+          policy") split into 27.2A/27.2B/27.2C, mirroring EPIC-10 Story 10.1's
+          10.1A-10.1E precedent — it bundled input-model, ordered-policy, and
+          persistence/event-publication, three independently verifiable deliverables.
+      - id: 27.2B
+        title: "Ordered candidate-match policy (steps 1-4, 6, 7 only — step 5 fallback deferred)"
+        status: done
+        requires: ["27.2A"]
+        note: >
+          Step 5 (fallback EndToEndId+amount+currency+participant+time-window) has no
+          source-backed data path inside iso-adapter's own schema — [OPEN-QUESTION],
+          not implemented. Steps 8 (IGNORED_DUPLICATE) and 9 (late/weaker -> FSM policy)
+          belong to Story 27.3, not this story.
+      - id: 27.2C
+        title: "Persistence (iso.iso_message_correlation) + iso.message.correlated publication"
+        status: done
+        requires: ["27.2B"]
         produces: cap.iso.correlation-engine
       - id: 27.3
         title: "Duplicate and out-of-order semantics"
         status: not-started
-        requires: ["27.2"]
+        requires: ["27.2C"]
       - id: 27.4
-        title: "Orphan -> DLQ + operator read model"
+        title: "Orphan -> DLQ"
         status: not-started
-        requires: ["27.2"]
+        requires: ["27.2C"]
         note: >
-          H6: one task, one verify, explicitly split by priority tag mid-sentence — DLQ
-          write is [MVP], the manual-correlation operator action is [P1].
+          H6: split from a single task/verify that mixed [MVP] DLQ write with [P1]
+          manual-correlation read model — the [P1] half moved to 27.5.
+      - id: 27.5
+        title: "Operator read model for manual correlation over the orphan DLQ [P1]"
+        status: not-started
+        requires: ["27.4"]
 
   - epic: EPIC-28
     title: "ISO: validation boundaries"
@@ -384,7 +409,7 @@ dependency_granularity_candidates:
   - { from: EPIC-35/35.1, to: EPIC-12, note: "H2 primary example — resolved in the prior 2026-07-16 backlog-redesign session" }
   - { from: EPIC-51, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35 — RESOLVED, see below" }
   - { from: EPIC-57, to: EPIC-12, note: "same un-narrowed pattern as EPIC-35 — RESOLVED, see below" }
-  - { from: EPIC-65, to: EPIC-27, note: "consumes iso.message.correlated (27.2's output), not all of EPIC-27 including the [P1] 27.4/27.5 manual-action half — RESOLVED, see below" }
+  - { from: EPIC-65, to: EPIC-27, note: "consumes iso.message.correlated (27.2C's output, since 27.2 split into 27.2A/27.2B/27.2C 2026-07-16), not all of EPIC-27 including the [P1] 27.4/27.5 manual-action half — RESOLVED, see below" }
   - { from: EPIC-14/14.1, to: EPIC-46, note: "currently a hidden blocker (no edge at all) — 14.1 needs egress.transport_attempts, created in EPIC-46; see cycle.egress-transport-status-vs-finality writeup for why this must be added narrowly, not at whole-epic granularity — RESOLVED, see below (also found: 14.1 needs EPIC-47's delivery_receipts too, a second missing edge not previously flagged)" }
 
 resolved_dependency_narrowings_2026_07_16:

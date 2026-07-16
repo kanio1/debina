@@ -61,7 +61,7 @@ public class Pain001PersistenceService {
         PaymentEntity payment = paymentCreationWriter.create(tenantId, branchId,
                 canonical.amount(), canonical.currency(), canonical.debtorIban(), canonical.creditorIban());
 
-        pain001LineageRecorder.record(payment.getId(), rawMessageId, canonical, clockPort.now());
+        pain001LineageRecorder.record(payment.getId(), tenantId, rawMessageId, canonical, clockPort.now());
 
         idempotencyStore.complete(tenantId, idempotencyKey, payment.getId(), SUBMIT_RESPONSE_CODE);
 

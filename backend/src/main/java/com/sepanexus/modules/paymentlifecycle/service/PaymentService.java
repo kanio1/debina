@@ -77,7 +77,7 @@ public class PaymentService {
 
         PaymentEntity payment = paymentCreationWriter.create(tenantId, command.branchId(),
                 command.amount(), command.currency(), command.debtorIban(), command.creditorIban());
-        jsonDirectLineageRecorder.record(payment.getId(), rawMessageId, command.endToEndId());
+        jsonDirectLineageRecorder.record(payment.getId(), tenantId, rawMessageId, command.endToEndId());
         idempotencyStore.complete(tenantId, command.idempotencyKey(), payment.getId(), SUBMIT_RESPONSE_CODE);
 
         return payment;

@@ -635,9 +635,19 @@
       "status": "done"
     },
     {
-      "id": "EPIC-27.27.2",
+      "id": "EPIC-27.27.2A",
       "type": "STORY",
-      "status": "not-started"
+      "status": "done"
+    },
+    {
+      "id": "EPIC-27.27.2B",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-27.27.2C",
+      "type": "STORY",
+      "status": "done"
     },
     {
       "id": "EPIC-27.27.3",
@@ -1078,7 +1088,7 @@
     },
     {
       "from": "EPIC-20.20.3",
-      "to": "EPIC-27.27.2",
+      "to": "EPIC-27.27.2C",
       "type": "REQUIRES"
     },
     {
@@ -1428,7 +1438,17 @@
     },
     {
       "from": "EPIC-27",
-      "to": "EPIC-27.27.2",
+      "to": "EPIC-27.27.2A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-27.27.2B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27",
+      "to": "EPIC-27.27.2C",
       "type": "REQUIRES"
     },
     {
@@ -1447,18 +1467,28 @@
       "type": "REQUIRES"
     },
     {
-      "from": "EPIC-27.27.2",
+      "from": "EPIC-27.27.2A",
       "to": "EPIC-27.27.1",
       "type": "REQUIRES"
     },
     {
+      "from": "EPIC-27.27.2B",
+      "to": "EPIC-27.27.2A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-27.27.2C",
+      "to": "EPIC-27.27.2B",
+      "type": "REQUIRES"
+    },
+    {
       "from": "EPIC-27.27.3",
-      "to": "EPIC-27.27.2",
+      "to": "EPIC-27.27.2C",
       "type": "REQUIRES"
     },
     {
       "from": "EPIC-27.27.4",
-      "to": "EPIC-27.27.2",
+      "to": "EPIC-27.27.2C",
       "type": "REQUIRES"
     },
     {
@@ -1958,7 +1988,7 @@
     },
     {
       "from": "EPIC-65",
-      "to": "EPIC-27.27.2",
+      "to": "EPIC-27.27.2C",
       "type": "REQUIRES"
     },
     {

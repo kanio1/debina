@@ -68,7 +68,7 @@ class PaymentServiceTest {
         verify(paymentCreationWriter).create(org.mockito.ArgumentMatchers.eq(tenantId), org.mockito.ArgumentMatchers.isNull(),
                 any(), any(), any(), any());
         ArgumentCaptor<String> endToEndId = ArgumentCaptor.forClass(String.class);
-        verify(jsonDirectLineageRecorder).record(any(), any(), endToEndId.capture());
+        verify(jsonDirectLineageRecorder).record(any(), any(), any(), endToEndId.capture());
         assertThat(saved.getStatus()).isEqualTo(PaymentStatus.RECEIVED);
         assertThat(saved.getTenantId()).isEqualTo(tenantId);
         assertThat(endToEndId.getValue()).isEqualTo("E2E-1");

@@ -21,12 +21,12 @@ public class JsonDirectLineageRecorder {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void record(UUID paymentId, UUID rawMessageId, String endToEndId) {
+    public void record(UUID paymentId, UUID tenantId, UUID rawMessageId, String endToEndId) {
         UUID isoMessageId = UUID.randomUUID();
         jdbcTemplate.update("""
-                INSERT INTO iso.iso_messages (id, direction, message_type, parse_status, raw_message_id)
-                VALUES (?, 'INBOUND', ?, 'SKIPPED', ?)
-                """, isoMessageId, MESSAGE_TYPE, rawMessageId);
+                INSERT INTO iso.iso_messages (id, direction, message_type, parse_status, raw_message_id, tenant_id)
+                VALUES (?, 'INBOUND', ?, 'SKIPPED', ?, ?)
+                """, isoMessageId, MESSAGE_TYPE, rawMessageId, tenantId);
 
         jdbcTemplate.update("""
                 INSERT INTO iso.payment_iso_identifiers (payment_id, source_message_type, iso_message_id, end_to_end_id)

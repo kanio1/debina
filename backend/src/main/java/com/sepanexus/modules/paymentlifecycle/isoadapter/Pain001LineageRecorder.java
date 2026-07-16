@@ -22,12 +22,13 @@ public class Pain001LineageRecorder {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void record(UUID paymentId, UUID rawMessageId, CanonicalPaymentCommand command, Instant recordedAt) {
+    public void record(UUID paymentId, UUID tenantId, UUID rawMessageId, CanonicalPaymentCommand command, Instant recordedAt) {
         UUID isoMessageId = UUID.randomUUID();
         jdbcTemplate.update("""
-                INSERT INTO iso.iso_messages (id, direction, message_type, parse_status, raw_message_id, msg_id, cre_dt_tm)
-                VALUES (?, 'INBOUND', ?, 'PARSED', ?, ?, ?)
-                """, isoMessageId, MESSAGE_TYPE, rawMessageId, command.msgId(), Timestamp.from(recordedAt));
+                INSERT INTO iso.iso_messages
+                    (id, direction, message_type, parse_status, raw_message_id, msg_id, cre_dt_tm, tenant_id)
+                VALUES (?, 'INBOUND', ?, 'PARSED', ?, ?, ?, ?)
+                """, isoMessageId, MESSAGE_TYPE, rawMessageId, command.msgId(), Timestamp.from(recordedAt), tenantId);
 
         jdbcTemplate.update("""
                 INSERT INTO iso.payment_iso_identifiers
