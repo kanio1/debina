@@ -85,6 +85,75 @@ public class Pacs002IdentifierExtractor {
         return Pacs002IdentifierExtractionResult.success(List.copyOf(identifiers));
     }
 
+    /**
+     * EPIC-27 Story 27.2A: the richer counterpart to {@link #extract} — also pulls
+     * {@code OrgnlTxId}/{@code OrgnlInstrId}/{@code OrgnlUETR} (each optional per the real
+     * pacs.002.001.10 schema), needed by the Story 27.2B correlation policy's steps 1–3.
+     * {@code OrgnlMsgId}/{@code OrgnlEndToEndId} stay required, matching {@link #extract}'s
+     * existing validation. Purely additive: does not change {@link #extract}'s behavior.
+     */
+    public Pacs002CorrelationExtractionResult extractCorrelationInputs(Document document) {
+        try {
+            return doExtractCorrelationInputs(document);
+        } catch (RuntimeException exception) {
+            return Pacs002CorrelationExtractionResult.failure(MAPPING_FAILED, null, exception.getClass().getSimpleName());
+        }
+    }
+
+    private Pacs002CorrelationExtractionResult doExtractCorrelationInputs(Document document) {
+        Element root = document.getDocumentElement();
+        String namespaceUri = root == null ? null : root.getNamespaceURI();
+        if (root == null || !"Document".equals(root.getLocalName())
+                || namespaceUri == null || !namespaceUri.startsWith(PACS002_NAMESPACE_PREFIX)) {
+            return Pacs002CorrelationExtractionResult.failure(UNSUPPORTED_MESSAGE_TYPE, "Document",
+                    "root element is not a recognized pacs.002 message");
+        }
+        if (!SUPPORTED_NAMESPACE.equals(namespaceUri)) {
+            return Pacs002CorrelationExtractionResult.failure(UNSUPPORTED_MESSAGE_VERSION, "Document",
+                    "unsupported pacs.002 version: " + namespaceUri);
+        }
+
+        Element fiToFiPmtStsRpt = firstChildElement(root, "FIToFIPmtStsRpt");
+        if (fiToFiPmtStsRpt == null) {
+            return Pacs002CorrelationExtractionResult.failure(UNSUPPORTED_MESSAGE_TYPE, "Document/FIToFIPmtStsRpt",
+                    "missing FIToFIPmtStsRpt");
+        }
+
+        Element orgnlGrpInfAndSts = firstChildElement(fiToFiPmtStsRpt, "OrgnlGrpInfAndSts");
+        String orgnlMsgId = textOf(firstChildElement(orgnlGrpInfAndSts, "OrgnlMsgId"));
+        if (isBlank(orgnlMsgId)) {
+            return Pacs002CorrelationExtractionResult.failure(MISSING_REQUIRED_ELEMENT,
+                    "OrgnlGrpInfAndSts/OrgnlMsgId", "OrgnlMsgId is required");
+        }
+
+        List<Element> txInfAndStsEntries = childElements(fiToFiPmtStsRpt, "TxInfAndSts");
+        if (txInfAndStsEntries.isEmpty()) {
+            return Pacs002CorrelationExtractionResult.failure(MISSING_REQUIRED_ELEMENT,
+                    "FIToFIPmtStsRpt/TxInfAndSts", "expected at least one TxInfAndSts");
+        }
+
+        List<Pacs002CorrelationInput> inputs = new ArrayList<>();
+        for (int i = 0; i < txInfAndStsEntries.size(); i++) {
+            Element txInfAndSts = txInfAndStsEntries.get(i);
+            String orgnlEndToEndId = textOf(firstChildElement(txInfAndSts, "OrgnlEndToEndId"));
+            if (isBlank(orgnlEndToEndId)) {
+                return Pacs002CorrelationExtractionResult.failure(MISSING_REQUIRED_ELEMENT,
+                        "TxInfAndSts[" + i + "]/OrgnlEndToEndId", "OrgnlEndToEndId is required");
+            }
+            String orgnlTxId = textOf(firstChildElement(txInfAndSts, "OrgnlTxId"));
+            String orgnlInstrId = textOf(firstChildElement(txInfAndSts, "OrgnlInstrId"));
+            String orgnlUetr = textOf(firstChildElement(txInfAndSts, "OrgnlUETR"));
+            inputs.add(new Pacs002CorrelationInput(
+                    orgnlMsgId, blankToNull(orgnlTxId), blankToNull(orgnlInstrId), orgnlEndToEndId, blankToNull(orgnlUetr)));
+        }
+
+        return Pacs002CorrelationExtractionResult.success(List.copyOf(inputs));
+    }
+
+    private static String blankToNull(String value) {
+        return isBlank(value) ? null : value;
+    }
+
     private static Element firstChildElement(Element parent, String localName) {
         if (parent == null) {
             return null;
