@@ -71,7 +71,7 @@
     },
     {
       "epic": "EPIC-13",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-13-ledger-ownership.md"
     },
     {
@@ -96,7 +96,7 @@
     },
     {
       "epic": "EPIC-18",
-      "status": "blocked",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md"
     },
     {
@@ -166,7 +166,7 @@
     },
     {
       "epic": "EPIC-32",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-32-ledger-core.md"
     },
     {
@@ -221,7 +221,7 @@
     },
     {
       "epic": "EPIC-43",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md"
     },
     {
@@ -1046,13 +1046,13 @@
       "epic": "EPIC-13",
       "story": "13.1",
       "title": "`ledger_role` jedynym writerem",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*LedgerSchemaOwnershipTest*"
       ],
       "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-13 Story 13.1 implementation session"
     },
     {
       "epic": "EPIC-13",
@@ -1072,7 +1072,7 @@
       "epic": "EPIC-13",
       "story": "13.3",
       "title": "Test: `settlement` bez grantu `ledger`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 13.1"
       ],
@@ -1080,7 +1080,7 @@
         "./mvnw -f backend test -Dtest=*SettlementRoleNoLedgerGrantTest*"
       ],
       "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-13 Story 13.3 implementation session"
     },
     {
       "epic": "EPIC-13",
@@ -2194,13 +2194,13 @@
       "epic": "EPIC-32",
       "story": "32.1",
       "title": "DDL kont + dziennika + granty",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "psql -c \"\\dt ledger.*\""
+        "./mvnw -f backend test -Dtest=*LedgerSchemaMigrationTest*"
       ],
       "source_file": "planning/epics/EPIC-32-ledger-core.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-32 Story 32.1 implementation session"
     },
     {
       "epic": "EPIC-32",
@@ -2372,7 +2372,7 @@
       "epic": "EPIC-35",
       "story": "35.2",
       "title": "Zakaz przełączania po nazwie profilu (ArchUnit)",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 35.1"
       ],
@@ -2380,7 +2380,7 @@
         "./mvnw -f backend test -Dtest=*NoProfileNameSwitchTest*"
       ],
       "source_file": "planning/epics/EPIC-35-settlement-strategy-resolver.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-35 Story 35.2 implementation session"
     },
     {
       "epic": "EPIC-35",
@@ -2676,13 +2676,13 @@
       "epic": "EPIC-43",
       "story": "43.1",
       "title": "`outbound_messages` + dispatcher SKIP LOCKED",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*DoubleDispatcherTest*"
       ],
       "source_file": "planning/epics/EPIC-43-egress-rail-outbound-dispatch.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-43 Story 43.1 implementation session"
     },
     {
       "epic": "EPIC-43",

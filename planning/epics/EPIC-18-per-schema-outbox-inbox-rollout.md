@@ -1,8 +1,10 @@
 ---
-status: blocked
+status: in-progress
 depends_on: [EPIC-09-ownership-schema-grants, EPIC-04-outbox-inbox-kafka-thin]
 source: "sepa-nexus-blueprint-ownership-integration.md §9 (EPIC-OWN-11, line 355, [ADD, ADR-N5, closed] — nieobecne w MFB §8)"
 ---
+
+`[UNBLOCKED 2026-07-17]`: EPIC-43 Story 43.1 (this session) built `egress`'s first migration, the first of the modules this epic's own text names as its unblocking condition ("odblokuj przy pierwszej migracji pierwszego modułu spośród iso-adapter/routing/settlement/egress/reconciliation/case"). `egress.outbox_events`/`egress.inbox_events` exist with the exact ADR-N5 pattern (§4.4), and `outbox_dispatcher_role` was created for the first time in this repository, scoped narrowly to `egress` only. **Story 18.1 is not marked `done`** — its completion criterion is "every newly-created module", and `iso-adapter`/`routing`/`settlement`/`reconciliation`/`case` still have no schema of their own, and `payment.outbox_events` (pre-dates ADR-N5) has not been retrofitted with the dispatcher-role pattern either. Both remain this epic's own, separate, not-started scope.
 
 # EPIC-18 — Ownership: rollout outbox/inbox per schemat na pozostałe moduły (EPIC-OWN-11)
 

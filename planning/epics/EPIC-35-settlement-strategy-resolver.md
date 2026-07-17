@@ -43,14 +43,21 @@ Taski:
 
 ## Story 35.2 — Zakaz przełączania po nazwie profilu (ArchUnit)
 
-status: not-started
+status: done
+
 depends_on: [Story 35.1]
 
-`[READINESS NOTE 2026-07-17]`: analytically `READY` — `Story 35.1` is `done`, `com.sepanexus.settlement.SettlementStrategyResolver` exists as the concrete class an ArchUnit rule can target (no `switch`/`if` on profile/CSM name anywhere reachable from strategy selection), and the rule needs no DB/Kafka — same pure-ArchUnit shape as `com.sepanexus.OwnershipArchRulesTest`/`ModularityTest`.
+`[DONE 2026-07-17]`: ArchUnit cannot parse arbitrary `if`/`switch` control-flow or string-literal semantics inside a method body — the invariant is instead enforced structurally at the selection-boundary API: (1) no public method declared in a `*Resolver`/`*Selector`-named class in `com.sepanexus.settlement` accepts `String`/`CharSequence`; (2) `com.sepanexus.settlement` has no dependency on a profile-model type (routing/reference-data profile classes — simulated via a fixture since neither module exists in main sources yet); (3) no class in `com.sepanexus.settlement` is named after a CSM/profile (`Tips`/`Rt1`/`Step2`/`Stet`/`Kir`/`Elixir*SettlementEngine`).
+
+Non-vacuous fixtures under `backend/src/test/java/com/sepanexus/architecturefixtures/settlementselection/`: `forbidden/` (`StringProfileSelector.resolve(String)`, `CsmNameSelector.resolve(CharSequence)`, `ProfileDependentSelector.resolve(FakeRoutingProfile)`, `TipsSettlementEngine`) — each rule proven to actually detect its own forbidden fixture before being trusted against production (a rule that silently matches zero classes is treated as a failure, not a vacuous pass — an early self-review of this story's own test harness caught and fixed exactly that bug in the `assertRuleViolated` helper before this was verified). `allowed/` (`TypedPairSelector.resolve(SettlementBasis, LiquidityMode)`) passes every check, mirroring `SettlementStrategyResolver`.
+
+Structural: `NoProfileNameSwitchTest` written first, referencing fixture packages that didn't exist yet — since package references are runtime strings not compile-time symbols, this produced not a compile failure but a real semantic RED (`ArchRule` "failed to check any classes" on the fixture-dependent tests). Semantic RED confirmed further: the first working version of the String/CharSequence rule (scoped to *all* public methods in the package) false-positived on JDK-generated `enum.valueOf(String)` methods — corrected by scoping to `*Resolver`/`*Selector`-named classes only, which also happens to be the correct, non-coincidental fix for the actual architectural question ("is this class a strategy-selection boundary"). GREEN: `7/7 PASS`. Mutation-proof, all 3 caught then reverted: (1) disabled the String/CharSequence check entirely → exactly `forbiddenFixtureSelectorsAcceptingStringOrCharSequenceAreDetected` FAIL; (2) pointed the profile-dependency rule at a nonexistent package → exactly `forbiddenFixtureDependencyOnProfileModelIsDetected` FAIL; (3) made the rule reject *any* parameter (not just String/CharSequence) → both `allowedFixtureTypedPairSelectorAcceptsNoStringOrCharSequence` and (correctly, incidentally) `productionSelectionBoundaryAcceptsNoStringOrCharSequence` FAIL. `git diff --check` clean after each revert, no leftover mutation markers.
+
+Targeted: `NoProfileNameSwitchTest` 7/7 PASS; `SettlementStrategyResolverTest` 17/17 PASS; `ModularityTest`+`PaymentNoGodModuleTest` 6/6 PASS. Full regression: `258 tests, 0 failures, 0 errors, BUILD SUCCESS` (251 prior + 7 new).
 
 Taski:
-- [ ] **Reguła ArchUnit: zero `switch`/`if` po nazwie profilu/CSM w kodzie wyboru strategii.**
-      `verify: ./mvnw -f backend test -Dtest=*NoProfileNameSwitchTest*`
+- [x] **Reguła ArchUnit: zero `switch`/`if` po nazwie profilu/CSM w kodzie wyboru strategii.**
+      `verify: ./mvnw -f backend test -Dtest=*NoProfileNameSwitchTest*` → `Tests run: 7, Failures: 0, Errors: 0` — PASS (2026-07-17).
 
 ## Story 35.3 — Zamrożony snapshot profilu na attempt
 
