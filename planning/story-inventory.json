@@ -1085,18 +1085,18 @@
     {
       "epic": "EPIC-13",
       "story": "13.4",
-      "title": "Testy deferred trigger + niemutowalność + reversal",
-      "status": "not-started",
+      "title": "Testy deferred trigger + niemutowalność",
+      "status": "done",
       "depends_on": [
         "Story 13.1",
-        "EPIC-32-ledger-core"
+        "EPIC-32-ledger-core/Story 32.1"
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*UnbalancedJournalEntryRejectedAtCommitTest*",
         "./mvnw -f backend test -Dtest=*JournalLinesImmutabilityTest*"
       ],
       "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-13 Story 13.4 implementation session"
     },
     {
       "epic": "EPIC-14",
@@ -2220,7 +2220,7 @@
       "epic": "EPIC-32",
       "story": "32.3",
       "title": "Deferred constraint trigger + niemutowalność",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 32.1"
       ],
@@ -2228,7 +2228,7 @@
         "./mvnw -f backend test -Dtest=*UnbalancedEntryAtCommitTest*"
       ],
       "source_file": "planning/epics/EPIC-32-ledger-core.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-32 Story 32.3 implementation session"
     },
     {
       "epic": "EPIC-32",
