@@ -181,7 +181,7 @@
     },
     {
       "epic": "EPIC-35",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-35-settlement-strategy-resolver.md"
     },
     {
@@ -2358,7 +2358,7 @@
       "epic": "EPIC-35",
       "story": "35.1",
       "title": "`SettlementStrategyResolver`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "EPIC-12-reference-data-ownership/Story 12.1"
       ],
@@ -2366,7 +2366,7 @@
         "./mvnw -f backend test -Dtest=*SettlementStrategyResolverTest*"
       ],
       "source_file": "planning/epics/EPIC-35-settlement-strategy-resolver.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-35 Story 35.1 implementation session"
     },
     {
       "epic": "EPIC-35",
