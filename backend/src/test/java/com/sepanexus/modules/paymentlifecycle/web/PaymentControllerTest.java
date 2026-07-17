@@ -27,12 +27,35 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
 
+/**
+ * {@code PaymentService} is fully mocked ({@link MockitoBean}), so no repository/query behaviour
+ * is under test here — the {@code @DynamicPropertySource} Testcontainers Postgres below exists
+ * only because {@code @SpringBootTest} boots the full application context, and Hibernate's
+ * JPA auto-configuration needs a reachable database to detect its dialect at startup. Per
+ * {@code infra/AGENTS.md} ("do not make tests depend on data left in infra_postgres_1"), this
+ * must be an isolated container, never the long-lived Compose Postgres.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class PaymentControllerTest {
+
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
+            .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");
+
+    @DynamicPropertySource
+    static void databaseProperties(DynamicPropertyRegistry registry) {
+        POSTGRES.start();
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
+        registry.add("spring.flyway.enabled", () -> false);
+    }
 
     @Autowired
     private MockMvc mockMvc;
