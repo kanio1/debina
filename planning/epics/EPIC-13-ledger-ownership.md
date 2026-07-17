@@ -43,15 +43,20 @@ Taski:
 - [x] **SQL grant-test: rola `settlement` nie ma żadnego uprawnienia zapisu na `ledger.*`.**
       `verify: ./mvnw -f backend test -Dtest=*SettlementRoleNoLedgerGrantTest*` → `Tests run: 6, Failures: 0, Errors: 0` — PASS (2026-07-17).
 
-## Story 13.4 — Testy deferred trigger + niemutowalność + reversal
+## Story 13.4 — Testy deferred trigger + niemutowalność
 
-status: not-started
-depends_on: [Story 13.1, EPIC-32-ledger-core]
+status: done
 
-Opis: `journal_lines` odrzuca niezbalansowany wpis na COMMIT (deferred constraint trigger), UPDATE/DELETE zabronione, reversal to osobny wpis.
+depends_on: [Story 13.1, EPIC-32-ledger-core/Story 32.1]
+
+`[SCOPE-MISMATCH RESOLVED 2026-07-17 — Variant A]`: tytuł tej story wymieniał "reversal" obok trigger+niemutowalność, ale jej WŁASNA lista tasków zawsze miała dokładnie dwa taski — żaden dotyczący reversal. Zgodnie z tej sesji regułą rozstrzygania (Wariant A: "jeżeli repo traktuje taski jako pełny zakres story — wykonaj dwa wskazane testy; popraw opis tak, aby nie sugerował ukończonego reversal; oznacz 13.4 jako done"): tytuł/opis poprawione (usunięto "+ reversal"); `depends_on` zawężone z całego `EPIC-32-ledger-core` do konkretnie potrzebnej `Story 32.1` (jedyna faktycznie wykorzystywana capability — schemat+trigger+granty). Reversal pozostaje wyłącznie zakresem `EPIC-32` Story 32.4 (obecnie `[CAPABILITY-BLOCKED]`, patrz tam) — ta story nigdy go nie obejmowała operacyjnie, tylko w tytule.
+
+`[DONE 2026-07-17]`: `UnbalancedJournalEntryRejectedAtCommitTest` — dedykowany, WŁASNY dowód własności EPIC-13 (osobna instancja Testcontainers, nie współdzieli żywej bazy z EPIC-32's `UnbalancedEntryAtCommitTest`, zgodnie z tej sesji zaleceniem "nie duplikuj kosztownej konfiguracji Testcontainers... ale nie współdziel działającej bazy między klasami") — 2 przypadki (unbalanced odrzucony na COMMIT, balanced przechodzi), framed jako "ledger_role jako jedyny writer" ownership invariant, nie pełna macierz brzegowych przypadków (tę posiada `EPIC-32` Story 32.3's własny test). `JournalLinesImmutabilityTest` — WSPÓŁDZIELONY dosłownie z `EPIC-32` Story 32.3 (ten sam plik/klasa satysfakcjonuje `verify:` obu stories, zgodnie z ustalonym w tym repo precedensem współdzielonych testów, np. `DeliveredNotFinalTest`).
+
+`7/7 PASS` (`UnbalancedJournalEntryRejectedAtCommitTest` 2/2 + `JournalLinesImmutabilityTest` 5/5). Mutation-proof, 3/3 złapane i cofnięte, każda wykryta przez test NAZWANY w tej story (nie tylko gdziekolwiek w suicie): (1) `ledger_role` z grantem UPDATE na `journal_lines` → `JournalLinesImmutabilityTest.ledgerRoleCannotUpdateJournalLines` FAIL; (2) trigger wyłączony (`DISABLE TRIGGER`) → `UnbalancedJournalEntryRejectedAtCommitTest.ledgerRoleAsSoleWriterCannotCommitAnUnbalancedEntry` FAIL; (3) osłabiony warunek `HAVING` → ten sam test FAIL. `git diff --check` czyste po każdym cofnięciu.
 
 Taski:
-- [ ] **Test: `journal_lines` odrzuca niezbalansowany wpis na COMMIT (deferred constraint trigger).**
-      `verify: ./mvnw -f backend test -Dtest=*UnbalancedJournalEntryRejectedAtCommitTest*`
-- [ ] **Test: UPDATE/DELETE na `journal_lines` odrzucone na poziomie grantów.**
-      `verify: ./mvnw -f backend test -Dtest=*JournalLinesImmutabilityTest*`
+- [x] **Test: `journal_lines` odrzuca niezbalansowany wpis na COMMIT (deferred constraint trigger).**
+      `verify: ./mvnw -f backend test -Dtest=*UnbalancedJournalEntryRejectedAtCommitTest*` → `Tests run: 2, Failures: 0, Errors: 0` — PASS (2026-07-17).
+- [x] **Test: UPDATE/DELETE na `journal_lines` odrzucone na poziomie grantów.**
+      `verify: ./mvnw -f backend test -Dtest=*JournalLinesImmutabilityTest*` → `Tests run: 5, Failures: 0, Errors: 0` — PASS (2026-07-17).
