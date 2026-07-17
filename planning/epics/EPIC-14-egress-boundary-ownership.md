@@ -21,12 +21,21 @@ Taski:
 
 ## Story 14.2 — Test: egress nie pisze `payment.status`
 
-status: not-started
-depends_on: [Story 14.1]
+status: done
+
+depends_on: [EPIC-43-egress-rail-outbound-dispatch/Story 43.1]
+
+`[DEPENDENCY NARROWED 2026-07-17 — egress ownership train, Phase B]`: was `depends_on: [Story 14.1]`, which itself transitively requires `EPIC-46/Story 46.1` and `EPIC-47/Story 47.1` (both `not-started`) — but this story's own test, `EgressCannotWritePaymentStatusTest`, only needs `egress_role` (created by `EPIC-43` Story 43.1, `done`) and `payment.payments` (exists since Iteration 0) — it never touches `transport_attempts`/`delivery_receipts`, which are Story 14.1's own tables, not this story's. Confirmed via migration audit: `egress_role` has zero grants anywhere in `backend/src/main/resources/db/migration/payment/*` and no `GRANT USAGE ON SCHEMA payment` — default-deny already applies; this story only needs to prove that with a real Testcontainers negative-grant test, not wait for Story 14.1's unrelated tables.
+
+`[DONE 2026-07-17]`: `payment.payments` has today exactly one status column (`status text CHECK (status IN ('RECEIVED','VALIDATED','REJECTED','DISPATCHED'))`) — no `finality_at` (also confirmed in the prior session, ledger train). Built `EgressCannotWritePaymentStatusTest`: `has_schema_privilege('egress_role','payment','USAGE')` = false (a pure grant signal, insensitive to RLS); `SELECT`/`INSERT`/`UPDATE(status)`/`DELETE`/`TRUNCATE` all denied `42501`.
+
+`[RLS-versus-grant distinction]`: `payment.payments` has `FORCE ROW LEVEL SECURITY` (V4) — applies to EVERY role without `BYPASSRLS`, independent of table grants, and no test connection ever sets `app.tenant_id`. This means even a HYPOTHETICAL erroneous `INSERT`/`UPDATE` grant to `egress_role` would ALSO be blocked by RLS (`NULLIF(current_setting('app.tenant_id', true), '')::uuid` = `NULL`, never matches) — a second, independent defense layer, not a test weakness. To confirm the GRANT layer is proven independently of RLS, `egressRoleHasNoUsageGrantOnPaymentSchema` reads only privilege metadata (`has_schema_privilege`), which RLS never touches.
+
+`6/6 PASS`. **Mutation-proof, 3/3 caught then reverted** (scratch migration `V29`, deleted after each mutation, never committed): (1) `egress_role` granted full `SELECT, UPDATE` on `payment.payments` → 3 tests FAIL (`egressRoleHasNoUsageGrantOnPaymentSchema`, `egressRoleCannotSelectPaymentPayments`, `egressRoleCannotUpdatePaymentStatusColumn`); (2) `egress_role` granted `INSERT` → `egressRoleHasNoUsageGrantOnPaymentSchema` FAIL (grant layer caught directly; the `INSERT` itself is additionally blocked by RLS, see above); (3) `egress_role` granted column-scoped `UPDATE(status)` only (no full `UPDATE`, no `INSERT`) → `egressRoleHasNoUsageGrantOnPaymentSchema` FAIL. `git diff --check` clean after each revert, scratch file deleted.
 
 Taski:
-- [ ] **Grant-test: rola `egress` nie ma zapisu na `payment.payments`.**
-      `verify: ./mvnw -f backend test -Dtest=*EgressCannotWritePaymentStatusTest*`
+- [x] **Grant-test: rola `egress` nie ma zapisu na `payment.payments`.**
+      `verify: ./mvnw -f backend test -Dtest=*EgressCannotWritePaymentStatusTest*` → `Tests run: 6, Failures: 0, Errors: 0` — PASS (2026-07-17).
 
 ## Story 14.3 — Asercja delivered ≠ final
 
