@@ -31,7 +31,8 @@ class JsonDirectIngestionTest {
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus")
             .withUsername("test_admin")
-            .withPassword("test_admin");
+            .withPassword("test_admin")
+            .withStartupAttempts(3);
     private static boolean initialized;
 
     @Autowired
