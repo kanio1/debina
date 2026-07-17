@@ -1117,15 +1117,15 @@
       "epic": "EPIC-14",
       "story": "14.2",
       "title": "Test: egress nie pisze `payment.status`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
-        "Story 14.1"
+        "EPIC-43-egress-rail-outbound-dispatch/Story 43.1"
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*EgressCannotWritePaymentStatusTest*"
       ],
       "source_file": "planning/epics/EPIC-14-egress-boundary-ownership.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-14 Story 14.2 implementation session"
     },
     {
       "epic": "EPIC-14",
@@ -1278,29 +1278,33 @@
       "epic": "EPIC-18",
       "story": "18.2",
       "title": "`outbox_dispatcher_role` grant + negatywny sweep",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
-        "Story 18.1"
+        "EPIC-01-postgresql-foundation/Story 1.3",
+        "EPIC-27-iso-correlation-engine/Story 27.2C",
+        "EPIC-43-egress-rail-outbound-dispatch/Story 43.1"
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*OutboxDispatcherNoDomainWriteSweepTest*"
       ],
       "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-18 Story 18.2 implementation session"
     },
     {
       "epic": "EPIC-18",
       "story": "18.3",
       "title": "Test: writer modułu nie pisze cudzego outbox",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
-        "Story 18.1"
+        "EPIC-01-postgresql-foundation/Story 1.3",
+        "EPIC-27-iso-correlation-engine/Story 27.2C",
+        "EPIC-43-egress-rail-outbound-dispatch/Story 43.1"
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*CrossModuleOutboxWriteDeniedTest*"
       ],
       "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-18 Story 18.3 implementation session"
     },
     {
       "epic": "EPIC-18",
@@ -2748,7 +2752,7 @@
       "status": "not-started",
       "depends_on": [],
       "verify": [
-        "psql -c \"\\d egress.egress_profile\""
+        "psql -c \"\\d reference_data.egress_profiles\""
       ],
       "source_file": "planning/epics/EPIC-44-egress-profile-artifact-taxonomy.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -2771,15 +2775,15 @@
       "epic": "EPIC-44",
       "story": "44.3",
       "title": "Mapa typ-artefaktu→trigger",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
-        "Story 44.1"
+        "EPIC-43-egress-rail-outbound-dispatch/Story 43.1"
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*ArtifactTriggerMapTest*"
       ],
       "source_file": "planning/epics/EPIC-44-egress-profile-artifact-taxonomy.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-44 Story 44.3 implementation session"
     },
     {
       "epic": "EPIC-45",
@@ -2812,15 +2816,15 @@
       "epic": "EPIC-45",
       "story": "45.3",
       "title": "Dispatcher SKIP LOCKED",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
-        "Story 45.1"
+        "EPIC-43-egress-rail-outbound-dispatch/Story 43.1"
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*DoubleDispatcherTest*"
       ],
       "source_file": "planning/epics/EPIC-45-egress-outbound-message-lifecycle.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-17 EPIC-45 Story 45.3 implementation session"
     },
     {
       "epic": "EPIC-45",
