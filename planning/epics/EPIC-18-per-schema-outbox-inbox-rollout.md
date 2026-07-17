@@ -25,21 +25,41 @@ Taski:
 
 ## Story 18.2 — `outbox_dispatcher_role` grant + negatywny sweep
 
-status: not-started
-depends_on: [Story 18.1]
+status: done
+
+depends_on: [EPIC-01-postgresql-foundation/Story 1.3, EPIC-27-iso-correlation-engine/Story 27.2C, EPIC-43-egress-rail-outbound-dispatch/Story 43.1]
+
+`[DEPENDENCY NARROWED 2026-07-17 — egress ownership train, Phase B]`: was `depends_on: [Story 18.1]`, whose own completion criterion is "every newly-created module" — a moving target that can never be `done` while future modules remain unbuilt. This story's own test (`OutboxDispatcherNoDomainWriteSweepTest`) is dynamic — it discovers whatever outbox tables currently exist and sweeps negatively across whatever domain tables currently exist — so it only needs the outboxes that exist *today*: `payment.outbox_events` (Story 1.3), `iso.outbox_events` (Story 27.2C), `egress.outbox_events` (Story 43.1, which also created `outbox_dispatcher_role` itself). It will automatically pick up future outboxes once Story 18.1 adds them, with no re-narrowing required. Story 18.1 remains its own, separate, not-started scope.
+
+`[DONE 2026-07-17]`: audit confirmed `outbox_dispatcher_role` had grants ONLY on `egress.outbox_events` — zero grants anywhere on `payment.*`/`iso.*` (no `GRANT ... TO outbox_dispatcher_role` in either schema's migrations). Per ADR-N5 (`[FREEZE]`, "explicit SELECT/UPDATE across every module's outbox table"), this was an incomplete rollout of an already-frozen decision, not a new architecture question — created `V28__outbox_dispatcher_role_grants.sql`: `GRANT USAGE ON SCHEMA payment/iso TO outbox_dispatcher_role` + `GRANT SELECT, UPDATE (published_at) ON payment.outbox_events/iso.outbox_events` — no `INSERT`/`DELETE`/`TRUNCATE`, no domain-table grant, application dispatcher code (`OutboxDispatcher`/`IsoOutboxDispatcher`, still running under `sepa_app`) deliberately untouched.
+
+Built `OutboxDispatcherNoDomainWriteSweepTest` (dynamic — discovers all `<schema>.outbox_events` tables via `information_schema.tables`, parameterized positive+negative matrix per outbox, plus a full metadata sweep via `has_table_privilege` across every non-outbox base table, plus real negative `INSERT` attempts against `payment.payments`/`iso.iso_messages`/`egress.outbound_messages`/`signature.signature_keys`/`ledger.journal_entries`/`reference_data.scheme_profiles`) and `OutboxDispatcherGrantsMigrationUpgradePathTest` (migrate to V27, seed pre-existing rows in both outboxes, confirm dispatcher is denied *before* V28 — proving the upgrade actually changes something — then apply V28, confirm rows survive and become immediately claimable).
+
+`23/23 PASS` (`OutboxDispatcherNoDomainWriteSweepTest` 22/22 + `OutboxDispatcherGrantsMigrationUpgradePathTest` 1/1). **Mutation-proof, 5/5 caught then reverted**: (1) `INSERT` granted on `payment.outbox_events` → `dispatcherCannotInsertIntoAnyOutbox[payment]` FAIL; (2) full-column `UPDATE` (not restricted to `published_at`) granted → `dispatcherCannotUpdateNonPublishedAtColumnOnAnyOutbox[payment]` FAIL; (3) `UPDATE` granted on domain table `egress.outbound_messages` → `dispatcherHasNoWritePrivilegeOnAnyNonOutboxTable` FAIL (metadata sweep, not a per-table allowlist); (4) `GRANT USAGE ON SCHEMA iso` omitted → claim test errors (schema unreachable); (5) `DELETE` granted on `iso.outbox_events` → `dispatcherCannotDeleteFromAnyOutbox[iso]` FAIL. `git diff --check` clean after each revert, no leftover `TEMPORARY MUTATION` markers.
 
 Taski:
-- [ ] **Rozszerz `outbox_dispatcher_role`** o wąski grant `SELECT`/`UPDATE(published_at)` na outbox nowego modułu, bez grantu na jego tabele domenowe.
-      `verify: ./mvnw -f backend test -Dtest=*OutboxDispatcherNoDomainWriteSweepTest*` → negatywny sweep przez wszystkie schematy, nie allowlist per tabela.
+- [x] **Rozszerz `outbox_dispatcher_role`** o wąski grant `SELECT`/`UPDATE(published_at)` na outbox nowego modułu, bez grantu na jego tabele domenowe.
+      `verify: ./mvnw -f backend test -Dtest=*OutboxDispatcherNoDomainWriteSweepTest*` → `Tests run: 22, Failures: 0, Errors: 0` — PASS (2026-07-17). Negatywny sweep przez wszystkie schematy, nie allowlist per tabela.
 
 ## Story 18.3 — Test: writer modułu nie pisze cudzego outbox
 
-status: not-started
-depends_on: [Story 18.1]
+status: done
+
+depends_on: [EPIC-01-postgresql-foundation/Story 1.3, EPIC-27-iso-correlation-engine/Story 27.2C, EPIC-43-egress-rail-outbound-dispatch/Story 43.1]
+
+`[DEPENDENCY NARROWED 2026-07-17 — egress ownership train, Phase B]`: identical reasoning to Story 18.2 — `CrossModuleOutboxWriteDeniedTest` builds its own writer-role registry dynamically from currently-existing schemas/outboxes (`payment`/`sepa_app`, `iso`/`sepa_app`, `egress`/`egress_role`), not from a hypothetical future-complete rollout.
+
+`[DONE 2026-07-17]`: writer-role registry built from source (grep across migrations, not guessed): `payment` and `iso` are TODAY written by the SAME shared role `sepa_app` (`iso-adapter` has not yet split into its own DB role — `EPIC-10` Story 10.1, blocked on a pending `SECURITY DEFINER` decision) — `payment`↔`iso` deliberately EXCLUDED from the negative matrix (not a real cross-module boundary today; asserting "denied" there would be a false positive). `egress` has its own dedicated `egress_role` (V22) — the only role in this registry genuinely different from the other two, so the only side of the matrix producing real cross-module assertions: `sepa_app→egress.outbox_events`, `egress_role→payment.outbox_events`, `egress_role→iso.outbox_events`.
+
+Built `CrossModuleOutboxWriteDeniedTest` (own Testcontainers instance, separate from Story 18.2's test, per this session's instruction not to share a live database between test classes) — positive matrix (3 owners × own outbox: `INSERT`+`SELECT` PASS) + negative matrix (3 cross-module pairs × `INSERT`/`UPDATE(published_at)`/`DELETE`/`TRUNCATE` → `42501`).
+
+**Real finding during mutation-proof**: the first version of mutation 4 (`sepa_app` granted only `UPDATE(published_at)` on `egress.outbox_events`, no `SELECT`) was NOT caught by `writerCannotUpdatePublishedAtOnForeignOutbox` — PostgreSQL requires `SELECT` on any column read in the `WHERE` clause (here: `id`) independent of the `UPDATE` grant, so the test "passed" but for the wrong reason (missing `SELECT`, not missing `UPDATE`) — a real risk of this specific boundary check passing vacuously. Fixed: the mutation was extended to also grant `SELECT`, so the test actually isolates the `UPDATE` boundary rather than the `SELECT`-in-`WHERE` boundary. Caught correctly after the fix.
+
+`16/16 PASS`. **Mutation-proof, 4/4 caught then reverted** (scratch migration `V29`, deleted after each mutation, never committed): (1) `sepa_app` granted `INSERT` on `egress.outbox_events` → `writerCannotInsertIntoForeignOutbox[1]` FAIL; (2) `egress_role` granted `INSERT` on `iso.outbox_events` → `writerCannotInsertIntoForeignOutbox[3]` FAIL; (3) `egress_role` granted `INSERT` on `payment.outbox_events` → `writerCannotInsertIntoForeignOutbox[2]` FAIL; (4) `sepa_app` granted `SELECT`+`UPDATE(published_at)` on `egress.outbox_events` → `writerCannotUpdatePublishedAtOnForeignOutbox[1]` FAIL (see finding above). `git diff --check` clean after each revert, scratch file deleted (not merely reverted in content).
 
 Taski:
-- [ ] **SQL grant-test: rola-writer modułu A nie ma zapisu na `<schemat B>.outbox_events`.**
-      `verify: ./mvnw -f backend test -Dtest=*CrossModuleOutboxWriteDeniedTest*`
+- [x] **SQL grant-test: rola-writer modułu A nie ma zapisu na `<schemat B>.outbox_events`.**
+      `verify: ./mvnw -f backend test -Dtest=*CrossModuleOutboxWriteDeniedTest*` → `Tests run: 16, Failures: 0, Errors: 0` — PASS (2026-07-17).
 
 ## Story 18.4 — Dedup inbox + replay-safe
 
