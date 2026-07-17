@@ -34,31 +34,63 @@ Taski:
 
 ## Story 32.2 — Niezmienniki reserve/post/release
 
-status: not-started
+status: not-started (`[CAPABILITY-BLOCKED]`)
+
 depends_on: [Story 32.1]
 
 Opis: test współbieżności no-double-reserve.
 
+`[CAPABILITY-BLOCKED 2026-07-17]`: pełny audyt źródłowy (`sepa-nexus-message-flow-and-data-blueprint.md` §4.5/§4.7/§4.11/§5, `sepa-nexus-full-blueprint-review-and-task-plan.md`, `sepa-nexus-blueprint-ownership-integration.md`, `sepa-nexus-decision-gate.md`) przed implementacją — readiness table:
+
+| Contract question | Source/code evidence | Result |
+|---|---|---|
+| `reserve()` account lock strategy | §5 GROSS_INSTANT: "row-lock account, check `available ≥ amount`, move to `reserved`" — jednoznaczne, `SELECT ... FOR UPDATE` na `liquidity_accounts` | PASS |
+| Insufficient-liquidity result shape | §4.11: `reserve(account,amount)→reservationId\|INSUFFICIENT` — typowany wynik, nie wyjątek | PASS |
+| `reservationId` identity | §5: "journal RESERVE entry"; `journal_entries.entry_type` CHECK zawiera `'RESERVE'` — `reservationId` = `journal_entries.id` dla wpisu RESERVE | PASS |
+| `POST` journal line model | §5: "journal POST entry (debit debtor available/reserved, credit creditor available)" — jednoznaczny, dwustronny wpis | PASS |
+| `RESERVE`/`RELEASE` journal line model | **Brak** — żaden dokument nie pokazuje konkretnego DDL/przykładu, jakie `journal_lines` (jeśli w ogóle) powstają dla wpisu RESERVE/RELEASE. RESERVE dotyczy przesunięcia WEWNĄTRZ jednego konta (`available_minor`↔`reserved_minor`), nie transferu między dwoma kontami — nie pasuje naturalnie do modelu Σ(`amount_minor`)=0 między RÓŻNYMI `account_id` | **OPEN QUESTION** |
+| Mechanizm zapobiegania podwójnemu `post()`/`release()` tej samej rezerwacji | **Brak.** `journal_entries.entry_status` (CHECK `'POSTED'`\|`'REVERSED'`, DEFAULT `'POSTED'`) nie pasuje semantycznie — domyślna wartość `'POSTED'` obowiązuje już dla świeżo utworzonego RESERVE, więc nie może służyć jako flaga "already posted/released"; `journal_entries` nie ma w ogóle kolumn `account_id`/`amount_minor` (mają je tylko `journal_lines`), więc nie da się z samego `journal_entries` odtworzyć, ile faktycznie zarezerwowano. `sepa-nexus-full-blueprint-review-and-task-plan.md` linia 170 wspomina słowo "reservations" w jednej komórce podsumowującej tabeli — nigdy nie poparte żadnym DDL ani przykładem | **OPEN QUESTION — blokujące** |
+| Nowa tabela `ledger.reservations`? | Zabroniona explicite przez tę sesję bez jednoznacznego źródła (`sepa-nexus-decision-gate.md` linia 170 to za mało — gołe słowo w komórce tabeli, nie DDL) | brak zgody na wynalezienie |
+| `NoDoubleReserveConcurrencyTest` może być non-vacuous? | Sama współbieżność `reserve()` (rywalizacja o `FOR UPDATE` na TYM SAMYM koncie) jest w pełni testowalna i jednoznaczna — ale "podwójny post/release TEJ SAMEJ rezerwacji" (jawnie wymagane przez taski Story 32.2's "niezmienniki transakcyjne" i tę sesję's §18 "drugi post/release nie tworzy drugiego efektu") zależy od nierozstrzygniętego elementu wyżej | PASS (dla samego reserve) / **BLOCKED** (dla post/release idempotency) |
+
+Zgodnie z jawną instrukcją tej sesji ("jeżeli któregokolwiek kluczowego elementu brakuje: nie twórz `ledger.reservations`; nie koduj połowy portu; oznacz Story 32.2 `[CAPABILITY-BLOCKED]`") — **nie zaimplementowano żadnej części `LedgerPort`** (ani samego `reserve()`, mimo że ta konkretna operacja jest źródłowo w pełni zdefiniowana — implementacja połowy portu bez `post()`/`release()` naruszałaby explicit zakaz "nie koduj połowy portu"). Story 32.4 (reversal, `depends_on: [Story 32.2]`) jest przez to transytywnie zablokowana — patrz niżej.
+
+**Otwarte pytanie do rozstrzygnięcia przez użytkownika/zespół**: czy `RESERVE`/`RELEASE` mają w ogóle tworzyć `journal_lines` (i jeśli tak — jaki jest dokładny kształt linii dla operacji dotyczącej jednego konta), oraz jaki mechanizm (nowa kolumna na `journal_entries`? nowa, źródłowo uzasadniona tabela? coś innego?) ma zapobiegać podwójnemu skonsumowaniu tej samej rezerwacji przez `post()`/`release()`.
+
 Taski:
-- [ ] **Zaimplementuj `LedgerPort.reserve/post/release` z niezmiennikami transakcyjnymi.**
+- [ ] **Zaimplementuj `LedgerPort.reserve/post/release` z niezmiennikami transakcyjnymi.** `[CAPABILITY-BLOCKED]`
       `verify: ./mvnw -f backend test -Dtest=*NoDoubleReserveConcurrencyTest*`
 
 ## Story 32.3 — Deferred constraint trigger + niemutowalność
 
-status: not-started
+status: done
+
 depends_on: [Story 32.1]
 
+`[DONE 2026-07-17]`: readiness PASS — depends only on `Story 32.1` (`done`), independent of the blocked `Story 32.2`. Migration audit confirmed the deferred constraint trigger (`ledger.check_entry_balance()`/`trg_entry_balance`, `DEFERRABLE INITIALLY DEFERRED`, fires `AFTER INSERT ON ledger.journal_lines`) and the immutability grants (`ledger_role`: `SELECT, INSERT` only, never `UPDATE`/`DELETE` on `journal_lines`) already exist correctly from Story 32.1's V26 migration — **no new migration created**, per this session's own instruction ("jeżeli trigger już istnieje i jest poprawny: nie twórz kolejnej migracji").
+
+Story 32.1's own `LedgerSchemaMigrationTest` already had incidental coverage of both properties, but this story's own `verify:` names a specific, dedicated class (`*UnbalancedEntryAtCommitTest*`) that a bare `LedgerSchemaMigrationTest` wildcard would never match — built `UnbalancedEntryAtCommitTest` (exhaustive: single unbalanced line rejected at COMMIT with zero rows surviving, balanced entry commits, multi-statement transaction temporarily unbalanced then balanced before COMMIT, two entry IDs (one balanced, one not) roll back together as one transaction, negative+positive amounts summing to exactly zero, large representative bigint values) and `JournalLinesImmutabilityTest` (INSERT/SELECT PASS, UPDATE/DELETE/TRUNCATE → `42501` for `ledger_role`) — the latter shared with `EPIC-13` Story 13.4 (see that story's own evidence).
+
+Caught a real bug during test-first development: `JournalLinesImmutabilityTest`'s own seed helper used a plain autocommit connection to insert two balancing lines — since the trigger is deferred (checked only at COMMIT, not per-statement) but autocommit implicitly commits after *each* statement, the first (still-unbalanced) line was rejected immediately. Fixed to use explicit transaction control, matching `UnbalancedEntryAtCommitTest`'s already-correct pattern.
+
+`11/11 PASS` (`UnbalancedEntryAtCommitTest` 6/6 + `JournalLinesImmutabilityTest` 5/5). Mutation-proof, 3/3 caught then reverted: (1) trigger made `NOT DEFERRABLE` → all 6 `UnbalancedEntryAtCommitTest` cases FAIL (breaks legitimate multi-line inserts entirely, not just the intended-unbalanced ones); (2) `HAVING` clause neutered → exactly the 2 tests expecting rejection FAIL; (3) `ledger_role` granted `UPDATE, DELETE` on `journal_lines` → exactly `ledgerRoleCannotUpdateJournalLines`/`ledgerRoleCannotDeleteJournalLines` FAIL. `git diff --check` clean after each revert.
+
 Taski:
-- [ ] **Trigger deferred constraint odrzucający niezbalansowany wpis na COMMIT + granty blokujące UPDATE/DELETE na `journal_lines`.**
-      `verify: ./mvnw -f backend test -Dtest=*UnbalancedEntryAtCommitTest*`
+- [x] **Trigger deferred constraint odrzucający niezbalansowany wpis na COMMIT + granty blokujące UPDATE/DELETE na `journal_lines`.**
+      `verify: ./mvnw -f backend test -Dtest=*UnbalancedEntryAtCommitTest*` → `Tests run: 6, Failures: 0, Errors: 0` — PASS (2026-07-17).
 
 ## Story 32.4 — Przepływ reversal
 
-status: not-started
+status: not-started (`[CAPABILITY-BLOCKED]` — transitive)
+
 depends_on: [Story 32.2]
 
 Opis: reversal to osobny wpis, nigdy mutacja; nightly Σ=0 job jako drugorzędna kontrola.
 
+`[CAPABILITY-BLOCKED 2026-07-17 — transitive from Story 32.2]`: formalnie zależy od `Story 32.2`, która jest `[CAPABILITY-BLOCKED]` (patrz wyżej) — `LedgerPort` (na którym reversal musi zostać zbudowany, per §4.11 "reverse(entryId,reason)" jako część tego samego portu) nie istnieje. Dodatkowo, ta sesja przeprowadziła NIEZALEŻNY audyt pytań kontraktowych specyficznych dla reversal (sekcja "PHASE F" tej sesji) i potwierdziła DRUGI, osobny blocker: **mechanizm "pre-finality authority"** (kto i jak `ledger` dowiaduje się, czy oryginalny wpis jest jeszcze przed finalnością, bez bezpośredniego SQL do `payment.*`/`settlement.*`) nie istnieje w ogóle w tym repozytorium — `EPIC-39` (model finalności: katalog `finality_rule`, `FinalityPolicy`, `settlement_finality_records`) jest w całości `not-started`; `payment.payments` nie ma dziś kolumny `finality_at`. Nie ma więc ani publicznego portu, ani kolumny, z której `ledger` mogłoby bezpiecznie i zgodnie z granicami modułów odczytać ten stan. Nie zaimplementowano.
+
+`[PLANNING-NOTE]`: task's tekst nadal wspomina `ledger.ledger_reversals` — ta sama, już raz skorygowana (Story 32.1) nieścisłość. Gdy ta story zostanie odblokowana, reversal ma być budowany jako nowy wiersz `journal_entries` (`entry_type='REVERSAL'`, `reversal_of_entry_id`), NIE osobna tabela — patrz Story 32.1's `[PLANNING-CORRECTION]`.
+
 Taski:
-- [ ] **Zaimplementuj przepływ `ledger.ledger_reversals` jako osobny wpis + nightly job Σ=0 jako wtórna kontrola.**
+- [ ] **Zaimplementuj przepływ reversal jako nowy wiersz `journal_entries` (`entry_type='REVERSAL'` + `reversal_of_entry_id`) + nightly job Σ=0 jako wtórna kontrola.** `[CAPABILITY-BLOCKED]`
       `verify: ./mvnw -f backend test -Dtest=*LedgerReversalFlowTest*`
