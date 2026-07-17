@@ -32,15 +32,42 @@ Taski:
 
 ## Story 43.2 — Renderer (Prowide) + integracja z SignatureSigningPort
 
-status: not-started
+status: not-started (`[CAPABILITY-BLOCKED]`)
 depends_on: [Story 43.1, EPIC-31-signature-module/Story 31.3A]
 
 `[SPLIT 2026-07-16 — dual-agent governance/backlog-redesign session, H1]`: `depends_on` narrowed from `EPIC-31-signature-module/Story 31.3` to `Story 31.3A` — the old, unsplit `Story 31.3` itself depended on the whole of this epic (`EPIC-43`), which transitively includes this very story, i.e. a real cycle (31.3 → EPIC-43 → 43.2 → 31.3). `Story 31.3A` is the narrowed, standalone half of the old 31.3 (signing capability only, no `EPIC-43` dependency — see `EPIC-31-signature-module.md`). The invocation-from-egress detail formerly also described (redundantly) in the old Story 31.3's task text now lives only here, since it's this story's own scope. See `planning/BACKLOG-REDESIGN.md` for the full writeup.
 
-`[READINESS NOTE 2026-07-17]`: analytically `READY` — both dependencies (`Story 43.1`, `EPIC-31 Story 31.3A`) are `done`. Deliberately not started this session (out of this session's explicitly forbidden scope: renderer, signing integration, transport).
+`[CAPABILITY-BLOCKED 2026-07-17 — egress ownership train, Phase B, supersedes the 2026-07-17 READY note]`: the formal `depends_on` (`Story 43.1`, `EPIC-31 Story 31.3A`) are both `done`, but a deeper hidden-dependency audit this session found this story cannot actually be implemented from source alone:
+
+| Required capability | Current owner/story | Exists | Blocking |
+|---|---|---|---|
+| egress profile catalog | `EPIC-44` Story 44.1 | No | Yes |
+| egress profile snapshot | `EPIC-44` Story 44.1 (`egress_profile_snapshots`, §6.8) | No | Yes |
+| outbound artifact | `EPIC-44` Story 44.2 (`outbound_artifacts`) | No | Yes |
+| artifact idempotency | `EPIC-44` Story 44.2 (`UNIQUE(trigger_event_id,...)`) | No | Yes |
+| render profile | `iso-adapter`, no story builds `render_profile_id` (§6.7) | No | Yes |
+| `ArtifactRenderPort` | unclear — §6.2 says "iso-adapter renderer", no story owns building the port itself | No | Yes |
+| ISO renderer | `iso-adapter`, no dedicated story in any epic | No | Yes |
+| Prowide dependency/version | not named anywhere in source | No | Yes |
+| `SignatureSigningPort` | `EPIC-31` Story 31.3A | Yes (done) | No |
+| detached signature storage | **conflict**, see below | Conflicting | Yes |
+| legal `RENDERED→SIGNED` transition | depends on `signing_required` from the (nonexistent) profile snapshot | No | Yes |
+
+**Source conflict (§6.4 vs §6.7), not resolved by any ADR or newer document**: §6.4's `outbound_messages` DDL includes `payload bytea NOT NULL, payload_sha256 bytea NOT NULL, signature bytea` directly on the transport table. §6.7 ("Outbound ISO artifact lineage `[P1]`") instead says: "Split render from transport: `iso-adapter` renders (`iso.iso_outbound_artifacts`: `render_profile_id`, version snapshot, `payload_sha256`, `iso_message_id`) → `egress` delivers (`outbound_messages`: unified transport lifecycle §6.2, `REQUESTED→…→CLOSED`). FK links, **no field overlap**: rendering ... is lineage; delivering it is transport; the two are never the same row." These two descriptions directly contradict where the rendered payload/signature bytes actually live. Story 43.1's own migration (V23) deliberately deferred `signature bytea` to this story rather than resolving the conflict speculatively.
+
+Open questions requiring a new ADR or user/team decision (not resolvable by re-reading source further):
+1. Is the signature stored on `signature.message_signatures`, `iso.iso_outbound_artifacts`, `egress.outbound_messages`, or more than one location as a pointer (not a duplicate)?
+2. Does `outbound_messages.payload` remain canonical, or does §6.7 supersede it?
+3. Does §6.7 (a `[P1]` section) supersede §6.4's `[MVP]` DDL, or do both apply to different artifact classes?
+4. Which module implements `ArtifactRenderPort`?
+5. Which Prowide library and version is approved?
+6. Which story creates the render profile?
+7. How does `signing_required` reach the snapshot, given Story 44.1 is itself blocked?
+
+Not implemented — no renderer, no Prowide dependency, no signing integration, no transport code written.
 
 Taski:
-- [ ] **Renderer oparty o Prowide + wywołanie `SignatureSigningPort` z `egress`, guardowane flagą `signing_required`, podpis detached przechowany na outbound message.**
+- [ ] **Renderer oparty o Prowide + wywołanie `SignatureSigningPort` z `egress`, guardowane flagą `signing_required`, podpis detached przechowany na outbound message.** `[CAPABILITY-BLOCKED]`
       `verify: ./mvnw -f backend test -Dtest=*EgressRendererSignerTest*`
 
 ## Story 43.3 — Retry/backoff/ABANDONED + DLQ
