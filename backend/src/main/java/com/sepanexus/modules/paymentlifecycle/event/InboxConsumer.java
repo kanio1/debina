@@ -1,11 +1,7 @@
 package com.sepanexus.modules.paymentlifecycle.event;
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentLifecycleEvent;
-import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
-import com.sepanexus.modules.paymentlifecycle.repository.PaymentRepository;
-import com.sepanexus.modules.paymentlifecycle.service.PaymentHistoryRecorder;
 import com.sepanexus.modules.paymentlifecycle.service.TenantGucConfigurer;
-import com.sepanexus.shared.ClockPort;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,23 +18,15 @@ public class InboxConsumer {
 
     private final ObjectMapper objectMapper;
     private final JdbcTemplate jdbcTemplate;
-    private final PaymentRepository paymentRepository;
     private final TenantGucConfigurer tenantGucConfigurer;
-    private final PaymentHistoryRecorder paymentHistoryRecorder;
-    private final ClockPort clockPort;
 
-    public InboxConsumer(ObjectMapper objectMapper, JdbcTemplate jdbcTemplate, PaymentRepository paymentRepository,
-            TenantGucConfigurer tenantGucConfigurer, PaymentHistoryRecorder paymentHistoryRecorder,
-            ClockPort clockPort) {
+    public InboxConsumer(ObjectMapper objectMapper, JdbcTemplate jdbcTemplate, TenantGucConfigurer tenantGucConfigurer) {
         this.objectMapper = objectMapper;
         this.jdbcTemplate = jdbcTemplate;
-        this.paymentRepository = paymentRepository;
         this.tenantGucConfigurer = tenantGucConfigurer;
-        this.paymentHistoryRecorder = paymentHistoryRecorder;
-        this.clockPort = clockPort;
     }
 
-    @KafkaListener(id = "payment-lifecycle-inbox", topics = PaymentLifecycleTopicConfig.TOPIC,
+    @KafkaListener(id = "payment-lifecycle-inbox", topics = PaymentLifecycleTopicConfig.RECEIVED_TOPIC,
             groupId = "payment-lifecycle-inbox")
     @Transactional
     public void consume(String payload) {
@@ -54,12 +42,6 @@ public class InboxConsumer {
         }
 
         tenantGucConfigurer.apply(event.tenantId());
-        paymentRepository.findById(event.aggregateId()).ifPresent(payment -> {
-            PaymentStatus fromStatus = payment.getStatus();
-            payment.markValidated();
-            paymentHistoryRecorder.recordTransition(payment.getId(), fromStatus, payment.getStatus(), "INTERNAL",
-                    event.eventId(), event.eventType(), clockPort.now());
-        });
     }
 
     private PaymentLifecycleEvent parse(String payload) {

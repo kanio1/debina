@@ -32,18 +32,18 @@ public class KafkaConsumerGroupLagGauge {
         this.kafkaAdmin = kafkaAdmin;
         Gauge.builder("kafka.consumer.lag", this, KafkaConsumerGroupLagGauge::currentLag)
                 .tag("group", GROUP_ID)
-                .tag("topic", PaymentLifecycleTopicConfig.TOPIC)
+                .tag("topic", PaymentLifecycleTopicConfig.RECEIVED_TOPIC)
                 .description("Sum of (end offset - committed offset) across all partitions of "
-                        + PaymentLifecycleTopicConfig.TOPIC + " for consumer group " + GROUP_ID)
+                        + PaymentLifecycleTopicConfig.RECEIVED_TOPIC + " for consumer group " + GROUP_ID)
                 .register(meterRegistry);
     }
 
     long currentLag() {
         try (AdminClient adminClient = AdminClient.create(kafkaAdmin.getConfigurationProperties())) {
-            TopicDescription description = adminClient.describeTopics(List.of(PaymentLifecycleTopicConfig.TOPIC))
-                    .topicNameValues().get(PaymentLifecycleTopicConfig.TOPIC).get();
+            TopicDescription description = adminClient.describeTopics(List.of(PaymentLifecycleTopicConfig.RECEIVED_TOPIC))
+                    .topicNameValues().get(PaymentLifecycleTopicConfig.RECEIVED_TOPIC).get();
             List<TopicPartition> partitions = description.partitions().stream()
-                    .map(partitionInfo -> new TopicPartition(PaymentLifecycleTopicConfig.TOPIC, partitionInfo.partition()))
+                    .map(partitionInfo -> new TopicPartition(PaymentLifecycleTopicConfig.RECEIVED_TOPIC, partitionInfo.partition()))
                     .toList();
 
             Map<TopicPartition, OffsetAndMetadata> committed = adminClient

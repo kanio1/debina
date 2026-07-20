@@ -44,7 +44,7 @@ class KafkaConsumerGroupLagGaugeTest extends KafkaIntegrationSupport {
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps)) {
-            producer.send(new ProducerRecord<>(PaymentLifecycleTopicConfig.TOPIC, payload)).get();
+            producer.send(new ProducerRecord<>(PaymentLifecycleTopicConfig.RECEIVED_TOPIC, payload)).get();
         }
 
         double lagWhilePaused = meterRegistry.get("kafka.consumer.lag")

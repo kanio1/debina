@@ -13,52 +13,62 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import tools.jackson.databind.ObjectMapper;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import static org.mockito.Mockito.when;
 
 /**
- * Proves the full walking-skeleton chain against a real, already-running Keycloak
- * (docker-compose, not a mock JWT): password grant -> real HTTP POST -> payment row ->
- * outbox row -> real Kafka publish -> inbox consumption -> read-side status update.
+ * Proves the full walking-skeleton chain with a test-context JWT decoder: authenticated HTTP POST
+ * -> payment row -> source-backed outbox fact -> real Kafka publication -> inbox consumption.
+ * Testcontainers supplies PostgreSQL and Kafka; this test does not depend on local Keycloak.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
 
-    private static final String KEYCLOAK_TOKEN_URL =
-            "http://localhost:8080/realms/sepa-nexus/protocol/openid-connect/token";
     private static final UUID SUBMITTER_TENANT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final HttpClient HTTP = HttpClient.newHttpClient();
-    private static final ObjectMapper JSON = new ObjectMapper();
 
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private OutboxDispatcher dispatcher;
+
+    @MockitoBean
+    private JwtDecoder jwtDecoder;
+
+    @BeforeEach
+    void tokensAreDecodedByTheTestContext() {
+        when(jwtDecoder.decode("submitter-token")).thenReturn(jwt("payment_submitter"));
+        when(jwtDecoder.decode("operator-token")).thenReturn(jwt("operator"));
+    }
+
     @Test
     void submittedPaymentFlowsThroughOutboxKafkaAndInbox() throws Exception {
         String endToEndId = "walking-skeleton-" + UUID.randomUUID();
-        String token = accessToken("submitter", "dev-only-submitter");
-
-        HttpResponse<String> response = submitPayment(token, endToEndId);
+        HttpResponse<String> response = submitPayment("submitter-token", endToEndId);
 
         assertThat(response.statusCode()).isEqualTo(201);
 
         eventually(() -> assertThat(paymentTenantId(endToEndId)).isEqualTo(SUBMITTER_TENANT_ID));
+        dispatcher.dispatch();
         eventually(() -> assertThat(outboxDispatched(endToEndId)).isTrue());
-        eventually(() -> assertThat(paymentStatus(endToEndId)).isEqualTo("VALIDATED"));
+        eventually(() -> assertThat(paymentStatus(endToEndId)).isEqualTo("RECEIVED"));
     }
 
     @Test
     void deniedRoleProducesNoSideEffects() throws Exception {
         String endToEndId = "walking-skeleton-denied-" + UUID.randomUUID();
-        String token = accessToken("operator", "dev-only-operator");
-
-        HttpResponse<String> response = submitPayment(token, endToEndId);
+        HttpResponse<String> response = submitPayment("operator-token", endToEndId);
 
         assertThat(response.statusCode()).isEqualTo(403);
-        // Longer than OutboxDispatcher's 2s fixedDelay: proves no async side effect ever appears either.
-        Thread.sleep(2500);
         assertThat(paymentExists(endToEndId)).isFalse();
         assertThat(outboxEventExists(endToEndId)).isFalse();
     }
@@ -73,21 +83,13 @@ class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
                 .build(), BodyHandlers.ofString());
     }
 
-    private static String accessToken(String username, String password) throws Exception {
-        String form = "grant_type=password&client_id=sepa-web&client_secret=dev-only-sepa-web-secret"
-                + "&username=" + username + "&password=" + password + "&scope=openid";
-        HttpResponse<String> response = HTTP.send(HttpRequest.newBuilder()
-                .uri(URI.create(KEYCLOAK_TOKEN_URL))
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(BodyPublishers.ofString(form))
-                .build(), BodyHandlers.ofString());
-        if (response.statusCode() != 200) {
-            throw new IllegalStateException(
-                    "Keycloak token request failed: " + response.statusCode() + " " + response.body());
-        }
-        @SuppressWarnings("unchecked")
-        Map<String, Object> tokenResponse = JSON.readValue(response.body(), Map.class);
-        return (String) tokenResponse.get("access_token");
+    private static Jwt jwt(String role) {
+        return Jwt.withTokenValue("test-token-" + role)
+                .header("alg", "none")
+                .claim("sub", "walking-skeleton-" + role)
+                .claim("tenant_id", SUBMITTER_TENANT_ID.toString())
+                .claim("realm_access", Map.of("roles", java.util.List.of(role)))
+                .build();
     }
 
     private static String paymentJson(String endToEndId) {

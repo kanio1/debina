@@ -38,6 +38,11 @@ abstract class KafkaIntegrationSupport {
         registry.add("spring.flyway.url", POSTGRES::getJdbcUrl);
         registry.add("spring.flyway.user", () -> "sepa_migration");
         registry.add("spring.flyway.password", () -> "dev-only-migration");
+        registry.add("outbox.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("outbox.datasource.username", () -> "outbox_dispatcher_role");
+        registry.add("outbox.datasource.password", () -> "dev-only-outbox-dispatcher");
+        registry.add("spring.kafka.admin.auto-create", () -> "true");
+        registry.add("spring.kafka.listener.auto-startup", () -> "true");
         registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
     }
 

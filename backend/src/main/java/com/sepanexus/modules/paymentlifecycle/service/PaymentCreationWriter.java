@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * The "insert payment row + write outbox(payment.submitted) + record RECEIVED history/event in one
+ * The "insert payment row + write outbox(payment.received) + record RECEIVED history/event in one
  * unit" step shared by every ingress channel (JSON_DIRECT, pain.001) — extracted so the two
  * channels' services don't each re-implement the same insert + event-serialization pair. The
  * domain event ID generated here is shared across three places (OQ-12 "event identity", EPIC-11
@@ -47,10 +47,10 @@ class PaymentCreationWriter {
 
         UUID eventId = UUID.randomUUID();
         String payload = eventPayload(eventId, payment, tenantId);
-        outboxEventRepository.save(OutboxEvent.paymentSubmitted(payment.getId(), payload, UUID.randomUUID(), now));
-        paymentHistoryRecorder.recordEvent(eventId, payment.getId(), OutboxEvent.PAYMENT_SUBMITTED, payload, now);
+        outboxEventRepository.save(OutboxEvent.paymentReceived(payment.getId(), payload, UUID.randomUUID(), now));
+        paymentHistoryRecorder.recordEvent(eventId, payment.getId(), OutboxEvent.PAYMENT_RECEIVED, payload, now);
         paymentHistoryRecorder.recordTransition(payment.getId(), null, PaymentStatus.RECEIVED, "INTERNAL",
-                eventId, OutboxEvent.PAYMENT_SUBMITTED, now);
+                eventId, OutboxEvent.PAYMENT_RECEIVED, now);
 
         return payment;
     }
@@ -58,7 +58,7 @@ class PaymentCreationWriter {
     private String eventPayload(UUID eventId, PaymentEntity payment, UUID tenantId) {
         try {
             return objectMapper.writeValueAsString(new PaymentLifecycleEvent(
-                    eventId, payment.getId(), tenantId, OutboxEvent.PAYMENT_SUBMITTED));
+                    eventId, payment.getId(), tenantId, OutboxEvent.PAYMENT_RECEIVED));
         } catch (RuntimeException exception) {
             throw new IllegalStateException("Could not serialize payment lifecycle event", exception);
         }

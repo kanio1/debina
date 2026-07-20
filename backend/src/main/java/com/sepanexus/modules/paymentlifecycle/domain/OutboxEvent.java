@@ -15,7 +15,7 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "outbox_events", schema = "payment")
 public class OutboxEvent {
 
-    public static final String PAYMENT_SUBMITTED = "payment.submitted.v1";
+    public static final String PAYMENT_RECEIVED = "payment.received.v1";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -43,10 +43,10 @@ public class OutboxEvent {
     protected OutboxEvent() {
     }
 
-    public static OutboxEvent paymentSubmitted(UUID aggregateId, String payload, UUID correlationId, Instant createdAt) {
+    public static OutboxEvent paymentReceived(UUID aggregateId, String payload, UUID correlationId, Instant createdAt) {
         OutboxEvent event = new OutboxEvent();
         event.aggregateId = aggregateId;
-        event.eventType = PAYMENT_SUBMITTED;
+        event.eventType = PAYMENT_RECEIVED;
         event.payload = payload;
         event.correlationId = correlationId;
         event.createdAt = createdAt;

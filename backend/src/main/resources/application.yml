@@ -16,6 +16,14 @@ spring:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/sepa-nexus}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+outbox:
+  datasource:
+    url: ${OUTBOX_RELAY_DB_URL:${SEPA_APP_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}}
+    username: ${OUTBOX_RELAY_DB_USER:outbox_dispatcher_role}
+    password: ${OUTBOX_RELAY_DB_PASSWORD:dev-only-outbox-dispatcher}
+sepa:
+  scheduling:
+    enabled: ${SEPA_SCHEDULING_ENABLED:true}
 signature:
   datasource:
     url: ${SEPA_SIGNATURE_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}

@@ -26,11 +26,11 @@ class OutboxDispatcherTest extends KafkaIntegrationSupport {
         UUID eventId = UUID.randomUUID();
         UUID aggregateId = UUID.randomUUID();
         UUID tenantId = UUID.randomUUID();
-        String payload = "{\"eventId\":\"%s\",\"aggregateId\":\"%s\",\"tenantId\":\"%s\",\"eventType\":\"payment.submitted.v1\"}"
+        String payload = "{\"eventId\":\"%s\",\"aggregateId\":\"%s\",\"tenantId\":\"%s\",\"eventType\":\"payment.received.v1\"}"
                 .formatted(eventId, aggregateId, tenantId);
         try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO payment.outbox_events (id, aggregate_id, event_type, payload, correlation_id)
-                VALUES (?, ?, 'payment.submitted.v1', CAST(? AS jsonb), ?)
+                VALUES (?, ?, 'payment.received.v1', CAST(? AS jsonb), ?)
                 """)) {
             statement.setObject(1, eventId);
             statement.setObject(2, aggregateId);
@@ -49,12 +49,12 @@ class OutboxDispatcherTest extends KafkaIntegrationSupport {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties)) {
-            consumer.subscribe(List.of(PaymentLifecycleTopicConfig.TOPIC));
+            consumer.subscribe(List.of(PaymentLifecycleTopicConfig.RECEIVED_TOPIC));
             boolean received = false;
             long deadline = System.nanoTime() + 5_000_000_000L;
             while (!received && System.nanoTime() < deadline) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(250));
-                for (var record : records.records(PaymentLifecycleTopicConfig.TOPIC)) {
+                for (var record : records.records(PaymentLifecycleTopicConfig.RECEIVED_TOPIC)) {
                     if (record.value().contains(eventId.toString())) {
                         received = true;
                         break;

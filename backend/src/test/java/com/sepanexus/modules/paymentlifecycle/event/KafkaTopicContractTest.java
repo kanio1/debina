@@ -25,11 +25,11 @@ class KafkaTopicContractTest {
     private static final Pattern PRODUCER_OWNER = Pattern.compile("^\\s{4}x-producer-owner:\\s*(\\S+)\\s*$");
 
     @Test
-    void paymentLifecycleProducesOnlyOntoATopicItOwnsInTheCatalog() throws IOException {
+    void controlledPaymentFactsResolveOnlyToCatalogTopicsWithTheirDeclaredOwners() throws IOException {
         Map<String, String> producerOwnerByTopic = parseTopicCatalog();
 
-        assertThat(producerOwnerByTopic).containsKey(PaymentLifecycleTopicConfig.TOPIC);
-        assertThat(producerOwnerByTopic.get(PaymentLifecycleTopicConfig.TOPIC)).isEqualTo("payment-lifecycle");
+        assertThat(producerOwnerByTopic).containsEntry(PaymentLifecycleTopicConfig.RECEIVED_TOPIC, "ingress");
+        assertThat(producerOwnerByTopic).containsEntry(PaymentLifecycleTopicConfig.VALIDATED_TOPIC, "payment-lifecycle");
     }
 
     private static Map<String, String> parseTopicCatalog() throws IOException {

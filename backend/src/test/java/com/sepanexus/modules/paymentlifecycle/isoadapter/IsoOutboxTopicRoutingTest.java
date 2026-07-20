@@ -1,32 +1,30 @@
 package com.sepanexus.modules.paymentlifecycle.isoadapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.testcontainers.containers.PostgreSQLContainer;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * EPIC-27 Story 27.4: proves {@link IsoOutboxDispatcher}'s real routing behavior against a real
@@ -39,6 +37,13 @@ class IsoOutboxTopicRoutingTest extends IsoKafkaIntegrationSupport {
 
     @Autowired
     private IsoOutboxDispatcher dispatcher;
+
+    @BeforeEach
+    void isolateTheClaimBatch() throws Exception {
+        try (Connection connection = adminConnection(); var statement = connection.createStatement()) {
+            statement.execute("TRUNCATE iso.outbox_events");
+        }
+    }
 
     @Test
     void correlatedEventIsPublishedOnlyToTheCorrelatedTopic() throws Exception {
@@ -77,8 +82,9 @@ class IsoOutboxTopicRoutingTest extends IsoKafkaIntegrationSupport {
         insertOutboxRow(eventId, aggregateId, "iso.message.something-else.v1",
                 "{\"eventId\":\"%s\"}".formatted(eventId));
 
-        dispatcher.dispatch();
-        Thread.sleep(1000);
+        assertThatThrownBy(dispatcher::dispatch)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unrecognized iso outbox event type");
 
         assertThat(publishedAt(eventId)).isNull();
         assertThat(consumeOne(IsoOutboxEventType.MESSAGE_CORRELATED.topic(), eventId)).isEmpty();
@@ -86,59 +92,38 @@ class IsoOutboxTopicRoutingTest extends IsoKafkaIntegrationSupport {
     }
 
     /**
-     * Deliberately does NOT use the shared {@code @SpringBootTest} context's own {@code
-     * @Scheduled} {@link IsoOutboxDispatcher} bean (wired to a healthy broker) — that bean polls
-     * every 2s and would race this test's manually-inserted row to the real, reachable Kafka
-     * container, publishing it before this test's own broken-broker dispatcher gets a chance and
-     * making the "stays unpublished" assertion false by construction. A dedicated, isolated
-     * Postgres Testcontainer (no Spring context, so no live scheduled bean anywhere near it) is
-     * the minimal isolation this failure scenario needs — see Story 27.4's own guidance on not
-     * depending on the scheduler's timing and not changing production dispatcher semantics.
+     * The dispatcher gets a deterministic failed acknowledgement rather than a fake localhost
+     * broker. Real topic routing and successful acknowledgements are covered by the other tests
+     * in this Testcontainers suite; this test isolates the transaction invariant that a failed
+     * acknowledgement cannot mark the row published.
      */
     @Test
-    void brokerPublicationFailureLeavesTheEventUnpublishedForRetry() throws Exception {
-        PostgreSQLContainer<?> isolatedPostgres = new PostgreSQLContainer<>("postgres:18")
-                .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");
-        isolatedPostgres.start();
-        DefaultKafkaProducerFactory<String, String> unreachableBrokerProducerFactory = unreachableBrokerProducerFactory();
-        try {
-            migrate(isolatedPostgres);
+    void failedKafkaAcknowledgementLeavesTheEventUnpublishedForRetry() throws Exception {
+        UUID eventId = UUID.randomUUID();
+        insertOutboxRow(eventId, UUID.randomUUID(), IsoOutboxEventType.MESSAGE_ORPHANED.eventType(),
+                "{\"eventId\":\"%s\"}".formatted(eventId));
 
-            UUID eventId = UUID.randomUUID();
-            UUID aggregateId = UUID.randomUUID();
-            insertOutboxRow(isolatedPostgres, eventId, aggregateId, IsoOutboxEventType.MESSAGE_ORPHANED.eventType(),
-                    "{\"eventId\":\"%s\"}".formatted(eventId));
+        KafkaTemplate<String, String> failingKafkaTemplate = mock(KafkaTemplate.class);
+        when(failingKafkaTemplate.send(anyString(), anyString(), anyString()))
+                .thenReturn(java.util.concurrent.CompletableFuture.failedFuture(
+                        new IllegalStateException("induced Kafka acknowledgement failure")));
+        IsoOutboxDispatcher failingDispatcher = new IsoOutboxDispatcher(
+                new JdbcTemplate(appDataSource()), failingKafkaTemplate, () -> java.time.Instant.now());
 
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(appDataSource(isolatedPostgres));
-            IsoOutboxDispatcher unreachableBrokerDispatcher = new IsoOutboxDispatcher(jdbcTemplate,
-                    new KafkaTemplate<>(unreachableBrokerProducerFactory), Instant::now);
-
-            unreachableBrokerDispatcher.dispatch();
-
-            assertThat(publishedAt(isolatedPostgres, eventId)).isNull();
-        } finally {
-            unreachableBrokerProducerFactory.destroy();
-            isolatedPostgres.stop();
-        }
+        assertThatThrownBy(failingDispatcher::dispatch)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Kafka publication failed");
+        assertThat(publishedAt(eventId)).isNull();
     }
 
     // -- helpers -------------------------------------------------------------------------------
 
     private static DriverManagerDataSource appDataSource() {
-        return appDataSource(POSTGRES);
-    }
-
-    private static DriverManagerDataSource appDataSource(PostgreSQLContainer<?> postgres) {
-        return new DriverManagerDataSource(postgres.getJdbcUrl(), "sepa_app", "dev-only-app");
+        return new DriverManagerDataSource(POSTGRES.getJdbcUrl(), "sepa_app", "dev-only-app");
     }
 
     private void insertOutboxRow(UUID id, UUID aggregateId, String eventType, String payloadJson) {
-        insertOutboxRow(POSTGRES, id, aggregateId, eventType, payloadJson);
-    }
-
-    private void insertOutboxRow(PostgreSQLContainer<?> postgres, UUID id, UUID aggregateId, String eventType,
-            String payloadJson) {
-        try (Connection connection = adminConnection(postgres); PreparedStatement statement = connection.prepareStatement("""
+        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO iso.outbox_events (id, aggregate_id, event_type, payload, correlation_id, created_at)
                 VALUES (?, ?, ?, CAST(? AS jsonb), ?, now())
                 """)) {
@@ -154,11 +139,7 @@ class IsoOutboxTopicRoutingTest extends IsoKafkaIntegrationSupport {
     }
 
     private static Object publishedAt(UUID eventId) {
-        return publishedAt(POSTGRES, eventId);
-    }
-
-    private static Object publishedAt(PostgreSQLContainer<?> postgres, UUID eventId) {
-        try (Connection connection = adminConnection(postgres); PreparedStatement statement = connection.prepareStatement(
+        try (Connection connection = adminConnection(); PreparedStatement statement = connection.prepareStatement(
                 "SELECT published_at FROM iso.outbox_events WHERE id = ?")) {
             statement.setObject(1, eventId);
             try (ResultSet result = statement.executeQuery()) {
@@ -168,22 +149,6 @@ class IsoOutboxTopicRoutingTest extends IsoKafkaIntegrationSupport {
         } catch (Exception exception) {
             throw new IllegalStateException(exception);
         }
-    }
-
-    private static Connection adminConnection(PostgreSQLContainer<?> postgres) throws SQLException {
-        return java.sql.DriverManager.getConnection(postgres.getJdbcUrl(), "test_admin", "test_admin");
-    }
-
-    private static void migrate(PostgreSQLContainer<?> postgres) throws SQLException {
-        try (Connection connection = adminConnection(postgres);
-                java.sql.Statement statement = connection.createStatement()) {
-            statement.execute("CREATE ROLE sepa_migration LOGIN SUPERUSER PASSWORD 'dev-only-migration'");
-        }
-        Flyway.configure()
-                .dataSource(postgres.getJdbcUrl(), "sepa_migration", "dev-only-migration")
-                .locations("filesystem:src/main/resources/db/migration")
-                .load()
-                .migrate();
     }
 
     private java.util.Optional<ConsumedRecord> consumeOne(String topic, UUID eventId) {
@@ -206,23 +171,6 @@ class IsoOutboxTopicRoutingTest extends IsoKafkaIntegrationSupport {
             }
             return java.util.Optional.empty();
         }
-    }
-
-    /**
-     * A producer factory pointed at an address nothing listens on — simulates a broker publication
-     * failure. Returned un-wrapped (not as a {@link KafkaTemplate}) so the caller can {@code
-     * destroy()} it after use — otherwise its background reconnect thread would keep retrying and
-     * logging for the remainder of the JVM's life.
-     */
-    private static DefaultKafkaProducerFactory<String, String> unreachableBrokerProducerFactory() {
-        Map<String, Object> producerProps = new HashMap<>();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:1");
-        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProps.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "2000");
-        producerProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "2000");
-        producerProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "3000");
-        return new DefaultKafkaProducerFactory<>(producerProps);
     }
 
     private record ConsumedRecord(String key, String value) {
