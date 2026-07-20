@@ -29,12 +29,19 @@ Taski:
 
 ## Story 36.2 — `settlement_liquidity_checks`
 
-status: not-started
+status: blocked
 depends_on: [Story 36.1]
 
+`[SOURCE-BLOCKED 2026-07-20]`: §3.6.2/§3.10 and EPIC-SETTLE-2 name this as a
+settlement-owned table, but the authoritative blueprint supplies no table shape, write trigger,
+retention/query contract, idempotency key, or source-backed verification. Creating an audit/check
+model from the gross-instant implementation would invent operational semantics. Keep the
+gross-instant command evidence as the authoritative liquidity decision path; unblock only with a
+source-backed table contract or an accepted decision record.
+
 Taski:
-- [ ] **Migracja + logika `settlement_liquidity_checks`.**
-      `verify: psql -c "\d settlement.settlement_liquidity_checks"`
+- [ ] **Migracja + logika `settlement_liquidity_checks`.** `[SOURCE-BLOCKED]`
+      `verify: source-backed Testcontainers migration/runtime command pending a table contract.`
 
 ## Story 36.3 — Test: `settlement_role` bez zapisu `ledger.*`
 

@@ -206,7 +206,7 @@
     },
     {
       "epic": "EPIC-40",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-40-settlement-insufficient-liquidity.md"
     },
     {
@@ -2509,12 +2509,12 @@
       "epic": "EPIC-36",
       "story": "36.2",
       "title": "`settlement_liquidity_checks`",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 36.1"
       ],
       "verify": [
-        "psql -c \"\\d settlement.settlement_liquidity_checks\""
+        "source-backed Testcontainers migration/runtime command pending a table contract."
       ],
       "source_file": "planning/epics/EPIC-36-settlement-gross-instant.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -2669,13 +2669,13 @@
       "epic": "EPIC-40",
       "story": "40.1",
       "title": "Odrzucenie (`[MVP]`)",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "./mvnw -f backend test -Dtest=*InsufficientLiquidityRejectTest*"
+        "./mvnw -f backend test -Dtest=GrossInstantOneTxFlowTest"
       ],
       "source_file": "planning/epics/EPIC-40-settlement-insufficient-liquidity.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-40 Story 40.1 implementation session"
     },
     {
       "epic": "EPIC-40",
