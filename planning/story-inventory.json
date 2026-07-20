@@ -2107,7 +2107,7 @@
       "epic": "EPIC-29",
       "story": "29.1",
       "title": "`iso.iso_outbound_artifacts`",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "psql -c \"\\d iso.iso_outbound_artifacts\""
@@ -2371,7 +2371,7 @@
       "epic": "EPIC-33",
       "story": "33.3",
       "title": "Timer SLA + zdarzenie breach",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 33.1"
       ],
@@ -2733,7 +2733,7 @@
       "epic": "EPIC-42",
       "story": "42.1",
       "title": "Reafirmacja: zwrot = nowa płatność",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*ReturnAfterFinalityIsNewPaymentTest*"

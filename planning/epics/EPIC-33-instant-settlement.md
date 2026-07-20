@@ -37,12 +37,20 @@ Taski:
 
 ## Story 33.3 — Timer SLA + zdarzenie breach
 
-status: not-started
+status: blocked
 depends_on: [Story 33.1]
 
+`[SOURCE-BLOCKED 2026-07-20]`: the blueprint says a gross-instant SLA breach emits
+`payment.sla.breached`, but ADR-N8's authoritative AsyncAPI catalog defines no such topic,
+payload, owner, key, or consumer. It also supplies no source-backed per-payment SLA threshold or
+profile field from which a timer could be calculated. Creating an internal/Kafka event, timer
+policy, or new status would invent a contract and risks conflating telemetry with business
+rejection. Needed decision packet: source-approved event contract and timing-policy owner; no
+payment/finality behavior is changed while blocked.
+
 Taski:
-- [ ] **Timer SLA + event breach.**
-      `verify: ./mvnw -f backend test -Dtest=*SlaBreachTimerTest*`
+- [ ] **Timer SLA + event breach.** `[SOURCE-BLOCKED]`
+      `verify: ./mvnw -f backend test -Dtest=*SlaBreachTimerTest*` — NOT RUN; missing ADR-N8 contract.
 
 ## Story 33.4 — Atrybuty finalności/timeout
 

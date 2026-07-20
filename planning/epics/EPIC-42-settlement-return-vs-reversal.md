@@ -14,12 +14,20 @@ it must not bypass their public ports or invent a return flow.
 
 ## Story 42.1 — Reafirmacja: zwrot = nowa płatność
 
-status: not-started
+status: blocked
 depends_on: []
 
+`[CAPABILITY-BLOCKED 2026-07-20]`: the frozen source is explicit that a post-finality return is
+requested by `case` through `ReturnPaymentRequestPort` and enters the normal payment intake path;
+`case` schema/module, the request port, and the intake contract do not yet exist. The current
+payment status vocabulary has no source-wired return transition. Adding a direct return command,
+`RETURNED` transition, or any `LedgerPort.reverse` route here would bypass the required owners and
+invent the missing request semantics. Needed capability packet: EPIC-65 case ownership plus a
+source-backed payment intake request contract; no business return is implemented while blocked.
+
 Taski:
-- [ ] **Test: zwrot po finalności tworzy nową płatność (`payment.payments`), oryginalne linie dziennika bit-identyczne, brak ścieżki `reverse`.**
-      `verify: ./mvnw -f backend test -Dtest=*ReturnAfterFinalityIsNewPaymentTest*`
+- [ ] **Test: zwrot po finalności tworzy nową płatność (`payment.payments`), oryginalne linie dziennika bit-identyczne, brak ścieżki `reverse`.** `[CAPABILITY-BLOCKED]`
+      `verify: ./mvnw -f backend test -Dtest=*ReturnAfterFinalityIsNewPaymentTest*` — NOT RUN; case/request capability absent.
 
 ## Story 42.2 — Reversal tylko pre-finality
 
