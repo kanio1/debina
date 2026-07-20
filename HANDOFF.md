@@ -2,7 +2,7 @@
 
 ## Zadanie
 
-`FINALITY-TRUTH-AND-READINESS-PROGRAM`: source-backed correction of false settlement finality derived from the payment FSM, with database, mutation, boundary, runtime and documentation-truth proof. Pre-handoff HEAD is `2edf97e` (`docs(analysis): record finality safety correction`); local `main` is three commits ahead of `origin/main` and no push was attempted.
+`FINALITY-TRUTH-AND-READINESS-PROGRAM`: source-backed correction of false settlement finality derived from the payment FSM, with database, mutation, boundary, runtime and documentation-truth proof. Pre-handoff HEAD is `a46bdb4` (`chore(handoff): record finality audit`); local `main` is four commits ahead of `origin/main` and no push was attempted.
 
 ## Zrobione
 
@@ -16,7 +16,7 @@
 
 ## Utknęliśmy na
 
-All executable work in this program is complete and committed (`7fde172`, `9c3b3c0`, `2edf97e`). One consolidated source/decision gate remains: the repository has no source-backed finality catalog/record/snapshot authority and lacks LedgerPort reservation lifecycle facts (RESERVE/RELEASE journal lines and no-double-post/release). Product scope and physical `payment.received` producer ownership are also documented but unresolved; do not invent a policy, receipt contract, CSM profile, reservation table or cross-schema writer.
+All executable work in this program is complete and committed (`7fde172`, `9c3b3c0`, `2edf97e`, `a46bdb4`). This same gate was re-audited for the third consecutive goal turn: the repository has no source-backed finality catalog/record/snapshot authority and lacks LedgerPort reservation lifecycle facts (RESERVE/RELEASE journal lines and no-double-post/release). Product scope and physical `payment.received` producer ownership are also documented but unresolved; do not invent a policy, receipt contract, CSM profile, reservation table or cross-schema writer. The active goal is now formally blocked pending one consolidated user/team decision.
 
 ## Plan na następny krok
 
