@@ -30,7 +30,7 @@ Taski:
 
 ## Story 51.3 — Filtr kompatybilności zestawu wiadomości
 
-status: not-started
+status: blocked
 depends_on: [Story 51.1]
 
 `[SOURCE-BLOCKED 2026-07-20]`: blueprint §4.10 says that allowed message set is static
@@ -47,9 +47,9 @@ Taski:
 
 ## Story 51.4 — Kandydaci w read modelu
 
-status: not-started
+status: done
 depends_on: [Story 51.1]
 
 Taski:
-- [ ] **Read model wystawiający listę kandydatów.**
-      `verify: ./mvnw -f backend test -Dtest=*RouteCandidatesReadModelTest*`
+- [x] **Read model wystawiający listę kandydatów.**
+      `verify: ./mvnw -f backend test -Dtest=RouteCandidatesReadModelTest,RouteCandidateResolutionTest` → `4/0/0 PASS` (2026-07-20). `RouteCandidatesReadModel` exposes the existing module-owned active, priority-ordered projection through a typed exact-key query only; it adds no GraphQL/REST surface and no routing, payment, settlement or finality mutation.

@@ -35,8 +35,11 @@ Taski:
 
 ## Story 52.4 — Dashboard osiągalności
 
-status: not-started
+status: blocked
 depends_on: [Story 52.3, EPIC-24-frontend-screens]
+
+`[CAPABILITY-BLOCKED 2026-07-20]`: the Control Room/frontend capability is not present; this
+backend routing tranche does not create it.
 
 Taski:
 - [ ] **Dashboard Playwright osiągalności.**

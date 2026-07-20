@@ -113,12 +113,12 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
-| EPIC-51 — Routing: rozwiązywanie kandydatów | not-started — **dependency narrowed 2026-07-16 do `EPIC-12/Story 12.1`** (schema+granty `done`, epik nie potrzebuje `Story 12.2`) | EPIC-12/Story 12.1 | [epics/EPIC-51-routing-candidate-profile-resolution.md](epics/EPIC-51-routing-candidate-profile-resolution.md) |
-| EPIC-52 — Routing: kwalifikowalność i osiągalność | not-started | EPIC-51 | [epics/EPIC-52-routing-eligibility-reachability.md](epics/EPIC-52-routing-eligibility-reachability.md) |
-| EPIC-53 — Routing: decyzja i wyjaśnienie | not-started | EPIC-52 | [epics/EPIC-53-routing-decision-explanation.md](epics/EPIC-53-routing-decision-explanation.md) |
-| EPIC-54 — Routing: reguły fallback | not-started | EPIC-53 | [epics/EPIC-54-routing-fallback-rules.md](epics/EPIC-54-routing-fallback-rules.md) |
+| EPIC-51 — Routing: rozwiązywanie kandydatów | in-progress — Stories 51.1–51.2 and 51.4 done; 51.3 `SOURCE-BLOCKED`; **dependency narrowed 2026-07-16 do `EPIC-12/Story 12.1`** (schema+granty `done`, epik nie potrzebuje `Story 12.2`) | EPIC-12/Story 12.1 | [epics/EPIC-51-routing-candidate-profile-resolution.md](epics/EPIC-51-routing-candidate-profile-resolution.md) |
+| EPIC-52 — Routing: kwalifikowalność i osiągalność | in-progress — Stories 52.1–52.3 done; 52.4 `CAPABILITY-BLOCKED` | EPIC-51 | [epics/EPIC-52-routing-eligibility-reachability.md](epics/EPIC-52-routing-eligibility-reachability.md) |
+| EPIC-53 — Routing: decyzja i wyjaśnienie | in-progress — Stories 53.1–53.3 done; 53.4 `CAPABILITY-BLOCKED` | EPIC-52 | [epics/EPIC-53-routing-decision-explanation.md](epics/EPIC-53-routing-decision-explanation.md) |
+| EPIC-54 — Routing: reguły fallback | in-progress — Stories 54.1–54.3 done; 54.4 `SOURCE-BLOCKED` | EPIC-53 | [epics/EPIC-54-routing-fallback-rules.md](epics/EPIC-54-routing-fallback-rules.md) |
 | EPIC-55 — Routing: precheck cutoff/cykl/płynność | not-started | EPIC-53, EPIC-37 | [epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md](epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md) |
-| EPIC-56 — Routing: test lab | not-started | EPIC-53, EPIC-54 | [epics/EPIC-56-routing-test-lab.md](epics/EPIC-56-routing-test-lab.md) |
+| EPIC-56 — Routing: test lab | in-progress — Stories 56.1–56.2 done; 56.3 `SOURCE-BLOCKED`; 56.4 `CAPABILITY-BLOCKED` | EPIC-53, EPIC-54 | [epics/EPIC-56-routing-test-lab.md](epics/EPIC-56-routing-test-lab.md) |
 
 ## Faza 8 — Reconciliation (Iteracja 4)
 

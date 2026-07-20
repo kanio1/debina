@@ -11,7 +11,7 @@ import java.util.Objects;
  * window. It records no route decision and performs no eligibility, reachability, settlement or
  * payment-state action; those remain subsequent pipeline stages in blueprint §4.10.
  */
-public final class RouteCandidateResolver {
+public final class RouteCandidateResolver implements RouteCandidatesReadModel {
 
     private static final Comparator<RouteCandidate> CANDIDATE_ORDER =
             Comparator.comparingInt(RouteCandidate::priority).thenComparing(RouteCandidate::profileId);
@@ -23,11 +23,14 @@ public final class RouteCandidateResolver {
     }
 
     public List<RouteCandidate> resolve(String scheme, String serviceLevel, String currency, LocalDate businessDate) {
-        Objects.requireNonNull(scheme, "scheme");
-        Objects.requireNonNull(currency, "currency");
-        Objects.requireNonNull(businessDate, "businessDate");
-        return lookup.findBySchemeServiceLevelAndCurrency(scheme, serviceLevel, currency).stream()
-                .filter(candidate -> candidate.isActiveOn(businessDate))
+        return findCandidates(new RouteCandidatesQuery(scheme, serviceLevel, currency, businessDate));
+    }
+
+    @Override
+    public List<RouteCandidate> findCandidates(RouteCandidatesQuery query) {
+        Objects.requireNonNull(query, "query");
+        return lookup.findBySchemeServiceLevelAndCurrency(query.scheme(), query.serviceLevel(), query.currency()).stream()
+                .filter(candidate -> candidate.isActiveOn(query.businessDate()))
                 .sorted(CANDIDATE_ORDER)
                 .toList();
     }

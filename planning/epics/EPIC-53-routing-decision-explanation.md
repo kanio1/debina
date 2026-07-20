@@ -37,8 +37,11 @@ Taski:
 
 ## Story 53.4 — Wyjaśnienie trasy w GraphQL
 
-status: not-started
+status: blocked
 depends_on: [Story 53.3]
+
+`[CAPABILITY-BLOCKED 2026-07-20]`: no GraphQL read-model capability or accepted external
+contract exists. Story 51.4 is internal only and does not authorize GraphQL creation.
 
 Taski:
 - [ ] **Read model GraphQL wystawiający wyjaśnienie decyzji trasy.**
