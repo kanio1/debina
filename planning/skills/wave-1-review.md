@@ -27,3 +27,16 @@ Backend and frontend regressions are `N/A` for this documentation/agent-workflow
 - `IMPLICIT ROUTING: NOT EXECUTED`
 
 A fresh Codex session explicitly invoked `$debina-payment-state-finality`, loaded its three named references, correctly classified ACSC as ISO/message status rather than settlement-finality authority, inspected binding sources, and made no changes. This is explicit-invocation evidence only; it does not establish implicit routing. A local `codex-cli 0.144.6` read-only ephemeral probe was attempted but could not initialize its in-process app-server client because of a read-only filesystem.
+
+## Wave 2 activation review
+
+| Review concern | Result |
+| --- | --- |
+| Trigger ambiguity and overlap | ISO excludes generic XML/JSON/migrations and hands persistence/finality to their focused skills. Kafka excludes synchronous/local/pure-DB work and names the runtime, Modulith, and planning overlaps. |
+| Unsupported ISO/EPC/CSM claims | ISO rules require source labels, exact version/namespace, and explicit participant/CSM/certification blockers; no EPC, CSM, or participant rule was added. |
+| Invented Kafka policy | Kafka rules derive catalog/ownership from ADR-N5/N8 and retain `payment.sla.breached` as source-blocked; no threshold, payload, retry count, or DLQ policy was invented. |
+| Length and references | Main skills are short workflows; detailed matrices are direct, checked references. |
+| ADR-N9/N10/N11 consistency | Both reinforce synthetic-scope non-claims, five-axis/finality authority, one-writer-per-schema, and ADR-N11's prohibition on invented saga/finality semantics. |
+| Unsafe autonomous implementation | Pressure fixtures and regression assertions reject fallback XSD, parse-before-required-signature, ACSC-as-finality, pre-ack publication, unowned DLQ, and epic-title SLA events. |
+
+No production Java, TypeScript, SQL migration, runtime configuration, payment behavior, or frozen architecture decision changed during Wave 2 activation.

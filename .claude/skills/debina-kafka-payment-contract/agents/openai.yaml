@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kafka Payment Contract"
+  short_description: "Kafka payment event contract safeguards"
+  default_prompt: "Use $debina-kafka-payment-contract to review a Kafka payment event contract safely."

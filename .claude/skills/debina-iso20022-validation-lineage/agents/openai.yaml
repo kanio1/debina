@@ -1,0 +1,4 @@
+interface:
+  display_name: "ISO 20022 Validation & Lineage"
+  short_description: "ISO validation and lineage safeguards"
+  default_prompt: "Use $debina-iso20022-validation-lineage to review ISO validation and message lineage safely."

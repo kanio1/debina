@@ -1,0 +1,1 @@
+{"skill":"debina-kafka-payment-contract","path":".claude/skills/debina-kafka-payment-contract/SKILL.md","contains":["§3.7 v2","module-owned outbox","broker acknowledgement","published marker","inbox/dedup","exactly-once business semantics","payment.sla.breached","DLQ","settlement finality"]}
