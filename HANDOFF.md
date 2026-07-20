@@ -2,7 +2,7 @@
 
 ## Zadanie
 
-`FINALITY-TRUTH-AND-READINESS-PROGRAM`: source-backed correction of false settlement finality derived from the payment FSM, with database, mutation, boundary and runtime proof. Pre-handoff HEAD is `7fde172` (`fix(payment): decouple business terminality from finality`); no push was attempted.
+`FINALITY-TRUTH-AND-READINESS-PROGRAM`: source-backed correction of false settlement finality derived from the payment FSM, with database, mutation, boundary, runtime and documentation-truth proof. Pre-handoff HEAD is `2edf97e` (`docs(analysis): record finality safety correction`); local `main` is three commits ahead of `origin/main` and no push was attempted.
 
 ## Zrobione
 
@@ -12,10 +12,11 @@
 - Mutation evidence: restored topology coupling, forced DISPATCHED, forced REJECTED, temporary egress history-insert grant, and narrowed V30 predicate each failed as expected and were reverted. No scratch migration or mutation marker remains.
 - Decision packet: `docs/analysis/DEBINA-FINALITY-LEDGERPORT-DECISION-PACKET.md`; planning evidence added to EPIC-20/32/39/42/47 without marking finality/receipt/LedgerPort stories done.
 - Program evidence: `/tmp/FINALITY-TRUTH-AND-READINESS-PROGRAM/` (`finality-inventory.md`, `database-review.md`, `execution-plan.md`, final logs). Governance, story-inventory and capability-graph validators passed. `final-regression-1.log` and `final-regression-2.log`: 387 tests, zero failures/errors.
+- Continuation audit found and repaired stale analysis claims that current FSM terminality still writes finality: `DEBINA-COMPREHENSIVE-PAYMENTS-ASSESSMENT.md`, the gap-risk backlog, lifecycle traceability, and artifact catalog now distinguish V30 safety behavior from the still-absent finality authority. Current targeted PostgreSQL 18/finality/boundary/architecture suite: 31 tests, zero failures/errors; governance validators pass.
 
 ## Utknęliśmy na
 
-All executable safety work is complete and committed. One consolidated decision remains: the repository has no source-backed finality catalog/record/snapshot authority and lacks LedgerPort reservation lifecycle facts (RESERVE/RELEASE journal lines and no-double-post/release). Product scope and physical `payment.received` producer ownership are also documented but unresolved; do not invent a policy, receipt contract, CSM profile, reservation table or cross-schema writer.
+All executable work in this program is complete and committed (`7fde172`, `9c3b3c0`, `2edf97e`). One consolidated source/decision gate remains: the repository has no source-backed finality catalog/record/snapshot authority and lacks LedgerPort reservation lifecycle facts (RESERVE/RELEASE journal lines and no-double-post/release). Product scope and physical `payment.received` producer ownership are also documented but unresolved; do not invent a policy, receipt contract, CSM profile, reservation table or cross-schema writer.
 
 ## Plan na następny krok
 
