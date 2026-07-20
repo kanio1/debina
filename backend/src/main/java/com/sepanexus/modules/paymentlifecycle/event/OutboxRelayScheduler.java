@@ -29,12 +29,12 @@ public class OutboxRelayScheduler {
         this.clockPort = clockPort;
     }
 
-    @Scheduled(fixedDelay = 2000)
+    @Scheduled(fixedDelayString = "${sepa.scheduling.relay-fixed-delay-ms:2000}")
     public void relayPaymentOutbox() {
         run("payment", paymentRelay::dispatch);
     }
 
-    @Scheduled(fixedDelay = 2000)
+    @Scheduled(fixedDelayString = "${sepa.scheduling.relay-fixed-delay-ms:2000}")
     public void relayIsoOutbox() {
         run("iso", isoRelay::dispatch);
     }
@@ -42,10 +42,10 @@ public class OutboxRelayScheduler {
     private void run(String relayName, Runnable relay) {
         try {
             relay.run();
-            state.recordSuccess(clockPort.now());
+            state.recordSuccess(relayName, clockPort.now());
         } catch (RuntimeException exception) {
             OutboxRelayFailureCategory category = categoryOf(exception);
-            state.recordFailure(clockPort.now(), category);
+            state.recordFailure(relayName, clockPort.now(), category);
             log.warn("Outbox relay {} run failed with category {}", relayName, category);
         }
     }

@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 depends_on: [EPIC-03-spring-modulith-backend-skeleton, EPIC-07-ci-cd-foundation]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-OWN-1, line 1257); sepa-nexus-blueprint-ownership-integration.md §9 (line 345); §3.6.4a/§3.6.5 layering+arch-test rules"
 ---
@@ -68,15 +68,24 @@ Taski:
 
 ## Story 9.5 — Runtime datasource ownership boundary
 
-status: in-progress
+status: done
 depends_on: [Story 9.1, EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5]
 
 Opis: runtime rozdziela domenową tożsamość writer (`sepa_app`) od technicznej tożsamości relay (`outbox_dispatcher_role`). Dispatcher może używać tylko jawnie kwalifikowanych beanów relay; usługi domenowe i repozytoria nie mogą przez przypadek przejąć infrastruktury relay.
 
 Kryterium ukończenia: test Spring wiring dowodzi osobnych datasource i transaction managerów; relay nie zależy od JPA/repository, a domain path nie używa relay role.
 
+**[DONE 2026-07-20]** `OutboxRelayRuntimeWiringTest` proves Spring wires distinct
+`sepa_app`/`outbox_dispatcher_role` datasource identities and transaction managers, injects the
+qualified relay JDBC template into both payment and ISO dispatchers, publishes both outbox types,
+and rejects a relay-role domain write. `RuntimeDatasourceOwnershipTest` structurally rejects
+repository/entity-manager use, exercises non-vacuous forbidden-domain fixtures, and confirms the
+scheduler delegates only to those transaction-qualified dispatchers. Story 7.4's PostgreSQL
+18/Kafka scheduled runtime proof executes that route under the restricted role. No domain service
+or repository gains access to relay infrastructure.
+
 Taski:
-- [ ] **Dodaj structural i Spring-wiring proof granicy datasource** dla payment oraz ISO relay, wraz z niepustymi fixture’ami zabronionych zależności.
-      `verify: ./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest` → PASS
-- [ ] **Sprawdź, że scheduler relay używa relay transaction managera**, po wdrożeniu Story 7.4.
-      `verify: ./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest` → PASS
+- [x] **Dodaj structural i Spring-wiring proof granicy datasource** dla payment oraz ISO relay, wraz z niepustymi fixture’ami zabronionych zależności.
+      `verify: ./mvnw -f backend test -Dtest=OutboxRelayRuntimeWiringTest,RuntimeDatasourceOwnershipTest` → `4/0/0 PASS` (2026-07-20).
+- [x] **Sprawdź, że scheduler relay używa relay transaction managera**, po wdrożeniu Story 7.4.
+      `verify: ./mvnw -f backend test -Dtest=ScheduledRelayOperationalRuntimeTest,RuntimeDatasourceOwnershipTest` → `4/0/0 PASS` (2026-07-20; actual restricted-role scheduled route).

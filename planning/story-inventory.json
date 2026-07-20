@@ -51,7 +51,7 @@
     },
     {
       "epic": "EPIC-09",
-      "status": "in-progress",
+      "status": "done",
       "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md"
     },
     {
@@ -786,15 +786,15 @@
       "epic": "EPIC-07",
       "story": "7.4",
       "title": "Scheduled background failures are operationally visible",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*ScheduledRelayOperationalTruthTest*"
+        "./mvnw -f backend test -Dtest=ScheduledRelayOperationalTruthTest,ScheduledRelayOperationalRuntimeTest,ScheduledRelayActivationIntegrationTest,OutboxRelayKafkaFailureTest"
       ],
       "source_file": "planning/epics/EPIC-07-ci-cd-foundation.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-07 Story 7.4 implementation session"
     },
     {
       "epic": "EPIC-08",
@@ -903,17 +903,17 @@
       "epic": "EPIC-09",
       "story": "9.5",
       "title": "Runtime datasource ownership boundary",
-      "status": "in-progress",
+      "status": "done",
       "depends_on": [
         "Story 9.1",
         "EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest",
-        "./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest"
+        "./mvnw -f backend test -Dtest=OutboxRelayRuntimeWiringTest,RuntimeDatasourceOwnershipTest",
+        "./mvnw -f backend test -Dtest=ScheduledRelayOperationalRuntimeTest,RuntimeDatasourceOwnershipTest"
       ],
       "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-09 Story 9.5 implementation session"
     },
     {
       "epic": "EPIC-10",

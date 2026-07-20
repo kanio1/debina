@@ -13,6 +13,8 @@ class RuntimeDatasourceOwnershipTest {
             "src/main/java/com/sepanexus/modules/paymentlifecycle/event/OutboxDispatcher.java");
     private static final Path ISO_RELAY = Path.of(
             "src/main/java/com/sepanexus/modules/paymentlifecycle/isoadapter/IsoOutboxDispatcher.java");
+    private static final Path SCHEDULER = Path.of(
+            "src/main/java/com/sepanexus/modules/paymentlifecycle/event/OutboxRelayScheduler.java");
 
     @Test
     void relayDispatchersUseOnlyTheDedicatedJdbcTemplateAndTransactionManager() throws IOException {
@@ -26,6 +28,15 @@ class RuntimeDatasourceOwnershipTest {
                 "src/test/java/com/sepanexus/runtimefixture/AllowedRelayFixture.java"))).isFalse();
         assertThat(violatesDomainRelayBoundary(Path.of(
                 "src/test/java/com/sepanexus/runtimefixture/ForbiddenDomainUsesRelayFixture.java"))).isTrue();
+    }
+
+    @Test
+    void schedulerDelegatesOnlyToTheTransactionQualifiedRelayDispatchers() throws IOException {
+        String scheduler = Files.readString(SCHEDULER);
+        assertThat(scheduler).contains("run(\"payment\", paymentRelay::dispatch)");
+        assertThat(scheduler).contains("run(\"iso\", isoRelay::dispatch)");
+        assertThat(scheduler).doesNotContain("JdbcTemplate");
+        assertThat(scheduler).doesNotContain("TransactionManager");
     }
 
     private static void assertRelaySource(Path sourcePath) throws IOException {

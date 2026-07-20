@@ -79,7 +79,7 @@ Taski:
 
 ## Story 7.4 — Scheduled background failures are operationally visible
 
-status: not-started
+status: done
 depends_on: [EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5]
 
 Opis: controlled scheduled relay failure updates an operational health state and is asserted by a
@@ -91,6 +91,17 @@ Kryterium ukończenia story: scheduler execution is isolated from unrelated test
 broker failures leave the event unpublished, turn `outboxRelay` health DOWN, and a later success
 returns it to UP without an uncontrolled background exception.
 
+**[DONE 2026-07-20]** Base test configuration disables scheduling; only
+`ScheduledRelayOperationalRuntimeTest` enables it, with a short test-only delay. In PostgreSQL
+18/Kafka Testcontainers it revokes only `SELECT` from `outbox_dispatcher_role`, inserts an event,
+and observes the actual scheduled payment relay leave it unpublished and expose
+`DATABASE_PERMISSION` through `outboxRelay` health. Restoring exactly
+`SELECT, UPDATE(published_at)` causes the same scheduled path to publish the row after a Kafka
+acknowledgement and return health to UP. `OutboxRelayKafkaFailureTest` independently proves the
+broker-acknowledgement rollback/redelivery path. Removing the payment `@Scheduled` annotation made
+the runtime test fail (health stayed UP), then restoration reran green. Per-relay snapshots prevent
+an ISO success from masking a payment relay failure.
+
 Taski:
-- [ ] **Add scheduling isolation and the relay operational-health contributor.** Production scheduling remains enabled; base tests opt out; the dedicated runtime test opts in.
-      `verify: ./mvnw -f backend test -Dtest=*ScheduledRelayOperationalTruthTest*`
+- [x] **Add scheduling isolation and the relay operational-health contributor.** Production scheduling remains enabled; base tests opt out; the dedicated runtime test opts in.
+      `verify: ./mvnw -f backend test -Dtest=ScheduledRelayOperationalTruthTest,ScheduledRelayOperationalRuntimeTest,ScheduledRelayActivationIntegrationTest,OutboxRelayKafkaFailureTest` → PASS (2026-07-20; PostgreSQL 18/Kafka + scheduler mutation proof).
