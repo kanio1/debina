@@ -2,59 +2,27 @@
 
 ## Zadanie
 
-SEPA Nexus is a synthetic, deterministic SEPA/ISO 20022 payment-quality platform. This session
-delivered the next autonomous backend tranche: source-backed money, finality, outbox-runtime and
-egress-boundary evidence, while preserving the frozen ADRs and one-writer-per-schema rules.
+SEPA Nexus is a synthetic, deterministic SEPA/ISO 20022 testing platform. This session activated two repository-governance skills—ISO 20022 validation/lineage and Kafka payment contracts—without changing production behavior or frozen architecture.
 
 ## Zrobione
 
-- Seven verified stories across six epics are complete and committed (no push):
-  - `ab11dcc` closes EPIC-32 Story 32.5 ledger journal-currency/reversal integrity evidence.
-  - `a9c3dbe` closes EPIC-40 Story 40.1 gross-instant insufficient-liquidity atomicity and records
-    EPIC-36 Story 36.2 as source-blocked.
-  - `87c0e0b` closes EPIC-18 Story 18.5 restricted outbox-relay runtime identity.
-  - `d38f7d2` adds V44 and closes EPIC-33 Story 33.4: nullable payment timeout/revocation facts
-    remain independent of business rejection and finality, with fresh and V43→V44 PostgreSQL 18
-    migration proofs plus a mutation proof.
-  - `38fe917` completes EPIC-07 Story 7.4 and EPIC-09 Story 9.5. The scheduled relay now retains
-    per-relay operational failure truth; a PostgreSQL 18/Kafka runtime test revokes the real relay
-    role's `SELECT`, observes DOWN/unpublished, restores the narrow grant, and observes real
-    scheduled publication/UP. Scheduler/datasource ownership is structurally and runtime proven.
-  - `9229b82` completes EPIC-14 Story 14.3 with `DeliveredNotFinalTest`: an `egress_role` delivery
-    transition cannot establish or change payment finality. A temporary SECURITY DEFINER
-    cross-schema mutation made the test fail, then was removed.
-  - `4460586` records source/capability blockers for EPIC-29 Story 29.1, EPIC-33 Story 33.3 and
-    EPIC-42 Story 42.1.
-- Planning, capability-graph, story-inventory and all repository skill validators pass. The final
-  two consecutive `./mvnw -f backend test` regressions passed cleanly; 102 Surefire suites report
-  no failures or errors.
-- The worktree is clean. Maven's generated `build/generated-spring-modulith/javadoc.json` was
-  restored after test runs and is not part of any commit.
+- Commit `60d20f0` created `.claude/skills/debina-iso20022-validation-lineage` and `.claude/skills/debina-kafka-payment-contract`, each with `SKILL.md`, `agents/openai.yaml`, and four direct references. `.agents/skills -> ../.claude/skills` remains the sole Codex discovery bridge; no copied skill tree was created.
+- `planning/skills/skills-registry.yaml` promotes both skills to `ACTIVE`, points at `.claude/skills`, records source/trigger/boundary/overlap/reference/eval metadata, and leaves three future Wave 2 candidates planned.
+- Added two routing fixture files (5 positive, 5 negative, 3 overlap, 2 pressure cases each) and two regression assertions. The ISO guardrails reject XSD-only EPC claims, unsupported-version fallback, parse-before-required-signature, identifier collapse, and ACSC-as-finality. The Kafka guardrails reject epic-title `payment.sla.breached`, pre-ack publication, unowned DLQs, invented policy, and delivery-as-finality.
+- Updated `planning/skills/README.md`, `planning/skills/HANDOFF.md`, and `planning/skills/wave-1-review.md` without erasing Wave 1 evidence. The Wave 2 review found no unsupported ISO/EPC/CSM claims or invented Kafka policy.
+- Passed `bash tools/skills/validate-all-skills.sh`, `git diff --check`, `python3 tools/agent-config/validate-capability-graph.py`, creator frontmatter validation, routing-fixture shape checks, and canonical discovery-path checks. Fresh `codex exec --ephemeral --sandbox read-only` explicit invocations loaded both skills and all direct references, made no edits, and rejected unsafe prompts. Implicit routing was not evaluated.
 
 ## Utknęliśmy na
 
-No currently defensible READY story remains after the reserve audit. The next high-value work is
-blocked by explicit missing contracts/capabilities:
-- EPIC-33 Story 33.3: no ADR-N8 `payment.sla.breached` topic/payload/owner or source-backed timer
-  threshold/policy.
-- EPIC-42 Story 42.1: the case schema, `ReturnPaymentRequestPort`, and normal return-payment
-  intake contract do not exist; do not invent a direct return, `RETURNED` transition, or reversal.
-- EPIC-29 Story 29.1: no complete `iso.iso_outbound_artifacts` DDL or render-profile snapshot
-  contract; EPIC-44 remains blocked on the unresolved profile representation.
+Nothing is blocked for this governance task. Do not treat the newly active skills as authorization to implement the next capability tranche: EPIC-33 Story 33.3 remains source-blocked because ADR-N8 has no `payment.sla.breached` topic/payload/owner or source-backed threshold/policy; EPIC-42 Story 42.1 and EPIC-29 Story 29.1 retain their recorded missing contracts.
 
 ## Plan na następny krok
 
-Start by reading `planning/README.md`, `planning/BACKLOG-REDESIGN.md`, and
-`planning/capabilities.yaml`, then re-audit the highest-ranked not-done candidate for a newly
-source-backed READY capability before implementing anything.
+Read `planning/README.md`, `planning/BACKLOG-REDESIGN.md`, and `planning/capabilities.yaml`, then re-audit the highest-ranked not-done candidate for a newly source-backed READY capability before implementing anything.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Preserve ADR-N9/N10/N11, five independent status axes, RLS, append-only ledger/finality
-  evidence, and one-writer-per-schema; do not infer finality from delivery, receipt or ISO status.
-- Do not invent the SLA Kafka contract, return/recall semantics, case request path, artifact DDL,
-  or egress-profile representation; retain the recorded SOURCE/CAPABILITY blockers until a source
-  or accepted decision supplies them.
-- Test Maven runs rewrite `build/generated-spring-modulith/javadoc.json`; restore that generated
-  artifact with `apply_patch` unless its change is explicitly reviewed and intended.
-- Use `apply_patch` for file edits. Never push, reset, clean, or discard existing worktree changes.
+- Preserve ADR-N9/N10/N11, the five independent status axes, one-writer-per-schema, and the synthetic-scope non-claims; never infer settlement finality from ISO status, receipt, delivery, or Kafka delivery.
+- Keep `.claude/skills` as the only authoring source and `.agents/skills -> ../.claude/skills` as the symlinked discovery bridge. Never replace it or duplicate `SKILL.md` trees.
+- Explicit named invocation proves discovery/loading only; do not call it implicit-routing evidence. Do not invent EPC/CSM/participant/certification rules, Kafka topics/payloads/retry counts/DLQs, or SLA policy from planning text.
+- Use `apply_patch` for repository edits. Never push, reset, clean, or discard existing worktree changes.
