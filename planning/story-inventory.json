@@ -1369,7 +1369,7 @@
       "epic": "EPIC-18",
       "story": "18.5",
       "title": "Runtime outbox relay identity and datasource wiring",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 18.2",
         "Story 18.3",
@@ -1377,10 +1377,10 @@
         "EPIC-27-iso-correlation-engine/Story 27.2C"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*OutboxRelayRuntimeWiringTest*,*OutboxRelayConcurrencyTest*,*OutboxRelayKafkaFailureTest*"
+        "./mvnw -f backend test -Dtest=OutboxRelayRuntimeWiringTest,OutboxRelayConcurrencyTest,OutboxRelayKafkaFailureTest,OutboxRelayCrashWindowRedeliveryTest,OutboxRelayAcknowledgementOrderTest,RuntimeDatasourceOwnershipTest"
       ],
       "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-18 Story 18.5 implementation session"
     },
     {
       "epic": "EPIC-19",

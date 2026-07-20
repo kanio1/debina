@@ -72,7 +72,7 @@ Taski:
 
 ## Story 18.5 — Runtime outbox relay identity and datasource wiring
 
-status: not-started
+status: done
 depends_on: [Story 18.2, Story 18.3, EPIC-04-outbox-inbox-kafka-thin/Story 4.2, EPIC-27-iso-correlation-engine/Story 27.2C]
 
 Opis: per ADR-N5, the runtime relay must use the already-granted `outbox_dispatcher_role`, not the
@@ -83,6 +83,13 @@ Kryterium ukończenia story: payment and ISO relays use a non-primary relay data
 manager, claim rows with `FOR UPDATE SKIP LOCKED`, publish before setting `published_at`, and cannot
 write any domain data.
 
+`[DONE 2026-07-20]`: committed runtime implementation `0dc30e1` supplies the dedicated
+`outbox_dispatcher_role` datasource/transaction manager and qualified payment/ISO relay paths.
+Fresh PostgreSQL 18 + Kafka evidence passes 7/7: identity and grants, concurrent disjoint claims,
+Kafka failure, crash-window redelivery, acknowledgement-before-mark, and structural ownership.
+Removing `SKIP LOCKED` made `RuntimeDatasourceOwnershipTest` fail, then was restored and the full
+matrix rerun green. The relay uses no JPA repository and retains no domain-table write grant.
+
 Taski:
-- [ ] **Wire the relay datasource and refactor payment/ISO polling to its restricted transaction boundary.**
-      `verify: ./mvnw -f backend test -Dtest=*OutboxRelayRuntimeWiringTest*,*OutboxRelayConcurrencyTest*,*OutboxRelayKafkaFailureTest*`
+- [x] **Wire the relay datasource and refactor payment/ISO polling to its restricted transaction boundary.**
+      `verify: ./mvnw -f backend test -Dtest=OutboxRelayRuntimeWiringTest,OutboxRelayConcurrencyTest,OutboxRelayKafkaFailureTest,OutboxRelayCrashWindowRedeliveryTest,OutboxRelayAcknowledgementOrderTest,RuntimeDatasourceOwnershipTest` → `7/0/0 PASS` (2026-07-20).
