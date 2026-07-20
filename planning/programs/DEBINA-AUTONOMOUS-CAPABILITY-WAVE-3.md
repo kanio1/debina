@@ -79,6 +79,5 @@
 
 - Class A: candidate ordering is priority ascending; UUID is only a deterministic tie presentation,
   not selection/fallback behavior. No Class B ADR was needed.
-- Commits: pending final diff inspection.
-- Next: commit this verified routing slice, then continue the reserve audit without revisiting the
-  unchanged blockers.
+- Commits: `4722014 feat(routing): resolve active route candidates`.
+- Next: continue the reserve audit without revisiting the unchanged blockers.
