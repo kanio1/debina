@@ -2385,16 +2385,16 @@
       "epic": "EPIC-33",
       "story": "33.4",
       "title": "Atrybuty finalności/timeout",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 33.1",
         "EPIC-39-settlement-finality-model"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*FinalityTimeoutAttributesTest*"
+        "./mvnw -f backend test -Dtest=FinalityTimeoutAttributesTest"
       ],
       "source_file": "planning/epics/EPIC-33-instant-settlement.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-33 Story 33.4 implementation session"
     },
     {
       "epic": "EPIC-34",

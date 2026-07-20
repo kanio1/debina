@@ -46,11 +46,22 @@ Taski:
 
 ## Story 33.4 — Atrybuty finalności/timeout
 
-status: not-started
+status: done
 depends_on: [Story 33.1, EPIC-39-settlement-finality-model]
 
 Opis: `revocation_cutoff`, `timeout_at` ≠ odrzucenie biznesowe.
 
+**[DONE 2026-07-20]** Blueprint §4.3 directly names nullable
+`payment.payments.timeout_at timestamptz(3)` and `revocation_cutoff timestamptz(3)`.
+Migration `V44` adds only those attributes in the payment-owned schema; existing writer grants and
+RLS remain unchanged. `FinalityTimeoutAttributesTest` proves both a fresh PostgreSQL 18 schema and
+an upgrade from V43 retain `VALIDATED` with `finality_at IS NULL` while both timing facts are set.
+An intentional `CHECK (timeout_at IS NULL)` mutation made both test paths fail and was restored.
+Independent database review: **PASS** for source fidelity, ownership, type precision, additive
+upgrade safety, and preservation of the five status axes. No SLA timer, revocation request/cutoff
+policy, business status, or finality derivation is inferred by this slice.
+
 Taski:
-- [ ] **Test: `timeout_at` i `revocation_cutoff` nie są tym samym co odrzucenie biznesowe.**
-      `verify: ./mvnw -f backend test -Dtest=*FinalityTimeoutAttributesTest*`
+- [x] **Test: `timeout_at` i `revocation_cutoff` nie są tym samym co odrzucenie biznesowe.**
+      `verify: ./mvnw -f backend test -Dtest=FinalityTimeoutAttributesTest` → `2/0/0 PASS`
+      (2026-07-20; PostgreSQL 18 fresh + V43→V44 upgrade; mutation proof PASS).
