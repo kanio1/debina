@@ -2,46 +2,59 @@
 
 ## Zadanie
 
-SEPA Nexus is a synthetic payment-quality learning platform. Debina Agent Skills Wave 1 is
-finalized as repository governance only: one authoring source, Codex discovery bridge, provenance,
-validators and eval fixtures; no payment implementation changed.
+SEPA Nexus is a synthetic, deterministic SEPA/ISO 20022 payment-quality platform. This session
+delivered the next autonomous backend tranche: source-backed money, finality, outbox-runtime and
+egress-boundary evidence, while preserving the frozen ADRs and one-writer-per-schema rules.
 
 ## Zrobione
 
-- ADR-N11 remains binding: one physical PostgreSQL transaction via narrow module-owned
-  `SECURITY DEFINER` commands. The verified gross-instant evidence and its no-saga/XA/`SET LOCAL
-  ROLE` boundary remain unchanged.
-- Commits `17798e8`, `abb3e74`, `db6669d`, `49fa0a7` and `fcf1470` establish the Wave 1 skill
-  system. `.claude/skills` is the one authoring source and `.agents/skills -> ../.claude/skills`
-  is the official Codex CLI discovery bridge; no copied `SKILL.md` tree exists.
-- `tools/skills/check-codex-discovery-path.py` verifies the bridge stays inside the repository,
-  exposes every registered active skill, resolves to the authoring source and has no divergent
-  mirror. All skill/governance/planning validators pass for 17 active skills and five Wave 2 plans.
-- Fresh Codex evidence verified discovery, explicit `$debina-payment-state-finality` invocation,
-  its three reference loads and read-only behavior. ACSC was correctly classified as ISO/message
-  status, not settlement-finality authority. Implicit routing remains `NOT EXECUTED`.
-- Reviewed four approved upstream source repositories as text-only material, recorded exact commits
-  and licenses, and made no production Java, TypeScript, SQL migration or runtime changes.
+- Seven verified stories across six epics are complete and committed (no push):
+  - `ab11dcc` closes EPIC-32 Story 32.5 ledger journal-currency/reversal integrity evidence.
+  - `a9c3dbe` closes EPIC-40 Story 40.1 gross-instant insufficient-liquidity atomicity and records
+    EPIC-36 Story 36.2 as source-blocked.
+  - `87c0e0b` closes EPIC-18 Story 18.5 restricted outbox-relay runtime identity.
+  - `d38f7d2` adds V44 and closes EPIC-33 Story 33.4: nullable payment timeout/revocation facts
+    remain independent of business rejection and finality, with fresh and V43→V44 PostgreSQL 18
+    migration proofs plus a mutation proof.
+  - `38fe917` completes EPIC-07 Story 7.4 and EPIC-09 Story 9.5. The scheduled relay now retains
+    per-relay operational failure truth; a PostgreSQL 18/Kafka runtime test revokes the real relay
+    role's `SELECT`, observes DOWN/unpublished, restores the narrow grant, and observes real
+    scheduled publication/UP. Scheduler/datasource ownership is structurally and runtime proven.
+  - `9229b82` completes EPIC-14 Story 14.3 with `DeliveredNotFinalTest`: an `egress_role` delivery
+    transition cannot establish or change payment finality. A temporary SECURITY DEFINER
+    cross-schema mutation made the test fail, then was removed.
+  - `4460586` records source/capability blockers for EPIC-29 Story 29.1, EPIC-33 Story 33.3 and
+    EPIC-42 Story 42.1.
+- Planning, capability-graph, story-inventory and all repository skill validators pass. The final
+  two consecutive `./mvnw -f backend test` regressions passed cleanly; 102 Surefire suites report
+  no failures or errors.
+- The worktree is clean. Maven's generated `build/generated-spring-modulith/javadoc.json` was
+  restored after test runs and is not part of any commit.
 
 ## Utknęliśmy na
 
-Nothing blocks Wave 1. A local `codex-cli 0.144.6` ephemeral read-only discovery probe could not
-initialize its in-process app-server client because of a read-only filesystem, but the bridge itself
-resolves and the independent fresh-session explicit-invocation evidence is recorded in
-`planning/skills/wave-1-review.md`.
+No currently defensible READY story remains after the reserve audit. The next high-value work is
+blocked by explicit missing contracts/capabilities:
+- EPIC-33 Story 33.3: no ADR-N8 `payment.sla.breached` topic/payload/owner or source-backed timer
+  threshold/policy.
+- EPIC-42 Story 42.1: the case schema, `ReturnPaymentRequestPort`, and normal return-payment
+  intake contract do not exist; do not invent a direct return, `RETURNED` transition, or reversal.
+- EPIC-29 Story 29.1: no complete `iso.iso_outbound_artifacts` DDL or render-profile snapshot
+  contract; EPIC-44 remains blocked on the unresolved profile representation.
 
 ## Plan na następny krok
 
-Before any future skill change, run `bash tools/skills/validate-all-skills.sh`; edit only
-`.claude/skills`, retain the `.agents/skills` symlink, and add explicit/implicit routing evidence
-without conflating the two.
+Start by reading `planning/README.md`, `planning/BACKLOG-REDESIGN.md`, and
+`planning/capabilities.yaml`, then re-audit the highest-ranked not-done candidate for a newly
+source-backed READY capability before implementing anything.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Do not replace `.agents/skills` with copied files or create a second `SKILL.md` tree; it must
-  remain a repository-local bridge to `.claude/skills`.
-- Do not call explicit `$skill` invocation evidence an implicit-routing pass.
-- Preserve ADR-N11: executor has function `EXECUTE` only, no direct table DML or owner membership;
-  no saga/XA/`SET LOCAL ROLE`, reversal, real CSM, or inferred finality.
-- V35–V43 remain append-only; correct through a higher migration only. Restore generated Modulith
-  artifacts after Maven unless their change is deliberately reviewed.
+- Preserve ADR-N9/N10/N11, five independent status axes, RLS, append-only ledger/finality
+  evidence, and one-writer-per-schema; do not infer finality from delivery, receipt or ISO status.
+- Do not invent the SLA Kafka contract, return/recall semantics, case request path, artifact DDL,
+  or egress-profile representation; retain the recorded SOURCE/CAPABILITY blockers until a source
+  or accepted decision supplies them.
+- Test Maven runs rewrite `build/generated-spring-modulith/javadoc.json`; restore that generated
+  artifact with `apply_patch` unless its change is explicitly reviewed and intended.
+- Use `apply_patch` for file edits. Never push, reset, clean, or discard existing worktree changes.
