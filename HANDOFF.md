@@ -11,9 +11,9 @@ the already verified ADR-N11 gross-instant implementation.
 - ADR-N11 remains binding: one physical PostgreSQL transaction via narrow module-owned
   `SECURITY DEFINER` commands. The verified gross-instant evidence and its no-saga/XA/`SET LOCAL
   ROLE` boundary remain unchanged.
-- Hardened five existing local skills and added four Debina-specific skills in `.claude/skills/`.
-  Durable program evidence is in `planning/skills/`, with `tools/skills/validate-all-skills.sh` and
-  routing/content eval fixtures.
+- Committed `17798e8 chore(skills): add registry validation and eval harness` and `abb3e74
+  docs(skills): harden Debina agent workflows`. Five existing local skills were hardened and four
+  Debina-specific skills were added in `.claude/skills/`; durable evidence is in `planning/skills/`.
 - Reviewed four approved upstream source repositories as text-only material, recorded exact commits
   and licenses, and made no production Java, TypeScript, SQL migration or runtime changes.
 
@@ -26,9 +26,8 @@ or protected-mount workaround was used.
 
 ## Plan na następny krok
 
-Run `bash tools/skills/validate-all-skills.sh`, inspect the skills-only commits, and report the
-canonical-path environment blocker. If an owner supplies a writable `.agents` directory, move the
-tracked root with `git mv`, update references and rerun validators before changing the registry path.
+Obtain a writable repository-local `.agents` directory from the environment owner. Then move the
+tracked root with `git mv`, update references and rerun all validators before changing registry paths.
 
 ## Pułapki, których nie wolno powtórzyć
 

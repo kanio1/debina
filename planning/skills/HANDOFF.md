@@ -14,4 +14,4 @@ Four Debina-specific skills were created, five existing skills were hardened, ev
 
 ## Next action
 
-Run `bash tools/skills/validate-all-skills.sh`; if it passes, inspect and commit only the skills-governance files. When a writable `.agents` path exists, perform the documented canonical migration and update this handoff.
+Validators passed and local commits `17798e8` and `abb3e74` contain the Wave 1 work. When a writable `.agents` path exists, perform the documented canonical migration, update registry/instructions, and rerun validators.
