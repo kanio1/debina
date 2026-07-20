@@ -11,6 +11,13 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-CORE-1, line 12
 status: done
 depends_on: []
 
+`[SAFETY-CORRECTION 2026-07-20]`: the previous implementation incorrectly used zero outgoing
+FSM transitions to set `payment_status_history.is_final`. The source-backed correction renamed the
+topology query to `hasNoLegalOutgoingTransitions`, makes `PaymentHistoryRecorder` write non-final
+history only, and adds forward-only V30 to correct existing `REJECTED`/`DISPATCHED` false positives.
+Fresh V19→V30 and V29→V30 PostgreSQL Testcontainers tests pass; this is **not** a FinalityPolicy or
+settlement-finality implementation.
+
 Taski:
 - [x] **Zaimplementuj tabelę przejść FSM `Payment`/`PaymentLifecycle` z guardami zgodnie z modelem statusów w main blueprincie.**
       `verify: export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"; ./mvnw -f backend test -Dtest=PaymentFsmTransitionTest` → `Tests run: 4, Failures: 0` — PASS (2026-07-14). Nowa `backend/src/main/java/com/sepanexus/modules/paymentlifecycle/domain/PaymentTransitionTable.java` (mapa `Map<PaymentStatus, Set<PaymentStatus>>` dozwolonych przejść, dokładnie wzorzec "FSM jako dane" z §3.5: "a forbidden pair throws IllegalTransition") + `IllegalPaymentTransitionException`. `PaymentEntity.markValidated()` przepisane: było ciche `if (status==RECEIVED) status=VALIDATED` (no-op na nielegalnym przejściu), teraz **rzuca** na nielegalnym przejściu zamiast cicho nic nie robić. Zakres oparty o **istniejący** 4-wartościowy `PaymentStatus` (RECEIVED/VALIDATED/REJECTED/DISPATCHED) z Iteracji 0 — pełny model `business_status_code` z §4.3 (RECEIVED/VALIDATED/ACCEPTED/ROUTED/SETTLED/REJECTED/RETURNED...) należy do przebudowy tabeli `payments` zaplanowanej w EPIC-11 ("cienki wiersz payments"), nie tego story. Test dowodzi nie-próżności: RECEIVED→VALIDATED legalne; VALIDATED→VALIDATED (self-loop) nielegalne i rzuca; REJECTED→VALIDATED (cofnięcie ze stanu terminalnego) nielegalne; DISPATCHED (terminalny) nie ma żadnych wyjść. Pełny regres (40/40, w tym `InboxConsumerIdempotencyTest`/`WalkingSkeletonIntegrationTest`, które wywołują `markValidated()` przez prawdziwy przepływ Kafka) niezmieniony — potwierdza, że jedyne realne wywołanie w produkcji (`InboxConsumer`, dokładnie raz na unikalny event dzięki dedup) pozostaje legalne.

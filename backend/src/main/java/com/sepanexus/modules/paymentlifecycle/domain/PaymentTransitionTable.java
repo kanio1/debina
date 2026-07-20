@@ -29,10 +29,12 @@ public final class PaymentTransitionTable {
         }
     }
 
-    /** A status with zero legal outgoing transitions — the single source of truth for
-     * {@code payment_status_history.is_final}, never duplicated as a separate REJECTED/DISPATCHED
-     * literal list elsewhere in application code. */
-    public static boolean isTerminal(PaymentStatus status) {
+    /**
+     * Reports only the topology of the current, deliberately thin payment business-state FSM.
+     * A state with no legal outgoing transition is not settlement or legal finality: settlement
+     * owns that independent, profile-configured fact.
+     */
+    public static boolean hasNoLegalOutgoingTransitions(PaymentStatus status) {
         return ALLOWED.getOrDefault(status, Set.of()).isEmpty();
     }
 }

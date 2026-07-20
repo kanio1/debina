@@ -1,7 +1,6 @@
 package com.sepanexus.modules.paymentlifecycle.service;
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
-import com.sepanexus.modules.paymentlifecycle.domain.PaymentTransitionTable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
@@ -48,7 +47,9 @@ public class PaymentHistoryRecorder {
                      event_type, event_ref, at)
                 VALUES (?, ?, ?, ?, ?, ?, 'SYSTEM', ?, ?, ?, ?)
                 """, paymentId, seq, fromStatus == null ? null : fromStatus.name(), toStatus.name(), toStatus.name(),
-                sourceType, PaymentTransitionTable.isTerminal(toStatus), eventType, eventRef, Timestamp.from(at));
+                // A business-status transition is not settlement finality. The only future writer
+                // of true must be a settlement-owned, profile-snapshot-backed finality authority.
+                sourceType, false, eventType, eventRef, Timestamp.from(at));
     }
 
     private int nextSeq(UUID paymentId) {

@@ -25,9 +25,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * {@code signature.*} (V14) and {@code iso.iso_message_parse_errors} (V16): {@code sepa_app} (the
  * sole writer of {@code payment.*} — {@code payment-lifecycle} is not yet a separate Modulith
  * module/role) can {@code INSERT}, a foreign module role ({@code signature_role}) cannot, and
- * nobody may {@code UPDATE}/{@code DELETE}. Also proves the V19/V20 migration on a fresh
+ * nobody may {@code UPDATE}/{@code DELETE}. Also proves the V19/V20/V30 migration sequence on a fresh
  * Testcontainers database: every pre-existing payment gets exactly one {@code MIGRATION_BASELINE}
- * row, no fabricated intermediate transitions.
+ * row, no fabricated intermediate transitions and no finality inferred from business terminality.
  */
 @Testcontainers
 class PaymentHistoryOwnershipTest {
@@ -149,25 +149,21 @@ class PaymentHistoryOwnershipTest {
     }
 
     @Test
-    void freshDatabaseBackfillGivesExactlyOneBaselineRowPerExistingPayment() throws Exception {
+    void baselineHistoryHasExactlyOneRowPerPaymentWithoutBusinessStatusFinality() throws Exception {
         UUID received = insertPayment("RECEIVED");
         UUID validated = insertPayment("VALIDATED");
         UUID rejected = insertPayment("REJECTED");
         UUID dispatched = insertPayment("DISPATCHED");
 
-        // V20 already ran once in @BeforeAll before these rows existed — simulate a fresh-DB
-        // backfill scenario by re-running just V20's INSERT logic against these newly-seeded rows,
-        // proving the migration's own logic (not relying on migration-run ordering against
-        // payments inserted after migrate() already completed). Runs as adminConnection() (the
-        // Testcontainers superuser), matching how the real migration runs as sepa_migration, not
-        // sepa_app — sepa_app is RLS-scoped and would see zero payment.payments rows with no
-        // app.tenant_id GUC set (the established empty-GUC-zero-rows rule).
+        // V20 already ran once in @BeforeAll before these rows existed. This keeps the original
+        // one-row baseline shape while the dedicated fresh-install test proves the real V19→V30
+        // migration order. A payment business status is never a finality assertion.
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
             statement.execute("""
                     INSERT INTO payment.payment_status_history
                         (payment_id, seq, from_status, to_status, status_code, source_type, actor_type, is_final, event_type, at)
                     SELECT id, 1, NULL, status, status, 'INTERNAL', 'SYSTEM',
-                           status IN ('REJECTED', 'DISPATCHED'), 'MIGRATION_BASELINE', now()
+                           false, 'MIGRATION_BASELINE', now()
                     FROM payment.payments
                     WHERE id IN ('%s', '%s', '%s', '%s')
                     """.formatted(received, validated, rejected, dispatched));
@@ -177,8 +173,8 @@ class PaymentHistoryOwnershipTest {
         assertEquals(1, historyRowCount(validated));
         assertEquals(1, historyRowCount(rejected));
         assertEquals(1, historyRowCount(dispatched));
-        assertEquals(true, isFinal(rejected));
-        assertEquals(true, isFinal(dispatched));
+        assertEquals(false, isFinal(rejected));
+        assertEquals(false, isFinal(dispatched));
         assertEquals(false, isFinal(received));
         assertEquals(false, isFinal(validated));
     }

@@ -99,6 +99,21 @@ class EgressCannotWritePaymentStatusTest {
     }
 
     @Test
+    void egressDeliveryOrReceiptPathCannotWritePaymentHistoryFinality() {
+        assertThatThrownBy(() -> {
+            try (Connection connection = egressConnection(); Statement statement = connection.createStatement()) {
+                statement.executeUpdate("""
+                        INSERT INTO payment.payment_status_history
+                            (payment_id, seq, from_status, to_status, status_code, source_type, actor_type, is_final,
+                             event_type, at)
+                        VALUES ('%s', 999, 'DISPATCHED', 'DISPATCHED', 'DISPATCHED', 'EGRESS', 'SYSTEM', true,
+                                'egress.receipt.received', now())
+                        """.formatted(seededPaymentId));
+            }
+        }).isInstanceOf(SQLException.class).hasFieldOrPropertyWithValue("SQLState", "42501");
+    }
+
+    @Test
     void egressRoleCannotDeleteFromPaymentPayments() {
         assertThatThrownBy(() -> {
             try (Connection connection = egressConnection(); Statement statement = connection.createStatement()) {

@@ -8,6 +8,12 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-SETTLE-5, line 
 
 `[FREEZE]` accepted/posted/delivered ≠ final. Finalność to jawna, konfigurowana profilem reguła.
 
+`[SAFETY-CORRECTION 2026-07-20]`: `payment` history no longer falsely derives finality from a
+terminal business-FSM state; V30 corrects known `REJECTED`/`DISPATCHED` false positives and targeted
+fresh/upgrade tests prove it. This negative repair does not create `finality_rule`, `FinalityPolicy`,
+`settlement_finality_records`, a snapshot, or a `finality_at` authority. Stories 39.1–39.4 therefore
+remain `DECISION-BLOCKED`/`CAPABILITY-BLOCKED`, not done.
+
 ## Story 39.1 — Katalog `finality_rule`
 
 status: not-started

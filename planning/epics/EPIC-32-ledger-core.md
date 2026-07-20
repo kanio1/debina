@@ -38,6 +38,11 @@ status: not-started (`[CAPABILITY-BLOCKED]`)
 
 depends_on: [Story 32.1]
 
+`[DECISION-PACKET 2026-07-20]`: `docs/analysis/DEBINA-FINALITY-LEDGERPORT-DECISION-PACKET.md`
+records the source-backed contract facts and missing authority for reservation identity/lifecycle,
+RESERVE/RELEASE journal lines, no-double-consumption, and pre-finality reversal gating. No
+reservation table, columns, or partial LedgerPort was invented.
+
 Opis: test współbieżności no-double-reserve.
 
 `[CAPABILITY-BLOCKED 2026-07-17]`: pełny audyt źródłowy (`sepa-nexus-message-flow-and-data-blueprint.md` §4.5/§4.7/§4.11/§5, `sepa-nexus-full-blueprint-review-and-task-plan.md`, `sepa-nexus-blueprint-ownership-integration.md`, `sepa-nexus-decision-gate.md`) przed implementacją — readiness table:

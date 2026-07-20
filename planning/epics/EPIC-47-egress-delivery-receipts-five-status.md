@@ -6,6 +6,11 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-EGRESS-4, line 
 
 # EPIC-47 — Egress: potwierdzenia dostawy i pięcioosiowy status (EPIC-EGRESS-4)
 
+`[SAFETY-EVIDENCE 2026-07-20]`: a PostgreSQL Testcontainers grant test now proves that
+`egress_role` cannot insert a payment-status-history row with `is_final=true`; a temporary grant
+mutation was caught and reverted. This protects the frozen boundary but does not implement
+`delivery_receipts`, `transport_receipts_in`, or the full five-axis persistence model.
+
 ## Story 47.1 — `delivery_receipts` + korelacja z artefaktem
 
 status: not-started

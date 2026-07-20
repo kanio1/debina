@@ -28,7 +28,7 @@ class PaymentFsmTransitionTest {
     }
 
     @Test
-    void terminalRejectedCannotTransitionBackToValidated() {
+    void rejectedWithNoLegalOutgoingTransitionCannotTransitionBackToValidated() {
         PaymentTransitionTable.requireLegal(PaymentStatus.RECEIVED, PaymentStatus.REJECTED);
 
         assertThatThrownBy(() -> PaymentTransitionTable.requireLegal(PaymentStatus.REJECTED, PaymentStatus.VALIDATED))
@@ -37,9 +37,11 @@ class PaymentFsmTransitionTest {
     }
 
     @Test
-    void terminalDispatchedHasNoOutgoingTransitions() {
+    void dispatchedWithNoLegalOutgoingTransitionsCannotTransitionAgain() {
         assertThatThrownBy(() -> PaymentTransitionTable.requireLegal(PaymentStatus.DISPATCHED, PaymentStatus.RECEIVED))
                 .isInstanceOf(IllegalPaymentTransitionException.class);
+        org.assertj.core.api.Assertions.assertThat(
+                PaymentTransitionTable.hasNoLegalOutgoingTransitions(PaymentStatus.DISPATCHED)).isTrue();
     }
 
     private static void assertStatus(PaymentEntity payment, PaymentStatus expected) {
