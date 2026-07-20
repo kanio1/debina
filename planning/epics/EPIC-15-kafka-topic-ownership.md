@@ -45,3 +45,20 @@ Opis: `egress.dead_lettered`, `egress.manual_intervention_required`, `reconcilia
 Taski:
 - [ ] **Potwierdź istnienie trzech topiców terminalnych w katalogu i ich konsumentów operacyjnych.**
       `verify: docker exec <kafka-container> kafka-topics.sh --bootstrap-server localhost:9092 --list | grep -E "egress.dead_lettered|egress.manual_intervention_required|reconciliation.run.failed"` — `NOT RUN`, świadomie odłożone (patrz `[PLANNING-DEFECT]` wyżej).
+
+## Story 15.4 — Event type/topic/producer/consumer semantic contract
+
+status: not-started
+depends_on: [Story 15.1, Story 15.2]
+
+Opis: a typed, source-backed catalog binds each actually produced payment event to the frozen §3.7
+topic, producer, consumers and aggregate key. Source: `sepa-nexus-message-flow-and-data-blueprint.md`
+§3.7, ADR-N8, and `DEBINA-GAP-RISK-BACKLOG.md` KAFKA-GAP-001.
+
+Kryterium ukończenia story: no dispatcher chooses one hard-coded topic for every outbox row; known
+events resolve to their catalog entry, unknown events remain unpublished, and the generated AsyncAPI
+contract detects a semantic mismatch.
+
+Taski:
+- [ ] **Implement the catalog and non-vacuous semantic contract test for the currently produced payment events.**
+      `verify: ./mvnw -f backend test -Dtest=*KafkaEventSemanticContractTest*`

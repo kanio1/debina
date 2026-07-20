@@ -1,5 +1,5 @@
 ---
-status: done
+status: in-progress
 depends_on: [EPIC-03-spring-modulith-backend-skeleton, EPIC-07-ci-cd-foundation]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-OWN-1, line 1257); sepa-nexus-blueprint-ownership-integration.md §9 (line 345); §3.6.4a/§3.6.5 layering+arch-test rules"
 ---
@@ -65,3 +65,18 @@ Kryterium ukończenia: wszystkie reguły ArchUnit z §3.6.5 wdrożone i przechod
 Taski:
 - [x] **Zaimplementuj pakiet testów ArchUnit** dokładnie wg listy w §3.6.5 (ownership blueprint) — jedna reguła = jeden test, z nazwą odzwierciedlającą regułę źródłową (zakres dziś: patrz `[PLANNING-DEFECT]` wyżej).
       `verify: export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"; ./mvnw -f backend test -Dtest=OwnershipArchRulesTest` → `Tests run: 3, Failures: 0` — PASS (2026-07-14). Nowy `backend/src/test/java/com/sepanexus/OwnershipArchRulesTest.java`, trzy reguły ArchUnit (core, bez dodatkowej zależności `archunit-junit5` — importowana transitywnie przez `spring-modulith-starter-test`): `repositoriesLiveOnlyInARepositoryPackage`, `controllersNeverReferenceARepositoryType`, `noHibernateTenantIdOrTenantFilterAnywhereInTheEntityModel`. **Wszystkie trzy zweryfikowane jako nie-próżne** (non-vacuous) przez tymczasowy deliberate-violation dla każdej: (1) `MisplacedRepository` poza pakietem `.repository` → `BUILD FAILURE` (EXPECTED FAIL), usunięty; (2) pole typu `PaymentRepository` dodane do `PaymentController` → `BUILD FAILURE` (EXPECTED FAIL), usunięte; (3) tymczasowa klasa z polem `@org.hibernate.annotations.TenantId` → `BUILD FAILURE` (EXPECTED FAIL), usunięta. Po każdym eksperymencie: usunięcie plików, `./mvnw -f backend test` → `BUILD SUCCESS`. Finalny pełny regres: `Tests run: 26, Failures: 0, Errors: 0` — PASS (2026-07-14). `git status --short`/`git diff --check` czyste (tylko zamierzone nowe/zmienione pliki tej sesji).
+
+## Story 9.5 — Runtime datasource ownership boundary
+
+status: in-progress
+depends_on: [Story 9.1, EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5]
+
+Opis: runtime rozdziela domenową tożsamość writer (`sepa_app`) od technicznej tożsamości relay (`outbox_dispatcher_role`). Dispatcher może używać tylko jawnie kwalifikowanych beanów relay; usługi domenowe i repozytoria nie mogą przez przypadek przejąć infrastruktury relay.
+
+Kryterium ukończenia: test Spring wiring dowodzi osobnych datasource i transaction managerów; relay nie zależy od JPA/repository, a domain path nie używa relay role.
+
+Taski:
+- [ ] **Dodaj structural i Spring-wiring proof granicy datasource** dla payment oraz ISO relay, wraz z niepustymi fixture’ami zabronionych zależności.
+      `verify: ./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest` → PASS
+- [ ] **Sprawdź, że scheduler relay używa relay transaction managera**, po wdrożeniu Story 7.4.
+      `verify: ./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest` → PASS

@@ -2,7 +2,7 @@
   "generated_by": "tools/agent-config/generate-story-inventory.py",
   "generated_note": "Programmatically extracted from planning/epics/*.md -- no invented data.",
   "epic_count": 76,
-  "story_count": 279,
+  "story_count": 285,
   "epics": [
     {
       "epic": "EPIC-00",
@@ -51,7 +51,7 @@
     },
     {
       "epic": "EPIC-09",
-      "status": "done",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md"
     },
     {
@@ -783,6 +783,20 @@
       "capability_analysis": "NOT_DEEP_DIVED"
     },
     {
+      "epic": "EPIC-07",
+      "story": "7.4",
+      "title": "Scheduled background failures are operationally visible",
+      "status": "not-started",
+      "depends_on": [
+        "EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*ScheduledRelayOperationalTruthTest*"
+      ],
+      "source_file": "planning/epics/EPIC-07-ci-cd-foundation.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
       "epic": "EPIC-08",
       "story": "8.1",
       "title": "Pełnołańcuchowy test integracyjny Testcontainers",
@@ -881,6 +895,22 @@
       ],
       "verify": [
         "export DOCKER_HOST=\"unix://${XDG_RUNTIME_DIR}/podman/podman.sock\"; ./mvnw -f backend test -Dtest=OwnershipArchRulesTest"
+      ],
+      "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-09",
+      "story": "9.5",
+      "title": "Runtime datasource ownership boundary",
+      "status": "in-progress",
+      "depends_on": [
+        "Story 9.1",
+        "EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest",
+        "./mvnw -f backend test -Dtest=RuntimeDatasourceOwnershipTest"
       ],
       "source_file": "planning/epics/EPIC-09-ownership-schema-grants.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -1183,6 +1213,21 @@
       "capability_analysis": "NOT_DEEP_DIVED"
     },
     {
+      "epic": "EPIC-15",
+      "story": "15.4",
+      "title": "Event type/topic/producer/consumer semantic contract",
+      "status": "not-started",
+      "depends_on": [
+        "Story 15.1",
+        "Story 15.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*KafkaEventSemanticContractTest*"
+      ],
+      "source_file": "planning/epics/EPIC-15-kafka-topic-ownership.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
       "epic": "EPIC-16",
       "story": "16.1",
       "title": "Read modele własnością modułu źródłowego",
@@ -1321,6 +1366,23 @@
       "capability_analysis": "NOT_DEEP_DIVED"
     },
     {
+      "epic": "EPIC-18",
+      "story": "18.5",
+      "title": "Runtime outbox relay identity and datasource wiring",
+      "status": "not-started",
+      "depends_on": [
+        "Story 18.2",
+        "Story 18.3",
+        "EPIC-04-outbox-inbox-kafka-thin/Story 4.2",
+        "EPIC-27-iso-correlation-engine/Story 27.2C"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*OutboxRelayRuntimeWiringTest*,*OutboxRelayConcurrencyTest*,*OutboxRelayKafkaFailureTest*"
+      ],
+      "source_file": "planning/epics/EPIC-18-per-schema-outbox-inbox-rollout.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
       "epic": "EPIC-19",
       "story": "19.1",
       "title": "REST JSON submit + idempotencja (JSON_DIRECT, ADR-N7)",
@@ -1414,6 +1476,22 @@
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*StatusInboundCorrelationTest*"
+      ],
+      "source_file": "planning/epics/EPIC-20-payment-lifecycle-fsm.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-20",
+      "story": "20.4",
+      "title": "`payment.received` → `VALIDATED` → `payment.validated`",
+      "status": "blocked",
+      "depends_on": [
+        "Story 20.1",
+        "EPIC-15-kafka-topic-ownership/Story 15.4",
+        "EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*PaymentReceivedValidatedFlowTest*,*NoPaymentValidatedSelfConsumptionTest*"
       ],
       "source_file": "planning/epics/EPIC-20-payment-lifecycle-fsm.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -2244,6 +2322,21 @@
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=*LedgerReversalFlowTest*"
+      ],
+      "source_file": "planning/epics/EPIC-32-ledger-core.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-32",
+      "story": "32.5",
+      "title": "Ledger account, currency and reversal structural invariants",
+      "status": "not-started",
+      "depends_on": [
+        "Story 32.1",
+        "Story 32.3"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*JournalAccountCurrencyIntegrityTest*,*ReversalStructuralIntegrityTest*,*LedgerIntegrityMigrationUpgradePathTest*"
       ],
       "source_file": "planning/epics/EPIC-32-ledger-core.md",
       "capability_analysis": "NOT_DEEP_DIVED"

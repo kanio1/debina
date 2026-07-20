@@ -94,3 +94,21 @@ Opis: reversal to osobny wpis, nigdy mutacja; nightly Σ=0 job jako drugorzędna
 Taski:
 - [ ] **Zaimplementuj przepływ reversal jako nowy wiersz `journal_entries` (`entry_type='REVERSAL'` + `reversal_of_entry_id`) + nightly job Σ=0 jako wtórna kontrola.** `[CAPABILITY-BLOCKED]`
       `verify: ./mvnw -f backend test -Dtest=*LedgerReversalFlowTest*`
+
+## Story 32.5 — Ledger account, currency and reversal structural invariants
+
+status: not-started
+depends_on: [Story 32.1, Story 32.3]
+
+Opis: closes the structural invalid-evidence gaps in the existing journal DDL without implementing
+LedgerPort or a runtime reversal flow. This slice has one journal-entry currency; FX and
+cross-currency entries are not defined in the repository. Source: `DEBINA-GAP-RISK-BACKLOG.md`
+DATA-GAP-001/002 and `DEBINA-COMPREHENSIVE-PAYMENTS-ASSESSMENT.md` §25.
+
+Kryterium ukończenia story: PostgreSQL rejects unknown accounts, account/currency mismatches,
+mixed-currency or unbalanced entries, malformed/self/duplicate reversal links, while valid existing
+ledger data survives an isolated Testcontainers upgrade path.
+
+Taski:
+- [ ] **Add one append-only ledger migration and Testcontainers fresh/upgrade/negative proof.**
+      `verify: ./mvnw -f backend test -Dtest=*JournalAccountCurrencyIntegrityTest*,*ReversalStructuralIntegrityTest*,*LedgerIntegrityMigrationUpgradePathTest*`

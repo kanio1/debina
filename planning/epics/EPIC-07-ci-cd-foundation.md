@@ -76,3 +76,21 @@ Kryterium ukończenia: `act -l` listuje oba workflowy bez błędów konfiguracji
 Taski:
 - [x] **`.actrc`** przypinający tę samą rodzinę obrazów runnera co GitHub Actions (`catthehacker/ubuntu:act-latest`/`act-24.04`/`act-22.04`, `linux/amd64`), żeby wyniki `act` były wystarczająco zbieżne z hostowanym CI, by im ufać lokalnie.
       `verify: act -l` → `Stage test test backend backend.yml push,pull_request` / `Stage build build frontend frontend.yml push,pull_request`, bez błędów konfiguracji — PASS (2026-07-14).
+
+## Story 7.4 — Scheduled background failures are operationally visible
+
+status: not-started
+depends_on: [EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5]
+
+Opis: controlled scheduled relay failure updates an operational health state and is asserted by a
+dedicated Testcontainers runtime test. Source: `DEBINA-GAP-RISK-BACKLOG.md` TEST-GAP-002 and
+`DEBINA-COMPREHENSIVE-PAYMENTS-ASSESSMENT.md` §32 identify the current scheduler error as an
+unrepresented runtime failure.
+
+Kryterium ukończenia story: scheduler execution is isolated from unrelated tests; permission and
+broker failures leave the event unpublished, turn `outboxRelay` health DOWN, and a later success
+returns it to UP without an uncontrolled background exception.
+
+Taski:
+- [ ] **Add scheduling isolation and the relay operational-health contributor.** Production scheduling remains enabled; base tests opt out; the dedicated runtime test opts in.
+      `verify: ./mvnw -f backend test -Dtest=*ScheduledRelayOperationalTruthTest*`

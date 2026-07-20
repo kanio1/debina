@@ -40,3 +40,22 @@ Opis: lookup przez `iso.payment_iso_identifiers`, orphan → DLQ.
 Taski:
 - [ ] **Korelacja statusu przychodzącego przez `iso.payment_iso_identifiers`; brak dopasowania → DLQ, nie cichy no-op.**
       `verify: ./mvnw -f backend test -Dtest=*StatusInboundCorrelationTest*` — `NOT RUN`, `blocked` do `EPIC-27-iso-correlation-engine/Story 27.2`.
+
+## Story 20.4 — `payment.received` → `VALIDATED` → `payment.validated`
+
+status: blocked
+depends_on: [Story 20.1, EPIC-15-kafka-topic-ownership/Story 15.4, EPIC-18-per-schema-outbox-inbox-rollout/Story 18.5]
+
+Opis: ingress publishes the `payment.received` fact; payment-lifecycle consumes it once, applies a
+source-backed validation verdict, transitions to `VALIDATED`, and writes `payment.validated` for
+routing. Source: `sepa-nexus-message-flow-and-data-blueprint.md` §2.2/§3.7 and
+`DEBINA-GAP-RISK-BACKLOG.md` KAFKA-GAP-001.
+
+`[CAPABILITY-BLOCKED 2026-07-20]`: the repository has no source-backed validation verdict, no
+defined distinction among syntactic/scheme/business acceptance, and no legal rejection outcome for
+this consumer. Implementing a `PaymentValidationPolicy` would invent business rules. The event
+catalog may proceed independently; this story cannot.
+
+Taski:
+- [ ] **Implement the received-to-validated flow only after an authoritative validation/rejection contract is added.** `[CAPABILITY-BLOCKED]`
+      `verify: ./mvnw -f backend test -Dtest=*PaymentReceivedValidatedFlowTest*,*NoPaymentValidatedSelfConsumptionTest*`

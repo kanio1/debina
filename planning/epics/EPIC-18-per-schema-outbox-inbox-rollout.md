@@ -69,3 +69,20 @@ depends_on: [Story 18.1]
 Taski:
 - [ ] **Test: redelivery Kafka na dowolny inbox nie duplikuje efektu domenowego (unique na id źródłowego eventu).**
       `verify: ./mvnw -f backend test -Dtest=*InboxReplayDoesNotDuplicateTest*`
+
+## Story 18.5 — Runtime outbox relay identity and datasource wiring
+
+status: not-started
+depends_on: [Story 18.2, Story 18.3, EPIC-04-outbox-inbox-kafka-thin/Story 4.2, EPIC-27-iso-correlation-engine/Story 27.2C]
+
+Opis: per ADR-N5, the runtime relay must use the already-granted `outbox_dispatcher_role`, not the
+domain writer connection. Source: ADR-N5, `sepa-nexus-message-flow-and-data-blueprint.md` §2.4/§4.4,
+and `DEBINA-GAP-RISK-BACKLOG.md` DATA-GAP-003.
+
+Kryterium ukończenia story: payment and ISO relays use a non-primary relay datasource and transaction
+manager, claim rows with `FOR UPDATE SKIP LOCKED`, publish before setting `published_at`, and cannot
+write any domain data.
+
+Taski:
+- [ ] **Wire the relay datasource and refactor payment/ISO polling to its restricted transaction boundary.**
+      `verify: ./mvnw -f backend test -Dtest=*OutboxRelayRuntimeWiringTest*,*OutboxRelayConcurrencyTest*,*OutboxRelayKafkaFailureTest*`
