@@ -9,7 +9,8 @@ import java.util.Optional;
  */
 public enum PaymentOutboxEventType {
     PAYMENT_RECEIVED("payment.received.v1", PaymentLifecycleTopicConfig.RECEIVED_TOPIC),
-    PAYMENT_VALIDATED("payment.validated.v1", PaymentLifecycleTopicConfig.VALIDATED_TOPIC);
+    PAYMENT_VALIDATED("payment.validated.v1", PaymentLifecycleTopicConfig.VALIDATED_TOPIC),
+    PAYMENT_STATUS_REPORTED("payment.status.reported.v1", PaymentLifecycleTopicConfig.STATUS_REPORTED_TOPIC);
 
     private final String eventType;
     private final String topic;

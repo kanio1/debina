@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /** Settlement-owned finality authority for the one executable ADR-N10 laboratory trigger. */
@@ -23,7 +24,8 @@ public class SettlementFinalityService {
     private final PaymentFinalityPort paymentFinalityPort;
     private final FinalityRulePolicy policy = new FinalityRulePolicy();
 
-    public SettlementFinalityService(SettlementConnectionFactory connections, PaymentFinalityPort paymentFinalityPort) {
+    public SettlementFinalityService(SettlementConnectionFactory connections,
+            @Qualifier("jdbcPaymentFinalityProjection") PaymentFinalityPort paymentFinalityPort) {
         this.connections = connections;
         this.paymentFinalityPort = paymentFinalityPort;
     }

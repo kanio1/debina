@@ -20,6 +20,7 @@ CPC-SP topology · one Spring Modulith deployable · one-writer-per-schema · st
 | [ADR-N8](./ADR-N8-asyncapi-topic-catalog-source-of-truth.md) | §3.7 v2 topic table as sole AsyncAPI source | R-10 |
 | [ADR-N9](./ADR-N9-synthetic-credit-transfer-learning-platform-scope.md) | Synthetic Credit Transfer learning-platform scope and non-claims | Product-scope gate |
 | [ADR-N10](./ADR-N10-settlement-finality-and-ledgerport-reservations.md) | Settlement finality authority and LedgerPort reservations | Finality/LedgerPort decision gate |
+| [ADR-N11](./ADR-N11-gross-instant-single-transaction-security-definer.md) | Gross-instant single-transaction SECURITY DEFINER coordination | EPIC-33/36 transaction-boundary decision |
 
 ## Status legend
 

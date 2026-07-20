@@ -1,5 +1,5 @@
 ---
-status: blocked
+status: in-progress
 depends_on: [EPIC-32-ledger-core, EPIC-35-settlement-strategy-resolver]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-MONEY-2, line 1251), [MVP], Iteracja 2"
 ---
@@ -8,29 +8,27 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-MONEY-2, line 1
 
 ## Story 33.1 — `GrossInstantStrategy` jedna transakcja
 
-status: blocked
+status: done
 depends_on: []
 
-`[DECISION-BLOCKED 2026-07-20]`: the source's requirement is one real PostgreSQL transaction,
-not a sequence of commits. `GrossInstantTransactionBoundaryProofTest` proves the current dedicated
-`ledger_role`/`settlement_role`/payment connections commit reserve, post, finality and projection
-in four distinct transactions; injected projection failure leaves committed POST+finality with no
-payment projection. `GROSS-INSTANT-TRANSACTION-COORDINATION-DECISION.md` records the attempted
-paths, viable ADR-level choices, recommendation, and exact decision required. No strategy may be
-implemented until that decision authorizes a coordination mechanism.
+`[DONE 2026-07-20]`: user-approved ADR-N11 freezes the dedicated executor and narrow module-owned
+`SECURITY DEFINER` command functions. `GrossInstantOneTxFlowTest` proves on PostgreSQL 18/Testcontainers
+one txid and backend PID across RESERVE, POST, ON_LEDGER_POST finality and payment projection; same-command
+replay is duplicate-free and injected failures before/after every command boundary roll back all durable effects.
 
 Taski:
-- [ ] **Zaimplementuj `GrossInstantStrategy`: reserve→post→FINAL w jednej transakcji.**
-      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*`
+- [x] **Zaimplementuj `GrossInstantStrategy`: reserve→post→FINAL w jednej transakcji.**
+      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `3/0/0 PASS` (2026-07-20).
 
 ## Story 33.2 — Ścieżka niewystarczającej płynności
 
-status: not-started
+status: done
 depends_on: [Story 33.1]
 
 Taski:
-- [ ] **Test: odrzucenie przy niewystarczającej płynności, status RJCT, brak częściowego zapisu.**
-      `verify: ./mvnw -f backend test -Dtest=*InsufficientLiquidityInstantTest*`
+- [x] **Test: odrzucenie przy niewystarczającej płynności, status RJCT, brak częściowego zapisu.**
+      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `3/0/0 PASS` (2026-07-20;
+      `insufficientLiquidityIsAtomic_rejectsBusinessStatusAndCreatesNoMoneyOrFinality`).
 
 ## Story 33.3 — Timer SLA + zdarzenie breach
 

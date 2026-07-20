@@ -1,5 +1,5 @@
 ---
-status: blocked
+status: in-progress
 depends_on: [EPIC-35-settlement-strategy-resolver, EPIC-13-ledger-ownership]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-SETTLE-2, line 1294), [MVP]"
 ---
@@ -8,20 +8,19 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-SETTLE-2, line 
 
 ## Story 36.1 — `GrossInstantStrategy` reserve→post→FINAL
 
-status: blocked
+status: done
 depends_on: []
 
-`[DECISION-BLOCKED 2026-07-20]`: same implementation and same blocker as EPIC-33 Story 33.1.
-The PostgreSQL 18 transaction-boundary proof records four committed transaction IDs for the current
-reserve→post→finality→payment-projection path. See
-`GROSS-INSTANT-TRANSACTION-COORDINATION-DECISION.md`; no multi-commit orchestration is to be
-described as one transaction.
+`[DONE 2026-07-20]`: ADR-N11 authorizes the coordinator. Settlement calls the public
+`GrossInstantLedgerPort` command (a typed extension of `LedgerPort`) rather than direct ledger DML;
+the ledger function performs RESERVE→POST in the caller transaction and settlement then records its
+own ON_LEDGER_POST finality. `GrossInstantOneTxFlowTest` is the shared PostgreSQL 18 proof.
 
 Opis: powiązane z EPIC-33 Story 33.1 — ta sama implementacja, inny kąt (settlement vs money).
 
 Taski:
-- [ ] **`GrossInstantStrategy` jedna transakcja przez `LedgerPort.reserve/post/release`.**
-      `verify: ./mvnw -f backend test -Dtest=*GrossInstantLedgerPortTest*`
+- [x] **`GrossInstantStrategy` jedna transakcja przez modułową komendę `LedgerPort` RESERVE→POST.**
+      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `3/0/0 PASS` (2026-07-20).
 
 ## Story 36.2 — `settlement_liquidity_checks`
 
