@@ -1,5 +1,6 @@
 package com.sepanexus.ledger;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /** ADR-N10's only settlement-facing money movement contract. */
@@ -17,5 +18,5 @@ public interface LedgerPort {
 
     record InsufficientLiquidity() implements ReserveResult { }
 
-    record TerminalResult(UUID reservationId, UUID terminalEntryId, ReservationState state) { }
+    record TerminalResult(UUID reservationId, UUID terminalEntryId, ReservationState state, Instant sourceOccurredAt) { }
 }

@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -55,15 +56,15 @@ public class JdbcLedgerPort implements LedgerPort {
                     connection.commit();
                     return new InsufficientLiquidity();
                 }
-                UUID reserveEntryId = insertEntry(connection, "RESERVE", paymentId, clockPort);
+                Entry reserveEntry = insertEntry(connection, "RESERVE", paymentId, clockPort);
                 UUID reservationId = UUID.randomUUID();
                 insertReservation(connection, reservationId, settlementAttemptId, paymentId, debtorAccountId,
-                        amountMinor, debtor.currency(), reserveEntryId);
-                insertLines(connection, reserveEntryId, debtorAccountId, debtor.currency(), amountMinor,
+                        amountMinor, debtor.currency(), reserveEntry.id());
+                insertLines(connection, reserveEntry.id(), debtorAccountId, debtor.currency(), amountMinor,
                         "AVAILABLE", "RESERVED", clockPort);
                 updateAccount(connection, debtorAccountId, -amountMinor, amountMinor);
                 connection.commit();
-                return new Reserved(reservationId, reserveEntryId);
+                return new Reserved(reservationId, reserveEntry.id());
             } catch (Exception failure) {
                 connection.rollback();
                 throw failure;
@@ -94,7 +95,8 @@ public class JdbcLedgerPort implements LedgerPort {
                 if (reservation.state() != ReservationState.ACTIVE) {
                     if (commandId.equals(reservation.terminalCommandId())) {
                         connection.commit();
-                        return new TerminalResult(reservation.id(), reservation.terminalEntryId(), reservation.state());
+                        return new TerminalResult(reservation.id(), reservation.terminalEntryId(), reservation.state(),
+                                entryOccurredAt(connection, reservation.terminalEntryId()));
                     }
                     throw new ReservationTerminalConflictException(reservationId, commandId);
                 }
@@ -112,22 +114,22 @@ public class JdbcLedgerPort implements LedgerPort {
                     if (!creditor.currency().equals(reservation.currency())) {
                         throw new IllegalArgumentException("Creditor account currency must match reservation currency");
                     }
-                    UUID entryId = insertEntry(connection, "POST", reservation.paymentId(), clockPort);
-                    insertTransferLines(connection, entryId, debtor.id(), creditor.id(), reservation.currency(),
+                    Entry entry = insertEntry(connection, "POST", reservation.paymentId(), clockPort);
+                    insertTransferLines(connection, entry.id(), debtor.id(), creditor.id(), reservation.currency(),
                             reservation.amountMinor(), "RESERVED", "AVAILABLE", clockPort);
                     updateAccount(connection, debtor.id(), 0, -reservation.amountMinor());
                     updateAccount(connection, creditor.id(), reservation.amountMinor(), 0);
-                    terminalize(connection, reservationId, target, entryId, commandId, clockPort);
+                    terminalize(connection, reservationId, target, entry.id(), commandId, clockPort);
                     connection.commit();
-                    return new TerminalResult(reservationId, entryId, target);
+                    return new TerminalResult(reservationId, entry.id(), target, entry.occurredAt());
                 }
-                UUID entryId = insertEntry(connection, "RELEASE", reservation.paymentId(), clockPort);
-                insertLines(connection, entryId, debtor.id(), reservation.currency(), reservation.amountMinor(),
+                Entry entry = insertEntry(connection, "RELEASE", reservation.paymentId(), clockPort);
+                insertLines(connection, entry.id(), debtor.id(), reservation.currency(), reservation.amountMinor(),
                         "RESERVED", "AVAILABLE", clockPort);
                 updateAccount(connection, debtor.id(), reservation.amountMinor(), -reservation.amountMinor());
-                terminalize(connection, reservationId, target, entryId, commandId, clockPort);
+                terminalize(connection, reservationId, target, entry.id(), commandId, clockPort);
                 connection.commit();
-                return new TerminalResult(reservationId, entryId, target);
+                return new TerminalResult(reservationId, entry.id(), target, entry.occurredAt());
             } catch (Exception failure) {
                 connection.rollback();
                 throw failure;
@@ -155,17 +157,19 @@ public class JdbcLedgerPort implements LedgerPort {
         }
     }
 
-    private static UUID insertEntry(Connection connection, String type, UUID paymentId, ClockPort clockPort)
+    private static Entry insertEntry(Connection connection, String type, UUID paymentId, ClockPort clockPort)
             throws SQLException {
         UUID id = UUID.randomUUID();
+        Instant occurredAt = clockPort.now();
         try (PreparedStatement statement = connection.prepareStatement("""
-                INSERT INTO ledger.journal_entries (id, entry_type, payment_id, business_date)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO ledger.journal_entries (id, entry_type, payment_id, business_date, created_at)
+                VALUES (?, ?, ?, ?, ?)
                 """)) {
             statement.setObject(1, id); statement.setString(2, type); statement.setObject(3, paymentId);
-            statement.setObject(4, LocalDate.ofInstant(clockPort.now(), ZoneOffset.UTC)); statement.executeUpdate();
+            statement.setObject(4, LocalDate.ofInstant(occurredAt, ZoneOffset.UTC));
+            statement.setTimestamp(5, Timestamp.from(occurredAt)); statement.executeUpdate();
         }
-        return id;
+        return new Entry(id, occurredAt);
     }
 
     private static void insertReservation(Connection c, UUID id, UUID attempt, UUID payment, UUID debtor, long amount,
@@ -231,6 +235,15 @@ public class JdbcLedgerPort implements LedgerPort {
     private static Reservation lockReservation(Connection c, UUID id) throws SQLException {
         return queryReservation(c, "SELECT * FROM ledger.reservations WHERE id = ? FOR UPDATE", id);
     }
+    private static Instant entryOccurredAt(Connection c, UUID entryId) throws SQLException {
+        try (PreparedStatement s = c.prepareStatement("SELECT created_at FROM ledger.journal_entries WHERE id = ?")) {
+            s.setObject(1, entryId);
+            try (ResultSet r = s.executeQuery()) {
+                if (!r.next()) throw new IllegalStateException("Terminal journal entry disappeared");
+                return r.getTimestamp(1).toInstant();
+            }
+        }
+    }
     private static Reservation queryReservation(Connection c, String sql, UUID id) throws SQLException {
         try (PreparedStatement s = c.prepareStatement(sql)) { s.setObject(1, id); try (ResultSet r = s.executeQuery()) {
             if (!r.next()) return null;
@@ -243,4 +256,5 @@ public class JdbcLedgerPort implements LedgerPort {
     private record Account(UUID id, String currency, long availableMinor, long reservedMinor) { }
     private record Reservation(UUID id, UUID paymentId, UUID debtorAccountId, long amountMinor, String currency,
             ReservationState state, UUID reserveEntryId, UUID terminalEntryId, UUID terminalCommandId) { }
+    private record Entry(UUID id, Instant occurredAt) { }
 }
