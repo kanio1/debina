@@ -14,7 +14,12 @@ import java.sql.Statement;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -115,6 +120,13 @@ class GrossInstantOneTxFlowTest {
         assertThat(value("SELECT status FROM payment.payments WHERE id = '" + paymentId + "'")).isEqualTo("REJECTED");
         assertThat(value("SELECT payload ->> 'isoStatus' FROM payment.outbox_events WHERE aggregate_id = '" + paymentId + "'"))
                 .isEqualTo("RJCT");
+        assertThat(execute(strategy(ignored -> { }), command)).isInstanceOf(GrossInstantStrategy.InsufficientLiquidity.class);
+        assertThat(count("SELECT count(*) FROM settlement.settlement_attempt_events WHERE attempt_id = '" + command.attemptId() + "'"))
+                .isEqualTo(3);
+        assertThat(count("SELECT count(*) FROM payment.payment_events WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = '" + paymentId + "'"))
+                .isEqualTo(1);
     }
 
     @Test
@@ -130,17 +142,153 @@ class GrossInstantOneTxFlowTest {
         }
     }
 
+    @Test
+    void concurrentIdenticalCommandsRetryTheWholeTransaction_andCreateOneMoneyFinalityAndOutboxEffect() throws Exception {
+        GrossInstantStrategy strategy = strategy(ignored -> { });
+        GrossInstantStrategy.GrossInstantCommand command = command(UUID.randomUUID(), UUID.randomUUID());
+
+        List<ExecutionResult> results = concurrently(() -> executeResult(strategy, command),
+                () -> executeResult(strategy, command));
+
+        assertThat(results).allSatisfy(result -> assertThat(result.failure()).isNull());
+        assertThat(results).allSatisfy(result -> assertThat(result.outcome()).isInstanceOf(GrossInstantStrategy.Settled.class));
+        assertThat(count("SELECT count(*) FROM ledger.journal_entries WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM ledger.reservations WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM settlement.settlement_finality_records WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payment_events WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+    }
+
+    @Test
+    void concurrentConflictingCommandsFailClosed_withoutSecondMoneyOrFinalityEffect() throws Exception {
+        GrossInstantStrategy strategy = strategy(ignored -> { });
+        GrossInstantStrategy.GrossInstantCommand first = command(UUID.randomUUID(), UUID.randomUUID());
+        GrossInstantStrategy.GrossInstantCommand conflicting = command(UUID.randomUUID(), UUID.randomUUID());
+
+        List<ExecutionResult> results = concurrently(() -> executeResult(strategy, first),
+                () -> executeResult(strategy, conflicting));
+
+        assertThat(results).filteredOn(result -> result.failure() == null).hasSize(1);
+        assertThat(results).filteredOn(result -> result.failure() != null).hasSize(1);
+        assertThat(count("SELECT count(*) FROM ledger.journal_entries WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM settlement.settlement_attempts WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM settlement.settlement_finality_records WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+    }
+
+    @Test
+    void deterministicAccountLockOrderCompletesCrossedPostsWithoutDeadlock() throws Exception {
+        UUID otherPayment = UUID.randomUUID();
+        payment(otherPayment);
+        try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+            statement.execute("UPDATE ledger.liquidity_accounts SET available_minor = 1000 WHERE id = '" + creditor + "'");
+        }
+        GrossInstantStrategy strategy = strategy(ignored -> { });
+        GrossInstantStrategy.GrossInstantCommand leftToRight = command(UUID.randomUUID(), UUID.randomUUID());
+        GrossInstantStrategy.GrossInstantCommand rightToLeft = new GrossInstantStrategy.GrossInstantCommand(TENANT,
+                UUID.randomUUID(), otherPayment, creditor, debtor, 300, "EUR", UUID.randomUUID(), NOW,
+                new byte[] {3, 3, 1, 2});
+
+        List<ExecutionResult> results = concurrently(() -> executeResult(strategy, leftToRight),
+                () -> executeResult(strategy, rightToLeft));
+
+        assertThat(results).allSatisfy(result -> assertThat(result.failure()).isNull());
+        assertThat(count("SELECT count(*) FROM ledger.journal_entries WHERE entry_type = 'POST'"))
+                .isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM settlement.settlement_finality_records")).isEqualTo(2);
+    }
+
+    @Test
+    void paymentRlsRejectsCrossTenantProjection_andRollsBackEarlierLedgerAndFinalityWork() throws Exception {
+        UUID foreignPayment = UUID.randomUUID();
+        UUID foreignTenant = UUID.randomUUID();
+        payment(foreignPayment, foreignTenant);
+        GrossInstantStrategy.GrossInstantCommand crossTenant = new GrossInstantStrategy.GrossInstantCommand(TENANT,
+                UUID.randomUUID(), foreignPayment, debtor, creditor, 400, "EUR", UUID.randomUUID(), NOW,
+                new byte[] {3, 3, 1, 3});
+
+        assertThatThrownBy(() -> execute(strategy(ignored -> { }), crossTenant)).isInstanceOf(RuntimeException.class);
+        assertThat(count("SELECT count(*) FROM ledger.journal_entries WHERE payment_id = '" + foreignPayment + "'"))
+                .isZero();
+        assertThat(count("SELECT count(*) FROM settlement.settlement_finality_records WHERE payment_id = '" + foreignPayment + "'"))
+                .isZero();
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = '" + foreignPayment + "'"))
+                .isZero();
+        assertThat(value("SELECT status FROM payment.payments WHERE id = '" + foreignPayment + "'"))
+                .isEqualTo("VALIDATED");
+    }
+
+    @Test
+    void paymentFunctionInternalFailureRollsBackReservePostAndFinality() throws Exception {
+        try {
+            installProjectionFailureTrigger();
+            GrossInstantStrategy.GrossInstantCommand command = command(UUID.randomUUID(), UUID.randomUUID());
+            assertThatThrownBy(() -> execute(strategy(ignored -> { }), command)).isInstanceOf(RuntimeException.class);
+            assertNoSuccessPartialState();
+        } finally {
+            dropProjectionFailureTrigger();
+        }
+    }
+
+    @Test
+    void changedFinalityEvidenceOnSameCommandFailsClosed_withoutSecondEffect() throws Exception {
+        GrossInstantStrategy strategy = strategy(ignored -> { });
+        GrossInstantStrategy.GrossInstantCommand command = command(UUID.randomUUID(), UUID.randomUUID());
+        execute(strategy, command);
+        GrossInstantStrategy.GrossInstantCommand conflictingEvidence = new GrossInstantStrategy.GrossInstantCommand(
+                command.tenantId(), command.attemptId(), command.paymentId(), command.debtorAccountId(),
+                command.creditorAccountId(), command.amountMinor(), command.currency(), command.commandId(),
+                command.occurredAt(), new byte[] {9, 9, 9});
+
+        assertThatThrownBy(() -> execute(strategy, conflictingEvidence)).isInstanceOf(RuntimeException.class);
+        assertThat(count("SELECT count(*) FROM ledger.journal_entries WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM settlement.settlement_finality_records WHERE payment_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = '" + paymentId + "'"))
+                .isEqualTo(1);
+    }
+
     private GrossInstantStrategy strategy(GrossInstantFailureInjector injector) {
         JdbcTemplate jdbc = new JdbcTemplate(((DataSourceTransactionManager) transactions.getTransactionManager()).getDataSource());
         return new GrossInstantStrategy(new JdbcGrossInstantLedgerPort(jdbc), new JdbcGrossInstantSettlementCommandPort(jdbc),
-                new JdbcGrossInstantPaymentFinalityPort(jdbc), new GrossInstantCoordinatorTenantContext(jdbc), injector);
+                new JdbcGrossInstantPaymentFinalityPort(jdbc), new GrossInstantCoordinatorTenantContext(jdbc), injector,
+                transactions);
     }
 
     private GrossInstantStrategy.GrossInstantOutcome execute(GrossInstantStrategy strategy,
             GrossInstantStrategy.GrossInstantCommand command) {
-        AtomicReference<GrossInstantStrategy.GrossInstantOutcome> result = new AtomicReference<>();
-        transactions.executeWithoutResult(ignored -> result.set(strategy.execute(command)));
-        return result.get();
+        return strategy.execute(command);
+    }
+
+    private ExecutionResult executeResult(GrossInstantStrategy strategy, GrossInstantStrategy.GrossInstantCommand command) {
+        try {
+            return new ExecutionResult(execute(strategy, command), null);
+        } catch (RuntimeException exception) {
+            return new ExecutionResult(null, exception);
+        }
+    }
+
+    private static List<ExecutionResult> concurrently(Callable<ExecutionResult> first, Callable<ExecutionResult> second)
+            throws Exception {
+        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
+            CountDownLatch ready = new CountDownLatch(2);
+            CountDownLatch start = new CountDownLatch(1);
+            Future<ExecutionResult> left = executor.submit(() -> { ready.countDown(); start.await(); return first.call(); });
+            Future<ExecutionResult> right = executor.submit(() -> { ready.countDown(); start.await(); return second.call(); });
+            assertThat(ready.await(5, TimeUnit.SECONDS)).isTrue();
+            start.countDown();
+            return List.of(left.get(15, TimeUnit.SECONDS), right.get(15, TimeUnit.SECONDS));
+        }
     }
 
     private GrossInstantStrategy.GrossInstantCommand command(UUID attempt, UUID commandId) {
@@ -166,7 +314,7 @@ class GrossInstantOneTxFlowTest {
 
     private static void installAuditTriggers() throws Exception {
         try (Connection connection = admin(); Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE public.gross_instant_command_audit (stage text PRIMARY KEY, txid bigint, backend_pid integer)");
+            statement.execute("CREATE TABLE public.gross_instant_command_audit (stage text, txid bigint, backend_pid integer)");
             statement.execute("""
                     CREATE FUNCTION public.capture_gross_instant_command_tx() RETURNS trigger
                     LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public, pg_temp AS $$
@@ -180,6 +328,27 @@ class GrossInstantOneTxFlowTest {
         }
     }
 
+    private static void installProjectionFailureTrigger() throws Exception {
+        try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+            statement.execute("""
+                    CREATE FUNCTION payment.fail_gross_instant_projection() RETURNS trigger LANGUAGE plpgsql AS $$
+                    BEGIN RAISE EXCEPTION 'injected payment command-function failure'; END;
+                    $$
+                    """);
+            statement.execute("""
+                    CREATE TRIGGER gross_instant_projection_failure BEFORE UPDATE OF finality_record_id ON payment.payments
+                    FOR EACH ROW EXECUTE FUNCTION payment.fail_gross_instant_projection()
+                    """);
+        }
+    }
+
+    private static void dropProjectionFailureTrigger() throws Exception {
+        try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+            statement.execute("DROP TRIGGER IF EXISTS gross_instant_projection_failure ON payment.payments");
+            statement.execute("DROP FUNCTION IF EXISTS payment.fail_gross_instant_projection()");
+        }
+    }
+
     private void clear() throws Exception {
         try (Connection connection = admin(); Statement statement = connection.createStatement()) {
             statement.execute("TRUNCATE payment.payment_status_history, payment.payment_events, payment.outbox_events, payment.payments, settlement.settlement_attempt_events, settlement.settlement_finality_records, settlement.settlement_profile_snapshots, settlement.settlement_attempts, ledger.reservations, ledger.journal_lines, ledger.journal_entries, ledger.liquidity_accounts CASCADE");
@@ -188,11 +357,15 @@ class GrossInstantOneTxFlowTest {
     }
 
     private void payment(UUID id) throws Exception {
+        payment(id, TENANT);
+    }
+
+    private void payment(UUID id, UUID tenantId) throws Exception {
         try (Connection connection = admin(); PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO payment.payments (id, tenant_id, amount, debtor_iban, creditor_iban, status)
                 VALUES (?, ?, ?, ?, ?, 'VALIDATED')
                 """)) {
-            statement.setObject(1, id); statement.setObject(2, TENANT); statement.setBigDecimal(3, new BigDecimal("4.00"));
+            statement.setObject(1, id); statement.setObject(2, tenantId); statement.setBigDecimal(3, new BigDecimal("4.00"));
             statement.setString(4, "DE89370400440532013000"); statement.setString(5, "FR7630006000011234567890189");
             statement.executeUpdate();
         }
@@ -221,4 +394,6 @@ class GrossInstantOneTxFlowTest {
         }
     }
     private static Connection admin() throws Exception { return DriverManager.getConnection(POSTGRES.getJdbcUrl(), "test_admin", "test_admin"); }
+
+    private record ExecutionResult(GrossInstantStrategy.GrossInstantOutcome outcome, RuntimeException failure) { }
 }

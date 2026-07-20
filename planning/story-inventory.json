@@ -1088,15 +1088,15 @@
       "epic": "EPIC-13",
       "story": "13.2",
       "title": "`LedgerPort` jako jedyna droga zapisu",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 13.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*SettlementNoDirectLedgerWriteTest*"
+        "./mvnw -f backend test -Dtest=*GrossInstantMutationContractTest,*GrossInstantOneTxFlowTest*"
       ],
       "source_file": "planning/epics/EPIC-13-ledger-ownership.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-13 Story 13.2 implementation session"
     },
     {
       "epic": "EPIC-13",

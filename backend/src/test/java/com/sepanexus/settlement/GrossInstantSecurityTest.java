@@ -3,12 +3,15 @@ package com.sepanexus.settlement;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.UUID;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -87,9 +90,63 @@ class GrossInstantSecurityTest {
         for (String schema : List.of("ledger", "settlement", "payment", "reference_data")) {
             assertThat(bool("SELECT has_schema_privilege('gross_instant_untrusted', '" + schema + "', 'CREATE')"))
                     .as(schema).isFalse();
+            assertThatThrownBy(() -> executeAsUntrusted("CREATE FUNCTION " + schema + ".hostile_" + schema
+                    + "() RETURNS integer LANGUAGE sql AS 'SELECT 1'"))
+                    .as(schema).isInstanceOf(SQLException.class).hasMessageContaining("permission denied");
         }
-        assertThatThrownBy(() -> executeAsUntrusted("CREATE FUNCTION ledger.hostile() RETURNS integer LANGUAGE sql AS 'SELECT 1'"))
-                .isInstanceOf(SQLException.class).hasMessageContaining("permission denied");
+    }
+
+    @Test
+    void hostileFunctionInAnEffectiveSchemaCannotHijackAnExecutedPaymentCommand() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID payment = UUID.randomUUID();
+        try (Connection connection = admin(); PreparedStatement insert = connection.prepareStatement("""
+                INSERT INTO payment.payments (id, tenant_id, amount, debtor_iban, creditor_iban, status)
+                VALUES (?, ?, ?, 'DE89370400440532013000', 'FR7630006000011234567890189', 'VALIDATED')
+                """)) {
+            insert.setObject(1, payment); insert.setObject(2, tenant); insert.setBigDecimal(3, new BigDecimal("4.00"));
+            insert.executeUpdate();
+        }
+        try {
+            try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+                statement.execute("GRANT USAGE, CREATE ON SCHEMA payment TO gross_instant_untrusted");
+            }
+            executeAsUntrusted("""
+                    CREATE FUNCTION payment.current_setting(text, boolean) RETURNS text LANGUAGE plpgsql AS $$
+                    BEGIN RAISE EXCEPTION 'hostile current_setting was executed'; END;
+                    $$
+                    """);
+            try (Connection connection = executor()) {
+                connection.setAutoCommit(false);
+                try (PreparedStatement guc = connection.prepareStatement("SELECT set_config('app.tenant_id', ?, true)")) {
+                    guc.setString(1, tenant.toString()); guc.execute();
+                }
+                try (PreparedStatement command = connection.prepareStatement("""
+                        SELECT rejection_outcome FROM payment.record_gross_instant_insufficient_liquidity(?, ?, ?, now())
+                        """)) {
+                    command.setObject(1, tenant); command.setObject(2, payment); command.setObject(3, UUID.randomUUID());
+                    try (ResultSet result = command.executeQuery()) {
+                        assertThat(result.next()).isTrue(); assertThat(result.getString(1)).isEqualTo("REJECTED");
+                    }
+                }
+                connection.commit();
+            }
+        } finally {
+            try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+                statement.execute("DROP FUNCTION IF EXISTS payment.current_setting(text, boolean)");
+                statement.execute("REVOKE CREATE, USAGE ON SCHEMA payment FROM gross_instant_untrusted");
+            }
+        }
+    }
+
+    @Test
+    void paymentAndSettlementCommandsRejectAnEmptyTenantContext() throws Exception {
+        SQLException paymentFailure = org.junit.jupiter.api.Assertions.assertThrows(SQLException.class, () ->
+                executeAsExecutor("SELECT * FROM payment.record_gross_instant_insufficient_liquidity(gen_random_uuid(), gen_random_uuid(), gen_random_uuid(), now())"));
+        assertThat(paymentFailure.getSQLState()).isEqualTo("22023");
+        SQLException settlementFailure = org.junit.jupiter.api.Assertions.assertThrows(SQLException.class, () ->
+                executeAsExecutor("SELECT * FROM settlement.record_gross_instant_insufficient_liquidity(gen_random_uuid(), gen_random_uuid(), gen_random_uuid(), gen_random_uuid(), 1, 'EUR', now())"));
+        assertThat(settlementFailure.getSQLState()).isEqualTo("22023");
     }
 
     private static List<String> functionExecute(String role) throws Exception {
@@ -120,4 +177,5 @@ class GrossInstantSecurityTest {
         try (Connection connection = DriverManager.getConnection(POSTGRES.getJdbcUrl(), user, password); Statement statement = connection.createStatement()) { statement.execute(sql); }
     }
     private static Connection admin() throws SQLException { return DriverManager.getConnection(POSTGRES.getJdbcUrl(), "test_admin", "test_admin"); }
+    private static Connection executor() throws SQLException { return DriverManager.getConnection(POSTGRES.getJdbcUrl(), "gross_instant_executor_role", "dev-only-gross-instant-executor"); }
 }

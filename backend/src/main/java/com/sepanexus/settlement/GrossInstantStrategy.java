@@ -2,12 +2,16 @@ package com.sepanexus.settlement;
 
 import com.sepanexus.ledger.GrossInstantLedgerPort;
 import com.sepanexus.modules.GrossInstantPaymentFinalityPort;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Source §5's gross-instant order executed as one physical PostgreSQL transaction under ADR-N11:
@@ -17,26 +21,48 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GrossInstantStrategy {
 
+    private static final int MAX_CONCURRENCY_ATTEMPTS = 3;
+
     private final GrossInstantLedgerPort ledgerPort;
     private final GrossInstantSettlementCommandPort settlementPort;
     private final GrossInstantPaymentFinalityPort paymentPort;
     private final GrossInstantCoordinatorTenantContext tenantContext;
     private final GrossInstantFailureInjector failureInjector;
+    private final TransactionTemplate transactions;
 
+    @Autowired
     public GrossInstantStrategy(@Qualifier("grossInstantLedgerPort") GrossInstantLedgerPort ledgerPort,
             GrossInstantSettlementCommandPort settlementPort,
             @Qualifier("grossInstantPaymentFinalityPort") GrossInstantPaymentFinalityPort paymentPort,
-            GrossInstantCoordinatorTenantContext tenantContext, GrossInstantFailureInjector failureInjector) {
+            GrossInstantCoordinatorTenantContext tenantContext, GrossInstantFailureInjector failureInjector,
+            @Qualifier("grossInstantTransactionManager") PlatformTransactionManager transactionManager) {
+        this(ledgerPort, settlementPort, paymentPort, tenantContext, failureInjector,
+                new TransactionTemplate(transactionManager));
+    }
+
+    GrossInstantStrategy(GrossInstantLedgerPort ledgerPort, GrossInstantSettlementCommandPort settlementPort,
+            GrossInstantPaymentFinalityPort paymentPort, GrossInstantCoordinatorTenantContext tenantContext,
+            GrossInstantFailureInjector failureInjector, TransactionTemplate transactions) {
         this.ledgerPort = ledgerPort;
         this.settlementPort = settlementPort;
         this.paymentPort = paymentPort;
         this.tenantContext = tenantContext;
         this.failureInjector = failureInjector;
+        this.transactions = transactions;
     }
 
-    @Transactional(transactionManager = "grossInstantTransactionManager")
     public GrossInstantOutcome execute(GrossInstantCommand command) {
         requireValid(command);
+        for (int attempt = 1; ; attempt++) {
+            try {
+                return transactions.execute(status -> executeOnce(command));
+            } catch (TransientDataAccessException exception) {
+                if (attempt >= MAX_CONCURRENCY_ATTEMPTS || !isRetryableConcurrencyFailure(exception)) throw exception;
+            }
+        }
+    }
+
+    private GrossInstantOutcome executeOnce(GrossInstantCommand command) {
         tenantContext.apply(command.tenantId());
         failureInjector.at(GrossInstantFailureInjector.Phase.BEFORE_LEDGER);
         GrossInstantLedgerPort.GrossInstantResult ledger = ledgerPort.reserveAndPost(new GrossInstantLedgerPort.GrossInstantCommand(
@@ -68,6 +94,16 @@ public class GrossInstantStrategy {
                 command.occurredAt());
         failureInjector.at(GrossInstantFailureInjector.Phase.AFTER_PAYMENT);
         return new Settled(posted, finality, projection);
+    }
+
+    private static boolean isRetryableConcurrencyFailure(Throwable exception) {
+        for (Throwable current = exception; current != null; current = current.getCause()) {
+            if (current instanceof SQLException sqlException
+                    && ("40001".equals(sqlException.getSQLState()) || "40P01".equals(sqlException.getSQLState()))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void requireValid(GrossInstantCommand command) {

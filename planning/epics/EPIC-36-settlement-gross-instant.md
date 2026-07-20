@@ -16,11 +16,16 @@ depends_on: []
 the ledger function performs RESERVE→POST in the caller transaction and settlement then records its
 own ON_LEDGER_POST finality. `GrossInstantOneTxFlowTest` is the shared PostgreSQL 18 proof.
 
+`[EVIDENCE EXPANDED 2026-07-20]`: concurrent same-command calls retry only from a fresh whole
+transaction after SQLSTATE `40001`/`40P01`; they never repeat a single function in isolation.
+Crossed debtor/creditor commands complete under the ledger function's UUID lock order, with no
+second reservation, POST, finality or payment outbox effect.
+
 Opis: powiązane z EPIC-33 Story 33.1 — ta sama implementacja, inny kąt (settlement vs money).
 
 Taski:
 - [x] **`GrossInstantStrategy` jedna transakcja przez modułową komendę `LedgerPort` RESERVE→POST.**
-      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `3/0/0 PASS` (2026-07-20).
+      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `9/0/0 PASS` (2026-07-20).
 
 ## Story 36.2 — `settlement_liquidity_checks`
 

@@ -22,12 +22,20 @@ Taski:
 
 ## Story 13.2 — `LedgerPort` jako jedyna droga zapisu
 
-status: not-started
+status: done
 depends_on: [Story 13.1]
 
+`[DONE 2026-07-20]`: ADR-N11's `GrossInstantStrategy` invokes the typed public
+`GrossInstantLedgerPort` extension of `LedgerPort`; the transaction-bound settlement adapter invokes
+only its own narrow command functions and contains no direct `ledger.*` or `payment.*` DML. The
+source mutation guard fails if a raw JDBC connection, an internal commit/rollback, or direct
+settlement cross-schema DML is restored. `GrossInstantOneTxFlowTest` supplies the PostgreSQL 18
+runtime proof that the port participates in the same physical executor transaction.
+
 Taski:
-- [ ] **Test: `settlement` woła wyłącznie `LedgerPort`, nigdy repository `ledger.*` bezpośrednio.**
-      `verify: ./mvnw -f backend test -Dtest=*SettlementNoDirectLedgerWriteTest*`
+- [x] **Test: `settlement` woła wyłącznie `LedgerPort`, nigdy repository `ledger.*` bezpośrednio.**
+      `verify: ./mvnw -f backend test -Dtest=*GrossInstantMutationContractTest,*GrossInstantOneTxFlowTest*`
+      → `15/0/0 PASS` (2026-07-20).
 
 ## Story 13.3 — Test: `settlement` bez grantu `ledger`
 

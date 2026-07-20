@@ -2,11 +2,12 @@
 
 ## Status
 
-`DECISION REQUIRED — no implementation authorization`
+`HISTORICAL — Option 1 approved and frozen as ADR-N11 on 2026-07-20`
 
-This is not an ADR and does not change ADR-N9, ADR-N10, or any frozen one-writer rule. It
-records the source-backed result required before EPIC-33 Story 33.1 / EPIC-36 Story 36.1 can be
-implemented.
+This is not an ADR and did not change ADR-N9, ADR-N10, or any frozen one-writer rule. It records
+the source-backed result that was required before EPIC-33 Story 33.1 / EPIC-36 Story 36.1 could be
+implemented. The user selected its Option 1; ADR-N11 is now the binding decision and the historical
+four-transaction proof remains preserved as the baseline it superseded.
 
 ## Source requirement and current fact
 

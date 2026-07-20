@@ -51,6 +51,10 @@ different command fails closed. Gross insufficient liquidity creates no ledger r
 money effect, no finality, and no successful payment projection; its rejected-attempt/RJCT outcome
 is committed atomically.
 
+Bounded SQLSTATE `40001`/`40P01` retries restart the *whole* Spring-managed JDBC transaction; they
+never retry a single module function in isolation. This preserves the physical one-transaction
+meaning for every successful attempt while making a concurrent same-command race replay safely.
+
 ## Consequences
 
 - A new append-only Flyway slice provisions roles, functions, grants, settlement attempt/outbox
@@ -61,3 +65,5 @@ is committed atomically.
 - No saga, compensation protocol, XA/JTA, `SET LOCAL ROLE`, generic elevated-SQL function,
   direct cross-schema DML grant, scheme-profile mapping, CSM behavior, certification claim,
   receipt-derived finality or ISO-status-derived finality is introduced.
+- `GROSS-INSTANT-ADR-N11-EXECUTION-EVIDENCE.md` records the independent database review and the
+  fresh, upgrade, security, mutation, RLS and concurrency evidence for this frozen decision.

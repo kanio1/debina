@@ -16,9 +16,14 @@ depends_on: []
 one txid and backend PID across RESERVE, POST, ON_LEDGER_POST finality and payment projection; same-command
 replay is duplicate-free and injected failures before/after every command boundary roll back all durable effects.
 
+`[EVIDENCE EXPANDED 2026-07-20]`: the same PostgreSQL 18 fixture now proves concurrent identical
+whole-transaction retry, concurrent conflict fail-closed, crossed-account deterministic locking and
+cross-tenant RLS rollback. V34→V43 upgrade, function-security and mutation evidence are recorded in
+`GROSS-INSTANT-ADR-N11-EXECUTION-EVIDENCE.md`.
+
 Taski:
 - [x] **Zaimplementuj `GrossInstantStrategy`: reserve→post→FINAL w jednej transakcji.**
-      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `3/0/0 PASS` (2026-07-20).
+      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `9/0/0 PASS` (2026-07-20).
 
 ## Story 33.2 — Ścieżka niewystarczającej płynności
 
@@ -27,7 +32,7 @@ depends_on: [Story 33.1]
 
 Taski:
 - [x] **Test: odrzucenie przy niewystarczającej płynności, status RJCT, brak częściowego zapisu.**
-      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `3/0/0 PASS` (2026-07-20;
+      `verify: ./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*` → `9/0/0 PASS` (2026-07-20;
       `insufficientLiquidityIsAtomic_rejectsBusinessStatusAndCreatesNoMoneyOrFinality`).
 
 ## Story 33.3 — Timer SLA + zdarzenie breach
