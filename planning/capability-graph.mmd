@@ -88,12 +88,12 @@ flowchart TB
 
     %% --- Cycle 2 (discovered incidentally, same shape) — FIXED 2026-07-16 ---
     S143["EPIC-14 / Story 14.3\n(finality/transport status)"]
-    S394["EPIC-39 / Story 39.4\n(return vs reversal)"]
-    S392["EPIC-39 / Story 39.2\n(FinalityPolicy)"]
+    S394["EPIC-39 / Story 39.4 done 2026-07-20\n(transport/delivery ≠ finality)"]
+    S392["EPIC-39 / Story 39.2 done 2026-07-20\n(settlement finality authority + projection)"]
     E14 --> S143
-    E39[EPIC-39 not-started] --> S394
+    E39[EPIC-39 done] --> S394
     E39 --> S392
-    E35 --> E39
+    E32 --> E39
     S143 -- "narrowed to Story 39.2 specifically [FIXED]" --> S392
     S394 -- "depends on Story 39.2 — EPIC-14 back-edge REMOVED [FIXED]" --> S392
     S143 -. "shared test DeliveredNotFinalTest, no blocking edge" .- S394
@@ -106,6 +106,7 @@ flowchart TB
 
     class E00,E01,E02,E03,E04,E05,E06,E07,E08,E09,E19,E21,E26,E31,E28,S351,S352,S431 done
     class E10,E11,E20,E23,E24,E27,E35,E13,E32,E43 inprogress
-    class E12,E39,E16 blocked
-    class E14,E44,E45,E46,E53,S313A,S432,S143,S394,S392,S2664,S231B notstarted
+    class E12,E16 blocked
+    class E14,E44,E45,E46,E53,S313A,S432,S143,S2664,S231B notstarted
+    class E39,S394,S392 done
     class GATE,GQLGATE gate

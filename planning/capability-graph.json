@@ -762,12 +762,12 @@
     {
       "id": "EPIC-39.39.2",
       "type": "STORY",
-      "status": "not-started"
+      "status": "done"
     },
     {
       "id": "EPIC-39.39.4",
       "type": "STORY",
-      "status": "not-started"
+      "status": "done"
     },
     {
       "id": "EPIC-21.21.1_21.3",
@@ -1688,7 +1688,7 @@
     },
     {
       "from": "EPIC-39",
-      "to": "EPIC-35",
+      "to": "EPIC-32",
       "type": "REQUIRES"
     },
     {

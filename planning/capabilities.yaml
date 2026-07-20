@@ -101,15 +101,16 @@ decision_resolutions_2026_07_20:
     result: >
       The reservation table, AVAILABLE/RESERVED journal components, terminal-command idempotency,
       deterministic locks and pre-finality reversal boundary are now source-backed. Story 32.2 is
-      executable after its existing Story 32.1 dependency; Story 32.4 remains dependent on the
-      implemented port and finality capability, not on an unresolved decision.
+      implemented and verified (commit e4e7a75); Story 32.4 is no longer transitively blocked but
+      remains SOURCE-BLOCKED on its separate reverse-command and narrow pre-finality read contract.
   - id: gate.EPIC-39.finality-authority
     resolved_by: ADR-N10
     affected: [EPIC-39/Story 39.1, EPIC-39/Story 39.2, EPIC-39/Story 39.3, EPIC-39/Story 39.4]
     result: >
       The finality-rule catalog, immutable snapshot, append-only authority record, payment
       projection, evidence/idempotency/conflict rules and prohibited transport/receipt evidence are
-      source-backed. Existing narrow Story 39.1 -> 39.2 -> 39.3/39.4 dependencies remain.
+      source-backed and verified (commit 2f1a591). The authority's executable dependency narrows
+      to EPIC-32 Story 32.2; catalog-only rules retain no fabricated trigger.
   - id: gate.product-scope.synthetic-lab
     resolved_by: ADR-N9
     affected: [EPIC-32, EPIC-39, EPIC-42, EPIC-47]

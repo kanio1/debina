@@ -22,7 +22,9 @@ depends_on: []
 
 Built: `ledger` schema + dedicated `ledger_role` (V25, mirroring `signature`'s precedent — a genuinely separate module from day one, never the shared `sepa_app` connection). `ledger.liquidity_accounts`, `ledger.journal_entries`, `ledger.journal_lines`, `ledger.balance_snapshots` (V26) — exact DDL from §4.5, schema-prefixed, `gen_random_uuid()` (this repo's established convention, not source's `uuidv7()`). Deferred constraint trigger `ledger.check_entry_balance()`/`trg_entry_balance` enforces Σ(`journal_lines.amount_minor`)=0 per `entry_id` at COMMIT (§4.5 — "a SQL-level invariant, not a Java convention"). Grants exactly match §4.7's own SQL example: `journal_entries`/`journal_lines` get `SELECT, INSERT` only for `ledger_role`, never `UPDATE`/`DELETE`; `liquidity_accounts` gets `SELECT, UPDATE` (source does not grant `INSERT` — account provisioning is out of this story's scope, an open question for Story 32.2). **NO RLS** on any ledger base table (§4.7's explicit table-by-table decision) — table ownership is the sole boundary, confirmed by a test reading `pg_class.relrowsecurity` directly, not just grant behavior.
 
-Explicitly NOT implemented (later stories, forbidden this session): `LedgerPort`/`reserve`/`post`/`release` (32.2), reversal flow/nightly Σ=0 secondary check (32.4), settlement integration.
+`[HISTORICAL 2026-07-17]`: `LedgerPort`/`reserve`/`post`/`release` was then deferred to Story
+32.2. ADR-N10 subsequently authorized and the 2026-07-20 program verified that complete slice;
+reversal/nightly Σ=0 and settlement-flow integration remain later work.
 
 Test-first: `LedgerSchemaMigrationTest` (fresh-database Testcontainers, 7 cases: balanced-entry insert, unbalanced-entry-rejected-at-commit, foreign-role-denied, journal_lines UPDATE-denied, journal_lines DELETE-denied, liquidity_accounts UPDATE-allowed, no-RLS-on-any-base-table) — GREEN on first run (migrations were written before the test in this session, a deviation from strict test-first ordering acknowledged in the session's own final report; RED/GREEN discipline was still applied via mutation-proof instead). `LedgerMigrationUpgradePathTest` (migrate to V24 with representative prior `payment.payments` data, then to V26, confirm survival + immediate usability) — GREEN. Mutation-proof, all 4 caught then reverted: (1) granting foreign role INSERT on `journal_entries` was initially a no-op due to missing schema `USAGE` (a real, useful finding about defense-in-depth), fixed the mutation to include schema USAGE, then correctly caught by `foreignRoleCannotInsertIntoJournalEntries`; (2) granting `ledger_role` UPDATE on `journal_lines` → exactly `ledgerRoleCannotUpdateJournalLines` FAIL; (3) neutering the balance trigger's `HAVING` clause → exactly `unbalancedEntryIsRejectedAtCommitByTheDeferredTrigger` FAIL; (4) enabling RLS on `journal_entries` → exactly `ledgerBaseTablesHaveNoRowLevelSecurityEnabled` FAIL (plus expected incidental failures from default-deny RLS blocking other operations). `git diff --check` clean after each revert, no leftover mutation markers.
 
@@ -34,13 +36,15 @@ Taski:
 
 ## Story 32.2 — Niezmienniki reserve/post/release
 
-status: in-progress
+status: done
 
 depends_on: [Story 32.1]
 
-`[READY 2026-07-20]`: ADR-N10 resolves the former contract gaps: `ledger.reservations`, the
-AVAILABLE/RESERVED journal-line component, one terminal transition, command-id replay, deterministic
-locks and atomicity. Implement the complete port, not a partial reserve-only slice.
+`[DONE 2026-07-20]`: ADR-N10's durable `ledger.reservations`, AVAILABLE/RESERVED components,
+single terminal transition, terminal-command replay, deterministic locks and atomicity are
+implemented by `JdbcLedgerPort` and V34. PostgreSQL 18 proof includes fresh and V30→V34 migration,
+zero-sum reserve/release/post semantics, typed insufficient liquidity, rollback, deterministic
+concurrency, grants, append-only journal lines and six reverted mutations. Commit: `e4e7a75`.
 
 Opis: test współbieżności no-double-reserve.
 
@@ -59,13 +63,13 @@ the newly accepted decision.
 | Nowa tabela `ledger.reservations`? | Zabroniona explicite przez tę sesję bez jednoznacznego źródła (`sepa-nexus-decision-gate.md` linia 170 to za mało — gołe słowo w komórce tabeli, nie DDL) | brak zgody na wynalezienie |
 | `NoDoubleReserveConcurrencyTest` może być non-vacuous? | Sama współbieżność `reserve()` (rywalizacja o `FOR UPDATE` na TYM SAMYM koncie) jest w pełni testowalna i jednoznaczna — ale "podwójny post/release TEJ SAMEJ rezerwacji" (jawnie wymagane przez taski Story 32.2's "niezmienniki transakcyjne" i tę sesję's §18 "drugi post/release nie tworzy drugiego efektu") zależy od nierozstrzygniętego elementu wyżej | PASS (dla samego reserve) / **BLOCKED** (dla post/release idempotency) |
 
-Zgodnie z jawną instrukcją tej sesji ("jeżeli któregokolwiek kluczowego elementu brakuje: nie twórz `ledger.reservations`; nie koduj połowy portu; oznacz Story 32.2 `[CAPABILITY-BLOCKED]`") — **nie zaimplementowano żadnej części `LedgerPort`** (ani samego `reserve()`, mimo że ta konkretna operacja jest źródłowo w pełni zdefiniowana — implementacja połowy portu bez `post()`/`release()` naruszałaby explicit zakaz "nie koduj połowy portu"). Story 32.4 (reversal, `depends_on: [Story 32.2]`) jest przez to transytywnie zablokowana — patrz niżej.
-
-**Otwarte pytanie do rozstrzygnięcia przez użytkownika/zespół**: czy `RESERVE`/`RELEASE` mają w ogóle tworzyć `journal_lines` (i jeśli tak — jaki jest dokładny kształt linii dla operacji dotyczącej jednego konta), oraz jaki mechanizm (nowa kolumna na `journal_entries`? nowa, źródłowo uzasadniona tabela? coś innego?) ma zapobiegać podwójnemu skonsumowaniu tej samej rezerwacji przez `post()`/`release()`.
+`[SUPERSEDED BY ADR-N10 2026-07-20]`: the historical missing-contract questions above are
+resolved by the accepted reservation model. The implementation deliberately remains limited to
+`reserve`/`post`/`release`; it does not add reversal or settlement orchestration.
 
 Taski:
-- [ ] **Zaimplementuj `LedgerPort.reserve/post/release` z niezmiennikami transakcyjnymi.** `[CAPABILITY-BLOCKED]`
-      `verify: ./mvnw -f backend test -Dtest=*NoDoubleReserveConcurrencyTest*`
+- [x] **Zaimplementuj `LedgerPort.reserve/post/release` z niezmiennikami transakcyjnymi.**
+      `verify: ./mvnw -f backend test -Dtest=JdbcLedgerPortTest,JdbcLedgerPortConcurrencyTest,JdbcLedgerPortRollbackTest,LedgerReservationMigrationProofTest,LedgerPortReservationProtocolContractTest,SettlementRoleNoLedgerGrantTest,LedgerSchemaOwnershipTest,JournalLinesImmutabilityTest,ClockPortEnforcementTest` → `32/0/0` PASS (2026-07-20).
 
 ## Story 32.3 — Deferred constraint trigger + niemutowalność
 
@@ -87,13 +91,16 @@ Taski:
 
 ## Story 32.4 — Przepływ reversal
 
-status: not-started (`[CAPABILITY-BLOCKED]` — transitive)
+status: not-started (`[SOURCE-BLOCKED]` — separate reversal contract/read boundary)
 
 depends_on: [Story 32.2]
 
 Opis: reversal to osobny wpis, nigdy mutacja; nightly Σ=0 job jako drugorzędna kontrola.
 
-`[CAPABILITY-BLOCKED 2026-07-17 — transitive from Story 32.2]`: formalnie zależy od `Story 32.2`, która jest `[CAPABILITY-BLOCKED]` (patrz wyżej) — `LedgerPort` (na którym reversal musi zostać zbudowany, per §4.11 "reverse(entryId,reason)" jako część tego samego portu) nie istnieje. Dodatkowo, ta sesja przeprowadziła NIEZALEŻNY audyt pytań kontraktowych specyficznych dla reversal (sekcja "PHASE F" tej sesji) i potwierdziła DRUGI, osobny blocker: **mechanizm "pre-finality authority"** (kto i jak `ledger` dowiaduje się, czy oryginalny wpis jest jeszcze przed finalnością, bez bezpośredniego SQL do `payment.*`/`settlement.*`) nie istnieje w ogóle w tym repozytorium — `EPIC-39` (model finalności: katalog `finality_rule`, `FinalityPolicy`, `settlement_finality_records`) jest w całości `not-started`; `payment.payments` nie ma dziś kolumny `finality_at`. Nie ma więc ani publicznego portu, ani kolumny, z której `ledger` mogłoby bezpiecznie i zgodnie z granicami modułów odczytać ten stan. Nie zaimplementowano.
+`[SOURCE-BLOCKED 2026-07-20]`: Story 32.2 and EPIC-39 authority are now implemented, but ADR-N10
+keeps `reverse()` separate and permits it only for an internal booking correction before finality.
+No source-backed `reverse` command contract or narrow pre-finality read port exists yet; ledger must
+not query `payment.*` or `settlement.*` directly. Do not infer either mechanism from this story.
 
 `[PLANNING-NOTE]`: task's tekst nadal wspomina `ledger.ledger_reversals` — ta sama, już raz skorygowana (Story 32.1) nieścisłość. Gdy ta story zostanie odblokowana, reversal ma być budowany jako nowy wiersz `journal_entries` (`entry_type='REVERSAL'`, `reversal_of_entry_id`), NIE osobna tabela — patrz Story 32.1's `[PLANNING-CORRECTION]`.
 

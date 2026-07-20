@@ -201,7 +201,7 @@
     },
     {
       "epic": "EPIC-39",
-      "status": "in-progress",
+      "status": "done",
       "source_file": "planning/epics/EPIC-39-settlement-finality-model.md"
     },
     {
@@ -2288,15 +2288,15 @@
       "epic": "EPIC-32",
       "story": "32.2",
       "title": "Niezmienniki reserve/post/release",
-      "status": "in-progress",
+      "status": "done",
       "depends_on": [
         "Story 32.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*NoDoubleReserveConcurrencyTest*"
+        "./mvnw -f backend test -Dtest=JdbcLedgerPortTest,JdbcLedgerPortConcurrencyTest,JdbcLedgerPortRollbackTest,LedgerReservationMigrationProofTest,LedgerPortReservationProtocolContractTest,SettlementRoleNoLedgerGrantTest,LedgerSchemaOwnershipTest,JournalLinesImmutabilityTest,ClockPortEnforcementTest"
       ],
       "source_file": "planning/epics/EPIC-32-ledger-core.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-32 Story 32.2 implementation session"
     },
     {
       "epic": "EPIC-32",
@@ -2615,55 +2615,55 @@
       "epic": "EPIC-39",
       "story": "39.1",
       "title": "Katalog `finality_rule`",
-      "status": "in-progress",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "psql -c \"\\d reference_data.finality_rule\""
+        "./mvnw -f backend test -Dtest=FinalitySchemaMigrationTest,FinalityMigrationUpgradePathTest"
       ],
       "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-39 Story 39.1 implementation session"
     },
     {
       "epic": "EPIC-39",
       "story": "39.2",
       "title": "`FinalityPolicy` + `settlement_finality_records`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 39.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*FinalityPolicyTest*"
+        "./mvnw -f backend test -Dtest=SettlementFinalityServiceTest,JdbcPaymentFinalityProjectionIntegrationTest,FinalitySchemaMigrationTest"
       ],
       "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-39 Story 39.2 implementation session"
     },
     {
       "epic": "EPIC-39",
       "story": "39.3",
       "title": "Test: accepted/posted ≠ final",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 39.2"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*AcceptedPostedNotFinalTest*"
+        "./mvnw -f backend test -Dtest=SettlementFinalityServiceTest,PaymentHistoryFreshMigrationFinalityTest,PaymentHistoryOwnershipTest"
       ],
       "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-39 Story 39.3 implementation session"
     },
     {
       "epic": "EPIC-39",
       "story": "39.4",
       "title": "Test: dostawa ≠ finalność",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 39.2"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*DeliveredNotFinalTest*"
+        "./mvnw -f backend test -Dtest=SettlementFinalityServiceTest,EgressCannotWritePaymentStatusTest"
       ],
       "source_file": "planning/epics/EPIC-39-settlement-finality-model.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-39 Story 39.4 implementation session"
     },
     {
       "epic": "EPIC-40",
