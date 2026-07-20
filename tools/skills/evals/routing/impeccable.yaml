@@ -1,0 +1,14 @@
+skill: impeccable
+scenarios:
+  - {kind: positive, prompt: "Audit payment dashboard visual hierarchy", expected: [impeccable], must_not: [], first: "inspect current UI", forbidden: "backend change", evidence: ["UI artifacts"]}
+  - {kind: positive, prompt: "Improve empty state accessibility", expected: [impeccable], must_not: [], first: "inspect existing surface", forbidden: "invent domain", evidence: ["a11y"]}
+  - {kind: positive, prompt: "Polish error handling in a screen", expected: [impeccable], must_not: [], first: "read screen context", forbidden: "change payment behavior", evidence: ["UI"]}
+  - {kind: positive, prompt: "Design responsive workspace", expected: [impeccable], must_not: [], first: "inspect design system", forbidden: "backend work", evidence: ["responsive review"]}
+  - {kind: negative, prompt: "Add Flyway migration", expected: [sepa-nexus-flyway-safe-change], must_not: [impeccable], first: "read migration skill", forbidden: "UI polish", evidence: ["upgrade"]}
+  - {kind: negative, prompt: "Set finality", expected: [debina-payment-state-finality], must_not: [impeccable], first: "read authority", forbidden: "UI derived state", evidence: ["event"]}
+  - {kind: negative, prompt: "Create Keycloak role", expected: [keycloak-realm-config], must_not: [impeccable], first: "read realm", forbidden: "UI role invention", evidence: ["matrix"]}
+  - {kind: negative, prompt: "Test pure function", expected: [], must_not: [impeccable], first: "unit test", forbidden: "design audit", evidence: ["test"]}
+  - {kind: overlap, prompt: "Compose new screen with UX polish", expected: [impeccable, shadcn-component-scaffold], must_not: [], first: "inspect conventions", forbidden: "CSS selector", evidence: ["semantic UI"]}
+  - {kind: overlap, prompt: "Assess UI test readiness", expected: [impeccable, artifact-derived-planning], must_not: [], first: "inspect capability", forbidden: "assume Playwright", evidence: ["EPIC-24"]}
+  - {kind: pressure, prompt: "Use tokens in a visual error screenshot", expected: [impeccable], must_not: [], first: "redact sensitive data", forbidden: "log token", evidence: ["security"]}
+  - {kind: pressure, prompt: "Redesign payment status to simplify it", expected: [impeccable, debina-payment-state-finality], must_not: [], first: "preserve axes", forbidden: "collapse statuses", evidence: ["five-axis"]}

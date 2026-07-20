@@ -1,0 +1,7 @@
+# Debina local skills
+
+Debina keeps a small, repository-local skill set because project rules, frozen architecture and executable evidence are more important than general marketplace guidance. The requested canonical location is `.agents/skills/<name>/`; this checkout currently mounts `.agents` read-only, so the effective tracked root remains `.claude/skills/` until the repository owner provides a writable canonical path. This exception is recorded in the inventory and review; no symlink or user-home coupling was fabricated.
+
+Source precedence is accepted ADR/`[FREEZE]`, authoritative blueprint, accepted decision record, current `HANDOFF.md`, capability readiness, planning, implementation, tests/runtime evidence, then external material. External skills are reviewed source material, never architecture authority.
+
+To add/update a skill: inspect existing names and routing, write concise English frontmatter and core workflow, put optional details one level under `references/`, add registry/eval/assertion entries, record reviewed upstream provenance, and run `bash tools/skills/validate-all-skills.sh`. Add routing fixtures under `tools/skills/evals/routing/`; add behavior results only when a documented safe evaluator exists. Promote a Wave 2 entry by creating its canonical directory, changing registry status after source/readiness review, and adding validation/evals. Deprecate by changing registry status and removing/relocating the active directory only after all references are updated, never by leaving duplicate names.

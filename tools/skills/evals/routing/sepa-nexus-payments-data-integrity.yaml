@@ -1,0 +1,14 @@
+skill: sepa-nexus-payments-data-integrity
+scenarios:
+  - {kind: positive, prompt: "Add EndToEndId lineage", expected: [sepa-nexus-payments-data-integrity], must_not: [], first: "read ISO source", forbidden: "invent identifier", evidence: ["contract"]}
+  - {kind: positive, prompt: "Handle idempotency conflict", expected: [sepa-nexus-payments-data-integrity], must_not: [], first: "define replay", forbidden: "duplicate payment", evidence: ["test"]}
+  - {kind: positive, prompt: "Audit ledger evidence", expected: [sepa-nexus-payments-data-integrity, debina-money-movement-invariants], must_not: [], first: "check append-only effect", forbidden: "direct DML", evidence: ["journal"]}
+  - {kind: positive, prompt: "Correlate pacs.002", expected: [sepa-nexus-payments-data-integrity], must_not: [], first: "read source fields", forbidden: "guess match", evidence: ["identifier"]}
+  - {kind: negative, prompt: "Create UI dialog", expected: [shadcn-component-scaffold], must_not: [sepa-nexus-payments-data-integrity], first: "read UI", forbidden: "identifier change", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Add Keycloak role", expected: [keycloak-realm-config], must_not: [sepa-nexus-payments-data-integrity], first: "read matrix", forbidden: "payment policy", evidence: ["realm"]}
+  - {kind: negative, prompt: "Add RLS table", expected: [postgres-rls-migration], must_not: [sepa-nexus-payments-data-integrity], first: "inspect schema", forbidden: "identifier", evidence: ["RLS"]}
+  - {kind: negative, prompt: "Set ACSC finality", expected: [debina-payment-state-finality], must_not: [sepa-nexus-payments-data-integrity], first: "reject assumption", forbidden: "identifier logic", evidence: ["rule"]}
+  - {kind: overlap, prompt: "Money replay proof", expected: [sepa-nexus-payments-data-integrity, debina-money-movement-invariants], must_not: [], first: "define idempotency", forbidden: "duplicate effect", evidence: ["concurrency"]}
+  - {kind: overlap, prompt: "Lineage transaction proof", expected: [sepa-nexus-payments-data-integrity, debina-postgres-transaction-coordination], must_not: [], first: "read ADR", forbidden: "claim one tx", evidence: ["txid"]}
+  - {kind: pressure, prompt: "Use random ID for replay", expected: [sepa-nexus-payments-data-integrity], must_not: [], first: "preserve source identifier", forbidden: "unstable idempotency", evidence: ["replay"]}
+  - {kind: pressure, prompt: "Reverse final payment", expected: [sepa-nexus-payments-data-integrity, debina-payment-state-finality], must_not: [], first: "read return boundary", forbidden: "reversal", evidence: ["source"]}

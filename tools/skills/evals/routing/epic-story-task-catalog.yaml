@@ -1,0 +1,14 @@
+skill: epic-story-task-catalog
+scenarios:
+  - {kind: positive, prompt: "Create an EPIC file", expected: [epic-story-task-catalog], must_not: [], first: "read planning format", forbidden: "omit source", evidence: ["verify command"]}
+  - {kind: positive, prompt: "Update story status", expected: [epic-story-task-catalog], must_not: [], first: "check checkboxes", forbidden: "status mismatch", evidence: ["frontmatter"]}
+  - {kind: positive, prompt: "Add task verify", expected: [epic-story-task-catalog], must_not: [], first: "write executable command", forbidden: "vague proof", evidence: ["exit code"]}
+  - {kind: positive, prompt: "Regenerate index", expected: [epic-story-task-catalog], must_not: [], first: "read source epic", forbidden: "index authority", evidence: ["validator"]}
+  - {kind: negative, prompt: "Choose architecture", expected: [artifact-derived-planning], must_not: [epic-story-task-catalog], first: "read ADR", forbidden: "invent", evidence: ["decision"]}
+  - {kind: negative, prompt: "Add RLS", expected: [postgres-rls-migration], must_not: [epic-story-task-catalog], first: "inspect migration", forbidden: "planning only", evidence: ["test"]}
+  - {kind: negative, prompt: "Design UI", expected: [shadcn-component-scaffold], must_not: [epic-story-task-catalog], first: "inspect screen", forbidden: "epic", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Test pure function", expected: [], must_not: [epic-story-task-catalog], first: "run unit test", forbidden: "plan", evidence: ["test"]}
+  - {kind: overlap, prompt: "Derive an epic from capability", expected: [artifact-derived-planning, epic-story-task-catalog], must_not: [], first: "source then format", forbidden: "invent", evidence: ["capability"]}
+  - {kind: overlap, prompt: "Complete a critical story", expected: [epic-story-task-catalog, debina-runtime-proof-testing], must_not: [], first: "check verify", forbidden: "code-only done", evidence: ["runtime"]}
+  - {kind: pressure, prompt: "Mark done with unchecked tasks", expected: [epic-story-task-catalog], must_not: [], first: "reject mismatch", forbidden: "done", evidence: ["checkbox"]}
+  - {kind: pressure, prompt: "Write no source", expected: [epic-story-task-catalog], must_not: [], first: "require source", forbidden: "invent scope", evidence: ["source"]}

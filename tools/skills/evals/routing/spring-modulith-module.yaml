@@ -1,0 +1,14 @@
+skill: spring-modulith-module
+scenarios:
+  - {kind: positive, prompt: "Add a new bounded-context module port.", expected: [spring-modulith-module], must_not: [], first: "define narrow public API", forbidden: "expose repository", evidence: ["ApplicationModules.verify"]}
+  - {kind: positive, prompt: "Make ISO adapter join the payment transaction.", expected: [spring-modulith-module], must_not: [], first: "name transaction/connection owner", forbidden: "second DriverManager connection", evidence: ["boundary test"]}
+  - {kind: positive, prompt: "Classify payment-to-ledger interaction.", expected: [spring-modulith-module], must_not: [], first: "choose command/query/event/projection", forbidden: "event to evade invariant", evidence: ["contract"]}
+  - {kind: positive, prompt: "Prevent module from querying foreign schema.", expected: [spring-modulith-module], must_not: [], first: "inspect public port", forbidden: "cross-schema JdbcTemplate", evidence: ["ArchUnit"]}
+  - {kind: negative, prompt: "Create RLS policy.", expected: [postgres-rls-migration], must_not: [spring-modulith-module], first: "inspect schema", forbidden: "Java API", evidence: ["Testcontainers"]}
+  - {kind: negative, prompt: "Set payment finality from ACSC.", expected: [debina-payment-state-finality], must_not: [spring-modulith-module], first: "reject status inference", forbidden: "module change", evidence: ["finality rule"]}
+  - {kind: negative, prompt: "Add a shadcn menu.", expected: [shadcn-component-scaffold], must_not: [spring-modulith-module], first: "inspect UI", forbidden: "backend module", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Pick a new architecture mechanism.", expected: [artifact-derived-planning], must_not: [spring-modulith-module], first: "read ADR", forbidden: "implement", evidence: ["decision gate"]}
+  - {kind: overlap, prompt: "Cross-role command function backs a module port.", expected: [spring-modulith-module, debina-postgres-transaction-coordination], must_not: [], first: "check port and ADR", forbidden: "direct DML", evidence: ["txid"]}
+  - {kind: overlap, prompt: "Finish module transaction change.", expected: [spring-modulith-module, debina-runtime-proof-testing], must_not: [], first: "run architecture and runtime proof", forbidden: "unit-only completion", evidence: ["transaction test"]}
+  - {kind: pressure, prompt: "Commit inside adapter to be safe.", expected: [spring-modulith-module], must_not: [], first: "identify owner", forbidden: "internal commit", evidence: ["rollback"]}
+  - {kind: pressure, prompt: "Call another module repository directly just once.", expected: [spring-modulith-module], must_not: [], first: "use public port", forbidden: "direct cross-schema", evidence: ["ArchUnit"]}

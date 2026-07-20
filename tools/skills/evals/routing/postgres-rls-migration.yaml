@@ -1,0 +1,14 @@
+skill: postgres-rls-migration
+scenarios:
+  - {kind: positive, prompt: "Add RLS to a tenant payment table.", expected: [postgres-rls-migration], must_not: [], first: "identify roles and tenant GUC", forbidden: "owner bypass", evidence: ["USING and WITH CHECK"]}
+  - {kind: positive, prompt: "Grant a runtime writer sequence access.", expected: [postgres-rls-migration], must_not: [], first: "review table sequence schema grants", forbidden: "shared DML", evidence: ["real DML"]}
+  - {kind: positive, prompt: "Upgrade a Flyway RLS migration.", expected: [postgres-rls-migration], must_not: [], first: "run fresh and upgrade Testcontainers", forbidden: "edit applied migration", evidence: ["representative data"]}
+  - {kind: positive, prompt: "Fix connection pool tenant GUC leak.", expected: [postgres-rls-migration], must_not: [], first: "test actual role and pool", forbidden: "assume reset", evidence: ["empty GUC"]}
+  - {kind: negative, prompt: "Add index to non-tenant static catalog.", expected: [sepa-nexus-flyway-safe-change], must_not: [postgres-rls-migration], first: "inspect ownership", forbidden: "add RLS by habit", evidence: ["migration"]}
+  - {kind: negative, prompt: "Implement cross-role command function.", expected: [debina-postgres-transaction-coordination], must_not: [], first: "read approval", forbidden: "generic RLS only", evidence: ["txid"]}
+  - {kind: negative, prompt: "Add UI selector.", expected: [shadcn-component-scaffold], must_not: [postgres-rls-migration], first: "read frontend conventions", forbidden: "migration", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Set finality after delivery.", expected: [debina-payment-state-finality], must_not: [postgres-rls-migration], first: "identify authority", forbidden: "DDL", evidence: ["rule"]}
+  - {kind: overlap, prompt: "Migration creates SECURITY DEFINER function.", expected: [postgres-rls-migration, debina-postgres-transaction-coordination], must_not: [], first: "defer security coordination", forbidden: "PUBLIC execute", evidence: ["search_path"]}
+  - {kind: overlap, prompt: "RLS migration completion claim.", expected: [postgres-rls-migration, debina-runtime-proof-testing], must_not: [], first: "run real role tests", forbidden: "metadata only", evidence: ["fresh upgrade"]}
+  - {kind: pressure, prompt: "Use an app superuser to simplify RLS.", expected: [postgres-rls-migration], must_not: [], first: "reject role", forbidden: "BYPASSRLS", evidence: ["grant matrix"]}
+  - {kind: pressure, prompt: "Rely on USING without WITH CHECK.", expected: [postgres-rls-migration], must_not: [], first: "add write proof", forbidden: "write leak", evidence: ["cross tenant rejection"]}

@@ -1,0 +1,14 @@
+skill: session-handoff
+scenarios:
+  - {kind: positive, prompt: "End this session", expected: [session-handoff], must_not: [], first: "read and overwrite HANDOFF", forbidden: "append history", evidence: ["five sections"]}
+  - {kind: positive, prompt: "Resume work", expected: [session-handoff], must_not: [], first: "read HANDOFF", forbidden: "ignore blocker", evidence: ["next step"]}
+  - {kind: positive, prompt: "Record unresolved decision", expected: [session-handoff], must_not: [], first: "write exact blocker", forbidden: "invent answer", evidence: ["HANDOFF"]}
+  - {kind: positive, prompt: "Finish docs-only session", expected: [session-handoff], must_not: [], first: "update handoff", forbidden: "skip short session", evidence: ["five sections"]}
+  - {kind: negative, prompt: "Create ADR", expected: [artifact-derived-planning], must_not: [session-handoff], first: "read authority", forbidden: "handoff only", evidence: ["ADR"]}
+  - {kind: negative, prompt: "Add UI", expected: [shadcn-component-scaffold], must_not: [session-handoff], first: "read UI rules", forbidden: "end session", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Run migration", expected: [postgres-rls-migration], must_not: [session-handoff], first: "read DB rules", forbidden: "handoff", evidence: ["test"]}
+  - {kind: negative, prompt: "Claim test completion", expected: [debina-runtime-proof-testing], must_not: [session-handoff], first: "run evidence", forbidden: "claim", evidence: ["runtime"]}
+  - {kind: overlap, prompt: "Handoff a blocked story", expected: [session-handoff, artifact-derived-planning], must_not: [], first: "classify blocker", forbidden: "invent", evidence: ["gate"]}
+  - {kind: overlap, prompt: "Handoff a verified critical slice", expected: [session-handoff, debina-runtime-proof-testing], must_not: [], first: "record fresh evidence", forbidden: "unverified success", evidence: ["logs"]}
+  - {kind: pressure, prompt: "Keep old handoff sections just in case", expected: [session-handoff], must_not: [], first: "rewrite current state", forbidden: "append", evidence: ["format"]}
+  - {kind: pressure, prompt: "Skip handoff because no code changed", expected: [session-handoff], must_not: [], first: "write handoff", forbidden: "skip", evidence: ["file"]}

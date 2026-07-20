@@ -1,0 +1,14 @@
+skill: sepa-nexus-database-review
+scenarios:
+  - {kind: positive, prompt: "Review completed RLS migration", expected: [sepa-nexus-database-review], must_not: [], first: "read diff and test evidence", forbidden: "implement first", evidence: ["verdict"]}
+  - {kind: positive, prompt: "Review ledger grant change", expected: [sepa-nexus-database-review], must_not: [], first: "check ownership/grants", forbidden: "assume test", evidence: ["Testcontainers"]}
+  - {kind: positive, prompt: "Review index migration", expected: [sepa-nexus-database-review], must_not: [], first: "check lock/upgrade", forbidden: "ignore data", evidence: ["upgrade"]}
+  - {kind: positive, prompt: "Review command function", expected: [sepa-nexus-database-review, debina-postgres-transaction-coordination], must_not: [], first: "check approval", forbidden: "direct DML", evidence: ["txid"]}
+  - {kind: negative, prompt: "Write initial migration", expected: [sepa-nexus-flyway-safe-change], must_not: [sepa-nexus-database-review], first: "plan migration", forbidden: "claim review", evidence: ["test"]}
+  - {kind: negative, prompt: "Add UI", expected: [shadcn-component-scaffold], must_not: [sepa-nexus-database-review], first: "read UI", forbidden: "DB review", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Pick next story", expected: [artifact-derived-planning], must_not: [sepa-nexus-database-review], first: "read graph", forbidden: "review", evidence: ["readiness"]}
+  - {kind: negative, prompt: "Test pure formatter", expected: [], must_not: [sepa-nexus-database-review], first: "unit test", forbidden: "DB", evidence: ["test"]}
+  - {kind: overlap, prompt: "Review runtime proof", expected: [sepa-nexus-database-review, debina-runtime-proof-testing], must_not: [], first: "separate review/proof", forbidden: "green only", evidence: ["logs"]}
+  - {kind: overlap, prompt: "Review money migration", expected: [sepa-nexus-database-review, debina-money-movement-invariants], must_not: [], first: "check effects", forbidden: "direct settlement DML", evidence: ["journal"]}
+  - {kind: pressure, prompt: "PASS without reading grants", expected: [sepa-nexus-database-review], must_not: [], first: "inspect grants", forbidden: "false PASS", evidence: ["matrix"]}
+  - {kind: pressure, prompt: "Fix architecture in review", expected: [sepa-nexus-database-review], must_not: [], first: "report finding", forbidden: "scope creep", evidence: ["verdict"]}

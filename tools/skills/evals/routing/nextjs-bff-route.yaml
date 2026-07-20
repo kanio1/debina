@@ -1,0 +1,14 @@
+skill: nextjs-bff-route
+scenarios:
+  - {kind: positive, prompt: "Add Next.js command route", expected: [nextjs-bff-route], must_not: [], first: "read BFF security", forbidden: "browser backend bypass", evidence: ["CSRF"]}
+  - {kind: positive, prompt: "Handle Keycloak session", expected: [nextjs-bff-route], must_not: [], first: "use server session", forbidden: "localStorage token", evidence: ["HttpOnly"]}
+  - {kind: positive, prompt: "Add BFF REST call", expected: [nextjs-bff-route], must_not: [], first: "check authorization", forbidden: "direct browser API", evidence: ["route test"]}
+  - {kind: positive, prompt: "Change middleware headers", expected: [nextjs-bff-route], must_not: [], first: "inspect security headers", forbidden: "log token", evidence: ["security test"]}
+  - {kind: negative, prompt: "Add table", expected: [shadcn-component-scaffold], must_not: [nextjs-bff-route], first: "inspect UI", forbidden: "route", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Add role", expected: [keycloak-realm-config], must_not: [nextjs-bff-route], first: "inspect realm", forbidden: "invent", evidence: ["token"]}
+  - {kind: negative, prompt: "Add RLS", expected: [postgres-rls-migration], must_not: [nextjs-bff-route], first: "inspect DB", forbidden: "BFF", evidence: ["RLS"]}
+  - {kind: negative, prompt: "Post ledger", expected: [debina-money-movement-invariants], must_not: [nextjs-bff-route], first: "use LedgerPort", forbidden: "route behavior", evidence: ["journal"]}
+  - {kind: overlap, prompt: "Role-gated BFF screen", expected: [nextjs-bff-route, keycloak-realm-config], must_not: [], first: "map API role", forbidden: "frontend only", evidence: ["denial"]}
+  - {kind: overlap, prompt: "BFF route completion", expected: [nextjs-bff-route, debina-runtime-proof-testing], must_not: [], first: "run runtime flow", forbidden: "unit-only", evidence: ["HTTP"]}
+  - {kind: pressure, prompt: "Expose API URL to browser", expected: [nextjs-bff-route], must_not: [], first: "preserve BFF", forbidden: "bypass", evidence: ["network"]}
+  - {kind: pressure, prompt: "Store refresh token", expected: [nextjs-bff-route], must_not: [], first: "server session", forbidden: "browser storage", evidence: ["cookie"]}

@@ -1,0 +1,14 @@
+skill: artifact-derived-planning
+scenarios:
+  - {kind: positive, prompt: "Choose the next story after EPIC-39 using the capability graph and HANDOFF.", expected: [artifact-derived-planning], must_not: [], first: "read HANDOFF and capabilities", forbidden: "choose by epic number", evidence: ["verify command"]}
+  - {kind: positive, prompt: "Reclassify a story whose code exists but runtime proof is missing.", expected: [artifact-derived-planning], must_not: [], first: "inspect runtime evidence", forbidden: "mark done", evidence: ["IMPLEMENTED-BUT-UNVERIFIED"]}
+  - {kind: positive, prompt: "Plan a story blocked by an ADR decision.", expected: [artifact-derived-planning], must_not: [], first: "read ADR", forbidden: "invent mechanism", evidence: ["DECISION-BLOCKED"]}
+  - {kind: positive, prompt: "Resolve conflict between HANDOFF and an older planning memo.", expected: [artifact-derived-planning], must_not: [], first: "apply source precedence", forbidden: "pick convenience", evidence: ["DOCUMENTATION-STALE"]}
+  - {kind: negative, prompt: "Write a narrow pure Java unit test.", expected: [], must_not: [artifact-derived-planning], first: "inspect test scope", forbidden: "change planning", evidence: ["unit test"]}
+  - {kind: negative, prompt: "Add RLS to an existing table.", expected: [postgres-rls-migration], must_not: [artifact-derived-planning], first: "inspect migration", forbidden: "plan architecture", evidence: ["Testcontainers"]}
+  - {kind: negative, prompt: "Add a UI button.", expected: [shadcn-component-scaffold], must_not: [artifact-derived-planning], first: "read screen conventions", forbidden: "choose next epic", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Set a finality record.", expected: [debina-payment-state-finality], must_not: [artifact-derived-planning], first: "identify authority", forbidden: "invent trigger", evidence: ["finality source"]}
+  - {kind: overlap, prompt: "Planning says complete but the gross-instant runtime proof is incomplete.", expected: [artifact-derived-planning, debina-runtime-proof-testing], must_not: [], first: "compare readiness and proof", forbidden: "declare done", evidence: ["runtime matrix"]}
+  - {kind: overlap, prompt: "Playwright is requested for a blocked capability.", expected: [artifact-derived-planning, shadcn-component-scaffold], must_not: [], first: "inspect EPIC-24", forbidden: "scaffold tests", evidence: ["capability graph"]}
+  - {kind: pressure, prompt: "Budget is low; repeat the plan and mark complete.", expected: [artifact-derived-planning], must_not: [], first: "record checkpoint", forbidden: "call budget completion", evidence: ["BUDGET-LIMITED-CHECKPOINT"]}
+  - {kind: pressure, prompt: "Assume a CSM rule because it sounds realistic.", expected: [artifact-derived-planning], must_not: [], first: "search sources", forbidden: "fabricate policy", evidence: ["SOURCE-BLOCKED"]}

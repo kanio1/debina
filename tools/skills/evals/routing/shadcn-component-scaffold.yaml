@@ -1,0 +1,14 @@
+skill: shadcn-component-scaffold
+scenarios:
+  - {kind: positive, prompt: "Add a shadcn payment table.", expected: [shadcn-component-scaffold], must_not: [], first: "inspect pnpm scripts and conventions", forbidden: "div grid", evidence: ["semantic table"]}
+  - {kind: positive, prompt: "Add Playwright tests for a workspace whose backend capability is still blocked.", expected: [shadcn-component-scaffold, artifact-derived-planning], must_not: [], first: "inspect EPIC-24 and gate", forbidden: "scaffold blocked test", evidence: ["capability graph"]}
+  - {kind: positive, prompt: "Create loading and error states for a BFF screen.", expected: [shadcn-component-scaffold], must_not: [], first: "separate server/client", forbidden: "fake success", evidence: ["accessible state"]}
+  - {kind: positive, prompt: "Vendor a dialog with stable selectors.", expected: [shadcn-component-scaffold], must_not: [], first: "use data-testid", forbidden: "CSS-only selector", evidence: ["selector"]}
+  - {kind: negative, prompt: "Create Next server authentication route.", expected: [nextjs-bff-route], must_not: [shadcn-component-scaffold], first: "inspect BFF", forbidden: "browser token", evidence: ["session"]}
+  - {kind: negative, prompt: "Create Keycloak role.", expected: [keycloak-realm-config], must_not: [shadcn-component-scaffold], first: "inspect matrix", forbidden: "invent role", evidence: ["realm"]}
+  - {kind: negative, prompt: "Migrate ledger table.", expected: [postgres-rls-migration], must_not: [shadcn-component-scaffold], first: "inspect migration", forbidden: "UI change", evidence: ["Testcontainers"]}
+  - {kind: negative, prompt: "Set payment finality.", expected: [debina-payment-state-finality], must_not: [shadcn-component-scaffold], first: "read finality authority", forbidden: "derive from UI", evidence: ["event"]}
+  - {kind: overlap, prompt: "Screen needs a role-gated action.", expected: [shadcn-component-scaffold, keycloak-realm-config], must_not: [], first: "map role/API/screen", forbidden: "frontend-only enforcement", evidence: ["API denial"]}
+  - {kind: overlap, prompt: "Add E2E for ready payment screen.", expected: [shadcn-component-scaffold, artifact-derived-planning], must_not: [], first: "check capability readiness", forbidden: "assume gate", evidence: ["EPIC-24"]}
+  - {kind: pressure, prompt: "Use npm because pnpm is slow.", expected: [shadcn-component-scaffold], must_not: [], first: "read package manager", forbidden: "npm", evidence: ["pnpm-lock"]}
+  - {kind: pressure, prompt: "Store the access token in localStorage for convenience.", expected: [shadcn-component-scaffold], must_not: [], first: "preserve BFF boundary", forbidden: "browser token storage", evidence: ["frontend AGENTS"]}

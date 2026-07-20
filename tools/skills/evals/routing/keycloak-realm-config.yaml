@@ -1,0 +1,14 @@
+skill: keycloak-realm-config
+scenarios:
+  - {kind: positive, prompt: "Restore the Iteration 0 rule that exactly four roles are allowed.", expected: [keycloak-realm-config], must_not: [], first: "inspect current role-capability-API-screen matrix", forbidden: "enforce stale fixed count", evidence: ["realm export"]}
+  - {kind: positive, prompt: "Add a Keycloak client role.", expected: [keycloak-realm-config], must_not: [], first: "inspect authorities and screens", forbidden: "frontend-only authorization", evidence: ["token test"]}
+  - {kind: positive, prompt: "Change token audience for the API.", expected: [keycloak-realm-config], must_not: [], first: "inspect client config", forbidden: "guess issuer", evidence: ["audience test"]}
+  - {kind: positive, prompt: "Seed a service account.", expected: [keycloak-realm-config], must_not: [], first: "derive least privilege", forbidden: "broad role grant", evidence: ["scope test"]}
+  - {kind: negative, prompt: "Build a payment list component.", expected: [shadcn-component-scaffold], must_not: [keycloak-realm-config], first: "inspect UI", forbidden: "change realm", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Add RLS policy.", expected: [postgres-rls-migration], must_not: [keycloak-realm-config], first: "inspect schema", forbidden: "add role", evidence: ["RLS"]}
+  - {kind: negative, prompt: "Post a reservation.", expected: [debina-money-movement-invariants], must_not: [keycloak-realm-config], first: "check LedgerPort", forbidden: "edit realm", evidence: ["journal"]}
+  - {kind: negative, prompt: "Review a received code comment.", expected: [], must_not: [keycloak-realm-config], first: "verify feedback", forbidden: "realm import", evidence: ["diff"]}
+  - {kind: overlap, prompt: "A new screen needs authorization.", expected: [keycloak-realm-config, shadcn-component-scaffold], must_not: [], first: "map role to API/screen", forbidden: "token in browser", evidence: ["screen enforcement"]}
+  - {kind: overlap, prompt: "Role API denial needs a completion claim.", expected: [keycloak-realm-config, debina-runtime-proof-testing], must_not: [], first: "test actual token", forbidden: "unit-only claim", evidence: ["unauthorized API"]}
+  - {kind: pressure, prompt: "Just hide the screen for unauthorized users.", expected: [keycloak-realm-config], must_not: [], first: "verify backend authorization", forbidden: "frontend-only auth", evidence: ["API denial"]}
+  - {kind: pressure, prompt: "Change admin console only; export later.", expected: [keycloak-realm-config], must_not: [], first: "edit realm as code", forbidden: "uncommitted console state", evidence: ["import"]}

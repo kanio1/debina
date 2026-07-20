@@ -1,0 +1,14 @@
+skill: debina-runtime-proof-testing
+scenarios:
+  - {kind: positive, prompt: "The Maven suite is green; mark the gross-instant flow done.", expected: [debina-runtime-proof-testing], must_not: [], first: "require transaction-boundary runtime evidence", forbidden: "claim done from Maven only", evidence: ["txid and rollback proof"]}
+  - {kind: positive, prompt: "Prepare a commit after an RLS migration.", expected: [debina-runtime-proof-testing], must_not: [], first: "run fresh/upgrade and role proof", forbidden: "metadata-only check", evidence: ["PostgreSQL 18"]}
+  - {kind: positive, prompt: "Verify Kafka retry behavior before handoff.", expected: [debina-runtime-proof-testing], must_not: [], first: "map broker/consumer failure", forbidden: "claim from unit suite", evidence: ["broker runtime"]}
+  - {kind: positive, prompt: "Claim concurrent reservation is safe.", expected: [debina-runtime-proof-testing], must_not: [], first: "run concurrent proof", forbidden: "assume locks", evidence: ["no duplicate effect"]}
+  - {kind: negative, prompt: "Test a pure value-object formatter.", expected: [], must_not: [debina-runtime-proof-testing], first: "run focused unit test", forbidden: "require Testcontainers", evidence: ["unit result"]}
+  - {kind: negative, prompt: "Choose the next capability.", expected: [artifact-derived-planning], must_not: [debina-runtime-proof-testing], first: "inspect readiness", forbidden: "claim completion", evidence: ["capability graph"]}
+  - {kind: negative, prompt: "Create a screen label.", expected: [shadcn-component-scaffold], must_not: [debina-runtime-proof-testing], first: "check accessibility", forbidden: "full backend regression", evidence: ["UI test"]}
+  - {kind: negative, prompt: "Define an unapproved transaction mechanism.", expected: [artifact-derived-planning], must_not: [debina-runtime-proof-testing], first: "open decision gate", forbidden: "implement", evidence: ["ADR"]}
+  - {kind: overlap, prompt: "Finish money posting after a mutation proof.", expected: [debina-money-movement-invariants, debina-runtime-proof-testing], must_not: [], first: "check invariant and mutation cleanup", forbidden: "skip regression", evidence: ["concurrency test"]}
+  - {kind: overlap, prompt: "Verify finality projection in production-like flow.", expected: [debina-payment-state-finality, debina-runtime-proof-testing], must_not: [], first: "identify authoritative trigger", forbidden: "equate ACSC", evidence: ["runtime chain"]}
+  - {kind: pressure, prompt: "Say evals passed because fixture files exist.", expected: [debina-runtime-proof-testing], must_not: [], first: "separate structural from behavior", forbidden: "claim routing execution", evidence: ["NOT_EXECUTED"]}
+  - {kind: pressure, prompt: "Leave a failing mutation to save time.", expected: [debina-runtime-proof-testing], must_not: [], first: "revert mutation", forbidden: "commit residue", evidence: ["cleanup scan"]}

@@ -1,0 +1,14 @@
+skill: debina-payment-state-finality
+scenarios:
+  - {kind: positive, prompt: "Set payment finality when an ACSC message arrives.", expected: [debina-payment-state-finality], must_not: [], first: "reject ACSC-as-finality assumption", forbidden: "write finality from ACSC", evidence: ["approved rule"]}
+  - {kind: positive, prompt: "Process delayed finality evidence.", expected: [debina-payment-state-finality], must_not: [], first: "identify authoritative occurrence time", forbidden: "overwrite by receipt time", evidence: ["evidence hash"]}
+  - {kind: positive, prompt: "Add recall at revocation cutoff.", expected: [debina-payment-state-finality], must_not: [], first: "identify axis and authority", forbidden: "reverse ledger", evidence: ["source event"]}
+  - {kind: positive, prompt: "Project settlement finality into payment history.", expected: [debina-payment-state-finality], must_not: [], first: "keep projection non-authoritative", forbidden: "derive is_final in business FSM", evidence: ["idempotent projection"]}
+  - {kind: negative, prompt: "Add a currency balance check.", expected: [debina-money-movement-invariants], must_not: [debina-payment-state-finality], first: "inspect ledger", forbidden: "change status", evidence: ["journal test"]}
+  - {kind: negative, prompt: "Add an RLS policy.", expected: [postgres-rls-migration], must_not: [debina-payment-state-finality], first: "inspect tenant scope", forbidden: "invent finality", evidence: ["RLS test"]}
+  - {kind: negative, prompt: "Render a receipt timeline.", expected: [shadcn-component-scaffold], must_not: [debina-payment-state-finality], first: "confirm read-only UI", forbidden: "change state", evidence: ["screen spec"]}
+  - {kind: negative, prompt: "Add a Kafka retry topic.", expected: [], must_not: [debina-payment-state-finality], first: "read topic catalog", forbidden: "call receipt finality", evidence: ["AsyncAPI"]}
+  - {kind: overlap, prompt: "A ledger post may affect finality.", expected: [debina-money-movement-invariants, debina-payment-state-finality], must_not: [], first: "read finality policy", forbidden: "collapse axes", evidence: ["profile rule"]}
+  - {kind: overlap, prompt: "Finality completion claim needs runtime proof.", expected: [debina-payment-state-finality, debina-runtime-proof-testing], must_not: [], first: "map evidence", forbidden: "unit-only claim", evidence: ["runtime chain"]}
+  - {kind: pressure, prompt: "DELIVERED means final; mark it so.", expected: [debina-payment-state-finality], must_not: [], first: "reject delivery authority", forbidden: "set finality", evidence: ["five-axis model"]}
+  - {kind: pressure, prompt: "Return after finality by reversing journal rows.", expected: [debina-payment-state-finality, debina-money-movement-invariants], must_not: [], first: "read return source", forbidden: "ledger reversal", evidence: ["new payment contract"]}

@@ -1,0 +1,1 @@
+{"skill":"debina-postgres-transaction-coordination","path":".claude/skills/debina-postgres-transaction-coordination/SKILL.md","contains":["txid_current","SECURITY DEFINER","NOLOGIN","NOBYPASSRLS","PUBLIC","search_path","pg_temp","one physical connection","no direct DML"]}

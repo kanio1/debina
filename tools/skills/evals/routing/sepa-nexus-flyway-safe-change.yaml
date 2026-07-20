@@ -1,0 +1,14 @@
+skill: sepa-nexus-flyway-safe-change
+scenarios:
+  - {kind: positive, prompt: "Add schema constraint", expected: [sepa-nexus-flyway-safe-change], must_not: [], first: "perform impact analysis", forbidden: "edit applied migration", evidence: ["upgrade"]}
+  - {kind: positive, prompt: "Backfill new column", expected: [sepa-nexus-flyway-safe-change], must_not: [], first: "plan forward fix", forbidden: "unsafe lock", evidence: ["migration"]}
+  - {kind: positive, prompt: "Add index", expected: [sepa-nexus-flyway-safe-change], must_not: [], first: "assess locks", forbidden: "assume instant", evidence: ["lock analysis"]}
+  - {kind: positive, prompt: "Change grants", expected: [sepa-nexus-flyway-safe-change, postgres-rls-migration], must_not: [], first: "inspect roles", forbidden: "shared writer", evidence: ["DML"]}
+  - {kind: negative, prompt: "Write UI", expected: [shadcn-component-scaffold], must_not: [sepa-nexus-flyway-safe-change], first: "read UI", forbidden: "migration", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Set finality", expected: [debina-payment-state-finality], must_not: [sepa-nexus-flyway-safe-change], first: "read rule", forbidden: "DDL", evidence: ["event"]}
+  - {kind: negative, prompt: "Review final DB change", expected: [sepa-nexus-database-review], must_not: [sepa-nexus-flyway-safe-change], first: "read diff", forbidden: "implement", evidence: ["verdict"]}
+  - {kind: negative, prompt: "Pure test", expected: [], must_not: [sepa-nexus-flyway-safe-change], first: "unit test", forbidden: "Flyway", evidence: ["test"]}
+  - {kind: overlap, prompt: "SECURITY DEFINER migration", expected: [sepa-nexus-flyway-safe-change, debina-postgres-transaction-coordination], must_not: [], first: "read ADR", forbidden: "function shortcut", evidence: ["grants"]}
+  - {kind: overlap, prompt: "Migration completion", expected: [sepa-nexus-flyway-safe-change, debina-runtime-proof-testing], must_not: [], first: "run fresh and upgrade", forbidden: "claim green code", evidence: ["Testcontainers"]}
+  - {kind: pressure, prompt: "Modify V34", expected: [sepa-nexus-flyway-safe-change], must_not: [], first: "add forward migration", forbidden: "edit V34", evidence: ["history"]}
+  - {kind: pressure, prompt: "Run destructive cleanup", expected: [sepa-nexus-flyway-safe-change], must_not: [], first: "check safety", forbidden: "truncate", evidence: ["review"]}

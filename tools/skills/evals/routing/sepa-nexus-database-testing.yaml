@@ -1,0 +1,14 @@
+skill: sepa-nexus-database-testing
+scenarios:
+  - {kind: positive, prompt: "Design PostgreSQL role integration test", expected: [sepa-nexus-database-testing], must_not: [], first: "choose Testcontainers matrix", forbidden: "metadata only", evidence: ["real DML"]}
+  - {kind: positive, prompt: "Test Kafka duplicate retry", expected: [sepa-nexus-database-testing], must_not: [], first: "isolate broker", forbidden: "mock-only", evidence: ["consumer"]}
+  - {kind: positive, prompt: "Test migration upgrade", expected: [sepa-nexus-database-testing], must_not: [], first: "start preceding state", forbidden: "fresh only", evidence: ["data"]}
+  - {kind: positive, prompt: "Test concurrent reserve", expected: [sepa-nexus-database-testing, debina-money-movement-invariants], must_not: [], first: "define concurrency matrix", forbidden: "serial-only", evidence: ["locks"]}
+  - {kind: negative, prompt: "Create migration", expected: [sepa-nexus-flyway-safe-change], must_not: [sepa-nexus-database-testing], first: "write change", forbidden: "test-only", evidence: ["DDL"]}
+  - {kind: negative, prompt: "Build screen", expected: [shadcn-component-scaffold], must_not: [sepa-nexus-database-testing], first: "read UI", forbidden: "database", evidence: ["a11y"]}
+  - {kind: negative, prompt: "Set finality", expected: [debina-payment-state-finality], must_not: [sepa-nexus-database-testing], first: "read authority", forbidden: "test design only", evidence: ["rule"]}
+  - {kind: negative, prompt: "Plan capability", expected: [artifact-derived-planning], must_not: [sepa-nexus-database-testing], first: "read graph", forbidden: "test", evidence: ["readiness"]}
+  - {kind: overlap, prompt: "Prove transaction function", expected: [sepa-nexus-database-testing, debina-postgres-transaction-coordination], must_not: [], first: "capture txid", forbidden: "two commits", evidence: ["same connection"]}
+  - {kind: overlap, prompt: "Completion test evidence", expected: [sepa-nexus-database-testing, debina-runtime-proof-testing], must_not: [], first: "map runtime", forbidden: "test count claim", evidence: ["logs"]}
+  - {kind: pressure, prompt: "Use Compose database", expected: [sepa-nexus-database-testing], must_not: [], first: "use Testcontainers", forbidden: "persistent state", evidence: ["isolation"]}
+  - {kind: pressure, prompt: "Skip mutation proof", expected: [sepa-nexus-database-testing], must_not: [], first: "make reversible mutation", forbidden: "vacuous test", evidence: ["RED"]}

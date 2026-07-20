@@ -1,0 +1,1 @@
+{"skill":"postgres-rls-migration","path":".claude/skills/postgres-rls-migration/SKILL.md","contains":["FORCE ROW LEVEL SECURITY","WITH CHECK","ALTER DEFAULT PRIVILEGES","one-writer-per-schema","search_path","PUBLIC","upgrade"]}
