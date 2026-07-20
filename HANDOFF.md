@@ -2,26 +2,28 @@
 
 ## Zadanie
 
-SEPA Nexus is a synthetic, deterministic ISO 20022 payment-quality platform. Wave 3 reconciles the prior backend tranche, preserves active ISO/Kafka guidance, and delivers only source-backed capabilities.
+SEPA Nexus to syntetyczna platforma płatności ISO 20022 służąca do nauki testowania enterprise. Wave 3 odzyskał historię po `ac9aa47`, utrzymał aktywne guidance ISO/Kafka i dostarczył źródłowo potwierdzony, ośmiostory’owy slice routingu bez rozszerzania semantyki biznesowej.
 
 ## Zrobione
 
-- Historical delivery at `ac9aa47` remains reconciled: seven verified backend stories around ledger integrity, gross-instant rejection/finality, outbox runtime, timeout facts, and egress/finality separation were not repeated.
-- Revalidated unchanged blockers once: EPIC-33 Story 33.3 is `SOURCE-BLOCKED` (no ADR-N8 SLA Kafka contract); EPIC-42 Story 42.1 is `CAPABILITY-BLOCKED` (no case/requested-payment intake); EPIC-29 Story 29.1/EPIC-44 is `SOURCE-BLOCKED` (no complete outbound artifact/profile-snapshot representation).
-- Commit `4722014` implements EPIC-51 Stories 51.1 and 51.2: V45 adds the source-shaped `reference_data.profile_route_priorities` catalog; `RouteCandidateResolver` resolves only exact scheme/service/currency candidates, orders by configured priority, and filters `scheme_profiles` validity-window facts without making route, payment, settlement, money, finality, Kafka, or ISO decisions.
-- PostgreSQL 18 fresh and V44→V45 upgrade proofs, owner/read/foreign writer grant proofs, duplicate-key proof, and a validity-filter mutation proof pass. Targeted suite: 6/0/0. Two full backend regressions pass: 446/0/0 each. Planning, capability and skill validators pass; generated story inventory was updated.
+- Historyczne siedem zweryfikowanych backend stories z `ac9aa47` pozostało nienaruszone. Jednorazowo potwierdzono brak nowych źródeł dla EPIC-33 Story 33.3 (`SOURCE-BLOCKED`), EPIC-42 Story 42.1 (`CAPABILITY-BLOCKED`) oraz EPIC-29 Story 29.1/EPIC-44 (`SOURCE-BLOCKED`). Szczegóły i hashe są w `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3.md`.
+- `4722014` dostarczył EPIC-51 Stories 51.1–51.2: katalog V45 oraz read-only `RouteCandidateResolver`; `c3f542f` dostarczył EPIC-52 Stories 52.1–52.3: V46 katalogów eligibility i V47 reachability plus routing outbox/inbox.
+- Końcowy slice EPIC-53 Stories 53.1–53.3: V48 tworzy `routing.route_decisions`, `route_candidate_results` i `route_decision_explanations` zgodnie z blueprint §4.10. Decyzje i zależne dowody są tenant-RLS scoped przez `app.tenant_id`, a granty `routing_role` są tylko `SELECT, INSERT`, więc nie ma UPDATE/DELETE po zapisie.
+- `RouteDecisionPersistenceMigrationTest` i `RouteDecisionPersistenceUpgradePathTest` pokrywają RED (brak relacji), fresh V48, V47→V48, puste/same/cross-tenant GUC, FK-derived child RLS, immutability i role grants. Mutacja polityki candidate `USING` do `true` ujawniła w teście cross-tenant jeden rekord i została natychmiast cofnięta.
+- `OutboxDispatcherNoDomainWriteSweepTest` rozpoznaje także source-defined routing outbox z kolumnami `topic,type`; zachowuje dynamiczny sweep wszystkich outboxów i uprawnienia dispatcher-only do `published_at`.
+- Targeted routing 51–53 suite: 12/0/0; focused dispatcher+route security sweep: 30/0/0. Dwie czyste pełne regresje backendu: 457/0/0 i 457/0/0 (`/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/backend-regression-4-retry.log`, `backend-regression-5.log`). Inventory, capability graph i `bash tools/skills/validate-all-skills.sh` są PASS; Maven-generated `build/generated-spring-modulith/javadoc.json` przywrócono.
 
 ## Utknęliśmy na
 
-No technical blocker for the committed EPIC-51 slice. Remaining high-value stories include source gaps: the allowed-message-set model for EPIC-51 Story 51.3, reconciliation profile DDL for EPIC-57, and case-schema DDL for EPIC-65 are not specified precisely enough to infer.
+Nic nie blokuje zakończonego slice’a routingu. Nie wolno samodzielnie rozstrzygać Class C luk: kontraktu `payment.sla.breached`, return/requested-payment intake i outbound artifact/render-profile snapshot. EPIC-51 Story 51.3 nie ma reprezentacji allowed-message-set; EPIC-57 nie ma source DDL profili reconciliation; EPIC-65 nie ma source DDL schematu case; EPIC-73 Story 73.1 nie ma intake metadata/business-date/file-signature policy.
 
 ## Plan na następny krok
 
-Continue the reserve-candidate audit from `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3.md`, starting with the source contract for the highest-value candidate not already classified blocked.
+Otwórz `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3.md`, wybierz najwyżej wartościowy niezablokowany kandydat po ponownym sprawdzeniu źródła, zależności i `verify:`; nie wracaj do trzech znanych blockerów bez nowego źródła.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Never treat `payment.sla.breached`, return/reversal semantics, or outbound profile representation as authorized by an epic title; the source and Kafka catalog have not changed.
-- Preserve the five status axes, one-writer-per-schema, `LedgerPort` boundary, and delivery-never-finality rule.
-- Maven rewrites `build/generated-spring-modulith/javadoc.json`; restore it unless an intentional generated artifact change is reviewed.
-- Keep `.claude/skills` as authoring source and `.agents/skills -> ../.claude/skills` as the discovery bridge; explicit skill invocation is not implicit-routing proof.
+- Maven nadpisuje `build/generated-spring-modulith/javadoc.json`; przywróć go przez `apply_patch`, chyba że zmiana jest celowa i zrecenzowana.
+- Dynamiczny dispatcher sweep odkrywa nowe outboxy automatycznie, ale fixture SQL musi znać ich faktyczny source-defined kształt. Routing używa `topic,type`, podobnie jak egress, a nie `event_type,correlation_id`.
+- Nie licz przerwanej ani uruchomionej przed poprawką regresji jako final gate. Finalne dowody tej fali to dokładnie dwa zielone runy po poprawce po 457 testów.
+- Nie myl aktywacji skills z implicit routing proof i nie wykorzystuj skills do wymyślania brakującej semantyki SLA, return lub egress profile.

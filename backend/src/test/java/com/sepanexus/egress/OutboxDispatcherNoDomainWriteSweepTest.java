@@ -239,18 +239,22 @@ class OutboxDispatcherNoDomainWriteSweepTest {
     }
 
     /**
-     * The outbox_events table shape differs slightly per schema (egress uses {@code topic, type};
-     * payment/iso use {@code event_type, correlation_id}) — both are pre-existing, source-defined
-     * shapes from prior stories, not something this story is free to normalize.
+     * The outbox_events table shape differs slightly per schema (egress/routing use {@code topic,
+     * type}; payment/iso use {@code event_type, correlation_id}) — these are source-defined shapes,
+     * not something this security sweep is free to normalize.
      */
     private static String typeColumns(String schema) {
-        return "egress".equals(schema) ? "topic, type" : "event_type, correlation_id";
+        return usesTopicAndType(schema) ? "topic, type" : "event_type, correlation_id";
     }
 
     private static String typeValues(String schema) {
-        return "egress".equals(schema)
+        return usesTopicAndType(schema)
                 ? "'sweep.test', 'sweep.test.v1'"
                 : "'sweep.test.v1', gen_random_uuid()";
+    }
+
+    private static boolean usesTopicAndType(String schema) {
+        return "egress".equals(schema) || "routing".equals(schema);
     }
 
     private static Connection dispatcherConnection() throws SQLException {

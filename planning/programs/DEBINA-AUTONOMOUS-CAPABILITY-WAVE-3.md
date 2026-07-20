@@ -36,7 +36,9 @@
 
 ## Candidate audit and queues
 
-- Completed primary: EPIC-51 Stories 51.1 and 51.2; EPIC-52 Stories 52.1–52.3.
+- Completed primary: EPIC-51 Stories 51.1 and 51.2; EPIC-52 Stories 52.1–52.3; EPIC-53
+  Stories 53.1–53.3. This is the locked eight-story maximum; Story 53.4 remains gated by the
+  GraphQL read-model capability and is outside this database tranche.
 - Rejected/source-blocked: EPIC-51 Story 51.3 (missing allowed-message-set representation),
   EPIC-28.2–28.4 (explicit Iteration-5 validation-catalog gate), EPIC-32.4 (no reversal command
   contract), EPIC-33.3, EPIC-42.1, EPIC-29.1/44, and egress continuation dependent on those gaps.
@@ -62,6 +64,10 @@
   creates the routing-owned per-profile reachability state and ADR-N5 outbox/inbox boundary.
   Neither migration defines an eligibility-rule vocabulary, routing decision, fallback, or Kafka
   business contract.
+- V48 adds §4.10's immutable route decision, candidate evidence, and explanation snapshot tables.
+  The Class A choice to scope child rows through their tenant-scoped decision FK preserves the
+  source shapes without denormalizing tenant facts. It introduces no route command, selection
+  behavior, payment mutation, `payment.routed` payload, or `route.failed` Kafka contract.
 
 ## Verification and review
 
@@ -91,11 +97,40 @@
   The migrations are additive and empty, have no tenant rows/RLS trigger, backfill, money fields,
   cross-schema write, or security-definer function. `PUBLIC` is revoked; real-role fresh and
   upgrade evidence proves least privilege, including dispatcher publication-only access.
+- EPIC-53 RED: before V48, `RouteDecisionPersistenceMigrationTest` failed 2 errors with
+  PostgreSQL relation `routing.route_decisions` absent (log:
+  `/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/route-53-red.log`).
+- EPIC-53 GREEN: fresh and V47→V48 `RouteDecisionPersistenceMigrationTest` +
+  `RouteDecisionPersistenceUpgradePathTest` → 3 tests, 0 failures, 0 errors; the combined routing
+  51–53 suite → 12 tests, 0 failures, 0 errors (log:
+  `/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/routing-51-53-green.log`). The proof covers empty/same/
+  cross-tenant GUC paths, parent/child RLS, grants, immutability, and representative upgrade.
+- Mutation proof: temporarily changing the candidate-results `USING` policy to `true` made the
+  cross-tenant assertion observe one row (1/0/1 expected failure; log:
+  `/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/route-53-rls-mutation.log`); the exact policy was
+  immediately restored.
+- Independent database review: **PASS**. V48 is additive and source-shaped; parent RLS plus
+  FK-derived child policies cover all tenant-visible rows, `PUBLIC` is revoked, and `routing_role`
+  has no update/delete grant. There is no backfill, source-table write, money/finality field,
+  security-definer function, or Kafka/ISO contract change.
+- Final regression 1: `./mvnw -f backend test` → 457 tests, 0 failures, 0 errors (log:
+  `/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/backend-regression-4-retry.log`).
+- Final regression 2: `./mvnw -f backend test` → 457 tests, 0 failures, 0 errors (log:
+  `/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/backend-regression-5.log`). The first attempt was
+  deliberately excluded after a corrected dynamic test-harness mapping; the focused corrected
+  `OutboxDispatcherNoDomainWriteSweepTest` + route decision proof passed 30/0/0 before both
+  counted full runs.
 
 ## Decisions, commits, and next work
 
 - Class A: candidate ordering is priority ascending; UUID is only a deterministic tie presentation,
   not selection/fallback behavior. No Class B ADR was needed.
-- Commits: `4722014 feat(routing): resolve active route candidates`; EPIC-52 commit pending
-  review and inventory validation.
-- Next: continue the reserve audit without revisiting the unchanged blockers.
+- Commits: `4722014 feat(routing): resolve active route candidates`; `c3f542f feat(routing): add
+  eligibility and reachability catalogs`; final EPIC-53 routing decision slice is committed with
+  this Wave 3 evidence.
+- Class A technical correction: the dynamic dispatcher outbox sweep recognizes routing's
+  source-defined `topic,type` outbox shape alongside egress, preserving its all-outbox
+  least-privilege invariant without normalizing production schemas.
+- Planning inventory, capability graph, skill validation, `git diff --check`, and generated-output
+  restoration pass. Next: re-audit the highest-value independent candidate; do not revisit the
+  one-pass known blockers without new source evidence.

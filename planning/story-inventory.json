@@ -271,7 +271,7 @@
     },
     {
       "epic": "EPIC-53",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md"
     },
     {
@@ -3267,10 +3267,10 @@
       "epic": "EPIC-53",
       "story": "53.1",
       "title": "Niemutowalne `route_decisions`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "./mvnw -f backend test -Dtest=*RouteDecisionsImmutableTest*"
+        "./mvnw -f backend test -Dtest=RouteDecisionPersistenceMigrationTest,RouteDecisionPersistenceUpgradePathTest"
       ],
       "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -3279,12 +3279,12 @@
       "epic": "EPIC-53",
       "story": "53.2",
       "title": "`route_candidate_results`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 53.1"
       ],
       "verify": [
-        "psql -c \"\\d routing.route_candidate_results\""
+        "./mvnw -f backend test -Dtest=RouteDecisionPersistenceMigrationTest"
       ],
       "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -3293,12 +3293,12 @@
       "epic": "EPIC-53",
       "story": "53.3",
       "title": "Niemutowalny snapshot wyjaśnienia (MVP-blocker)",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 53.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*RouteExplanationSnapshotImmutabilityTest*"
+        "./mvnw -f backend test -Dtest=RouteDecisionPersistenceMigrationTest,RouteDecisionPersistenceUpgradePathTest"
       ],
       "source_file": "planning/epics/EPIC-53-routing-decision-explanation.md",
       "capability_analysis": "NOT_DEEP_DIVED"
