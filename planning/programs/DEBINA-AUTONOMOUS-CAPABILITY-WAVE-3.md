@@ -36,13 +36,17 @@
 
 ## Candidate audit and queues
 
-- Completed primary: EPIC-51 Stories 51.1 and 51.2.
+- Completed primary: EPIC-51 Stories 51.1 and 51.2; EPIC-52 Stories 52.1–52.3.
 - Rejected/source-blocked: EPIC-51 Story 51.3 (missing allowed-message-set representation),
   EPIC-28.2–28.4 (explicit Iteration-5 validation-catalog gate), EPIC-32.4 (no reversal command
   contract), EPIC-33.3, EPIC-42.1, EPIC-29.1/44, and egress continuation dependent on those gaps.
 - Reserve audit: EPIC-57 profile story has source ownership but no DDL contract; EPIC-65 case
   schema names tables but does not provide a DDL contract. Both require source-backed table shapes
   rather than guessed schemas.
+- EPIC-73 Story 73.1 is `SOURCE-BLOCKED`: §3.4 names raw-file archive fields but the inbound
+  `SubmitFile` boundary leaves acceptance metadata, business-date derivation, and file-signature
+  policy unspecified. Its declared `sender_id`/`branch_id` archive facts cannot be inferred from
+  the current raw-archive surface without defining that external intake contract.
 
 ## Implemented capability
 
@@ -54,6 +58,10 @@
 - Migration impact: additive V45, new empty catalog, no backfill or existing-table lock, no RLS
   because static reference-data uses ownership grants. The only new index-like structure is the
   source-specified primary key used by exact candidate lookups.
+- V46 adds the source-defined static participant capability and eligibility-rule catalogs; V47
+  creates the routing-owned per-profile reachability state and ADR-N5 outbox/inbox boundary.
+  Neither migration defines an eligibility-rule vocabulary, routing decision, fallback, or Kafka
+  business contract.
 
 ## Verification and review
 
@@ -74,10 +82,20 @@
   validators pass after regenerating the generator-owned story inventory.
 - Regression 2: `./mvnw -f backend test` → 446 tests, 0 failures, 0 errors (log:
   `/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/backend-regression-2.log`).
+- EPIC-52 focused GREEN: `RoutingEligibilityAndReachabilityMigrationTest` +
+  `RoutingEligibilityAndReachabilityUpgradePathTest` → 3 tests, 0 failures, 0 errors. Fresh and
+  V45→V47 Testcontainers migrations prove owner/read/foreign-writer/dispatcher boundaries. A
+  temporary removal of routing's catalog-read grant failed with PostgreSQL `42501`; it was reverted.
+- Independent database review: **PASS**. V46 reproduces §4.10's exact two catalog shapes; V47
+  reproduces the reachability shape and supplies the required ADR-N5 per-schema messaging tables.
+  The migrations are additive and empty, have no tenant rows/RLS trigger, backfill, money fields,
+  cross-schema write, or security-definer function. `PUBLIC` is revoked; real-role fresh and
+  upgrade evidence proves least privilege, including dispatcher publication-only access.
 
 ## Decisions, commits, and next work
 
 - Class A: candidate ordering is priority ascending; UUID is only a deterministic tie presentation,
   not selection/fallback behavior. No Class B ADR was needed.
-- Commits: `4722014 feat(routing): resolve active route candidates`.
+- Commits: `4722014 feat(routing): resolve active route candidates`; EPIC-52 commit pending
+  review and inventory validation.
 - Next: continue the reserve audit without revisiting the unchanged blockers.

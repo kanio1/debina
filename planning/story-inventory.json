@@ -266,7 +266,7 @@
     },
     {
       "epic": "EPIC-52",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md"
     },
     {
@@ -3212,10 +3212,10 @@
       "epic": "EPIC-52",
       "story": "52.1",
       "title": "`reference_data.participant_capabilities`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "psql -c \"\\d reference_data.participant_capabilities\""
+        "./mvnw -f backend test -Dtest=RoutingEligibilityAndReachabilityMigrationTest,RoutingEligibilityAndReachabilityUpgradePathTest"
       ],
       "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -3224,12 +3224,12 @@
       "epic": "EPIC-52",
       "story": "52.2",
       "title": "`participant_eligibility_rules`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 52.1"
       ],
       "verify": [
-        "psql -c \"\\d reference_data.participant_eligibility_rules\""
+        "./mvnw -f backend test -Dtest=RoutingEligibilityAndReachabilityMigrationTest"
       ],
       "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -3238,12 +3238,12 @@
       "epic": "EPIC-52",
       "story": "52.3",
       "title": "Osiągalność runtime per profil",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 52.1"
       ],
       "verify": [
-        "psql -c \"\\d routing.participant_reachability\""
+        "./mvnw -f backend test -Dtest=RoutingEligibilityAndReachabilityMigrationTest,RoutingEligibilityAndReachabilityUpgradePathTest"
       ],
       "source_file": "planning/epics/EPIC-52-routing-eligibility-reachability.md",
       "capability_analysis": "NOT_DEEP_DIVED"
