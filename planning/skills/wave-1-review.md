@@ -15,3 +15,5 @@ Review perspective: routing ambiguity, stale assumptions, external acquisition s
 | Requested `.agents/skills` canonical destination cannot be written in this checkout. | Unresolved environmental blocker documented: `.agents` is read-only. Effective tracked root remains `.claude/skills`; no fake symlink, duplicate, or user-home coupling was created. |
 
 No production Java, TypeScript, SQL migration, runtime configuration, payment behavior, or frozen architecture decision was changed. No hidden network action is embedded in a skill. The independent reviewer found no remaining fixable Wave 1 issue; canonical-path migration requires a writable repository path supplied by the owner/environment.
+
+Backend and frontend regressions are `N/A` for this documentation/agent-workflow-only change: no production source, manifest, runtime configuration, generated application artifact, or instruction requiring those suites was modified. The focused skills and existing governance validators were run instead.
