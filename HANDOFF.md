@@ -2,28 +2,63 @@
 
 ## Zadanie
 
-SEPA Nexus to syntetyczna platforma płatności ISO 20022 służąca do nauki testowania enterprise. Wave 3 odzyskał historię po `ac9aa47`, utrzymał aktywne guidance ISO/Kafka i dostarczył źródłowo potwierdzony, ośmiostory’owy slice routingu bez rozszerzania semantyki biznesowej.
+SEPA Nexus jest syntetyczną platformą płatności ISO 20022 do nauki testów
+enterprise. Wave 4 rozszerzył źródłowo potwierdzony routing o jawny fallback,
+niezmienne dowody decyzji oraz test lab, zachowując historyczne Wave 3 i aktywne
+skills ISO/Kafka.
 
 ## Zrobione
 
-- Historyczne siedem zweryfikowanych backend stories z `ac9aa47` pozostało nienaruszone. Jednorazowo potwierdzono brak nowych źródeł dla EPIC-33 Story 33.3 (`SOURCE-BLOCKED`), EPIC-42 Story 42.1 (`CAPABILITY-BLOCKED`) oraz EPIC-29 Story 29.1/EPIC-44 (`SOURCE-BLOCKED`). Szczegóły i hashe są w `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3.md`.
-- `4722014` dostarczył EPIC-51 Stories 51.1–51.2: katalog V45 oraz read-only `RouteCandidateResolver`; `c3f542f` dostarczył EPIC-52 Stories 52.1–52.3: V46 katalogów eligibility i V47 reachability plus routing outbox/inbox.
-- Końcowy slice EPIC-53 Stories 53.1–53.3: V48 tworzy `routing.route_decisions`, `route_candidate_results` i `route_decision_explanations` zgodnie z blueprint §4.10. Decyzje i zależne dowody są tenant-RLS scoped przez `app.tenant_id`, a granty `routing_role` są tylko `SELECT, INSERT`, więc nie ma UPDATE/DELETE po zapisie.
-- `RouteDecisionPersistenceMigrationTest` i `RouteDecisionPersistenceUpgradePathTest` pokrywają RED (brak relacji), fresh V48, V47→V48, puste/same/cross-tenant GUC, FK-derived child RLS, immutability i role grants. Mutacja polityki candidate `USING` do `true` ujawniła w teście cross-tenant jeden rekord i została natychmiast cofnięta.
-- `OutboxDispatcherNoDomainWriteSweepTest` rozpoznaje także source-defined routing outbox z kolumnami `topic,type`; zachowuje dynamiczny sweep wszystkich outboxów i uprawnienia dispatcher-only do `published_at`.
-- Targeted routing 51–53 suite: 12/0/0; focused dispatcher+route security sweep: 30/0/0. Dwie czyste pełne regresje backendu: 457/0/0 i 457/0/0 (`/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3/backend-regression-4-retry.log`, `backend-regression-5.log`). Inventory, capability graph i `bash tools/skills/validate-all-skills.sh` są PASS; Maven-generated `build/generated-spring-modulith/javadoc.json` przywrócono.
+- Wave 3 pozostaje dowodem dla EPIC-51 Stories 51.1--51.2, EPIC-52 Stories
+  52.1--52.3 i EPIC-53 Stories 53.1--53.3 (`planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3.md`);
+  nie zostały odtworzone ani policzone ponownie.
+- Wave 4 (`planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-4.md`) zakończył
+  sześć READY stories: EPIC-51/51.4, EPIC-54/54.1--54.3 oraz EPIC-56/56.1--56.2.
+  `RouteCandidatesReadModel` daje wyłącznie wewnętrzny, read-only model
+  kandydatów bez GraphQL/REST i bez mutacji płatności.
+- ADR-N12 zdecydował techniczną tożsamość fallback rule: V49 tworzy
+  `reference_data.profile_fallback_rules` z UUID i zachowaną unikalnością
+  `(profile_id, priority)`; V50 wiąże `routing.route_decisions.fallback_rule_id`
+  FK i flagą. `reference_data_role` jest jedynym writerem katalogu, a
+  `routing_role` tylko czyta/referenceuje go i zapisuje własne `routing.*`.
+- `FallbackPolicy` wybiera tylko jawną, bezwarunkową regułę w rosnącym
+  priorytecie. Brak reguły nie daje fallbacku; wybrany nie-null `condition`
+  kończy się fail-closed bez dynamicznego języka. Recorder atomowo zapisuje
+  fallback decision/candidates/snapshot pod tenant GUC; rollback, FK, RLS,
+  cross-tenant, role grants, PUBLIC denial i V48→V50 upgrade są pokryte przez
+  Testcontainers PostgreSQL 18.
+- Deterministyczne fixture'y i testy pairwise wykonują realny resolver/policy.
+  Odwrócenie kolejności produkcyjnego komparatora celowo dało 2 błędy testów,
+  po czym zostało cofnięte. Focused routing suite: 25/0/0. Dwie kolejne pełne
+  regresje backendu: 475/0/0 i 475/0/0 (`/tmp/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-4/backend-regression-1.log`,
+  `backend-regression-2.log`). Governance, inventory, capability graph oraz
+  `bash tools/skills/validate-all-skills.sh` są PASS; wygenerowany
+  `build/generated-spring-modulith/javadoc.json` przywrócono.
+- Commit implementacyjny Wave 4: `5491d21 feat(routing): add explicit fallback decision evidence`.
+  Kolejny lokalny commit zapisuje ten handoff; nic nie zostało wypchnięte.
 
 ## Utknęliśmy na
 
-Nic nie blokuje zakończonego slice’a routingu. Nie wolno samodzielnie rozstrzygać Class C luk: kontraktu `payment.sla.breached`, return/requested-payment intake i outbound artifact/render-profile snapshot. EPIC-51 Story 51.3 nie ma reprezentacji allowed-message-set; EPIC-57 nie ma source DDL profili reconciliation; EPIC-65 nie ma source DDL schematu case; EPIC-73 Story 73.1 nie ma intake metadata/business-date/file-signature policy.
+Brak READY pracy z audytowanego routing cluster. EPIC-51/51.3 pozostaje
+`SOURCE-BLOCKED` (allowed-message-set), EPIC-54/54.4 `SOURCE-BLOCKED`
+(multi-CSM), EPIC-56/56.3 `SOURCE-BLOCKED` (amount/currency boundary
+vocabulary), a 52.4, 53.4, 55.1 i 56.4 są `CAPABILITY-BLOCKED`. Nie wolno
+samodzielnie rozstrzygać nadal niezmienionych Class C luk: `payment.sla.breached`,
+return/requested-payment intake, outbound artifact/render-profile snapshot,
+reconciliation DDL, case DDL ani file-intake policy.
 
 ## Plan na następny krok
 
-Otwórz `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-3.md`, wybierz najwyżej wartościowy niezablokowany kandydat po ponownym sprawdzeniu źródła, zależności i `verify:`; nie wracaj do trzech znanych blockerów bez nowego źródła.
+Otwórz `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-4.md` i wybierz
+najwyżej wartościowy kandydat spoza routing cluster dopiero po ponownym
+potwierdzeniu źródła, zależności i wykonywalnego `verify:`.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Maven nadpisuje `build/generated-spring-modulith/javadoc.json`; przywróć go przez `apply_patch`, chyba że zmiana jest celowa i zrecenzowana.
-- Dynamiczny dispatcher sweep odkrywa nowe outboxy automatycznie, ale fixture SQL musi znać ich faktyczny source-defined kształt. Routing używa `topic,type`, podobnie jak egress, a nie `event_type,correlation_id`.
-- Nie licz przerwanej ani uruchomionej przed poprawką regresji jako final gate. Finalne dowody tej fali to dokładnie dwa zielone runy po poprawce po 457 testów.
-- Nie myl aktywacji skills z implicit routing proof i nie wykorzystuj skills do wymyślania brakującej semantyki SLA, return lub egress profile.
+- Maven nadpisuje `build/generated-spring-modulith/javadoc.json`; przywróć go
+  po każdym przebiegu, jeśli zmiana nie jest celowa.
+- Nie traktuj `condition text` jako języka reguł, nie wyprowadzaj fallbacku z
+  profile family/CSM/settlement basis i nie dodawaj routingowego Kafka topic.
+- Nie licz aktywacji skills jako implicit-routing proof ani nie wymyślaj
+  semantyki Class C. Final gate wymaga dokładnie dwóch zielonych regresji po
+  ostatniej zmianie.

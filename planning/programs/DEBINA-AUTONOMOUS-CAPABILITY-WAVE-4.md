@@ -131,6 +131,13 @@ finding remains.
   parser/lineage surface changed. Existing active skills were sanity-checked;
   only explicit skill use is claimed.
 
+## Commits
+
+- `5491d21 feat(routing): add explicit fallback decision evidence` — EPIC-51/51.4,
+  EPIC-54/54.1--54.3, EPIC-56/56.1--56.2, ADR-N12, V49/V50 and their runtime
+  proof. The following handoff commit records the final clean state; nothing is
+  pushed.
+
 ## Next work
 
 Re-audit the next highest-value backlog family outside completed routing. Do
