@@ -300,7 +300,7 @@ flowchart LR
 
 ## B.8. Lifecycle and state machine
 
-The frozen model requires five independent axes: business status, ISO status, finality, transport status and receipt status. Actual Java FSM has only `RECEIVED`, `VALIDATED`, `REJECTED`, `DISPATCHED`; `DISPATCHED` is terminal and history marks terminal as `is_final`, which violates the frozen rule.
+The frozen model requires five independent axes: business status, ISO status, finality, transport status and receipt status. Actual Java FSM still has only `RECEIVED`, `VALIDATED`, `REJECTED`, `DISPATCHED`; `REJECTED` and `DISPATCHED` have no legal outgoing business transition, but that topology is no longer written as finality. `PaymentHistoryRecorder` writes `is_final=false` for current transitions and V30 clears the known legacy false positives. A settlement-owned finality record/policy is still absent.
 
 ```mermaid
 stateDiagram-v2
@@ -309,8 +309,8 @@ stateDiagram-v2
   RECEIVED --> REJECTED: allowed only [P]
   VALIDATED --> DISPATCHED: allowed only [P]
   VALIDATED --> REJECTED: allowed only [P]
-  REJECTED --> [*]: terminal [I model]
-  DISPATCHED --> [*]: terminal+is_final [I, WRONG]
+  REJECTED --> [*]: no outgoing business transition [I, not final]
+  DISPATCHED --> [*]: no outgoing business transition [I, not final]
   state RequiredFiveAxes {
     business
     ISO
@@ -320,7 +320,7 @@ stateDiagram-v2
   }
 ```
 
-Corrective rule is not a new design: implement EPIC-39/47 according to frozen ADR and remove the false implication `DISPATCHED ⇒ final`. Incoming and outgoing need distinct journeys but may share the five-axis vocabulary. Event application needs expected-version/transition uniqueness so redelivery and concurrent responses cannot produce two transitions. `max(seq)+1` in history is not concurrency-safe.
+The false implication `DISPATCHED ⇒ final` is corrected by V30 and the current recorder; this is not a new finality design. EPIC-39/47 still need to implement the frozen settlement-owned authority. Incoming and outgoing need distinct journeys but may share the five-axis vocabulary. Event application needs expected-version/transition uniqueness so redelivery and concurrent responses cannot produce two transitions. `max(seq)+1` in history is not concurrency-safe.
 
 ## B.9. ISO processing and Kafka publication
 

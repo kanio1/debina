@@ -23,7 +23,7 @@ Najmocniejsza część produktu to zamrożony model odpowiedzialności: jeden Pa
 
 Implementacja osiągnęła walking skeleton: JSON i pojedynczy pain.001.001.09 intake, raw archive, idempotency, payment record, outbox/inbox, cienki FSM, ISO identifiers/lineage, częściowa korelacja pacs.002.001.10, signature evidence, podstawowe UI/BFF oraz DDL egress i ledger. Nie istnieje jednak wykonywalny łańcuch route→settle→ledger→render/sign→CSM→receipt→finality→reconciliation. Incoming pacs.008, rzeczywiste adaptery CSM, pełne R-transactions, claims, operations i SDD są nieobecne lub tylko zaprojektowane.
 
-Audyt wykrył **45 luk**, w tym **6 BLOCKER i 13 CRITICAL**. Najpoważniejsze wykonawcze defekty to: ledger dopuszczający bilansowanie EUR przeciw USD i nieistniejące konta; `DISPATCHED` błędnie oznaczany jako final; event `payment.submitted.v1` publikowany na `payment.validated` i konsumowany jako własny trigger walidacji; oraz role dispatcherów poprawnie utworzone w SQL, lecz niewykorzystane przez Spring, co podczas pełnej regresji powoduje `permission denied` w schedulerach. Mimo tego Maven zakończył **356 testów PASS**, dowodząc luki w oracle/wiring tests.
+Audyt wykrył **45 luk**, w tym **6 BLOCKER i 13 CRITICAL**. W stanie audytowym najpoważniejsze wykonawcze defekty obejmowały: ledger dopuszczający bilansowanie EUR przeciw USD i nieistniejące konta; `DISPATCHED` błędnie oznaczany jako final; event `payment.submitted.v1` publikowany na `payment.validated` i konsumowany jako własny trigger walidacji; oraz role dispatcherów poprawnie utworzone w SQL, lecz niewykorzystane przez Spring. Późniejsze, odrębne programy naprawcze usunęły fałszywe `DISPATCHED⇒final` (V30) oraz część wskazanych luk ledger/outbox; nie zamyka to pełnej finality authority ani LedgerPort. Wynik **356 testów PASS** dotyczył momentu pierwotnego audytu i wykazywał wtedy lukę w oracle/wiring tests.
 
 Ocena końcowa: **4 — częściowa implementacja** jako learning lab, **2 — częściowy projekt** jako pełny SEPA hub. Debina nie jest gotowa do integracyjnego pilotażu z bankiem/CSM, certyfikacji ani produkcji.
 
@@ -199,7 +199,7 @@ Debina ma hardened XML parse, nie conformance validation. Nie ma XSD/TVS/profile
 
 Potwierdzone kanały: REST JSON, REST XML pain.001, OIDC BFF, local Kafka, PostgreSQL. Planowane: file/SFTP/MFT, CSM adapter, ledger/core, GraphQL read-only. Brak gRPC/MQ/protobuf dowodów. Tabela H z protocol/format/direction/SLA/retry/idempotency/monitoring: [Aneks B §B.4](annexes/DEBINA-FLOWS-MESSAGES-TRACEABILITY.md).
 
-System projektowo rozróżnia acceptance, validation, processing, dispatch, CSM acknowledgement, settlement, posting i finality, ale actual FSM scala delivery/finality. SLA, auth/mTLS/certs, signatures, replay, DLQ and operator runbooks dla zewnętrznego partnera są absent.
+System projektowo rozróżnia acceptance, validation, processing, dispatch, CSM acknowledgement, settlement, posting i finality. Current thin FSM nadal nie implementuje wszystkich niezależnych osi, ale nie scala już terminalności biznesowej z finality: recorder zapisuje każdą bieżącą transition jako non-final, a egress nie ma prawa zapisywać payment history. SLA, auth/mTLS/certs, signatures, replay, DLQ and operator runbooks dla zewnętrznego partnera są absent.
 
 ## 22. TIPS, STET, RT1, STEP2 i inne wykryte kanały
 
@@ -207,9 +207,9 @@ TIPS publicznie potwierdza 24/7/365, central-bank-money RTGS i current R2026.JUN
 
 ## 23. Modele stanów i lifecycle
 
-Frozen target rozdziela pięć osi: business, ISO, finality, transport i receipt. To poprawna podstawa. Actual `PaymentStatus` zawiera `RECEIVED`, `VALIDATED`, `REJECTED`, `DISPATCHED`. `PaymentTransitionTable` uznaje `DISPATCHED` za terminalny, a `PaymentHistoryRecorder` mapuje terminal na `is_final`; V20 i test utrwalają tę samą sprzeczność. Kod realizuje dziś tylko `RECEIVED→VALIDATED` przez InboxConsumer.
+Frozen target rozdziela pięć osi: business, ISO, finality, transport i receipt. To poprawna podstawa. Actual `PaymentStatus` zawiera `RECEIVED`, `VALIDATED`, `REJECTED`, `DISPATCHED`. `PaymentTransitionTable` może wskazać brak legalnego dalszego przejścia, ale wyłącznie jako topologię FSM; `PaymentHistoryRecorder` zapisuje obecnie `is_final=false` dla każdej przejściowej historii. Forward-only V30 usuwa odziedziczone false-positive `is_final=true` dla `REJECTED` i `DISPATCHED`. To jest naprawa bezpieczeństwa, nie implementacja niezależnego modelu finality. Kod realizuje dziś tylko `RECEIVED→VALIDATED` przez InboxConsumer.
 
-Brakuje: transition source/evidence, expected version, independent axes, suspended/manual states, timeout timers, terminal business vs finality semantics, inbound/outbound variants, explicit late/duplicate policy i stuck detector. `max(seq)+1` w historii jest race-prone. Diagram actual vs required model: [Aneks B §B.8](annexes/DEBINA-FLOWS-MESSAGES-TRACEABILITY.md).
+Brakuje: transition source/evidence, expected version, trwałej settlement-owned authority dla finality, suspended/manual states, timeout timers, inbound/outbound variants, explicit late/duplicate policy i stuck detector. `max(seq)+1` w historii jest race-prone. Diagram actual vs required model: [Aneks B §B.8](annexes/DEBINA-FLOWS-MESSAGES-TRACEABILITY.md).
 
 ## 24. Settlement i księgowanie
 

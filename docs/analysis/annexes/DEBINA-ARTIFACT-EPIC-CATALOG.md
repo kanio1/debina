@@ -133,7 +133,7 @@ F0 ma 29/29 done; ownership 17 done/7 blocked/12 not-started; spine/frontend 18 
 |---|---|---|---|
 | CON-001 | `planning/README.md` vs EPIC-14/44/45 frontmatter | index: in-progress; frontmatter: not-started | Naprawić parity, bez zmiany merytorycznego scope |
 | CON-002 | capability graph vs inventory | EPIC-14.14.2 not-started vs done | Validator nie sprawdza status parity |
-| CON-003 | `PaymentTransitionTable`/V20 vs frozen ADR | `DISPATCHED` terminal i `is_final=true` | Krytyczna sprzeczność implementacyjna |
+| CON-003 | `PaymentTransitionTable`/V20 vs frozen ADR | `DISPATCHED` terminal i `is_final=true` | **Rozwiązane 2026-07-20:** V30 czyści false-positive dane, recorder nie wyprowadza finality z topologii FSM; pełna settlement-owned authority pozostaje open |
 | CON-004 | AsyncAPI vs outbox code | `payment.received/validated` ownership nie odpowiada `payment.submitted.v1` i publikacji na `payment.validated` | Naprawić kontrakt przed dalszym routingiem |
 | CON-005 | grants vs Spring wiring | role dispatcherów istnieją w SQL, aplikacja używa `sepa_app` | Implementacja nieoperacyjna mimo testów algorytmu |
 | CON-006 | target IAM vs realm | blueprint 12 ról, export 4 role | Jawny etap nieukończony, nie „done security” |
