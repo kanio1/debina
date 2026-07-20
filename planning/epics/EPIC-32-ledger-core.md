@@ -34,18 +34,19 @@ Taski:
 
 ## Story 32.2 — Niezmienniki reserve/post/release
 
-status: not-started (`[CAPABILITY-BLOCKED]`)
+status: in-progress
 
 depends_on: [Story 32.1]
 
-`[DECISION-PACKET 2026-07-20]`: `docs/analysis/DEBINA-FINALITY-LEDGERPORT-DECISION-PACKET.md`
-records the source-backed contract facts and missing authority for reservation identity/lifecycle,
-RESERVE/RELEASE journal lines, no-double-consumption, and pre-finality reversal gating. No
-reservation table, columns, or partial LedgerPort was invented.
+`[READY 2026-07-20]`: ADR-N10 resolves the former contract gaps: `ledger.reservations`, the
+AVAILABLE/RESERVED journal-line component, one terminal transition, command-id replay, deterministic
+locks and atomicity. Implement the complete port, not a partial reserve-only slice.
 
 Opis: test współbieżności no-double-reserve.
 
-`[CAPABILITY-BLOCKED 2026-07-17]`: pełny audyt źródłowy (`sepa-nexus-message-flow-and-data-blueprint.md` §4.5/§4.7/§4.11/§5, `sepa-nexus-full-blueprint-review-and-task-plan.md`, `sepa-nexus-blueprint-ownership-integration.md`, `sepa-nexus-decision-gate.md`) przed implementacją — readiness table:
+`[HISTORICAL — superseded by ADR-N10 2026-07-20]`: the prior source audit lacked the following
+contract facts and correctly blocked implementation at that time. The table remains provenance for
+the newly accepted decision.
 
 | Contract question | Source/code evidence | Result |
 |---|---|---|

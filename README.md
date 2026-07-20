@@ -18,6 +18,8 @@ CPC-SP topology · one Spring Modulith deployable · one-writer-per-schema · st
 | [ADR-N6](./ADR-N6-one-priority-taxonomy.md) | One priority taxonomy (`[MVP]`=Iter 0–5, `[P1]`=wave 1, `[P2]`=wave 2/labs) | R-02 / R-05 |
 | [ADR-N7](./ADR-N7-json-direct-pseudo-message-version.md) | `JSON_DIRECT` pseudo message-version | R-08 / Blocker B3 |
 | [ADR-N8](./ADR-N8-asyncapi-topic-catalog-source-of-truth.md) | §3.7 v2 topic table as sole AsyncAPI source | R-10 |
+| [ADR-N9](./ADR-N9-synthetic-credit-transfer-learning-platform-scope.md) | Synthetic Credit Transfer learning-platform scope and non-claims | Product-scope gate |
+| [ADR-N10](./ADR-N10-settlement-finality-and-ledgerport-reservations.md) | Settlement finality authority and LedgerPort reservations | Finality/LedgerPort decision gate |
 
 ## Status legend
 

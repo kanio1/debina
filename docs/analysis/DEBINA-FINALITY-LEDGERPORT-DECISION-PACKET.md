@@ -1,6 +1,7 @@
 # Debina finality, LedgerPort, and producer-ownership decision packet
 
-Status: **PROPOSED — requires product/team decisions where noted; not an ADR and does not accept any option.**
+Status: **ACCEPTED DECISION RECORD — implemented through ADR-N9 and ADR-N10; this packet remains
+supporting analysis, not an ADR.**
 
 ## Purpose and source hierarchy
 
@@ -30,8 +31,8 @@ integration-ready full payment hub, and identifies scope as a stop-the-line deci
 | Incoming flows | May remain explicitly out of scope while learning goals are met. | Incoming SCT/SCT Inst (and any approved products) need source-backed ownership, parsing, validation, correlation, lifecycle, reconciliation, and exception paths. |
 | Receipts and reconciliation | Transport-only receipt exercises and read-only mismatch detection can remain staged. | Contracted receipt semantics, evidence retention, operational recovery, reconciliation closure, and accountable escalation are required. |
 
-No option is selected here. The implication is material: choosing the full-hub column would broaden
-the required authority and evidence, and cannot be inferred from an implementation convenience.
+**Accepted:** the synthetic learning-lab column, frozen by [ADR-N9](../../ADR-N9-synthetic-credit-transfer-learning-platform-scope.md).
+The full-hub column remains a separate product-scope ADR gate.
 
 ## Decision B — finality persistence authority
 
@@ -50,28 +51,11 @@ the required authority and evidence, and cannot be inferred from an implementati
 - A return after finality is a new opposite-direction payment. A ledger reversal is only an
   internal booking correction before finality (`message-flow:388-390`).
 
-### What is still missing from sources
+### Accepted authority
 
-The repository does not define the columns/constraints of `settlement_finality_records`, the exact
-`finality_rule` catalog shape/versioning, a profile-snapshot schema, the authoritative clock/evidence
-for `finality_at`, or the late/conflicting-evidence algorithm. No receipt can fill those gaps.
-
-### Source-compatible options (none accepted)
-
-1. **Settlement record plus payment projection (recommended).** Settlement persists the authoritative,
-   profile-snapshot-linked finality record, then uses a narrow payment-lifecycle port to project
-   `payment.finality_at`. This directly follows `message-flow:999,1005`, preserves one-writer-per-
-   schema, and makes the history/read model a projection rather than authority.
-2. **Settlement record only, with a read projection.** Keep legal finality exclusively in settlement
-   and expose it through a settlement-owned/read-model projection. This can preserve ownership but
-   needs a source-backed answer for the blueprint's explicit `payment.finality_at` projection.
-3. **History marker as projection only.** Retain `payment_status_history.is_final` as a downstream
-   marker written only after a settlement authority event. This needs an explicit source decision on
-   its relation to `settlement_finality_records`; it cannot replace the settlement record.
-
-Recommendation: option 1, conditional on a source-backed catalog, immutable snapshot and record
-shape. It is the only option stated directly by the authoritative blueprint. It is not accepted by
-this packet.
+**Accepted by ADR-N10:** option 1, settlement record plus payment projection. ADR-N10 defines the
+catalog, immutable snapshot and record fields, one-record-per-payment/idempotency/conflict rules,
+authoritative event time, and the prohibition on delivery/receipt/ISO-derived finality.
 
 ## Decision C — LedgerPort `RESERVE` / `POST` / `RELEASE`
 
@@ -88,21 +72,12 @@ this packet.
   reversal links. It does not create a reservation runtime model (`planning/epics/EPIC-32-ledger-core.md`
   Story 32.2).
 
-### Facts still missing — no implementation authority
+### Accepted authority
 
-| Contract question | Status |
-|---|---|
-| `reservationId` | Source suggests the RESERVE journal entry identity, but no durable reservation lifecycle/schema is specified. |
-| Account locking / insufficient result | Defined: row lock; `available ≥ amount`; return `INSUFFICIENT`, not an invented exception. |
-| Available/reserved movement | Defined for RESERVE and POST at a high level; no complete transaction/constraint design is supplied. |
-| POST and RELEASE journal lines | POST is described as balanced; RESERVE/RELEASE line shape is not. A single-account available↔reserved move does not by itself specify balanced `journal_lines`. |
-| Double `post()` / `release()` prevention | Missing. Current `entry_status='POSTED'` cannot distinguish a fresh reserve from a consumed one. |
-| New table/columns | Missing. Do not create `ledger.reservations` or invent journal-entry fields. |
-| Business return | Never `LedgerPort.reverse`; it is a new opposite-direction payment after finality. |
-
-No option is accepted. The required decision is a source-backed reservation lifecycle and the
-reserve/release journal-line semantics, including a no-double-consumption invariant. Until then,
-EPIC-32 Story 32.2 remains `CAPABILITY-BLOCKED` and no partial port is safe.
+**Accepted by ADR-N10:** `ledger.reservations`, its fields and state machine, AVAILABLE/RESERVED
+journal components, zero-sum RESERVE/RELEASE/POST lines, deterministic row locking, transactional
+terminal transitions, and command-id idempotency. `reverse()` remains a separate, pre-finality
+internal correction; a business return remains a new opposite-direction payment.
 
 ## Decision D — physical producer ownership of `payment.received`
 
@@ -114,17 +89,6 @@ The authoritative topic catalog names `ingress` as the producer-owner and contra
 history and `payment.outbox_events`. The current source flow itself shows one transaction inserting
 the payment and `outbox(payment.received)` (`message-flow:62-68`).
 
-### Consequences and options (none selected)
-
-1. **Retain the physical writer temporarily and document the mismatch.** It avoids a new cross-schema
-   write and preserves the already-tested atomic payment/outbox transaction, but leaves catalog
-   ownership inconsistent.
-2. **Move the physical producer to ingress.** This needs a source-backed command/event handoff that
-   lets ingress own its outbox without writing `payment.*` directly; ingress is forbidden from direct
-   payment/settlement/ledger/egress writes (`message-flow:289`).
-3. **Change the topic-owner catalogue.** This changes the frozen producer-owns-topic source and
-   requires a superseding ADR/source decision, not a code-only correction.
-
-No move was made in this program. Moving an outbox write across the current module/schema boundary
-would either violate one-writer-per-schema or require a new authority/hand-off contract. The mismatch
-remains an open decision, not a reason to introduce a cross-schema write.
+**Accepted technical debt:** ADR-N9/N10 retain the physical writer temporarily in
+`payment-lifecycle`. No writer move or cross-schema write is part of this program. A separate ADR is
+required before changing the frozen topic-catalog ownership.

@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: in-progress
 depends_on: [EPIC-35-settlement-strategy-resolver]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-SETTLE-5, line 1297), [MVP]"
 ---
@@ -10,14 +10,16 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-SETTLE-5, line 
 
 `[SAFETY-CORRECTION 2026-07-20]`: `payment` history no longer falsely derives finality from a
 terminal business-FSM state; V30 corrects known `REJECTED`/`DISPATCHED` false positives and targeted
-fresh/upgrade tests prove it. This negative repair does not create `finality_rule`, `FinalityPolicy`,
-`settlement_finality_records`, a snapshot, or a `finality_at` authority. Stories 39.1–39.4 therefore
-remain `DECISION-BLOCKED`/`CAPABILITY-BLOCKED`, not done.
+fresh/upgrade tests prove it. ADR-N10 now supplies the missing catalog, snapshot, record, projection,
+idempotency and conflict authority. Stories 39.1–39.4 are no longer decision-blocked; they remain
+incomplete until their executable verification passes.
 
 ## Story 39.1 — Katalog `finality_rule`
 
-status: not-started
+status: in-progress
 depends_on: []
+
+`[READY 2026-07-20]`: ADR-N10 defines the versioned catalog's role and allowed laboratory rules.
 
 Taski:
 - [ ] **Migracja katalogu `finality_rule`.**
@@ -27,6 +29,9 @@ Taski:
 
 status: not-started
 depends_on: [Story 39.1]
+
+`[CAPABILITY-BLOCKED]`: ADR-N10 resolves semantics, but implementation waits for Story 39.1's
+catalog migration and test evidence.
 
 Taski:
 - [ ] **`FinalityPolicy` + tabela `settlement_finality_records`.**

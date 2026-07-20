@@ -201,7 +201,7 @@
     },
     {
       "epic": "EPIC-39",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-39-settlement-finality-model.md"
     },
     {
@@ -2288,7 +2288,7 @@
       "epic": "EPIC-32",
       "story": "32.2",
       "title": "Niezmienniki reserve/post/release",
-      "status": "not-started",
+      "status": "in-progress",
       "depends_on": [
         "Story 32.1"
       ],
@@ -2615,7 +2615,7 @@
       "epic": "EPIC-39",
       "story": "39.1",
       "title": "Katalog `finality_rule`",
-      "status": "not-started",
+      "status": "in-progress",
       "depends_on": [],
       "verify": [
         "psql -c \"\\d reference_data.finality_rule\""
