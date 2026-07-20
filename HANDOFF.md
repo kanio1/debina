@@ -5,46 +5,39 @@
 `PAYMENT-SPINE-CORRECTNESS-PROGRAM`: recovery ledger/outbox runtime spine, source-backed event routing, scheduler operational truth and payment safety without inventing validation, finality, receipt or egress-profile contracts.
 
 - Start: `main` at `fc5be93d82038530db52a2a48e487a7f035ce6c2`, aligned with `origin/main`.
-- Current pre-handoff-commit HEAD: `6787905`; local is 3 commits ahead of `origin/main`. No fetch/pull/push occurred.
-- Codex ran in `/home/suso/debina`, `danger-full-access`; Podman socket active and Testcontainers PASS. No `act`.
+- Pre-handoff-update HEAD: `5a7c2a0`; local is 5 commits ahead of `origin/main`, with no fetch/pull/push.
+- Codex ran in `/home/suso/debina` with `danger-full-access`; Podman socket was active and Testcontainers passed. No `act`.
 - Evidence plan: `/tmp/PAYMENT-SPINE-CORRECTNESS-PROGRAM/execution-plan.md`; protected javadoc baseline: `/tmp/PAYMENT-SPINE-CORRECTNESS-PROGRAM/javadoc-pre-session.json`.
 
 ## Zrobione
 
-- Committed `bd2899c feat(ledger): enforce journal currency and reversal integrity`:
-  V29 creates composite account/currency integrity, one-currency deferred-balance trigger behavior and reversal pointer/self/uniqueness rules. Fresh and V28→V29 upgrade proof PASS; 28 ledger tests PASS; independent review PASS in `/tmp/PAYMENT-SPINE-CORRECTNESS-PROGRAM/database-review-v29.md`. Existing five V29 mutation proofs were verified as restored.
-- Committed `0dc30e1 feat(outbox): harden relay runtime and event truth`:
-  dedicated `outbox_dispatcher_role` datasource/JDBC/transaction manager; primary JPA transaction manager explicitly retained; payment and ISO relays claim with `FOR UPDATE SKIP LOCKED`, await ACK and mark only `published_at`; domain writes are denied.
-- Scheduler defaults are isolated in `backend/src/test/resources/application.properties`; only `OutboxRelayScheduler` is scheduled, and a dedicated enabled context proves health UP → DOWN on permission/broker failure → UP after success without uncontrolled scheduler exception. Egress remains an explicit claim mechanism, never a scheduled one.
-- Source-backed event safety: payment creation emits `payment.received.v1`, routing is by known `event_type`, unknown types have no default topic and remain unpublished. The payment inbox consumes received only, applies tenant/branch context and preserves `RECEIVED`; it neither validates nor creates a validated outbox fact.
-- Deterministic crash-window proof PASS: ACK then forced DB rollback leaves `published_at` NULL; the next relay uses the same event ID; payment inbox records one identity and the business status remains `RECEIVED`.
-- WalkingSkeleton no longer depends on local Keycloak/Compose; it uses a test-context `JwtDecoder`, Testcontainers PostgreSQL/Kafka, and explicit relay dispatch. ISO routing tests truncate their outbox per test and use deterministic failed acknowledgment rather than a fake localhost broker.
-- Relay mutation: removing production `SKIP LOCKED` produced the expected `RuntimeDatasourceOwnershipTest` failure and was restored. Scheduler-disabled and crash-window mutations were likewise expected failures and restored. No mutation marker remains.
-- Committed `6787905 chore(planning): record payment spine evidence`; planning generator, inventory, graph and governance validators PASS.
-- Final regressions:
-  - `final-regression-1.log`: 379 tests, 0 failures, 0 errors, BUILD SUCCESS (2:25).
-  - `final-regression-2.log`: 379 tests, 0 failures, 0 errors, BUILD SUCCESS (2:23).
-  Both required operational scans are empty for scheduler errors, denied relay access, fixed localhost ports and failed Kafka connections. `build/generated-spring-modulith/javadoc.json` was restored and is not changed/staged.
+- `bd2899c feat(ledger): enforce journal currency and reversal integrity`: V29 account/currency, one-currency deferred balance, reversal pointer/self/uniqueness and immutable-line integrity. Fresh and V28→V29 upgrade proof, 28-test ledger regression and independent database review PASS (`/tmp/PAYMENT-SPINE-CORRECTNESS-PROGRAM/database-review-v29.md`). Existing five V29 mutations were verified restored.
+- `0dc30e1 feat(outbox): harden relay runtime and event truth`: dedicated `outbox_dispatcher_role` datasource/JDBC/transaction manager; payment and ISO relay claim with `FOR UPDATE SKIP LOCKED`, wait for Kafka ACK and update only `published_at`; domain writes are denied while the primary JPA manager remains separate.
+- Scheduler defaults are isolated in test configuration. The dedicated enabled context proves health UP → DOWN for permission/broker failures → UP after success, with unpublished rows retained and no uncontrolled scheduler exception. Egress is an explicit claim mechanism, not a scheduled one.
+- Payment creation emits `payment.received.v1`; routing is controlled by known `event_type`; unknown events have no default topic and remain unpublished. Payment inbox deduplicates, applies tenant/branch context and preserves `RECEIVED`; it neither validates nor produces a validated fact.
+- ACK→rollback crash-window proof passed with real PostgreSQL/Kafka Testcontainers: the same event ID is redelivered after rollback, one inbox identity is retained, and the only business effect keeps `RECEIVED`.
+- `5a7c2a0 test(outbox): prove acknowledgement precedes published mark`: a dedicated ACK-order test holds the broker future open and proves the database mark cannot occur first. Removing production `.get(5, TimeUnit.SECONDS)` was an EXPECTED FAIL; it was fully restored. Related regression: 4 tests, 0 failures/errors.
+- Planning/instruction/database-skill validators PASS. `post-ack-final-regression-1.log` and `post-ack-final-regression-2.log` each passed 380 tests with 0 failures and 0 errors; prescribed scheduler/permission/fixed-localhost/broker-error scans are empty. Generated javadoc was restored from the protected baseline and is not staged.
 
 ## Utknęliśmy na
 
-No infrastructure blocker. These are intentionally `CAPABILITY BLOCKED`, not implementation work:
+No infrastructure blocker. These remain intentionally `CAPABILITY BLOCKED`:
 
-1. EPIC-20 Story 20.4 full validation/rejection: no source-backed validation verdict or rejection model. Keep the RECEIVED-only safety behavior.
-2. EPIC-27 ISO inbox beyond generic dedup: no `csm.response.received` payload, status/reason semantics or FSM handoff contract.
-3. EPIC-14/39/47 finality, receipt and five-axis model: no finality catalog/policy/records or receipt artifact source contract. Do not create placeholder enums/DDL/tests.
-4. EPIC-44 profile/snapshot/artifact persistence: retry policy, allowed-artifact representation and version/snapshot shape remain undecided.
-5. `payment.received` is still physically written from `payment-lifecycle`; blueprint topic ownership names ingress. Do not move it or create cross-schema writes without a source-backed boundary decision.
+1. EPIC-20 Story 20.4 full validation/rejection needs a source-backed validation verdict and rejection model; keep the RECEIVED-only safety behavior.
+2. EPIC-27 ISO inbox beyond generic dedup needs `csm.response.received` payload, status/reason semantics and FSM-handoff contract.
+3. EPIC-14/39/47 finality, receipt and five-axis model need a finality catalog/policy/records and receipt artifact source contract; do not invent placeholders.
+4. EPIC-44 profile persistence needs settled retry, allowed-artifact, versioning and snapshot semantics.
+5. `payment.received` is physically written by `payment-lifecycle` while blueprint topic ownership names ingress. Do not move it or introduce cross-schema writes without a source-backed boundary decision.
 
 ## Plan na następny krok
 
-Start with the highest READY capability outside the blocked list after checking `planning/README.md`, `capabilities.yaml`, direct dependencies and executable `verify:`. A likely safe next analytical task is recording the physical producer-owner conflict as an explicit source question; do not alter modules until a superior ADR/source resolves it.
+Start from `planning/README.md`, `capabilities.yaml`, direct dependencies and executable `verify:` to choose the next READY capability outside the blocked list. A safe analytical follow-up is to record the physical producer-owner conflict as a source question; do not change module ownership until a superior ADR/source resolves it.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Never treat received/accepted/dispatched/delivered as finality or as validation.
-- Keep relay identity separate from `sepa_app`; do not inject relay infrastructure into domain services or use the primary transaction manager for relay work.
-- Keep scheduler activation opt-in in ordinary test contexts. Testcontainers mapped random localhost ports are legitimate; fixed `localhost:9092`, `localhost:5432` or fake `127.0.0.1:1` are not.
+- Never treat received/accepted/dispatched/delivered as validation or finality.
+- Keep relay identity separate from `sepa_app`; relay code must not use the primary transaction manager or domain repositories.
+- Ordinary test contexts must opt out of scheduler/admin/listener activation. Testcontainers mapped random localhost ports are valid; fixed `localhost:9092`, `localhost:5432` and fake local brokers are not.
 - Do not claim exactly-once: the proved contract is at-least-once publication plus inbox dedup.
-- Do not use `act`, Compose as test fixture, fetch/pull/push, reset/clean/stash/restore, or destructive Git operations.
+- Do not use `act`, Compose test fixtures, fetch/pull/push, reset/clean/stash/restore or destructive Git operations.
 - Restore `build/generated-spring-modulith/javadoc.json` from the protected baseline before full tests/commits and never stage it.
