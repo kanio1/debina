@@ -60,6 +60,16 @@ class SettlementRoleNoLedgerGrantTest {
     }
 
     @Test
+    void settlementRoleCannotInsertOrSelectReservations() {
+        assertDenied(() -> """
+                INSERT INTO ledger.reservations (settlement_attempt_id, payment_id, debtor_account_id,
+                    amount_minor, currency, state, reserve_entry_id)
+                VALUES (gen_random_uuid(), gen_random_uuid(), gen_random_uuid(), 1, 'EUR', 'ACTIVE', gen_random_uuid())
+                """);
+        assertDenied(() -> "SELECT * FROM ledger.reservations");
+    }
+
+    @Test
     void settlementRoleCannotUpdateLiquidityAccounts() throws Exception {
         UUID accountId = seedLiquidityAccount();
         assertDenied(() -> "UPDATE ledger.liquidity_accounts SET available_minor = 999 WHERE id = '" + accountId + "'");

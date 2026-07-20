@@ -29,6 +29,11 @@ signature:
     url: ${SEPA_SIGNATURE_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
     username: ${SEPA_SIGNATURE_DB_USER:signature_role}
     password: ${SEPA_SIGNATURE_DB_PASSWORD:dev-only-signature}
+ledger:
+  datasource:
+    url: ${SEPA_LEDGER_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
+    username: ${SEPA_LEDGER_DB_USER:ledger_role}
+    password: ${SEPA_LEDGER_DB_PASSWORD:dev-only-ledger}
 server:
   port: 8081
 management:
