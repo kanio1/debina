@@ -1,40 +1,26 @@
 ---
 name: artifact-derived-planning
-description: Użyj przy tworzeniu lub aktualizacji katalogu epic/story/task w /planning/ — dyscyplina wyprowadzania planu z istniejącej dokumentacji bez wymyślania architektury.
+description: Use when selecting, creating, or updating Debina planning artifacts, readiness, capabilities, epics, stories, or tasks; do not use to invent architecture or override ADR/[FREEZE] decisions.
 ---
 
-# artifact-derived-planning
+# Artifact-derived planning
 
-## Zasada nadrzędna
+Derive work from the repository; do not design around gaps. Source precedence is:
 
-Jedynym źródłem prawdy jest dokumentacja/artefakty faktycznie obecne w tym repo. To narzędzie do **wyprowadzania** planu pracy z tego, co już zdecydowane — nie do projektowania architektury ani priorytetów od nowa. Jeśli czujesz pokusę, żeby "dopisać coś, co i tak by tam było" — nie rób tego; zapisz brak jako otwarte pytanie.
+`accepted ADR and [FREEZE] → authoritative blueprint → accepted decision record → current HANDOFF → capability graph and readiness → EPIC/story/task → implementation → tests and runtime evidence → external reference`.
 
-## Zanim napiszesz jakikolwiek epik
+If sources conflict, identify the stale source and update it only with authority. Otherwise record `[OPEN-QUESTION]` and classify the work `SOURCE-BLOCKED` or `DECISION-BLOCKED`; never choose the convenient interpretation.
 
-Przeskanuj całą dostępną dokumentację projektu — nie tylko jeden plik. W szczególności potraktuj istniejące pliki z zalążkami backlogu (np. sekcje "Backlog seed", "Concrete Backlog", "Updated Backlog") jako **input do przetworzenia i skonsolidowania**, nie jako gotowy wynik do skopiowania 1:1 ani jako coś do zignorowania.
+## Selection workflow
 
-Wyciągnij systematycznie:
+Before selecting or implementing a story: (1) read applicable instructions, current HEAD and relevant recent commits; (2) read `HANDOFF.md`, ADRs and sources; (3) inspect implementation and tests; (4) inspect the capability graph; (5) identify the next executable task and a concrete `verify:` command; (6) classify actual readiness. Formal epic status is never readiness evidence.
 
-1. **Wszystkie oznaczenia `[MVP]` / `[P1]` / `[P2]`** (lub odpowiadające im, np. numer iteracji). To jest priorytetyzacja projektu — nigdy nie twórz własnej. Jeśli dwa dokumenty się nie zgadzają, obowiązuje ten, który jest jawnie oznaczony jako nadrzędny/nowszy/`[FREEZE]` (np. ADR ponad wcześniejszym draftem).
-2. **Wszystkie `[FREEZE]` i decyzje ADR.** To są nienegocjowalne inputy — ograniczają możliwe sekwencje pracy (np. "moduł X nie może powstać przed CI gates"), ale plan nigdy ich nie zmienia ani nie renegocjuje.
-3. **Wszystkie jawnie nazwane zależności między modułami/epikami** (np. "blokuje X", "wymaga Y", "closes R-NN", "depends on ADR-N5"). To one, nie intuicja tematyczna, ustalają kolejność techniczną.
-4. **Jawnie ustalone sekwencjonowanie** (np. "Playwright dopiero gdy istnieją konkretne ekrany", "Iteracja 0 przed Iteracją 1", "signature blueprint przed EPIC-SIG"). Szanuj je dosłownie — nie przesuwaj "bo logicznie by pasowało wcześniej".
+Use only: `READY`, `DECISION-BLOCKED`, `CAPABILITY-BLOCKED`, `SOURCE-BLOCKED`, `ITERATION-BLOCKED`, `INFRASTRUCTURE-BLOCKED`, `IMPLEMENTED-BUT-UNVERIFIED`, `DOCUMENTATION-STALE`, `DONE`.
 
-## Gdy dokumentacja nie odpowiada na pytanie planistyczne
+Detect contradictions among `HANDOFF.md`, ADRs, decision packets, planning README, EPIC files, story inventory, capability graph, code, tests and latest commits. Do not fabricate participant policy, CSM behavior, events, contracts, or transaction mechanisms. Never call code present or dependencies done at epic level sufficient to mark a story done.
 
-Zapisz to jako otwarte pytanie (w pliku epika jako `[OPEN-QUESTION]` w sekcji odpowiedniej story, albo w `HANDOFF.md` jeśli blokuje całą sesję) — **nigdy nie wymyślaj odpowiedzi**, nawet jeśli wydaje się oczywista. Przykład dobrego zachowania: "dokumentacja nie precyzuje kolejności wewnątrz EPIC-RECON — zostawiam jako open question" zamiast cichego ustalenia własnej kolejności.
+Every task needs an executable verification command and expected result. Preserve explicit sequencing and the narrowest real capability dependency.
 
-## Kolejność: techniczna ważniejsza niż tematyczna
+## Goal-aware execution
 
-Grupowanie epików wg tematu (np. "wszystko o egress w jednym miejscu") jest wtórne wobec faktycznych zależności odczytu/zapisu. Jeśli zadanie B czyta/konsumuje coś, co tworzy zadanie A (tabelę, event, kontrakt, port, plik konfiguracyjny) — **A musi poprzedzać B** w katalogu i w `depends_on`, niezależnie od tego, do jakiego modułu tematycznie należą.
-
-## Kryteria ukończenia
-
-Każde zadanie (task) potrzebuje **konkretnego, wykonywalnego kryterium ukończenia** — dokładnej komendy (`verify: <komenda>`) i oczekiwanego rezultatu. Nigdy opisu słownego typu "działa poprawnie", "zaimplementowane", "przetestowane ręcznie" bez podania jak to zweryfikować. Jeśli w danym momencie repo nie ma jeszcze frameworka testowego/build systemu do uruchomienia realnej komendy (np. wciąż faza dokumentacyjna) — komenda weryfikująca może być np. sprawdzeniem istnienia/zawartości pliku (`test -f ...`, `grep -q ...`), ale musi być czymś uruchamialnym, nie zdaniem opisowym.
-
-## Sequencing, którego nie wolno łamać w tym konkretnym projekcie
-
-- Iteracja 0 (platform skeleton) poprzedza Iterację 1 (`ADR-N1`) — żadna tabela domenowa przed zielonymi CI gates.
-- Testy Playwright nie są planowane ani scaffoldowane, dopóki dokument wizji/pokrycia Playwright nie wskaże, że dany ekran/moment już na to pozwala (Iteracja 0 ma jawną regułę `[NO-PLAYWRIGHT]`).
-- `[P1]`/`[P2]` nie wchodzi do iteracji MVP bez nadrzędnego ADR (reguła z decision gate).
-- Moduł `signature` musi mieć zamkniętą granicę (ports/DDL) zanim epiki zależne od jego portu (np. egress signing, ingress verify-before-parse) mogą być zaplanowane jako wykonywalne.
+Under `/goal`, make completion evidence-backed. A hard blocker is a valid stop; a budget-limited checkpoint is not completion. Each continuation must inspect, edit, test, or verify evidence unless reporting success, interruption, blocker, or budget limit. After approval, resume from the checkpoint rather than repeating the audit.

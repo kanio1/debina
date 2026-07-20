@@ -2,46 +2,38 @@
 
 ## Zadanie
 
-Completed active Goal: deliver the strongest source-backed synthetic gross-instant slice under the
-user-approved frozen ADR-N11 option—one physical PostgreSQL transaction through narrow,
-module-owned `SECURITY DEFINER` commands—with PostgreSQL 18/Testcontainers, migration, security,
-concurrency, mutation, ownership and governance evidence. No push was requested or performed.
+SEPA Nexus is a synthetic payment-quality learning platform. This session adds Debina Agent Skills
+Wave 1 governance only: local skills, provenance, validators and eval fixtures; it does not alter
+the already verified ADR-N11 gross-instant implementation.
 
 ## Zrobione
 
-- ADR-N11 remains the binding approval. The historical transaction audit is preserved and explicitly
-  marked superseded by the approved Option 1, not rewritten.
-- `GrossInstantStrategy` now starts a `TransactionTemplate` on the dedicated executor transaction
-  manager and safely retries SQLSTATE `40001`/`40P01` only by restarting the complete transaction.
-- Added PostgreSQL 18 evidence: `GrossInstantOneTxFlowTest` (9 cases),
-  `GrossInstantSecurityTest` (5), `GrossInstantMigrationUpgradePathTest` (V34→V43), and
-  `GrossInstantMutationContractTest` (6), alongside ownership, egress and Modulith tests.
-- `GROSS-INSTANT-ADR-N11-EXECUTION-EVIDENCE.md` contains the PASS database review and proof matrix.
-  Fresh and upgrade Flyway paths, hostile search-path mutation, RLS/cross-tenant rollback,
-  idempotency/conflict, internal-function failure rollback, deterministic locking and exact grants
-  are covered.
-- Focused evidence run passed `36/0/0`; two consecutive clean `./mvnw -f backend test` regressions
-  passed on 2026-07-20. Governance, story inventory and capability graph validators pass. Planning
-  EPIC-13 Story 13.2, EPIC-33 and EPIC-36 have been updated.
+- ADR-N11 remains binding: one physical PostgreSQL transaction via narrow module-owned
+  `SECURITY DEFINER` commands. The verified gross-instant evidence and its no-saga/XA/`SET LOCAL
+  ROLE` boundary remain unchanged.
+- Hardened five existing local skills and added four Debina-specific skills in `.claude/skills/`.
+  Durable program evidence is in `planning/skills/`, with `tools/skills/validate-all-skills.sh` and
+  routing/content eval fixtures.
+- Reviewed four approved upstream source repositories as text-only material, recorded exact commits
+  and licenses, and made no production Java, TypeScript, SQL migration or runtime changes.
 
 ## Utknęliśmy na
 
-Nothing is blocked. The verified continuation changes are ready for the required local commit.
+The requested canonical `.agents/skills/` path cannot be created in this checkout: `mkdir
+.agents/skills` returns `Read-only file system`. The existing tracked `.claude/skills/` root remains
+effective and is explicitly recorded in `planning/skills/HANDOFF.md`; no symlink, user-global edit,
+or protected-mount workaround was used.
 
 ## Plan na następny krok
 
-Commit the reviewed ADR-N11 evidence continuation locally, verify `git status --short` is empty,
-and report completion. If new scope arises, preserve the ADR-N11 boundary: no saga/XA/`SET LOCAL
-ROLE`, direct cross-schema DML, reversal, real CSM or inferred finality.
+Run `bash tools/skills/validate-all-skills.sh`, inspect the skills-only commits, and report the
+canonical-path environment blocker. If an owner supplies a writable `.agents` directory, move the
+tracked root with `git mv`, update references and rerun validators before changing the registry path.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- V35–V43 are append-only; correct only with a higher migration.
-- Executor has function `EXECUTE` only—never table DML or function-owner membership. Owners stay
-  module-scoped, no-login, no-superuser and no-BYPASSRLS.
-- Any retry must recreate the whole Spring transaction; never retry a single command function after
-  an abort.
-- Preserve the independent business/ISO/finality/transport/receipt statuses and settlement-owned
-  ON_LEDGER_POST finality.
-- `build/generated-spring-modulith/javadoc.json` is intentionally restored to its baseline after
-  Maven runs; do not commit Maven's generated replacement unless it is deliberately reviewed.
+- Do not remove, chmod, replace, or work around the read-only `.agents` system mount.
+- Preserve ADR-N11: executor has function `EXECUTE` only, no direct table DML or owner membership;
+  no saga/XA/`SET LOCAL ROLE`, reversal, real CSM, or inferred finality.
+- V35–V43 remain append-only; correct through a higher migration only. Restore generated Modulith
+  artifacts after Maven unless their change is deliberately reviewed.

@@ -1,11 +1,11 @@
 ---
 name: shadcn-component-scaffold
-description: Use when adding a UI component via the shadcn/ui CLI or composing a new screen — component-foundation and data-testid conventions for this project.
+description: Use when adding a vendored shadcn component or Debina screen; preserve accessible semantic UI and BFF boundaries, and do not assume Playwright is either always allowed or always forbidden.
 ---
-# shadcn/ui + TanStack Table conventions (Iteration 0 scope)
+# shadcn component scaffolding
 
-1. Components are vendored (copy-paste via the shadcn CLI), never installed as an npm dependency — we own the code so `data-testid` never breaks on a library upgrade.
-2. Every interactive element gets `data-testid="<workspace>.<entity>.<component>.<action-or-state>"` — e.g. `payments.list.submit-button`.
-3. Tables use TanStack Table (headless) rendering real `<table>`/`<th scope>` — never a `<div>` grid.
-4. No optimistic UI: a submitted form shows a pending state until the server confirms, never an immediate assumed-success row.
-5. After any change: `npm run build` in `frontend/`, then manually click through the flow once in a browser — no Playwright check at this stage.
+Use vendored components, semantic markup, accessible names/roles, deterministic `data-testid="<workspace>.<entity>.<component>.<action-or-state>"`, and real semantic tables. Include loading, error and empty states; never show fake optimistic success or bind selectors solely to styling classes.
+
+Inspect current `frontend/` scripts and use `pnpm`, never generic npm commands. Deliberately separate Server and Client Components. The browser must not store Keycloak access tokens or bypass the authoritative BFF; never log tokens or sensitive payment data.
+
+Before adding Playwright work, inspect EPIC-24 sequencing, capability gates, and whether the screen/workspace and backend capability exist. Classify it `READY`, blocked, or `N/A`; Playwright is capability-gated, not permanently prohibited.
