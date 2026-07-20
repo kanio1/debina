@@ -110,7 +110,7 @@ Taski:
 
 ## Story 32.5 — Ledger account, currency and reversal structural invariants
 
-status: not-started
+status: done
 depends_on: [Story 32.1, Story 32.3]
 
 Opis: closes the structural invalid-evidence gaps in the existing journal DDL without implementing
@@ -122,6 +122,15 @@ Kryterium ukończenia story: PostgreSQL rejects unknown accounts, account/curren
 mixed-currency or unbalanced entries, malformed/self/duplicate reversal links, while valid existing
 ledger data survives an isolated Testcontainers upgrade path.
 
+`[DONE 2026-07-20]`: V29 and its committed PostgreSQL 18 proofs (`bd2899c`) were left without
+the corresponding story-state closure. Fresh re-verification passes 11/11: foreign and
+account/currency-mismatched lines are rejected, mixed currencies and unbalanced evidence roll back
+at COMMIT, valid one-currency evidence survives V28→V43, and malformed/self/duplicate reversal
+pointers are rejected. A reversible mutation removing the single-currency predicate made
+`rejectsMixedCurrenciesEvenWhenEachCurrencyBalances` fail, then was restored and the complete
+suite rerun green. This remains structural evidence only; it does not authorize a runtime
+`reverse()` command or derive finality.
+
 Taski:
-- [ ] **Add one append-only ledger migration and Testcontainers fresh/upgrade/negative proof.**
-      `verify: ./mvnw -f backend test -Dtest=*JournalAccountCurrencyIntegrityTest*,*ReversalStructuralIntegrityTest*,*LedgerIntegrityMigrationUpgradePathTest*`
+- [x] **Add one append-only ledger migration and Testcontainers fresh/upgrade/negative proof.**
+      `verify: ./mvnw -f backend test -Dtest=JournalAccountCurrencyIntegrityTest,ReversalStructuralIntegrityTest,LedgerIntegrityMigrationUpgradePathTest` → `11/0/0 PASS` (2026-07-20).
