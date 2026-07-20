@@ -171,7 +171,7 @@
     },
     {
       "epic": "EPIC-33",
-      "status": "not-started",
+      "status": "blocked",
       "source_file": "planning/epics/EPIC-33-instant-settlement.md"
     },
     {
@@ -186,7 +186,7 @@
     },
     {
       "epic": "EPIC-36",
-      "status": "not-started",
+      "status": "blocked",
       "source_file": "planning/epics/EPIC-36-settlement-gross-instant.md"
     },
     {
@@ -2345,7 +2345,7 @@
       "epic": "EPIC-33",
       "story": "33.1",
       "title": "`GrossInstantStrategy` jedna transakcja",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*GrossInstantOneTxFlowTest*"
@@ -2497,7 +2497,7 @@
       "epic": "EPIC-36",
       "story": "36.1",
       "title": "`GrossInstantStrategy` reserve→post→FINAL",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*GrossInstantLedgerPortTest*"
@@ -2523,7 +2523,7 @@
       "epic": "EPIC-36",
       "story": "36.3",
       "title": "Test: `settlement_role` bez zapisu `ledger.*`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "EPIC-13-ledger-ownership/Story 13.3"
       ],
@@ -2531,7 +2531,7 @@
         "./mvnw -f backend test -Dtest=*SettlementRoleNoLedgerGrantTest*"
       ],
       "source_file": "planning/epics/EPIC-36-settlement-gross-instant.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-20 EPIC-36 Story 36.3 implementation session"
     },
     {
       "epic": "EPIC-37",

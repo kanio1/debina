@@ -1,56 +1,60 @@
 # HANDOFF
 
-## Completed program
+## Zadanie
 
-`FINALITY-TRUTH-AND-READINESS-PROGRAM` is complete on 2026-07-20. ADR-N9 and ADR-N10 remain
-frozen and authoritative. No reset, restore, stash, clean, fetch, pull, rebase or push was used.
+SEPA Nexus is a synthetic payment-testing platform with frozen one-writer-per-schema, LedgerPort,
+and explicit-finality rules. The current request attempted EPIC-33/EPIC-36 synthetic
+gross-instant settlement, whose source requires reserve→post→FINAL in one real transaction.
 
-Local commits, in order:
+## Zrobione
 
-- `3faa2db docs(adr): authorize finality and ledger reservations`
-- `e4e7a75 feat(ledger): prove reservation lifecycle`
-- `2f1a591 feat(settlement): add authoritative finality projection`
+- Read HANDOFF, ADR-N9/N10, EPIC-13/33/35/36/39, backend and planning instructions before work.
+- Added `backend/src/test/java/com/sepanexus/settlement/GrossInstantTransactionBoundaryProofTest.java`.
+  On isolated PostgreSQL 18 Testcontainers it records four different `txid_current()` values for
+  the actual `JdbcLedgerPort.reserve`, `JdbcLedgerPort.post`, settlement finality, and payment
+  projection path. Its injected projection failure proves a committed POST and settlement
+  finality record can remain while the payment projection is rolled back.
+- Reran the independent READY evidence: 50 tests passed, including ledger reserve/post/release,
+  concurrency and rollback; V34 and V31–V34 fresh/upgrade migrations; finality replay/conflict;
+  payment projection idempotency/rollback; ledger grants; and Modulith boundaries.
+- Added `GROSS-INSTANT-TRANSACTION-COORDINATION-DECISION.md`, with source facts, actual failure
+  window, viable coordination choices, the SECURITY DEFINER recommendation, and exact ADR input.
+- Updated `planning/epics/EPIC-33-instant-settlement.md` and
+  `planning/epics/EPIC-36-settlement-gross-instant.md`: Story 33.1 / 36.1 and both epics are
+  accurately `blocked`; shared EPIC-36 Story 36.3 is `done` with rerun evidence. Updated
+  `planning/README.md` and regenerated `planning/story-inventory.json`.
+- Planning governance passes: story-inventory generator check, story validator, capability-graph
+  validator, and `git diff --check`. Generated Spring Modulith Javadoc was restored to its prior
+  baseline after Maven.
 
-## Delivered and verified
+## Utknęliśmy na
 
-- LedgerPort has durable V34 reservations, AVAILABLE/RESERVED journal components, typed
-  insufficient liquidity, atomic reserve/post/release, same-command replay, deterministic locks
-  and append-only journal behavior. PostgreSQL 18 fresh/upgrade, rollback, concurrency, ownership,
-  grants and six reverted mutation proofs passed.
-- Settlement owns finality authority: V31 catalog; immutable V32 snapshots and authority records;
-  exact evidence/source replay and conflict rejection; `finality_at` from the real LedgerPort POST
-  event; a narrow payment-owned projection port; no settlement direct payment/ledger write.
-- The only executable rule is synthetic `ON_LEDGER_POST`. `ON_CYCLE_SETTLED`,
-  `ON_NET_POSITION_SETTLED` (P1) and `ON_INTERNAL_BOOK_POST` are catalogued only. No CSM,
-  certification, receipt/delivery/ISO-trigger or legal-finality claim was introduced.
-- Payment status history remains compatibility data: business transitions do not write `is_final`
-  true. Egress has zero payment write access; ACSC, DISPATCHED, DELIVERED and receipts cannot
-  establish or remove finality.
-- Independent V31–V34 review: PASS at
-  `/tmp/FINALITY-TRUTH-AND-READINESS-PROGRAM/database-review-v31-v34.md`.
-- Governance passed. Story inventory regenerated: 76 epics / 285 stories. Capability graph:
-  144 nodes / 256 edges / zero cycles. EPIC-32 Story 32.2 is done; EPIC-39 is done for the approved
-  synthetic authority scope. Story 32.4 remains SOURCE-BLOCKED on its separate reverse-command and
-  narrow pre-finality read contract.
-- Two required sequential full backend regressions passed from the unchanged worktree:
-  `final-regression-5-sequential.log` and `final-regression-6-sequential.log`, each 412/0/0.
-  Scans found only expected negative-test permission denial and controlled scheduler
-  `BROKER_UNAVAILABLE`/`DATABASE_PERMISSION` warnings; no unexpected deadlock, connection, Kafka,
-  transaction, rollback or async failure.
-- Frontend/BFF checks: N/A; no frontend or BFF source/contract changed.
+The current implementation cannot meet the source phrase "in one transaction": each LedgerPort
+method opens and commits a new `ledger_role` connection, settlement finality opens and commits a
+new `settlement_role` connection, and `JdbcPaymentFinalityProjection` owns a separate Spring
+`sepa_app` transaction. The PostgreSQL proof establishes this is four transactions, not an
+assumption. No approved ADR authorizes a cross-role coordination mechanism for this slice. Do not
+implement `GrossInstantStrategy` as a sequence of those commits, and do not silently add
+SECURITY DEFINER, SET LOCAL ROLE, XA/JTA, direct cross-schema grants, a saga, compensation, or
+reverse behavior. Two full backend regressions are not claimed because the requested production
+slice is correctly decision-blocked before it can be completed.
 
-## Persistent constraints
+## Plan na następny krok
 
-- Do not reopen ADR-N9/N10 or broaden Debina into a real bank, CSM, payment hub, certified product,
-  or production integration.
-- Never derive finality from business status, ISO status, egress/delivery, receipt or transport.
-- Settlement continues to reach money and payment only through `LedgerPort` and
-  `PaymentFinalityPort`; no cross-schema write grant.
-- Restore generated Javadoc from
-  `/tmp/FINALITY-TRUTH-AND-READINESS-PROGRAM/javadoc-baseline.json` after Maven runs.
+Obtain one explicit ADR-level decision using
+`GROSS-INSTANT-TRANSACTION-COORDINATION-DECISION.md` (recommended: narrowly scoped PostgreSQL
+SECURITY DEFINER command functions with one physical coordinator transaction); only then open
+EPIC-33 Story 33.1 and implement the approved `GrossInstantStrategy` plus its full evidence
+matrix and two clean regressions.
 
-## Next work
+## Pułapki, których nie wolno powtórzyć
 
-Resume only a separately source-backed READY capability. Do not implement `reverse()` until a
-separate source/ADR defines its command and pre-finality read boundary. Do not fabricate a trigger
-for the catalog-only finality rules.
+- Never label the current reserve→post→finality→projection sequence one transaction: the proof
+  records four committed PostgreSQL transaction IDs and a real POST/finality-to-projection
+  recovery window.
+- Settlement must retain zero direct ledger/payment table grants; money remains only behind
+  LedgerPort and payment projection only behind PaymentFinalityPort.
+- Do not infer finality from business/ISO/transport/receipt status, add reverse(), real CSM
+  behavior, certification claims, or invent a scheme-profile mapping.
+- Maven rewrites `build/generated-spring-modulith/javadoc.json`; restore its baseline before
+  ending a session.

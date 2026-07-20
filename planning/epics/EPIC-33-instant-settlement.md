@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: blocked
 depends_on: [EPIC-32-ledger-core, EPIC-35-settlement-strategy-resolver]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-MONEY-2, line 1251), [MVP], Iteracja 2"
 ---
@@ -8,8 +8,16 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-MONEY-2, line 1
 
 ## Story 33.1 — `GrossInstantStrategy` jedna transakcja
 
-status: not-started
+status: blocked
 depends_on: []
+
+`[DECISION-BLOCKED 2026-07-20]`: the source's requirement is one real PostgreSQL transaction,
+not a sequence of commits. `GrossInstantTransactionBoundaryProofTest` proves the current dedicated
+`ledger_role`/`settlement_role`/payment connections commit reserve, post, finality and projection
+in four distinct transactions; injected projection failure leaves committed POST+finality with no
+payment projection. `GROSS-INSTANT-TRANSACTION-COORDINATION-DECISION.md` records the attempted
+paths, viable ADR-level choices, recommendation, and exact decision required. No strategy may be
+implemented until that decision authorizes a coordination mechanism.
 
 Taski:
 - [ ] **Zaimplementuj `GrossInstantStrategy`: reserve→post→FINAL w jednej transakcji.**
