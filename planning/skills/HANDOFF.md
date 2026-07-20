@@ -2,16 +2,16 @@
 
 ## State
 
-Wave 1 adds/hardens local skill governance, validators, provenance and eval fixtures only. The effective tracked skill root is `.claude/skills`; the requested `.agents/skills` root is blocked by a read-only system mount.
+Wave 1 is finalized. `.claude/skills` is the one tracked authoring source and `.agents/skills -> ../.claude/skills` is the official Codex CLI discovery bridge.
 
 ## Completed
 
-Four Debina-specific skills were created, five existing skills were hardened, every active repository-local skill was registered, public source provenance was pinned, and deterministic validation/eval artifacts were added. External source material was inspected as text only; no external scripts were executed or copied.
+Four Debina-specific skills were created, five existing skills were hardened, 17 active skills were registered, public source provenance was pinned, and deterministic validation/eval artifacts were added. The discovery-path validator verifies the bridge, canonical real-path deduplication, all active registry entries and absence of a copied mirror. External source material was inspected as text only; no external scripts were executed or copied.
 
-## Blocker
+## Runtime evidence
 
-`mkdir .agents/skills` returns `Read-only file system`. Do not remove, chmod, or replace that system mount. A later owner/environment action must provide a writable repository-local `.agents` directory before moving the effective root with `git mv` and updating references.
+`CODEX DISCOVERY: VERIFIED`; `EXPLICIT SKILL INVOCATION: VERIFIED`; `REFERENCE LOADING: VERIFIED`; `READ-ONLY BEHAVIOR: VERIFIED`; `IMPLICIT ROUTING: NOT EXECUTED`. The verified explicit case was `$debina-payment-state-finality`; ACSC was correctly rejected as settlement-finality authority. A local Codex CLI probe could not initialize its app-server client on read-only filesystem, but the repository bridge resolves and the prior fresh-session evidence is authoritative.
 
 ## Next action
 
-Validators passed and local commits `17798e8` and `abb3e74` contain the Wave 1 work. When a writable `.agents` path exists, perform the documented canonical migration, update registry/instructions, and rerun validators.
+Run `bash tools/skills/validate-all-skills.sh` before any future skills change. Wave 2 remains planned: `debina-iso20022-validation-lineage`, `debina-kafka-payment-contract`, `debina-dependency-version-gate`, `debina-next16-keycloak-bff`, and `debina-playwright-payment-lab`. Production code was untouched.

@@ -1,6 +1,6 @@
 # Repository-local skill inventory
 
-Inventory date: 2026-07-20. The tracked effective root is `.claude/skills`; `.agents` exists but is a read-only system mount (`mkdir .agents/skills` → `Read-only file system`). User-level directories were read-only inspected and were not modified. No repository-local duplicate frontmatter names were found before Wave 1.
+Inventory date: 2026-07-20, finalized with bridge commit `fcf1470`. The single tracked authoring source is `.claude/skills`; Codex CLI discovers the exact same physical files through `.agents/skills -> ../.claude/skills`. The former read-only `.agents` mount is retained only as environment history explaining the source location, not as an unresolved project blocker. User-level directories were read-only inspected and were not modified. No repository-local duplicate frontmatter names were found before Wave 1.
 
 | Skill | Original path | Tracked | Trigger / state | References/scripts | Assessment |
 | --- | --- | --- | --- | --- | --- |
@@ -22,4 +22,4 @@ Inventory date: 2026-07-20. The tracked effective root is `.claude/skills`; `.ag
 | debina-payment-state-finality | new `.claude/skills/...` | yes | five status axes/finality | 3 refs | created; distinct from accounting |
 | debina-runtime-proof-testing | new `.claude/skills/...` | yes | runtime completion evidence | 4 refs | created; distinct from planning readiness |
 
-The only discovered non-source `SKILL.md` files were under `frontend/node_modules`; they are dependency content, not repository-local active skills. No legacy copy was moved because the mandated destination cannot be written; leaving `.claude/skills` intact avoids duplicate active names and preserves existing references.
+The only discovered non-source `SKILL.md` files were under `frontend/node_modules`; they are dependency content, not repository-local active skills. `.agents/skills` is a discovery symlink, not a second copy; validators compare canonical real paths and reject copied/divergent mirrors.

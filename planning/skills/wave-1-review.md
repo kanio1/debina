@@ -12,8 +12,18 @@ Review perspective: routing ambiguity, stale assumptions, external acquisition s
 | External repositories can contain unsafe instructions/scripts. | Cloned only four approved sources in `/tmp`; read text only; executed nothing from them; no script copied. |
 | Trail of Bits license is CC-BY-SA-4.0. | Used as review inspiration only; all prose original and notices/lock record that no wording was copied. |
 | Static overlap checking could be misrepresented as model-routing proof. | Validator says heuristic only; behavior run is explicitly `NOT_EXECUTED`. |
-| Requested `.agents/skills` canonical destination cannot be written in this checkout. | Unresolved environmental blocker documented: `.agents` is read-only. Effective tracked root remains `.claude/skills`; no fake symlink, duplicate, or user-home coupling was created. |
+| Original `.agents` mount could not be written. | Resolved by the repository-local bridge `.agents/skills -> ../.claude/skills`; `.claude/skills` remains the one authoring source and no copied mirror exists. |
 
-No production Java, TypeScript, SQL migration, runtime configuration, payment behavior, or frozen architecture decision was changed. No hidden network action is embedded in a skill. The independent reviewer found no remaining fixable Wave 1 issue; canonical-path migration requires a writable repository path supplied by the owner/environment.
+No production Java, TypeScript, SQL migration, runtime configuration, payment behavior, or frozen architecture decision was changed. No hidden network action is embedded in a skill. The independent reviewer found no remaining fixable Wave 1 issue.
 
 Backend and frontend regressions are `N/A` for this documentation/agent-workflow-only change: no production source, manifest, runtime configuration, generated application artifact, or instruction requiring those suites was modified. The focused skills and existing governance validators were run instead.
+
+## Codex discovery evidence
+
+- `CODEX DISCOVERY: VERIFIED`
+- `EXPLICIT SKILL INVOCATION: VERIFIED`
+- `REFERENCE LOADING: VERIFIED`
+- `READ-ONLY BEHAVIOR: VERIFIED`
+- `IMPLICIT ROUTING: NOT EXECUTED`
+
+A fresh Codex session explicitly invoked `$debina-payment-state-finality`, loaded its three named references, correctly classified ACSC as ISO/message status rather than settlement-finality authority, inspected binding sources, and made no changes. This is explicit-invocation evidence only; it does not establish implicit routing. A local `codex-cli 0.144.6` read-only ephemeral probe was attempted but could not initialize its in-process app-server client because of a read-only filesystem.

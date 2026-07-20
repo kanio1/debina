@@ -1,5 +1,8 @@
 {
   "version": 1,
+  "authoring_source": ".claude/skills",
+  "codex_discovery_path": ".agents/skills",
+  "discovery_bridge": ".agents/skills -> ../.claude/skills",
   "skills": [
     {"name":"artifact-derived-planning","path":".claude/skills/artifact-derived-planning","scope":"planning readiness and source precedence","owner":"Debina","status":"ACTIVE","origin":"existing, hardened Wave 1","upstream_sources":["openai/skills","obra/superpowers","mattpocock/skills"],"verified_against":"AGENTS.md, planning/AGENTS.md, capabilities.yaml","last_verified":"2026-07-20","implicit_invocation":true,"positive_triggers":["planning","readiness","capability graph"],"negative_boundaries":["architecture invention"],"overlaps_with":["debina-runtime-proof-testing: readiness versus completion evidence"],"references":[],"scripts":[],"evals":["tools/skills/evals/routing/artifact-derived-planning.yaml"]},
     {"name":"postgres-rls-migration","path":".claude/skills/postgres-rls-migration","scope":"general RLS, roles and Flyway","owner":"Debina","status":"ACTIVE","origin":"existing, hardened Wave 1","upstream_sources":["trailofbits/skills"],"verified_against":"infra/AGENTS.md, backend/AGENTS.md","last_verified":"2026-07-20","implicit_invocation":true,"positive_triggers":["RLS","Flyway","tenant GUC"],"negative_boundaries":["approved cross-role coordination"],"overlaps_with":["debina-postgres-transaction-coordination: general migration/RLS versus approved cross-role single transaction"],"references":["references/grant-matrix.md"],"scripts":[],"evals":["tools/skills/evals/routing/postgres-rls-migration.yaml"]},
