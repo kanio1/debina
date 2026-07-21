@@ -1,6 +1,5 @@
 package com.sepanexus.modules.paymentlifecycle.service;
 
-import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyClaim;
 import com.sepanexus.modules.paymentlifecycle.ingress.IdempotencyStore;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.CanonicalPaymentCommand;
@@ -30,22 +29,22 @@ public class Pain001PersistenceService {
     private final Pain001LineageRecorder pain001LineageRecorder;
     private final TenantGucConfigurer tenantGucConfigurer;
     private final ClockPort clockPort;
-    private final PaymentCreationWriter paymentCreationWriter;
+    private final ApprovalSubmissionGate approvalSubmissionGate;
 
     public Pain001PersistenceService(PaymentRepository paymentRepository, IdempotencyStore idempotencyStore,
             Pain001LineageRecorder pain001LineageRecorder, TenantGucConfigurer tenantGucConfigurer,
-            ClockPort clockPort, PaymentCreationWriter paymentCreationWriter) {
+            ClockPort clockPort, ApprovalSubmissionGate approvalSubmissionGate) {
         this.paymentRepository = paymentRepository;
         this.idempotencyStore = idempotencyStore;
         this.pain001LineageRecorder = pain001LineageRecorder;
         this.tenantGucConfigurer = tenantGucConfigurer;
         this.clockPort = clockPort;
-        this.paymentCreationWriter = paymentCreationWriter;
+        this.approvalSubmissionGate = approvalSubmissionGate;
     }
 
     @Transactional
-    public PaymentEntity persist(UUID tenantId, UUID branchId, String idempotencyKey, byte[] requestHash,
-            UUID rawMessageId, CanonicalPaymentCommand canonical) {
+    public PaymentSubmissionResult persist(UUID tenantId, UUID branchId, String makerUserId, String idempotencyKey,
+            byte[] requestHash, UUID rawMessageId, CanonicalPaymentCommand canonical) {
         tenantGucConfigurer.apply(tenantId, branchId);
 
         IdempotencyClaim claim = idempotencyStore.claim(tenantId, idempotencyKey, requestHash);
@@ -53,18 +52,18 @@ public class Pain001PersistenceService {
             throw new IdempotencyConflictException(idempotencyKey);
         }
         if (claim.outcome() == IdempotencyClaim.Outcome.REPLAY) {
-            return paymentRepository.findById(claim.existingPaymentId())
+            return approvalSubmissionGate.replay(paymentRepository.findById(claim.existingPaymentId())
                     .orElseThrow(() -> new IllegalStateException(
-                            "Idempotency replay points at a payment that no longer exists: " + claim.existingPaymentId()));
+                            "Idempotency replay points at a payment that no longer exists: " + claim.existingPaymentId())));
         }
 
-        PaymentEntity payment = paymentCreationWriter.create(tenantId, branchId,
-                canonical.amount(), canonical.currency(), canonical.debtorIban(), canonical.creditorIban());
+        PaymentSubmissionResult result = approvalSubmissionGate.create(tenantId, branchId, canonical.amount(),
+                canonical.currency(), canonical.debtorIban(), canonical.creditorIban(), makerUserId,
+                paymentId -> pain001LineageRecorder.record(paymentId, tenantId, rawMessageId, canonical,
+                        clockPort.now()));
+        idempotencyStore.complete(tenantId, idempotencyKey, result.payment().getId(),
+                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE);
 
-        pain001LineageRecorder.record(payment.getId(), tenantId, rawMessageId, canonical, clockPort.now());
-
-        idempotencyStore.complete(tenantId, idempotencyKey, payment.getId(), SUBMIT_RESPONSE_CODE);
-
-        return payment;
+        return result;
     }
 }

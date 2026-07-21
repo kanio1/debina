@@ -1,9 +1,10 @@
 package com.sepanexus.modules.paymentlifecycle.web;
 
-import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
+import com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus;
 import com.sepanexus.modules.paymentlifecycle.service.Pain001IngestionService;
 import com.sepanexus.modules.paymentlifecycle.service.Pain001SubmissionCommand;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentSubmissionResult;
 import com.sepanexus.modules.paymentlifecycle.service.SubmitPaymentCommand;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -40,15 +41,16 @@ public class PaymentController {
     }
 
     @PostMapping("/api/v1/payments")
-    public ResponseEntity<Void> submit(@Valid @RequestBody SubmitPaymentRequest request,
+    public ResponseEntity<?> submit(@Valid @RequestBody SubmitPaymentRequest request,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal Jwt jwt) {
-        PaymentEntity payment = paymentService.submitPayment(new SubmitPaymentCommand(
+        var payment = paymentService.submitPayment(new SubmitPaymentCommand(
                 UUID.fromString(jwt.getClaimAsString("tenant_id")),
                 branchIdClaim(jwt),
                 request.endToEndId(), request.amount(), request.currency(), request.debtorIban(),
-                request.creditorIban(), idempotencyKey));
-        return ResponseEntity.created(URI.create("/api/v1/payments/" + payment.getId())).build();
+                request.creditorIban(), jwt.getSubject(), idempotencyKey));
+        return submissionResponse(payment.getId(), paymentService.approvalStatus(
+                UUID.fromString(jwt.getClaimAsString("tenant_id")), branchIdClaim(jwt), payment.getId()));
     }
 
     /**
@@ -60,22 +62,31 @@ public class PaymentController {
      * {@code SignatureVerificationPort} as evidence, never be rejected earlier by validation.
      */
     @PostMapping(path = "/api/v1/iso/pain001", consumes = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<Void> submitPain001(@RequestBody byte[] xmlBytes,
+    public ResponseEntity<?> submitPain001(@RequestBody byte[] xmlBytes,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @RequestHeader(value = "X-Signer-Id", required = false) UUID declaredSignerId,
             @RequestHeader(value = "X-Signature", required = false) String signatureBase64,
             @RequestHeader(value = "X-Signature-Algo", defaultValue = "Ed25519") String algo,
             @AuthenticationPrincipal Jwt jwt) {
         byte[] signatureBytes = signatureBase64 == null ? null : Base64.getDecoder().decode(signatureBase64);
-        PaymentEntity payment = pain001IngestionService.submit(new Pain001SubmissionCommand(
+        PaymentSubmissionResult result = pain001IngestionService.submit(new Pain001SubmissionCommand(
                 UUID.fromString(jwt.getClaimAsString("tenant_id")), branchIdClaim(jwt), xmlBytes, signatureBytes,
-                declaredSignerId, algo, idempotencyKey));
-        return ResponseEntity.created(URI.create("/api/v1/payments/" + payment.getId())).build();
+                declaredSignerId, algo, jwt.getSubject(), idempotencyKey));
+        return submissionResponse(result.payment().getId(), result.approvalStatus());
     }
 
     private static UUID branchIdClaim(Jwt jwt) {
         String branchId = jwt.getClaimAsString("branch_id");
         return branchId == null ? null : UUID.fromString(branchId);
+    }
+
+    private static ResponseEntity<?> submissionResponse(UUID paymentId, ApprovalStatus approvalStatus) {
+        URI location = URI.create("/api/v1/payments/" + paymentId);
+        if (approvalStatus == ApprovalStatus.PENDING_APPROVAL) {
+            return ResponseEntity.accepted().location(location)
+                    .body(new PaymentSubmissionResponse(paymentId, approvalStatus));
+        }
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/api/v1/payments")

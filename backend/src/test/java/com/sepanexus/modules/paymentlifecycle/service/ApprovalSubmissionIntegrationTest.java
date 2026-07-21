@@ -1,0 +1,174 @@
+package com.sepanexus.modules.paymentlifecycle.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import com.sepanexus.SepaNexusApplication;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.UUID;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+/** PostgreSQL 18 proof for the frozen approval prefix gate (EPIC-76 Story 76.2). */
+@SpringBootTest(classes = SepaNexusApplication.class)
+class ApprovalSubmissionIntegrationTest {
+
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
+            .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");
+    private static boolean initialized;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @DynamicPropertySource
+    static void databaseProperties(DynamicPropertyRegistry registry) {
+        initializeDatabase();
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", () -> "sepa_app");
+        registry.add("spring.datasource.password", () -> "dev-only-app");
+        registry.add("spring.flyway.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.flyway.user", () -> "sepa_migration");
+        registry.add("spring.flyway.password", () -> "dev-only-migration");
+    }
+
+    @BeforeEach
+    void cleanTables() throws Exception {
+        try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+            statement.execute("TRUNCATE payment.payment_approvals, payment.payments, payment.outbox_events, "
+                    + "payment.payment_status_history, payment.payment_events, ingress.idempotency_keys, "
+                    + "ingress.raw_inbound_messages, iso.payment_iso_identifiers, iso.message_lineage, "
+                    + "iso.iso_messages, reference_data.approval_matrix_rules CASCADE");
+        }
+    }
+
+    @Test
+    @WithMockUser(roles = "payment_submitter")
+    void broadApprovalRuleKeepsPaymentBeforeFsmAndReplayDoesNotReleaseAnEvent() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        UUID branchId = UUID.randomUUID();
+        UUID ruleId = addBroadRule(tenantId, true, false);
+        SubmitPaymentCommand command = command(tenantId, branchId, "maker-subject", UUID.randomUUID().toString());
+
+        var first = paymentService.submitPayment(command);
+        var replay = paymentService.submitPayment(command);
+
+        assertThat(replay.getId()).isEqualTo(first.getId());
+        assertThat(paymentService.approvalStatus(tenantId, branchId, first.getId()).name()).isEqualTo("PENDING_APPROVAL");
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", first.getId())).isZero();
+        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", first.getId())).isZero();
+        assertThat(count("SELECT count(*) FROM iso.message_lineage WHERE payment_id = ?", first.getId())).isEqualTo(1);
+        try (Connection connection = admin(); PreparedStatement statement = connection.prepareStatement("""
+                SELECT p.status, a.status, a.maker_user_id, a.matrix_rule_id,
+                       a.expires_at - a.submitted_for_approval_at AS expiry
+                FROM payment.payments p JOIN payment.payment_approvals a ON a.payment_id = p.id
+                WHERE p.id = ?
+                """)) {
+            statement.setObject(1, first.getId());
+            try (ResultSet result = statement.executeQuery()) {
+                assertThat(result.next()).isTrue();
+                assertThat(result.getString("status")).isNull();
+                assertThat(result.getString("maker_user_id")).isEqualTo("maker-subject");
+                assertThat(result.getObject("matrix_rule_id")).isEqualTo(ruleId);
+                assertThat(result.getString("expiry")).isEqualTo("1 day");
+            }
+        }
+    }
+
+    @Test
+    @WithMockUser(roles = "payment_submitter")
+    void noMatchingRulePreservesReceivedFlowAndWritesExactlyOneApprovalAndOutboxEvent() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        UUID branchId = UUID.randomUUID();
+        var payment = paymentService.submitPayment(command(tenantId, branchId, "maker-subject", UUID.randomUUID().toString()));
+
+        assertThat(payment.getStatus().name()).isEqualTo("RECEIVED");
+        assertThat(paymentService.approvalStatus(tenantId, branchId, payment.getId()).name()).isEqualTo("NOT_REQUIRED");
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment.getId())).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", payment.getId())).isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser(roles = "payment_submitter")
+    void ambiguousOrUnavailableRulesFailClosedBeforePaymentCreation() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        UUID branchId = UUID.randomUUID();
+        addBroadRule(tenantId, true, false);
+        addBroadRule(tenantId, false, false);
+
+        assertThatThrownBy(() -> paymentService.submitPayment(command(tenantId, branchId, "maker", UUID.randomUUID().toString())))
+                .isInstanceOf(ApprovalMatrixPolicyException.class);
+        assertThat(count("SELECT count(*) FROM payment.payments")).isZero();
+        assertThat(count("SELECT count(*) FROM payment.outbox_events")).isZero();
+    }
+
+    private static SubmitPaymentCommand command(UUID tenantId, UUID branchId, String maker, String idempotencyKey) {
+        return new SubmitPaymentCommand(tenantId, branchId, "E2E-APPROVAL", new BigDecimal("10.00"), "EUR",
+                "DE89370400440532013000", "FR7630006000011234567890189", maker, idempotencyKey);
+    }
+
+    private static UUID addBroadRule(UUID tenantId, boolean requiresApproval, boolean requiresStepUp) throws Exception {
+        try (Connection connection = DriverManager.getConnection(POSTGRES.getJdbcUrl(), "reference_data_role",
+                "dev-only-reference-data")) {
+            try (PreparedStatement guc = connection.prepareStatement("SELECT set_config('app.tenant_id', ?, false)")) {
+                guc.setString(1, tenantId.toString());
+                guc.execute();
+            }
+            try (PreparedStatement insert = connection.prepareStatement("""
+                    INSERT INTO reference_data.approval_matrix_rules
+                        (tenant_id, requires_approval, requires_step_up, valid_from)
+                    VALUES (?, ?, ?, CURRENT_DATE) RETURNING id
+                    """)) {
+                insert.setObject(1, tenantId);
+                insert.setBoolean(2, requiresApproval);
+                insert.setBoolean(3, requiresStepUp);
+                try (ResultSet result = insert.executeQuery()) {
+                    assertThat(result.next()).isTrue();
+                    return (UUID) result.getObject(1);
+                }
+            }
+        }
+    }
+
+    private static int count(String sql, Object... parameters) throws Exception {
+        try (Connection connection = admin(); PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (int index = 0; index < parameters.length; index++) {
+                statement.setObject(index + 1, parameters[index]);
+            }
+            try (ResultSet result = statement.executeQuery()) {
+                assertThat(result.next()).isTrue();
+                return result.getInt(1);
+            }
+        }
+    }
+
+    static synchronized void initializeDatabase() {
+        if (initialized) {
+            return;
+        }
+        POSTGRES.start();
+        try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+            statement.execute("CREATE ROLE sepa_migration LOGIN SUPERUSER PASSWORD 'dev-only-migration'");
+        } catch (Exception exception) {
+            throw new IllegalStateException("Cannot initialize PostgreSQL test container", exception);
+        }
+        Flyway.configure().dataSource(POSTGRES.getJdbcUrl(), "sepa_migration", "dev-only-migration")
+                .locations("filesystem:src/main/resources/db/migration").load().migrate();
+        initialized = true;
+    }
+
+    private static Connection admin() throws Exception {
+        return DriverManager.getConnection(POSTGRES.getJdbcUrl(), "test_admin", "test_admin");
+    }
+}

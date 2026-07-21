@@ -1,6 +1,5 @@
 package com.sepanexus.modules.paymentlifecycle.service;
 
-import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
 import com.sepanexus.modules.paymentlifecycle.ingress.HardenedXmlFactory;
 import com.sepanexus.modules.paymentlifecycle.ingress.SignatureVerificationFailedException;
 import com.sepanexus.modules.paymentlifecycle.ingress.SignedChannelIngestionPipeline;
@@ -51,7 +50,7 @@ public class Pain001IngestionService {
     }
 
     @PreAuthorize("hasRole('payment_submitter')")
-    public PaymentEntity submit(Pain001SubmissionCommand command) {
+    public PaymentSubmissionResult submit(Pain001SubmissionCommand command) {
         SignedChannelIngestionPipeline.PipelineResult result = pipeline.ingest(CHANNEL, command.tenantId(),
                 Pain001LineageRecorder.MESSAGE_TYPE, command.xmlBytes(), command.signatureBytes(),
                 command.declaredSignerId(), command.algo(), true, clockPort.now());
@@ -72,8 +71,8 @@ public class Pain001IngestionService {
             throw new CanonicalMappingException(mapping.error());
         }
 
-        return persistenceService.persist(command.tenantId(), command.branchId(), command.idempotencyKey(),
-                sha256(command.xmlBytes()), result.rawMessageId(), mapping.command());
+        return persistenceService.persist(command.tenantId(), command.branchId(), command.makerUserId(),
+                command.idempotencyKey(), sha256(command.xmlBytes()), result.rawMessageId(), mapping.command());
     }
 
     private static byte[] sha256(byte[] payload) {

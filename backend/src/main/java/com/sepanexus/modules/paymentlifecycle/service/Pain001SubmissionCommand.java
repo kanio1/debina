@@ -9,5 +9,6 @@ public record Pain001SubmissionCommand(
         byte[] signatureBytes,
         UUID declaredSignerId,
         String algo,
+        String makerUserId,
         String idempotencyKey) {
 }

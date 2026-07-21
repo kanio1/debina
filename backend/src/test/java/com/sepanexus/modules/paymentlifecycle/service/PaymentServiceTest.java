@@ -43,7 +43,7 @@ class PaymentServiceTest {
     private IsoIdentifierLookup isoIdentifierLookup;
 
     @Mock
-    private PaymentCreationWriter paymentCreationWriter;
+    private ApprovalSubmissionGate approvalSubmissionGate;
 
     @Mock
     private PaymentTimelineLookup paymentTimelineLookup;
@@ -55,18 +55,25 @@ class PaymentServiceTest {
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 UUID.randomUUID().toString());
         PaymentService service = new PaymentService(paymentRepository, tenantGucConfigurer, idempotencyStore,
-                rawMessageArchive, jsonDirectLineageRecorder, isoIdentifierLookup, paymentCreationWriter,
+                rawMessageArchive, jsonDirectLineageRecorder, isoIdentifierLookup, approvalSubmissionGate,
                 paymentTimelineLookup);
         when(rawMessageArchive.archive(any(), any(), any(), any())).thenReturn(UUID.randomUUID());
         when(idempotencyStore.claim(any(), any(), any())).thenReturn(IdempotencyClaim.claimed());
         PaymentEntity created = PaymentEntity.received(tenantId, null, new BigDecimal("10.00"), "EUR",
                 "DE89370400440532013000", "FR7630006000011234567890189", java.time.Instant.now());
-        when(paymentCreationWriter.create(any(), any(), any(), any(), any(), any())).thenReturn(created);
+        when(approvalSubmissionGate.create(any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenAnswer(invocation -> {
+                    @SuppressWarnings("unchecked")
+                    java.util.function.Consumer<UUID> lineage = invocation.getArgument(7);
+                    lineage.accept(created.getId());
+                    return new PaymentSubmissionResult(created,
+                            com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus.NOT_REQUIRED);
+                });
 
         PaymentEntity saved = service.submitPayment(command);
 
-        verify(paymentCreationWriter).create(org.mockito.ArgumentMatchers.eq(tenantId), org.mockito.ArgumentMatchers.isNull(),
-                any(), any(), any(), any());
+        verify(approvalSubmissionGate).create(org.mockito.ArgumentMatchers.eq(tenantId), org.mockito.ArgumentMatchers.isNull(),
+                any(), any(), any(), any(), any(), any());
         ArgumentCaptor<String> endToEndId = ArgumentCaptor.forClass(String.class);
         verify(jsonDirectLineageRecorder).record(any(), any(), any(), endToEndId.capture());
         assertThat(saved.getStatus()).isEqualTo(PaymentStatus.RECEIVED);

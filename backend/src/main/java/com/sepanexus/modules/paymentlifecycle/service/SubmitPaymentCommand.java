@@ -11,5 +11,11 @@ public record SubmitPaymentCommand(
         String currency,
         String debtorIban,
         String creditorIban,
+        String makerUserId,
         String idempotencyKey) {
+
+    public SubmitPaymentCommand(UUID tenantId, UUID branchId, String endToEndId, BigDecimal amount, String currency,
+            String debtorIban, String creditorIban, String idempotencyKey) {
+        this(tenantId, branchId, endToEndId, amount, currency, debtorIban, creditorIban, "test-maker", idempotencyKey);
+    }
 }

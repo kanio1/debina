@@ -14,9 +14,10 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * The "insert payment row + write outbox(payment.received) + record RECEIVED history/event in one
- * unit" step shared by every ingress channel (JSON_DIRECT, pain.001) — extracted so the two
- * channels' services don't each re-implement the same insert + event-serialization pair. The
+ * The payment-row persistence and the existing {@code payment.received} release step shared by
+ * every ingress channel (JSON_DIRECT, pain.001).  The steps are deliberately separate: the frozen
+ * maker–checker prefix gate first persists/records lineage, then releases this existing event only
+ * for {@code NOT_REQUIRED}. The
  * domain event ID generated here is shared across three places (OQ-12 "event identity", EPIC-11
  * Story 11.1): {@link PaymentLifecycleEvent#eventId()} (what {@code InboxConsumer} dedups on),
  * {@code payment.payment_events.id}, and {@code payment.payment_status_history.event_ref}.
@@ -39,11 +40,21 @@ class PaymentCreationWriter {
         this.objectMapper = objectMapper;
     }
 
-    PaymentEntity create(UUID tenantId, UUID branchId, BigDecimal amount, String currency,
+    PaymentEntity createReceived(UUID tenantId, UUID branchId, BigDecimal amount, String currency,
             String debtorIban, String creditorIban) {
         Instant now = clockPort.now();
-        PaymentEntity payment = paymentRepository.save(PaymentEntity.received(tenantId, branchId, amount,
+        return paymentRepository.save(PaymentEntity.received(tenantId, branchId, amount,
                 currency, debtorIban, creditorIban, now));
+    }
+
+    PaymentEntity createAwaitingApproval(UUID tenantId, UUID branchId, BigDecimal amount, String currency,
+            String debtorIban, String creditorIban) {
+        return paymentRepository.save(PaymentEntity.awaitingApproval(tenantId, branchId, amount,
+                currency, debtorIban, creditorIban, clockPort.now()));
+    }
+
+    void releaseReceived(PaymentEntity payment, UUID tenantId) {
+        Instant now = clockPort.now();
 
         UUID eventId = UUID.randomUUID();
         String payload = eventPayload(eventId, payment, tenantId);
@@ -51,8 +62,6 @@ class PaymentCreationWriter {
         paymentHistoryRecorder.recordEvent(eventId, payment.getId(), OutboxEvent.PAYMENT_RECEIVED, payload, now);
         paymentHistoryRecorder.recordTransition(payment.getId(), null, PaymentStatus.RECEIVED, "INTERNAL",
                 eventId, OutboxEvent.PAYMENT_RECEIVED, now);
-
-        return payment;
     }
 
     private String eventPayload(UUID eventId, PaymentEntity payment, UUID tenantId) {

@@ -55,6 +55,29 @@ public class PaymentApprovalEntity {
     protected PaymentApprovalEntity() {
     }
 
+    public static PaymentApprovalEntity notRequired(UUID paymentId, String makerUserId, UUID matrixRuleId) {
+        PaymentApprovalEntity approval = new PaymentApprovalEntity();
+        approval.id = UUID.randomUUID();
+        approval.paymentId = paymentId;
+        approval.status = ApprovalStatus.NOT_REQUIRED;
+        approval.makerUserId = makerUserId;
+        approval.matrixRuleId = matrixRuleId;
+        return approval;
+    }
+
+    public static PaymentApprovalEntity pending(UUID paymentId, String makerUserId, UUID matrixRuleId,
+            Instant submittedAt, Instant expiresAt) {
+        PaymentApprovalEntity approval = new PaymentApprovalEntity();
+        approval.id = UUID.randomUUID();
+        approval.paymentId = paymentId;
+        approval.status = ApprovalStatus.PENDING_APPROVAL;
+        approval.makerUserId = makerUserId;
+        approval.matrixRuleId = matrixRuleId;
+        approval.submittedForApprovalAt = submittedAt;
+        approval.expiresAt = expiresAt;
+        return approval;
+    }
+
     public UUID getId() { return id; }
     public UUID getPaymentId() { return paymentId; }
     public UUID getBatchId() { return batchId; }

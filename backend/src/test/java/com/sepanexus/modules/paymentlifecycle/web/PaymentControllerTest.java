@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
+import com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus;
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup.IsoIdentifierView;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentNotFoundException;
@@ -78,6 +79,28 @@ class PaymentControllerTest {
                         .content(validPaymentJson()))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/payments/" + paymentId));
+    }
+
+    @Test
+    void pendingApprovalReturnsItsIndependentStatusAndAcceptedLocation() throws Exception {
+        PaymentEntity payment = org.mockito.Mockito.mock(PaymentEntity.class);
+        UUID paymentId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+        when(payment.getId()).thenReturn(paymentId);
+        when(paymentService.submitPayment(any())).thenReturn(payment);
+        when(paymentService.approvalStatus(org.mockito.ArgumentMatchers.eq(tenantId), any(),
+                org.mockito.ArgumentMatchers.eq(paymentId))).thenReturn(ApprovalStatus.PENDING_APPROVAL);
+
+        mockMvc.perform(post("/api/v1/payments")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", tenantId.toString()).subject("maker-subject"))
+                                .authorities(() -> "ROLE_payment_submitter"))
+                        .header("Idempotency-Key", UUID.randomUUID().toString())
+                        .contentType("application/json")
+                        .content(validPaymentJson()))
+                .andExpect(status().isAccepted())
+                .andExpect(header().string("Location", "/api/v1/payments/" + paymentId))
+                .andExpect(jsonPath("$.paymentId").value(paymentId.toString()))
+                .andExpect(jsonPath("$.approvalStatus").value("PENDING_APPROVAL"));
     }
 
     @Test

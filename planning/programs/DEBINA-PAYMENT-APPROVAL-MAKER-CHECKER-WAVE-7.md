@@ -24,7 +24,7 @@ No existing epic/story owned maker–checker (`rg` across every epic, inventory 
 | Candidate | Readiness | Evidence / disposition |
 |---|---|---|
 | 76.1 approval persistence | VERIFIED | source DDL/ownership and Class B ADR-W7-01; V53/V54 with PostgreSQL proof |
-| 76.2 submission prefix gate | READY | depends only on 76.1; archive/idempotency/lineage/outbox implementation is present |
+| 76.2 submission prefix gate | VERIFIED | frozen prefix gate implemented and runtime-proven in JSON_DIRECT and pain.001 |
 | 76.3 approve/reject | CAPABILITY-BLOCKED | frozen audit requires `audit.audit_log` through absent evidence-audit module/port |
 | 76.4 expiry | CAPABILITY-BLOCKED | same missing audit capability plus 76.3 |
 | 76.5 internal approval queue | READY | payment-lifecycle owns source rows and can prove RLS/cursor behavior internally |
@@ -39,6 +39,8 @@ Primary queue: 76.1, 76.2, 76.5.  Reserve queue: source-derived evidence-audit o
 - **Class B / ADR-W7-01:** nullable `payment.payments.status` represents only a pre-FSM approval-gated payment; retaining `RECEIVED` would be a false lifecycle state, while a staged aggregate would duplicate payment/lineage/idempotency state.  Existing no-approval ingress remains `RECEIVED`.
 - **Class A:** approval and matrix records use source fields, a unique single-payment row, partial pending-queue index, immutable submitted matrix reference, source status/timestamp checks, `numeric(18,2)` money selector, `ClockPort` boundary for later expiry, and join-through payment RLS rather than redundant approval tenant state.
 - Added V53 `reference_data.approval_matrix_rules` (reference-data writer; payment read only) and V54 `payment.payment_approvals` (payment-lifecycle writer).  No Kafka topic/event, ISO identifier, finality, transport or frontend surface changed.
+- **76.2 Class A:** an initial rule is usable only when it is one active tenant-wide row with all optional selectors null and `requires_step_up=false`.  Any selector whose vocabulary/units cannot yet be evaluated, multiple active candidates, or step-up fails closed before payment creation.  No matching rule is `NOT_REQUIRED`.
+- The shared payment writer now separates payment persistence from the existing release of `payment.received`: both JSON_DIRECT and pain.001 write archive/idempotency/lineage/payment/approval in one transaction, pending rows keep `payment.status` null and have no outbox/history event, and `NOT_REQUIRED` writes exactly one existing `payment.received` event after its approval row.  Stable JWT `sub` is the production maker identity; tests use an explicit command identity.
 
 ## Verification and review
 
@@ -47,15 +49,17 @@ Primary queue: 76.1, 76.2, 76.5.  Reserve queue: source-derived evidence-audit o
 - Mutation proof: removing the database maker≠checker check made the focused suite fail (`Expecting code to raise a throwable`); restored immediately, then GREEN rerun passed.  Log: `/tmp/DEBINA-PAYMENT-APPROVAL-MAKER-CHECKER-WAVE-7/mutation-remove-maker-checker-guard.log`.
 - Compatibility review: the new source-defined payment FK exposed nine older PostgreSQL test fixtures that truncated the parent before its new child, and the V50 upgrade test still asserted V52.  The fixtures now truncate `payment.payment_approvals` first and the upgrade assertion expects V54; this preserves the FK rather than weakening it.  The focused compatibility suite passed **56/0/0**.  Log: `/tmp/DEBINA-PAYMENT-APPROVAL-MAKER-CHECKER-WAVE-7/regression-fixture-compatibility.log`.
 - Full backend regression after that correction passed **491/0/0**.  This is the first clean tranche regression; the test count is two above the Wave 6 baseline because this story adds two migration proofs.  Log: `/tmp/DEBINA-PAYMENT-APPROVAL-MAKER-CHECKER-WAVE-7/backend-regression-story-76-1-fixed.log`.
+- 76.2 structural RED first exposed the date-interval rendering assertion (`1 day` rather than `24:00:00`), then GREEN passed **3/0/0** PostgreSQL 18 integration tests.  The affected command/controller suite passed **27/0/0**, including real signed pain.001 ingestion and the pending `202` response body.  Full backend regression passed **495/0/0**.  Logs: `/tmp/DEBINA-PAYMENT-APPROVAL-MAKER-CHECKER-WAVE-7/story-76-2-focused.log`, `story-76-2-focused-green.log`, `story-76-2-affected-green.log`, and `backend-regression-story-76-2.log`.
 - Database review: **PASS.** V53/V54 are append-only additive migrations; V54's metadata-only `DROP NOT NULL` preserves existing rows; no backfill or cross-schema runtime writer is added.  The only cross-schema relationship is the source-defined read-only matrix FK/grant.  RLS is forced on both tenant-scoped tables, `PUBLIC` is revoked, and isolated fresh/upgrade plus positive/negative role proofs exist.  No `SECURITY DEFINER`, money movement, audit substitute, or unapproved event contract was introduced.
 
 ## Promotion and commit history
 
 - Planning owner created before implementation; first proof was RED, not plan-only.
-- Coherent 76.1 commit is being created after the final diff/validator inspection; its SHA will be recorded immediately afterwards.
+- `d87bb441b01cb9df58e708be748cc852c4dee656` — `feat(payment): add maker-checker approval persistence` (verified Story 76.1).
+- Commit pending for verified Story 76.2.
 
 ## Current blockers and next work
 
 - `audit.audit_log` / `evidence-audit` has authoritative ownership but no implemented module, schema, public command-audit port or planning owner.  Therefore 76.3/76.4 are not claimed complete and neither logs, history, payment events nor outbox rows are treated as audit.
 - GraphQL ownership, Playwright sequencing, batch and step-up gates remain unchanged.
-- Next executable action: re-confirm 76.2 source/transaction assumptions, add its RED proof, then implement the supported approval-matrix submission gate without releasing `payment.received` for pending approval.
+- Next executable action: re-confirm 76.5 queue projection ownership/cursor proof; it remains independent of the external GraphQL/UI gate.

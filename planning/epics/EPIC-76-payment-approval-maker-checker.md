@@ -25,7 +25,7 @@ Tasks:
 
 ## Story 76.2 — Approval-matrix evaluation and submission prefix gate
 
-status: not-started
+status: done
 depends_on: [Story 76.1]
 
 Description: Evaluate the supported single-payment matrix subset within the existing submission transaction.  `NOT_REQUIRED` creates an approval row and releases exactly one existing `payment.received`; `PENDING_APPROVAL` freezes the rule and maker identity, records a 24-hour expiry using `ClockPort`, and releases no event.
@@ -33,8 +33,8 @@ Description: Evaluate the supported single-payment matrix subset within the exis
 Completion criterion: JSON_DIRECT and pain.001 preserve archive/idempotency/lineage, replay is stable, policy ambiguity fails closed, and the no-approval flow remains backward-compatible.
 
 Tasks:
-- [ ] **Implement the source-backed matrix subset and payment creation gate.** Support broad tenant rules and only source-backed selectors; classify step-up/batch/risk selectors as unsupported until their prerequisites exist.
-      `verify: ./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest` → pending/no-approval/replay/conflict/ambiguous-policy proof passes.
+- [x] **Implement the source-backed matrix subset and payment creation gate.** The first slice accepts exactly one active, tenant-wide rule with all optional selectors null.  `min_amount`, payment type, batch size, risk level and step-up are fail-closed unsupported; multiple active broad rules are a typed policy ambiguity.  JSON_DIRECT and pain.001 now create the approval row after lineage, and only `NOT_REQUIRED` releases the existing outbox event.
+      `verify: ./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest,PaymentControllerTest,JsonDirectIngestionTest,Pain001SubmissionEndpointTest,PaymentServiceTest` → PASS (27 tests: pending/no-approval/replay/lineage/outbox/pain.001/controller proof); full backend regression → PASS (495 tests).
 
 ## Story 76.3 — Approve and reject commands with same-transaction audit
 

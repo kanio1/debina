@@ -4356,12 +4356,12 @@
       "epic": "EPIC-76",
       "story": "76.2",
       "title": "Approval-matrix evaluation and submission prefix gate",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 76.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest"
+        "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest,PaymentControllerTest,JsonDirectIngestionTest,Pain001SubmissionEndpointTest,PaymentServiceTest"
       ],
       "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
       "capability_analysis": "NOT_DEEP_DIVED"

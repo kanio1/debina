@@ -72,6 +72,14 @@ public class PaymentEntity {
         return new PaymentEntity(tenantId, branchId, amount, currency, debtorIban, creditorIban, createdAt);
     }
 
+    public static PaymentEntity awaitingApproval(UUID tenantId, UUID branchId, BigDecimal amount,
+            String currency, String debtorIban, String creditorIban, Instant createdAt) {
+        PaymentEntity payment = new PaymentEntity(tenantId, branchId, amount, currency, debtorIban, creditorIban,
+                createdAt);
+        payment.status = null;
+        return payment;
+    }
+
     public UUID getId() { return id; }
     public UUID getTenantId() { return tenantId; }
     public UUID getBranchId() { return branchId; }

@@ -29,20 +29,20 @@ public class PaymentService {
     private final RawMessageArchive rawMessageArchive;
     private final JsonDirectLineageRecorder jsonDirectLineageRecorder;
     private final IsoIdentifierLookup isoIdentifierLookup;
-    private final PaymentCreationWriter paymentCreationWriter;
+    private final ApprovalSubmissionGate approvalSubmissionGate;
     private final PaymentTimelineLookup paymentTimelineLookup;
 
     public PaymentService(PaymentRepository paymentRepository, TenantGucConfigurer tenantGucConfigurer,
             IdempotencyStore idempotencyStore, RawMessageArchive rawMessageArchive,
             JsonDirectLineageRecorder jsonDirectLineageRecorder, IsoIdentifierLookup isoIdentifierLookup,
-            PaymentCreationWriter paymentCreationWriter, PaymentTimelineLookup paymentTimelineLookup) {
+            ApprovalSubmissionGate approvalSubmissionGate, PaymentTimelineLookup paymentTimelineLookup) {
         this.paymentRepository = paymentRepository;
         this.tenantGucConfigurer = tenantGucConfigurer;
         this.idempotencyStore = idempotencyStore;
         this.rawMessageArchive = rawMessageArchive;
         this.jsonDirectLineageRecorder = jsonDirectLineageRecorder;
         this.isoIdentifierLookup = isoIdentifierLookup;
-        this.paymentCreationWriter = paymentCreationWriter;
+        this.approvalSubmissionGate = approvalSubmissionGate;
         this.paymentTimelineLookup = paymentTimelineLookup;
     }
 
@@ -70,17 +70,29 @@ public class PaymentService {
             throw new IdempotencyConflictException(command.idempotencyKey());
         }
         if (claim.outcome() == IdempotencyClaim.Outcome.REPLAY) {
-            return paymentRepository.findById(claim.existingPaymentId())
+            PaymentEntity payment = paymentRepository.findById(claim.existingPaymentId())
                     .orElseThrow(() -> new IllegalStateException(
                             "Idempotency replay points at a payment that no longer exists: " + claim.existingPaymentId()));
+            return payment;
         }
 
-        PaymentEntity payment = paymentCreationWriter.create(tenantId, command.branchId(),
-                command.amount(), command.currency(), command.debtorIban(), command.creditorIban());
-        jsonDirectLineageRecorder.record(payment.getId(), tenantId, rawMessageId, command.endToEndId());
-        idempotencyStore.complete(tenantId, command.idempotencyKey(), payment.getId(), SUBMIT_RESPONSE_CODE);
+        PaymentSubmissionResult result = approvalSubmissionGate.create(tenantId, command.branchId(), command.amount(),
+                command.currency(), command.debtorIban(), command.creditorIban(), command.makerUserId(),
+                paymentId -> jsonDirectLineageRecorder.record(paymentId, tenantId, rawMessageId, command.endToEndId()));
+        idempotencyStore.complete(tenantId, command.idempotencyKey(), result.payment().getId(),
+                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE);
 
-        return payment;
+        return result.payment();
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('payment_submitter')")
+    public com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus approvalStatus(UUID tenantId, UUID branchId,
+            UUID paymentId) {
+        tenantGucConfigurer.apply(tenantId, branchId);
+        PaymentEntity payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new PaymentNotFoundException(paymentId));
+        return approvalSubmissionGate.replay(payment).approvalStatus();
     }
 
     private byte[] canonicalRequestBytes(SubmitPaymentCommand command) {
