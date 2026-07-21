@@ -6,4 +6,6 @@
 - External registry: `docs/standards/SOURCE-REGISTRY.yaml`; public-source gaps are explicitly retained as `UNKNOWN`/`PARTICIPANT-DOCUMENTATION-REQUIRED`.
 - Findings: payment representation remains sufficient for current flow; instruction/group/batch/clearing submission require UC2/source evidence; ingress/ISO physical packaging and GraphQL growth are boundary findings.
 - Follow-up: C1 → C2 → D → E → F → G; see [program](DEBINA-ENTERPRISE-REBASE-PROGRAM.md).
-- Validation and commit SHA are appended after final verification; no production/Dagger/CI/Wave 12 change belongs to this record.
+- Commit: `4f3d629 docs(rebase): complete phase B product architecture model`.
+- Validation PASS: agent instructions; story inventory (`79 epics`, `304 stories`); capability graph (`155 nodes`, `273 edges`, no cycles); all skills; YAML parse; new/changed Markdown-link audit; Mermaid declarations; duplicate concept/process/candidate/module IDs; module package/schema evidence; `git diff --check`.
+- Diff audit: no backend production/test Java, migration, GraphQL schema, frontend runtime/dependency, infrastructure runtime, `.github/workflows`, `act`, or Dagger implementation change. Wave 12 branch remains at `5ebebb034e4a70e93f14d6a6498654ef5804a451`.

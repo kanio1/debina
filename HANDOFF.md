@@ -9,6 +9,7 @@ Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research plat
 - Created durable product, process, concept, rail, context, module, C4, dynamic-flow, quality, ATAM, risk, use-case-candidate and gap artifacts under `docs/`.
 - Updated `planning/programs/DEBINA-ENTERPRISE-REBASE-PROGRAM.md` with C1 → C2 → D → E → F → G and recorded the Phase B scope in `planning/programs/DEBINA-ENTERPRISE-REBASE-PHASE-B.md`.
 - Validated agent instructions, story inventory, capability graph, skills, YAML, Markdown links, Mermaid declarations, catalogue IDs and actual module package/schema references.
+- Phase B core model is committed as `4f3d629`; the follow-up commit records the final validation evidence.
 
 ## Utknęliśmy na
 
