@@ -2,24 +2,25 @@
 
 ## Zadanie
 
-Wave 9 dostarcza source-owned read-only GraphQL oraz maker-checker approval workspace przez Next.js BFF. Wave 8 jest zakończonym fundamentem; nie pushować.
+Wave 9 dostarcza read-only GraphQL approval spine i maker-checker workspace w Payments & Files przez Next.js BFF. Nie pushować.
 
 ## Zrobione
 
-- Baseline Wave 9: `ade6218`; commity `bdb38ae` i `a62f87b` tworzą EPIC-78, Query-only SDL, publiczny `modules.ApprovalQueueQuery`, thin `graphql` Modulith adapter oraz pierwszą runtime proof.
-- `ApprovalGraphQlRuntimeTest` działa na PostgreSQL 18 Testcontainers: authenticated `payment_approver` otrzymuje DTO z `/graphql`, brak bearer dostaje 401.
-- Parser schema test dowodzi Query oraz braku Mutation/Subscription; mutation proof był RED, następnie schema została przywrócona GREEN.
+- Commity `bdb38ae`..`2e10738` tworzą secured Query-only GraphQL, source-owned payment port, query limits, prod introspection restriction oraz PostgreSQL 18 RLS/cursor/detail proof.
+- `bd5d3aa` tworzy deterministic GraphQL TypeScript codegen (`pnpm run codegen:graphql`), drugi run ma ten sam SHA, typecheck przechodzi.
+- `259b618` BFF proxy ma dwa allowlisted read operations; `92c2880` BFF ma CSRF/session/idempotency-protected approve/reject routes.
 
 ## Utknęliśmy na
 
-Nie ma Class C blokera. Nieukończone Wave 9: bezpośrednie testy depth/complexity i prod introspection, realne GraphQL RLS/cursor/detail, codegen, BFF proxy/commands, UI i runtime flow. Niecommitowany jest tylko GraphQL hardening (`GraphQlSecurityConfiguration`, `application-prod.yml`), który ładuje się w runtime test, ale nie ma jeszcze negatywnego testu limitów.
+Nie ma Class C blokera. Brakuje UI approval queue/detail i server-confirmed command refresh, BFF route tests/runtime proof, real Keycloak+BFF+backend journey, full regressions/validators. Lint jest GREEN z jednym istniejącym warningiem TanStack `useReactTable`.
 
 ## Plan na następny krok
 
-Dodaj do `ApprovalGraphQlRuntimeTest` negatywną query-depth/complexity proof i profil `prod` introspection proof dla istniejącego niecommitowanego hardeningu, uruchom targeted test, potem commit.
+Zbuduj client component approval queue w `frontend/src/components/payments/` i włącz go do `/payments`: fetch przez `/api/graphql`, approve/reject przez nowe BFF routes, bez optimistic update, z distinct loading/empty/error/unauthorized states.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Maven nadal przepisuje `build/generated-spring-modulith/javadoc.json`; zawsze odtwórz przez `apply_patch`.
-- GraphQL `@SchemaMapping` nie może mieć dwóch overloadów dla tego samego schema field; bezpieczne `expiredButUnprocessed` musi być property obu DTO.
-- Adapter GraphQL używa tylko root public port `com.sepanexus.modules.ApprovalQueueQuery`; port w package `.service` nie jest eksportowany przez Modulith i łamie `ApplicationModules.verify()`.
+- Maven przepisuje `build/generated-spring-modulith/javadoc.json`; odtwórz go przez `apply_patch`.
+- Cursor decoder musi używać Java regex `"\\|"`, nie nadmiernie escaped `"\\\\|"`.
+- BFF GraphQL nie przyjmuje browser query text ani backend URL; tylko allowlisted operation names i variables.
+- Adapter GraphQL używa tylko `com.sepanexus.modules.ApprovalQueueQuery`, nie package `.service`.
