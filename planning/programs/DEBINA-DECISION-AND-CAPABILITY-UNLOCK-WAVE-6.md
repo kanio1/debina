@@ -49,7 +49,7 @@ Initial primary audit: EPIC-55/55.2, 55.4, 55.3; EPIC-38/38.1, 38.2; EPIC-40/40.
 - Class A resolved: none independently reachable. Class B ADRs: none; an ADR cannot create absent business semantics.
 - Class C decisions are consolidated in `planning/decisions/DEBINA-WAVE-6-CONSOLIDATED-DECISION-PACKET.md`.
 - Production surfaces/migrations: none. Kafka/ISO evidence: N/A. Two full backend regressions are N/A because no production/test/migration/runtime change occurred; no bounded Maven baseline was needed because the only changes are planning records. `bash tools/agent-config/validate-governance.sh`, `bash tools/skills/validate-all-skills.sh`, and `git diff --check` all passed on 2026-07-21 (logs in the configured `/tmp` state directory).
-- Commit the validated decision checkpoint and the reconciled handoff locally only. No push is allowed.
+- Commit `5e38b5d chore(planning): record wave six decision checkpoint` contains the validated decision packet, program record, planning reconciliation, regenerated inventory and handoff. No push occurred.
 
 ## Next work
 
