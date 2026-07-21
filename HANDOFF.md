@@ -2,44 +2,46 @@
 
 ## Zadanie
 
-Wave 8 implementuje source-owned application command audit oraz single-payment approve/reject i
-approval expiry dla syntetycznej platformy SEPA Nexus. Celem jest atomowy audit decyzji bez
-naruszania one-writer-per-schema i bez mieszania approval axis z business FSM.
+Wave 8: source-owned application command audit, single-payment approve/reject and replay-safe
+approval expiry. Do not push. Continue from the actual local HEAD, not the original baseline hints.
 
 ## Zrobione
 
-- Commit `73501af` (`feat(audit): add immutable command audit boundary`) dostarczył EPIC-77 Story
-  77.1: moduł `evidenceaudit`, V55-V57 z `audit.audit_log`, RLS, append-only grants, narrow
-  auditor read role oraz ADR-W8-01. `CommandAuditMigrationTest` (fresh + V54 upgrade) i
-  `CommandAuditArchitectureTest`/`ModularityTest` przeszły; log jest w
-  `/tmp/DEBINA-COMMAND-AUDIT-AND-APPROVAL-DECISIONS-WAVE-8/audit-slice-focused-green.log`.
-- EPIC-77 jest source-derived ownerem, a 76.3 zależy od właściwej capability
-  `cap.audit.same-transaction-command-append`, nie od fikcyjnego substitute.
-- W worktree (niecommitowane) rozpoczęto Story 77.2/76.3: `ApprovalDecisionService`, REST approve/
-  reject i podstawowa PostgreSQL proof. `ApprovalSubmissionIntegrationTest` 5/0/0 dowodzi: approve
-  → dokładnie jeden istniejący `payment.received` + audit; reject → audit bez outbox; replay bez
-  duplikacji. Log `approval-decision-first-proof-green-4.log` w tym samym katalogu `/tmp`.
+- Baseline `edf6dcb`; current committed HEAD `7396725` (no push, clean worktree at checkpoint).
+- Commits `73501af` through `7396725` implement audit persistence/ports, decision commands,
+  expiry service role/function, object authorization and proof slices.
+- `ApprovalSubmissionIntegrationTest` is 13/0/0 against PostgreSQL 18: approve/reject/idempotency,
+  denied audit and fail-closed denial-audit failure, audit append rollback, two-checker race and
+  approve/reject-vs-expiry races.
+- `ApprovalDecisionKeycloakRuntimeTest` is 1/0/0 against real Keycloak 26.6.4. It validates a
+  signed issuer token and approves another maker's payment. `infra/keycloak/realm-export.json`
+  now gives `sepa-guc` the stable public subject mapper; the test first exposed that `sub` was absent.
+- Mutation proof is recorded: suppressing approve audit caused one focused failure, then restore
+  passed. Full backend regressions #2 and #3 were 505/0/0 before proof-only commit `7396725`.
 
 ## Utknęliśmy na
 
-Nie ma source/decision blocker. Niecommitowany approve/reject slice NIE jest kompletny: brakuje
-custom `AuthorizationManager<MethodInvocation>` wykonanego przed service body, audited denied
-attempt path, audit-failure rollback, two-checker and expiry races, expiry worker/RLS role,
-Keycloak proof, mutation proof i pełne regresje. Nie commitować tej części przed tymi proofami.
+No Class C blocker. Wave is not yet SUCCESS: final evidence still needs a dedicated physical
+same-transaction identity test, controlled audit-append failure for reject and expiry, HTTP
+controller boundary evidence, final planning/skill validators, and two new consecutive full backend
+regressions after `7396725`.
 
 ## Plan na następny krok
 
-Otwórz `ApprovalDecisionService` oraz `SecurityConfig`, zastąp role-only guard source-required
-object-level `AuthorizationManager<MethodInvocation>`, następnie napisz i uruchom proof dla
-same-tenant/branch approver, foreign tenant/branch, submitter/viewer i maker=self przed service
-body wraz z denial-audit requirement.
+1. Add `CommandAuditTransactionIntegrationTest`: compare audit-row `xmin` with `txid_current()`
+   inside one transaction and prove rollback.
+2. Extend `ApprovalSubmissionIntegrationTest` with reject audit-port failure and an expiry failure
+   by temporarily revoking the expiry function owner's execute privilege on `audit.append_command_audit`,
+   restoring it in `finally`.
+3. Add/extend MockMvc endpoint test for Idempotency-Key, RFC-7807 conflict/forbidden boundaries.
+4. Update program/epic evidence, rerun focused suites, validators, and two full `./mvnw -f backend test`
+   runs; restore `build/generated-spring-modulith/javadoc.json` after Maven; commit each slice.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- V55/V56 są już historycznie zachowane; błąd `pg_catalog.nullif` został naprawiony wyłącznie
-  forward migration V57, nigdy nie edytuj zastosowanej migracji.
-- `PaymentApprovalEntity` helper w starym teście zwraca approval ID, nie payment ID.
-- PostgreSQL JDBC nie inferuje `Instant` w funkcji SQL; `JdbcCommandAuditPort` musi przekazywać
-  `Timestamp`.
-- Maven nadpisuje `build/generated-spring-modulith/javadoc.json`; przy końcowym cleanup przywróć
-  go, jeśli nie jest świadomym artefaktem.
+- Never edit applied V55–V60 migrations; use forward migrations.
+- Maven rewrites `build/generated-spring-modulith/javadoc.json`; restore it with `apply_patch`.
+- Keep `PENDING_APPROVAL` pre-FSM and no outbox on reject/expiry.
+- Do not treat app logs, outbox, payment events or Keycloak events as application audit.
+- Keycloak probe client is idempotent; `sepa-guc` now must retain the `oidc-sub-mapper` because
+  approval identity is the stable token `sub`.
