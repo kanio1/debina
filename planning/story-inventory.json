@@ -86,7 +86,7 @@
     },
     {
       "epic": "EPIC-16",
-      "status": "blocked",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-16-read-model-graphql-ownership.md"
     },
     {
@@ -396,7 +396,7 @@
     },
     {
       "epic": "EPIC-78",
-      "status": "in-progress",
+      "status": "done",
       "source_file": "planning/epics/EPIC-78-read-only-graphql-delivery.md"
     }
   ],
@@ -1246,7 +1246,7 @@
       "epic": "EPIC-16",
       "story": "16.1",
       "title": "Read modele własnością modułu źródłowego",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*ReadModelOwnershipTest*"
@@ -1258,7 +1258,7 @@
       "epic": "EPIC-16",
       "story": "16.2",
       "title": "Wymuszenie GraphQL read-only",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 16.1"
       ],
@@ -4424,7 +4424,7 @@
       "epic": "EPIC-76",
       "story": "76.6",
       "title": "Payments workspace approval queue and command UI",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [
         "Story 76.3",
         "Story 76.5",
@@ -4500,7 +4500,7 @@
       "epic": "EPIC-77",
       "story": "77.3",
       "title": "Internal audit query and integrity proof",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 77.2"
       ],
@@ -4514,7 +4514,7 @@
       "epic": "EPIC-78",
       "story": "78.1",
       "title": "Secured read-only Spring GraphQL foundation",
-      "status": "in-progress",
+      "status": "done",
       "depends_on": [
         "EPIC-09-ownership-schema-grants"
       ],
@@ -4528,7 +4528,7 @@
       "epic": "EPIC-78",
       "story": "78.2",
       "title": "Payment-owned approval GraphQL queries",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 78.1",
         "EPIC-76/Story 76.5"
@@ -4543,7 +4543,7 @@
       "epic": "EPIC-78",
       "story": "78.3",
       "title": "Fixed-destination BFF GraphQL proxy and runtime contract",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 78.2",
         "EPIC-23/Story 23.1B"
@@ -4558,7 +4558,7 @@
       "epic": "EPIC-78",
       "story": "78.4",
       "title": "Conditional audit query exposure",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [
         "EPIC-77/Story 77.3",
         "Story 78.1"

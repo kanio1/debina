@@ -87,7 +87,7 @@ Tasks:
 
 ## Story 76.6 — Payments workspace approval queue and command UI
 
-status: blocked
+status: done
 depends_on: [Story 76.3, Story 76.5, gate.graphql-owner]
 
 Description: The `payment_approver` queue belongs in the existing Payments & Files workspace, with REST commands through the BFF and reads only through the established GraphQL boundary.

@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 depends_on: [EPIC-09-ownership-schema-grants, EPIC-76-payment-approval-maker-checker]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §§3.6.5, 6.6, 7.2; sepa-nexus-blueprint-ownership-integration.md §3.6; sepa-nexus-keycloak-26-security-architecture-blueprint.md §§7, 9-10, 13; ADR-N3"
 ---
@@ -12,7 +12,7 @@ module-owned query ports and DTOs; it owns neither data nor commands.
 
 ## Story 78.1 — Secured read-only Spring GraphQL foundation
 
-status: in-progress
+status: done
 depends_on: [EPIC-09-ownership-schema-grants]
 
 Taski:
@@ -21,7 +21,7 @@ Taski:
 
 ## Story 78.2 — Payment-owned approval GraphQL queries
 
-status: not-started
+status: done
 depends_on: [Story 78.1, EPIC-76/Story 76.5]
 
 Taski:
@@ -30,7 +30,7 @@ Taski:
 
 ## Story 78.3 — Fixed-destination BFF GraphQL proxy and runtime contract
 
-status: not-started
+status: done
 depends_on: [Story 78.2, EPIC-23/Story 23.1B]
 
 Taski:
@@ -39,8 +39,7 @@ Taski:
 
 ## Story 78.4 — Conditional audit query exposure
 
-status: blocked
+status: done
 depends_on: [EPIC-77/Story 77.3, Story 78.1]
 
 `[RESERVE]` Audit query exposure is not required for the approval workspace and must not delay it.
-

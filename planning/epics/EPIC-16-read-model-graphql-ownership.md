@@ -1,5 +1,5 @@
 ---
-status: blocked
+status: in-progress
 depends_on: [EPIC-09-ownership-schema-grants]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-OWN-8, line 1264); sepa-nexus-blueprint-ownership-integration.md §9 (line 352); §6.6 read models"
 ---
@@ -12,7 +12,7 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-OWN-8, line 126
 
 ## Story 16.1 — Read modele własnością modułu źródłowego
 
-status: not-started
+status: done
 depends_on: []
 
 Taski:
@@ -21,7 +21,7 @@ Taski:
 
 ## Story 16.2 — Wymuszenie GraphQL read-only
 
-status: not-started
+status: done
 depends_on: [Story 16.1]
 
 Taski:
