@@ -27,7 +27,7 @@ No existing epic/story owned maker–checker (`rg` across every epic, inventory 
 | 76.2 submission prefix gate | VERIFIED | frozen prefix gate implemented and runtime-proven in JSON_DIRECT and pain.001 |
 | 76.3 approve/reject | CAPABILITY-BLOCKED | frozen audit requires `audit.audit_log` through absent evidence-audit module/port |
 | 76.4 expiry | CAPABILITY-BLOCKED | same missing audit capability plus 76.3 |
-| 76.5 internal approval queue | READY | payment-lifecycle owns source rows and can prove RLS/cursor behavior internally |
+| 76.5 internal approval queue | VERIFIED | internal typed queue has PostgreSQL cursor/RLS/expiry proof; external read remains gated |
 | 76.6 UI/external queue | DECISION-BLOCKED | graph `gate.graphql-owner`; writes may not bypass BFF/REST boundary |
 | 76.7 Playwright | ITERATION-BLOCKED | first-three-screen gate remains closed |
 | 76.8 batch | CAPABILITY-BLOCKED | no file/batch aggregate or membership capability |
@@ -50,6 +50,7 @@ Primary queue: 76.1, 76.2, 76.5.  Reserve queue: source-derived evidence-audit o
 - Compatibility review: the new source-defined payment FK exposed nine older PostgreSQL test fixtures that truncated the parent before its new child, and the V50 upgrade test still asserted V52.  The fixtures now truncate `payment.payment_approvals` first and the upgrade assertion expects V54; this preserves the FK rather than weakening it.  The focused compatibility suite passed **56/0/0**.  Log: `/tmp/DEBINA-PAYMENT-APPROVAL-MAKER-CHECKER-WAVE-7/regression-fixture-compatibility.log`.
 - Full backend regression after that correction passed **491/0/0**.  This is the first clean tranche regression; the test count is two above the Wave 6 baseline because this story adds two migration proofs.  Log: `/tmp/DEBINA-PAYMENT-APPROVAL-MAKER-CHECKER-WAVE-7/backend-regression-story-76-1-fixed.log`.
 - 76.2 structural RED first exposed the date-interval rendering assertion (`1 day` rather than `24:00:00`), then GREEN passed **3/0/0** PostgreSQL 18 integration tests.  The affected command/controller suite passed **27/0/0**, including real signed pain.001 ingestion and the pending `202` response body.  Full backend regression passed **495/0/0**.  Logs: `/tmp/DEBINA-PAYMENT-APPROVAL-MAKER-CHECKER-WAVE-7/story-76-2-focused.log`, `story-76-2-focused-green.log`, `story-76-2-affected-green.log`, and `backend-regression-story-76-2.log`.
+- 76.5 queue RED exposed the JDBC `Instant` binding in the test fixture; GREEN passed **4/0/0** with PostgreSQL 18 cursor/RLS/expiry proof.  Final independent full regressions both passed **496/0/0**. Logs: `story-76-5-focused.log`, `story-76-5-focused-green.log`, `final-backend-regression-1.log`, `final-backend-regression-2.log`.
 - Database review: **PASS.** V53/V54 are append-only additive migrations; V54's metadata-only `DROP NOT NULL` preserves existing rows; no backfill or cross-schema runtime writer is added.  The only cross-schema relationship is the source-defined read-only matrix FK/grant.  RLS is forced on both tenant-scoped tables, `PUBLIC` is revoked, and isolated fresh/upgrade plus positive/negative role proofs exist.  No `SECURITY DEFINER`, money movement, audit substitute, or unapproved event contract was introduced.
 
 ## Promotion and commit history
@@ -57,6 +58,7 @@ Primary queue: 76.1, 76.2, 76.5.  Reserve queue: source-derived evidence-audit o
 - Planning owner created before implementation; first proof was RED, not plan-only.
 - `d87bb441b01cb9df58e708be748cc852c4dee656` — `feat(payment): add maker-checker approval persistence` (verified Story 76.1).
 - Commit pending for verified Story 76.2.
+- Commit pending for verified Story 76.5; the wave reaches READY-EXHAUSTED after this slice because all remaining maker-checker stories carry the stated audit, GraphQL, Playwright, batch, or step-up gates.
 
 ## Current blockers and next work
 

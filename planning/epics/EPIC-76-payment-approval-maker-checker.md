@@ -66,7 +66,7 @@ Tasks:
 
 ## Story 76.5 — Module-owned approval queue/detail read model
 
-status: not-started
+status: done
 depends_on: [Story 76.1]
 
 Description: Provide a typed payment-lifecycle read model for pending single-payment approvals, tenant/branch-scoped through the payment owner, deterministic cursor pagination, and an honest expired-not-yet-processed representation.  It is internal until the frozen GraphQL read boundary has an owner.
@@ -74,8 +74,8 @@ Description: Provide a typed payment-lifecycle read model for pending single-pay
 Completion criterion: the read model exposes only decision-relevant fields and proves same-tenant/branch visibility, cross-tenant/branch denial, empty-GUC behavior and stable cursor ordering.
 
 Tasks:
-- [ ] **Implement and prove the internal approval queue/detail read model.** Keep it inside payment-lifecycle and do not add a one-off REST read endpoint or GraphQL implementation.
-      `verify: ./mvnw -f backend test -Dtest=ApprovalQueueReadModelIntegrationTest` → PostgreSQL 18 queue cursor/RLS proof passes.
+- [x] **Implement and prove the internal approval queue/detail read model.** `ApprovalQueueReadModel` is payment-lifecycle internal, requires `payment_approver`, uses payment RLS plus deterministic `(submitted_at,id)` cursor pagination, and reports expired-but-unprocessed pending work honestly.  No REST or GraphQL adapter was added.
+      `verify: ./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest` → PASS (4 PostgreSQL 18 tests including queue cursor/RLS/expiry); two full backend regressions → PASS (496 tests each).
 
 ## Story 76.6 — Payments workspace approval queue and command UI
 

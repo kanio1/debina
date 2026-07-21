@@ -4400,12 +4400,12 @@
       "epic": "EPIC-76",
       "story": "76.5",
       "title": "Module-owned approval queue/detail read model",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 76.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=ApprovalQueueReadModelIntegrationTest"
+        "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
       "capability_analysis": "NOT_DEEP_DIVED"

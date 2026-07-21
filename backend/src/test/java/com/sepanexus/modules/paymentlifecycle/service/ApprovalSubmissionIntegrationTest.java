@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.UUID;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,9 @@ class ApprovalSubmissionIntegrationTest {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private ApprovalQueueReadModel approvalQueueReadModel;
 
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
@@ -113,6 +117,33 @@ class ApprovalSubmissionIntegrationTest {
         assertThat(count("SELECT count(*) FROM payment.outbox_events")).isZero();
     }
 
+    @Test
+    @WithMockUser(roles = "payment_approver")
+    void queueIsRlsScopedCursorPaginatedAndHonestAboutUnprocessedExpiry() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        UUID branchId = UUID.randomUUID();
+        UUID ruleId = addBroadRule(tenantId, true, false);
+        UUID first = insertPending(tenantId, branchId, ruleId, Instant.parse("2026-07-01T08:00:00Z"),
+                Instant.parse("2026-07-02T08:00:00Z"));
+        UUID second = insertPending(tenantId, branchId, ruleId, Instant.parse("2026-07-03T08:00:00Z"),
+                Instant.parse("2099-07-04T08:00:00Z"));
+        UUID third = insertPending(tenantId, branchId, ruleId, Instant.parse("2026-07-05T08:00:00Z"),
+                Instant.parse("2099-07-06T08:00:00Z"));
+
+        ApprovalQueueReadModel.QueuePage firstPage = approvalQueueReadModel.pending(tenantId, branchId, 2, null);
+        ApprovalQueueReadModel.QueuePage secondPage = approvalQueueReadModel.pending(tenantId, branchId, 2,
+                firstPage.nextCursor());
+
+        assertThat(firstPage.items()).extracting(ApprovalQueueReadModel.QueueItem::approvalId)
+                .containsExactly(first, second);
+        assertThat(firstPage.items().getFirst().expired()).isTrue();
+        assertThat(firstPage.nextCursor()).isNotNull();
+        assertThat(secondPage.items()).extracting(ApprovalQueueReadModel.QueueItem::approvalId).containsExactly(third);
+        assertThat(secondPage.nextCursor()).isNull();
+        assertThat(approvalQueueReadModel.pending(tenantId, UUID.randomUUID(), 2, null).items()).isEmpty();
+        assertThat(approvalQueueReadModel.pending(UUID.randomUUID(), branchId, 2, null).items()).isEmpty();
+    }
+
     private static SubmitPaymentCommand command(UUID tenantId, UUID branchId, String maker, String idempotencyKey) {
         return new SubmitPaymentCommand(tenantId, branchId, "E2E-APPROVAL", new BigDecimal("10.00"), "EUR",
                 "DE89370400440532013000", "FR7630006000011234567890189", maker, idempotencyKey);
@@ -136,6 +167,35 @@ class ApprovalSubmissionIntegrationTest {
                 try (ResultSet result = insert.executeQuery()) {
                     assertThat(result.next()).isTrue();
                     return (UUID) result.getObject(1);
+                }
+            }
+        }
+    }
+
+    private static UUID insertPending(UUID tenantId, UUID branchId, UUID ruleId, Instant submittedAt, Instant expiresAt)
+            throws Exception {
+        try (Connection connection = admin(); PreparedStatement payment = connection.prepareStatement("""
+                INSERT INTO payment.payments (tenant_id, branch_id, amount, currency, debtor_iban, creditor_iban, status)
+                VALUES (?, ?, 10.00, 'EUR', 'DEBTOR', 'CREDITOR', NULL) RETURNING id
+                """)) {
+            payment.setObject(1, tenantId);
+            payment.setObject(2, branchId);
+            try (ResultSet result = payment.executeQuery()) {
+                assertThat(result.next()).isTrue();
+                UUID paymentId = (UUID) result.getObject(1);
+                try (PreparedStatement approval = connection.prepareStatement("""
+                        INSERT INTO payment.payment_approvals
+                            (payment_id, status, maker_user_id, matrix_rule_id, submitted_for_approval_at, expires_at)
+                        VALUES (?, 'PENDING_APPROVAL', 'maker-queue', ?, ?, ?) RETURNING id
+                        """)) {
+                    approval.setObject(1, paymentId);
+                    approval.setObject(2, ruleId);
+                    approval.setTimestamp(3, java.sql.Timestamp.from(submittedAt));
+                    approval.setTimestamp(4, java.sql.Timestamp.from(expiresAt));
+                    try (ResultSet approvalResult = approval.executeQuery()) {
+                        assertThat(approvalResult.next()).isTrue();
+                        return (UUID) approvalResult.getObject(1);
+                    }
                 }
             }
         }
