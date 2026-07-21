@@ -1,6 +1,6 @@
 # ADR-N14 — Dedicated Keycloak database and offline realm backup
 
-**Status:** Accepted (2026-07-21)  
+**Status:** Accepted (2026-07-21)
 **Scope:** local development infrastructure only
 
 ## Context
