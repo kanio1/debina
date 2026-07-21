@@ -300,10 +300,27 @@ capabilities:
         status: blocked
         requires: [EPIC-12]
         note: "Flagged in-file as closest-to-unblockable of the remaining workspaces — 12.1 is done, only CRUD write endpoints remain."
-      - id: 24.8
-        title: "Evidence/Audit drawer + workspace auditor"
+      - id: 24.8A
+        title: "Audit trail and command-history drawer"
+        status: done
+        requires: [cap.audit.internal-query]
+      - id: 24.8B
+        title: "Auditor audit-search workspace"
+        status: done
+        requires: [cap.audit.internal-query]
+      - id: 24.8C
+        title: "Source-owned message evidence"
         status: blocked
-        note: "PII-gating/export format explicitly requires a governance decision, unresolved."
+        note: "SOURCE-BLOCKED: no source-owned typed read ports with exposure rules."
+      - id: 24.8D
+        title: "Evidence drawer Playwright acceptance"
+        status: blocked
+        requires: ["24.1", "24.2", "24.3"]
+        note: "ITERATION-BLOCKED by frozen first-three-screen sequencing."
+      - id: 24.8E
+        title: "Evidence bundle export"
+        status: blocked
+        note: "DECISION-BLOCKED by export format and PII governance."
       - id: 24.9
         title: "Operator worklist (S-01, [P1])"
         status: blocked

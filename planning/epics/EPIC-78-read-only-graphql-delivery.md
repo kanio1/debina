@@ -43,3 +43,5 @@ status: done
 depends_on: [EPIC-77/Story 77.3, Story 78.1]
 
 `[RESERVE]` Audit query exposure is not required for the approval workspace and must not delay it.
+
+Wave 10 completion evidence: the read-only audit fields are secured through the fixed-destination BFF allowlist; live Keycloak/BFF/backend/PostgreSQL proof covers the permitted operator/auditor paths, unknown-operation rejection, and ordinary-user denial. See the Wave 10 program record for commands and retained logs.

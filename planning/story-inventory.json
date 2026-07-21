@@ -2,7 +2,7 @@
   "generated_by": "tools/agent-config/generate-story-inventory.py",
   "generated_note": "Programmatically extracted from planning/epics/*.md -- no invented data.",
   "epic_count": 79,
-  "story_count": 300,
+  "story_count": 304,
   "epics": [
     {
       "epic": "EPIC-00",
@@ -1772,13 +1772,65 @@
     },
     {
       "epic": "EPIC-24",
-      "story": "24.8",
-      "title": "Evidence/Audit drawer + workspace auditor (S-18)",
+      "story": "24.8A",
+      "title": "Audit trail and command-history drawer (S-18)",
+      "status": "done",
+      "depends_on": [
+        "Story 77.3",
+        "Story 78.4"
+      ],
+      "verify": [
+        "cd frontend && pnpm run codegen:graphql:check && pnpm run lint && pnpm run typecheck && pnpm run build"
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.8B",
+      "title": "Auditor audit-search workspace (S-18)",
+      "status": "done",
+      "depends_on": [
+        "Story 77.3",
+        "Story 78.4"
+      ],
+      "verify": [
+        "cd frontend && pnpm run codegen:graphql:check && pnpm run lint && pnpm run typecheck && pnpm run build"
+      ],
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.8C",
+      "title": "Message evidence sections (S-18)",
       "status": "blocked",
       "depends_on": [],
-      "verify": [
-        "npm run test:e2e -- --grep \"@smoke.*evidence-drawer\""
+      "verify": null,
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.8D",
+      "title": "Evidence drawer Playwright acceptance (S-18)",
+      "status": "blocked",
+      "depends_on": [
+        "Story 24.1",
+        "Story 24.2",
+        "Story 24.3"
       ],
+      "verify": null,
+      "source_file": "planning/epics/EPIC-24-frontend-screens.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-24",
+      "story": "24.8E",
+      "title": "Evidence bundle export (S-18)",
+      "status": "blocked",
+      "depends_on": [],
+      "verify": null,
       "source_file": "planning/epics/EPIC-24-frontend-screens.md",
       "capability_analysis": "NOT_DEEP_DIVED"
     },

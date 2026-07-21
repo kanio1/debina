@@ -595,7 +595,27 @@
       "status": "blocked"
     },
     {
-      "id": "EPIC-24.24.8",
+      "id": "EPIC-24.24.8A",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-24.24.8B",
+      "type": "STORY",
+      "status": "done"
+    },
+    {
+      "id": "EPIC-24.24.8C",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.8D",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-24.24.8E",
       "type": "STORY",
       "status": "blocked"
     },
@@ -1238,7 +1258,27 @@
     },
     {
       "from": "EPIC-24",
-      "to": "EPIC-24.24.8",
+      "to": "EPIC-24.24.8A",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.8B",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.8C",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.8D",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-24",
+      "to": "EPIC-24.24.8E",
       "type": "REQUIRES"
     },
     {

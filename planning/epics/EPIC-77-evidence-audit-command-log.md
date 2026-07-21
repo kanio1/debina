@@ -62,3 +62,5 @@ source-required distinct, read-only views without entity/repository leakage.
 Tasks:
 - [x] **Implement the internal query port and Testcontainers integrity/read-isolation proof.** `AuditQueryPort` is evidence-audit-owned and returns only typed records; `JdbcAuditQueryPort` uses PostgreSQL keyset pagination ordered by `(occurred_at DESC, audit_entry_id DESC)`, a maximum page size of 100, ordinary tenant/branch transaction-local GUCs, and the dedicated `audit_auditor_role` for cross-tenant queries. Snapshot exposure is an explicit approval-state allowlist, never raw JSONB.
       `verify: ./mvnw -f backend test -Dtest=CommandAuditQueryIntegrationTest` → PASS (3 PostgreSQL 18 tests: ordinary tenant/branch RLS, source-backed filters, equal-timestamp cursor traversal with a newly inserted row, invalid cursor, page cap, auditor cross-tenant read and auditor write denial).
+
+Wave 10 completion evidence: the query port was exercised through the secured GraphQL/BFF path against an isolated PostgreSQL 18 runtime and the full backend regression. The durable Wave 10 record captures the recovery and runtime log paths.

@@ -140,18 +140,52 @@ Taski:
 - [ ] **Zbuduj cienkie edytory katalogów reference-data** z optimistic locking na konfliktach wersji.
       `verify: npm run test:e2e -- --grep "@smoke.*reference-data"` — `NOT RUN`, `blocked` (patrz wyżej — backend CRUD endpoints dla `reference_data.*` też nie istnieją jeszcze).
 
-## Story 24.8 — Evidence/Audit drawer + workspace auditor (S-18)
+## Story 24.8A — Audit trail and command-history drawer (S-18)
+
+status: done
+depends_on: [Story 77.3, Story 78.4]
+
+Opis: read-only Evidence Drawer na Payment Detail, z dwoma widokami tych samych immutable wpisów `audit.audit_log`: audit trail (kto/co/przed-po) oraz command history (command/aktor/rola/outcome/czas). Nie tworzy drugiej persystencji ani nie wyprowadza historii z logów aplikacji lub eventów.
+
+`[WAVE-10 2026-07-21]`: dawny blocker „evidence-audit zero kodu” był nieaktualny po Wave 8. Drawer używa `paymentAuditTrail` przez fixed-destination BFF, z loading/empty/error/unauthorized, Sheet focus handling, tabelami `audit.trail.table` i `audit.command-history.table`, collapsed decision state oraz correlation copy feedback. Proof: Wave 10 frontend codegen/lint/typecheck/build i backend query/GraphQL tests.
+
+Taski:
+- [x] **Zbuduj audit-focused Evidence Drawer** (bez eksportu i bez source-nieistniejących message-evidence sections).
+      `verify: cd frontend && pnpm run codegen:graphql:check && pnpm run lint && pnpm run typecheck && pnpm run build` — `PASS` (Wave 10).
+
+## Story 24.8B — Auditor audit-search workspace (S-18)
+
+status: done
+depends_on: [Story 77.3, Story 78.4]
+
+Opis: cienki, audytor-only workspace `/evidence` dla cross-tenant read-only search `audit.audit_log`. URL zawiera tylko source-backed filtry, tabela pokazuje tenant context i cursor pagination; nie jest generic database browser i nie ma write/export controls.
+
+`[WAVE-10 2026-07-21]`: widoczność workspace jest ograniczona mapą ról, a server layout odrzuca sesję bez roli `auditor`; `auditEntries` jest audytor-only również po stronie GraphQL i RLS. Proof: `CommandAuditQueryIntegrationTest`, `ApprovalGraphQlRuntimeTest` oraz frontend verification Wave 10.
+
+Taski:
+- [x] **Zbuduj audytor-only audit search workspace**.
+      `verify: cd frontend && pnpm run codegen:graphql:check && pnpm run lint && pnpm run typecheck && pnpm run build` — `PASS` (Wave 10).
+
+## Story 24.8C — Message evidence sections (S-18)
 
 status: blocked
 depends_on: []
 
-Opis: globalna szuflada Evidence (`[MVP]`) + cienki workspace auditora (`[P1]`). Format eksportu bundle'a evidence i reguły PII-gating jawnie oznaczone jako "wymaga decyzji governance przed buildem" (`sepa-nexus-final-3-screens-ui-spec.md` §11) — nie rozstrzygam.
+`[SOURCE-BLOCKED WAVE-10]`: signature verdict, payload hash, raw/parsed message, evidence records and trace ID mają brak publicznych source-owned typed read ports z field-level exposure rules. Drawer nie może czytać bezpośrednio `signature.*`, `ingress.*` ani `iso.*`; nie jest dozwolone wymyślanie tych danych. Odblokowanie wymaga ownera i read portów dla każdego section.
 
-`[AUDYT 2026-07-14]`: moduł `evidence-audit` (schematy `evidence`/`audit`) zero kodu. **Status `blocked`**.
+## Story 24.8D — Evidence drawer Playwright acceptance (S-18)
 
-Taski:
-- [ ] **Zbuduj globalną szufladę Evidence** (bez eksportu — eksport czeka na decyzję governance, patrz otwarte pytanie w README).
-      `verify: npm run test:e2e -- --grep "@smoke.*evidence-drawer"` — `NOT RUN`, `blocked`.
+status: blocked
+depends_on: [Story 24.1, Story 24.2, Story 24.3]
+
+`[SEQUENCING-BLOCKED]`: frozen first-three-screen Playwright sequence pozostaje nieotwarta, bo Ops Control Room/Story 24.1 nie jest source-backed/implemented. Wave 10 nie instaluje ani nie aktywuje Playwrighta.
+
+## Story 24.8E — Evidence bundle export (S-18)
+
+status: blocked
+depends_on: []
+
+`[DECISION-BLOCKED]`: format bundle, PII gating, retention window i authorization governance są jawnie otwarte w `sepa-nexus-final-3-screens-ui-spec.md` §11. Nie tworzyć placeholder download, CSV/PDF/archive ani endpointu plikowego przed decyzją governance.
 
 ## Story 24.9 — Operator worklist (S-01, `[P1]`)
 

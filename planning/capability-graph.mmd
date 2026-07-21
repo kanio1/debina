@@ -1,5 +1,5 @@
 %% SEPA Nexus — capability graph (curated view)
-%% Full machine graph: planning/capability-graph.json (142 nodes / 251 edges).
+%% Full machine graph: planning/capability-graph.json (155 nodes / 273 edges).
 %% This file is a curated subgraph for human reading — phase heads, the two resolved
 %% cycles, and the two open decision gates (EPIC-10 SECURITY DEFINER, GraphQL owner). It
 %% is not regenerated automatically; keep it in sync by hand with capability-graph.json
@@ -30,6 +30,14 @@ flowchart TB
         E19 --> E23[EPIC-23 in-progress]
         E23 --> E24[EPIC-24 in-progress]
     end
+
+    %% --- Wave 10 audit evidence slice (reconciled 2026-07-21) ---
+    S248A["EPIC-24 / Story 24.8A done\n(audit trail and command-history drawer)"]
+    S248B["EPIC-24 / Story 24.8B done\n(auditor audit-search workspace)"]
+    S248C["EPIC-24 / Story 24.8C SOURCE-BLOCKED\n(source-owned message evidence)"]
+    S248D["EPIC-24 / Story 24.8D ITERATION-BLOCKED\n(Playwright acceptance)"]
+    S248E["EPIC-24 / Story 24.8E DECISION-BLOCKED\n(evidence-bundle export / PII)"]
+    E24 --> S248A & S248B & S248C & S248D & S248E
 
     subgraph P3["Phase 3 — ISO lineage/correlation"]
         E19 --> E26[EPIC-26 in-progress]
@@ -104,9 +112,9 @@ flowchart TB
     classDef notstarted fill:#4a5568,color:#fff,stroke:#2d3748
     classDef gate fill:#7c3aed,color:#fff,stroke:#4c1d95
 
-    class E00,E01,E02,E03,E04,E05,E06,E07,E08,E09,E19,E21,E26,E31,E28,S351,S352,S431 done
+    class E00,E01,E02,E03,E04,E05,E06,E07,E08,E09,E19,E21,E26,E31,E28,S351,S352,S431,S248A,S248B done
     class E10,E11,E20,E23,E24,E27,E35,E13,E32,E43 inprogress
-    class E12,E16 blocked
+    class E12,E16,S248C,S248D,S248E blocked
     class E14,E44,E45,E46,E53,S313A,S432,S143,S2664,S231B notstarted
     class E39,S394,S392 done
     class GATE,GQLGATE gate
