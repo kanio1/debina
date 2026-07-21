@@ -1,0 +1,7 @@
+version: 1
+levels:
+  LEGACY: existing unmigrated planning; missing C1 traceability is a warning unless an existing hard rule fails.
+  PILOT: explicitly marked epic/story; all pilot traceability and status rules are errors.
+  ENFORCED: explicit `semantic_enforcement: ENFORCED` metadata on a new or materially changed business story; missing mandatory traceability is an error.
+selection: explicit frontmatter-or-story-metadata marker; Git history is not used as enforcement evidence.
+pilot_epics: [EPIC-76]

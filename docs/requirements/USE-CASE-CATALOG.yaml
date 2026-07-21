@@ -1,0 +1,10 @@
+version: 1
+use_cases:
+  - id: UC-SCT-APPROVAL-001
+    name: maker-checker-payment-approval
+    status: PILOT
+    business_process: BP-03
+    primary_actor: payment-approver
+    source_references: [project-adr-n10]
+    slices: [UCS-SCT-APPROVAL-001-A, UCS-SCT-APPROVAL-001-B, UCS-SCT-APPROVAL-001-C, UCS-SCT-APPROVAL-001-D, UCS-SCT-APPROVAL-001-E, UCS-SCT-APPROVAL-001-F, UCS-SCT-APPROVAL-001-G, UCS-SCT-APPROVAL-001-H, UCS-SCT-APPROVAL-001-I, UCS-SCT-APPROVAL-001-J, UCS-SCT-APPROVAL-001-K, UCS-SCT-APPROVAL-001-L]
+    document: docs/requirements/use-cases/UC-SCT-APPROVAL-001-maker-checker-payment-approval.md

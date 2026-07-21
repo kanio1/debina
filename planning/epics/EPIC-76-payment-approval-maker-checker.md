@@ -2,6 +2,11 @@
 status: in-progress
 depends_on: [EPIC-19-ingress-rest-json-payment]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §2.2b [FREEZE], §3.5, §3.6.2, §4.7, §4.13a; sepa-nexus-keycloak-26-security-architecture-blueprint.md §§5, 10, 12; sepa-nexus-react-nextjs-frontend-blueprint.md §§3a, 3b, 9, 10, 13–19"
+semantic_enforcement: PILOT
+business_processes: [BP-03]
+use_cases: [UC-SCT-APPROVAL-001]
+source_references: [project-adr-n10]
+quality_scenarios: [QS-INT-01, QS-SEC-01, QS-TRC-01, QS-REL-01]
 ---
 
 # EPIC-76 — Payment approval: maker–checker prefix gate
@@ -12,6 +17,8 @@ The frozen maker–checker flow is a fifth approval-status axis before the payme
 
 status: done
 depends_on: []
+use_case_slices: [UCS-SCT-APPROVAL-001-B]
+business_rules: [BR-APPROVAL-002]
 
 Description: Add the source-defined `payment.payment_approvals` and `reference_data.approval_matrix_rules` tables with one-writer-per-schema grants, read-only matrix access from payment, approval-state constraints, and a source-compatible nullable business lifecycle status for pre-FSM pending payments.  Existing no-approval creation remains `RECEIVED`.
 
@@ -27,6 +34,8 @@ Tasks:
 
 status: done
 depends_on: [Story 76.1]
+use_case_slices: [UCS-SCT-APPROVAL-001-A, UCS-SCT-APPROVAL-001-B]
+business_rules: [BR-APPROVAL-002, BR-APPROVAL-006, BR-APPROVAL-008]
 
 Description: Evaluate the supported single-payment matrix subset within the existing submission transaction.  `NOT_REQUIRED` creates an approval row and releases exactly one existing `payment.received`; `PENDING_APPROVAL` freezes the rule and maker identity, records a 24-hour expiry using `ClockPort`, and releases no event.
 
@@ -38,8 +47,10 @@ Tasks:
 
 ## Story 76.3 — Approve and reject commands with same-transaction audit
 
-status: done
+status: in-progress
 depends_on: [Story 76.2]
+use_case_slices: [UCS-SCT-APPROVAL-001-D, UCS-SCT-APPROVAL-001-E, UCS-SCT-APPROVAL-001-G, UCS-SCT-APPROVAL-001-H, UCS-SCT-APPROVAL-001-I]
+business_rules: [BR-APPROVAL-001, BR-APPROVAL-002, BR-APPROVAL-004, BR-APPROVAL-005, BR-APPROVAL-006, BR-APPROVAL-007, BR-APPROVAL-008]
 
 Description: Implement `POST /api/v1/payments/{paymentId}/approve` and `/reject` through payment-lifecycle with role, tenant/branch, maker≠checker, idempotency, conditional-transition and outbox-release guards.
 
@@ -59,8 +70,10 @@ Tasks:
 
 ## Story 76.4 — Approval expiry
 
-status: done
+status: in-progress
 depends_on: [Story 76.2, Story 76.3]
+use_case_slices: [UCS-SCT-APPROVAL-001-F, UCS-SCT-APPROVAL-001-G]
+business_rules: [BR-APPROVAL-003, BR-APPROVAL-004, BR-APPROVAL-005]
 
 Description: A narrow service-role expiry capability changes only `PENDING_APPROVAL` rows past the frozen 24-hour limit to `EXPIRED`; it never starts the payment FSM or releases `payment.received`.
 
@@ -76,6 +89,8 @@ Tasks:
 
 status: done
 depends_on: [Story 76.1]
+use_case_slices: [UCS-SCT-APPROVAL-001-C]
+business_rules: [BR-APPROVAL-002]
 
 Description: Provide a typed payment-lifecycle read model for pending single-payment approvals, tenant/branch-scoped through the payment owner, deterministic cursor pagination, and an honest expired-not-yet-processed representation.  It is internal until the frozen GraphQL read boundary has an owner.
 
@@ -87,8 +102,10 @@ Tasks:
 
 ## Story 76.6 — Payments workspace approval queue and command UI
 
-status: done
+status: in-progress
 depends_on: [Story 76.3, Story 76.5, gate.graphql-owner]
+use_case_slices: [UCS-SCT-APPROVAL-001-C, UCS-SCT-APPROVAL-001-J]
+business_rules: [BR-APPROVAL-001, BR-APPROVAL-002]
 
 Description: The `payment_approver` queue belongs in the existing Payments & Files workspace, with REST commands through the BFF and reads only through the established GraphQL boundary.
 
@@ -102,6 +119,8 @@ Tasks:
 
 status: blocked
 depends_on: [Story 76.6, Story 24.1]
+use_case_slices: [UCS-SCT-APPROVAL-001-K]
+blocker_classification: ITERATION-BLOCKED
 
 Description: Acceptance is deliberately separate from the backend and UI capability because Playwright remains gated until the first three screens exist.
 
@@ -113,6 +132,8 @@ Tasks:
 
 status: blocked
 depends_on: [Story 76.3, EPIC-73-ingress-file-rail]
+use_case_slices: [UCS-SCT-APPROVAL-001-L]
+blocker_classification: SOURCE-BLOCKED
 
 Description: Batch commands and item override are source-defined but require a real batch/file aggregate.  They are excluded from the single-payment slice.
 

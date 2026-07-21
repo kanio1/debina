@@ -4432,7 +4432,7 @@
       "epic": "EPIC-76",
       "story": "76.3",
       "title": "Approve and reject commands with same-transaction audit",
-      "status": "done",
+      "status": "in-progress",
       "depends_on": [
         "Story 76.2"
       ],
@@ -4447,7 +4447,7 @@
       "epic": "EPIC-76",
       "story": "76.4",
       "title": "Approval expiry",
-      "status": "done",
+      "status": "in-progress",
       "depends_on": [
         "Story 76.2",
         "Story 76.3"
@@ -4476,7 +4476,7 @@
       "epic": "EPIC-76",
       "story": "76.6",
       "title": "Payments workspace approval queue and command UI",
-      "status": "done",
+      "status": "in-progress",
       "depends_on": [
         "Story 76.3",
         "Story 76.5",
