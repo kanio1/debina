@@ -71,3 +71,17 @@ write or unapproved SECURITY DEFINER surface was added.
   EPIC-37/37.1--37.4, shared EPIC-34/34.1--34.2, EPIC-55/55.1 and all recorded proof.
 - No push occurred. Next highest-value work is a source-backed resolution of EPIC-55/55.2's
   cutoff/cycle disagreement policy; without it, 55.4 must remain blocked.
+
+## Reserve audit and completion shape
+
+| Candidate | Classification | Exact evidence |
+|---|---|---|
+| EPIC-38/38.1 | SOURCE-BLOCKED | §4.11 names internal posting/finality but defines neither an internal-account eligibility contract nor a distinct authoritative `ON_INTERNAL_BOOK_POST` source identity; reusing ADR-N11 would be an unapproved transaction change. |
+| EPIC-38/38.2 | SOURCE-BLOCKED | File/cycle assignment has no file identity, intake, idempotency, signature or result policy; it cannot be inferred from EPIC-73. |
+| EPIC-40/40.2 | SOURCE-BLOCKED | §4.11 explicitly says outcomes differ by basis/mode/cutoff but supplies no outcome matrix. |
+| EPIC-40/40.3 | SOURCE-BLOCKED | No queue representation/selection/replay/cancellation contract; automatic next-cycle creation is expressly prohibited. |
+| EPIC-50/50.1 | CAPABILITY-BLOCKED | Current egress state supports outbound-message claiming only; retry/DLQ persistence required by the story is absent. |
+
+Wave 5 completion shape: **READY-EXHAUSTED**. Five independently counted capabilities were verified
+(the two EPIC-34/37 pairs were correctly delivered and counted once); all remaining preferred and
+reserve candidates have an exact source/capability blocker.

@@ -50,7 +50,7 @@ reconciliation DDL, case DDL ani file-intake policy.
 
 ## Plan na następny krok
 
-Open `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-5.md` and prepare the exact Class C decision packet for EPIC-55 Story 55.2; do not implement routing outcomes until a source defines cutoff/cycle disagreement precedence.
+Open `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-5.md` and prepare the exact Class C decision packet for EPIC-55 Story 55.2; Wave 5 is READY-EXHAUSTED and no routing outcome may be implemented until a source defines cutoff/cycle disagreement precedence.
 
 ## Pułapki, których nie wolno powtórzyć
 
