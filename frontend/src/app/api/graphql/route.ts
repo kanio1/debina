@@ -19,6 +19,8 @@ const OPERATIONS = {
       approvalId paymentId approvalStatus makerUserId submittedAt expiresAt expiredButUnprocessed matrixRuleId amount currency debtorIban creditorIban decisionComment decidedAt
     }
   }`,
+  PaymentAuditTrail: `query PaymentAuditTrail($paymentId: ID!, $first: Int!, $after: String) { paymentAuditTrail(paymentId: $paymentId, first: $first, after: $after) { items { auditEntryId tenantId branchId occurredAt actorType actorId authorizedRole correlationId commandType targetType targetId paymentId batchId outcome decisionComment beforeState { approvalId approvalStatus } afterState { approvalId approvalStatus } } nextCursor } }`,
+  AuditEntries: `query AuditEntries($auditFilter: AuditQueryFilter!, $first: Int!, $after: String) { auditEntries(filter: $auditFilter, first: $first, after: $after) { items { auditEntryId tenantId branchId occurredAt actorType actorId authorizedRole correlationId commandType targetType targetId paymentId batchId outcome decisionComment beforeState { approvalId approvalStatus } afterState { approvalId approvalStatus } } nextCursor } }`,
 } as const;
 
 type OperationName = keyof typeof OPERATIONS;

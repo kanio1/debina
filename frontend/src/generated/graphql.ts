@@ -2,56 +2,19 @@
 type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
-/** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-};
-
-export type Approval = {
-  __typename?: 'Approval';
-  amount: Scalars['String']['output'];
-  approvalId: Scalars['ID']['output'];
-  approvalStatus: Scalars['String']['output'];
-  creditorIban: Scalars['String']['output'];
-  currency: Scalars['String']['output'];
-  debtorIban: Scalars['String']['output'];
-  decidedAt: Maybe<Scalars['String']['output']>;
-  decisionComment: Maybe<Scalars['String']['output']>;
-  expiredButUnprocessed: Scalars['Boolean']['output'];
-  expiresAt: Scalars['String']['output'];
-  makerUserId: Scalars['String']['output'];
-  matrixRuleId: Scalars['ID']['output'];
-  paymentId: Scalars['ID']['output'];
-  submittedAt: Scalars['String']['output'];
-};
-
-export type ApprovalConnection = {
-  __typename?: 'ApprovalConnection';
-  items: Array<Approval>;
-  nextCursor: Maybe<Scalars['String']['output']>;
-};
-
-export type Query = {
-  __typename?: 'Query';
-  approval: Maybe<Approval>;
-  approvalQueue: ApprovalConnection;
-};
-
-
-export type QueryApprovalArgs = {
-  paymentId: Scalars['ID']['input'];
-};
-
-
-export type QueryApprovalQueueArgs = {
-  after: InputMaybe<Scalars['String']['input']>;
-  first: Scalars['Int']['input'];
+export type AuditQueryFilter = {
+  actorId: string | null | undefined;
+  batchId: string | null | undefined;
+  branchId: string | null | undefined;
+  commandType: string | null | undefined;
+  correlationId: string | null | undefined;
+  occurredFrom: string | null | undefined;
+  occurredTo: string | null | undefined;
+  outcome: string | null | undefined;
+  paymentId: string | null | undefined;
+  targetId: string | null | undefined;
+  targetType: string | null | undefined;
+  tenantId: string | null | undefined;
 };
 
 export type ApprovalQueueQueryVariables = Exact<{
@@ -68,3 +31,21 @@ export type ApprovalQueryVariables = Exact<{
 
 
 export type ApprovalQuery = { approval: { approvalId: string, paymentId: string, approvalStatus: string, makerUserId: string, submittedAt: string, expiresAt: string, expiredButUnprocessed: boolean, matrixRuleId: string, amount: string, currency: string, debtorIban: string, creditorIban: string, decisionComment: string | null, decidedAt: string | null } | null };
+
+export type PaymentAuditTrailQueryVariables = Exact<{
+  paymentId: string;
+  first: number;
+  after: string | null | undefined;
+}>;
+
+
+export type PaymentAuditTrailQuery = { paymentAuditTrail: { nextCursor: string | null, items: Array<{ auditEntryId: string, tenantId: string, branchId: string | null, occurredAt: string, actorType: string, actorId: string, authorizedRole: string, correlationId: string, commandType: string, targetType: string, targetId: string, paymentId: string | null, batchId: string | null, outcome: string, decisionComment: string | null, beforeState: { approvalId: string | null, approvalStatus: string | null }, afterState: { approvalId: string | null, approvalStatus: string | null } }> } };
+
+export type AuditEntriesQueryVariables = Exact<{
+  auditFilter: AuditQueryFilter;
+  first: number;
+  after: string | null | undefined;
+}>;
+
+
+export type AuditEntriesQuery = { auditEntries: { nextCursor: string | null, items: Array<{ auditEntryId: string, tenantId: string, branchId: string | null, occurredAt: string, actorType: string, actorId: string, authorizedRole: string, correlationId: string, commandType: string, targetType: string, targetId: string, paymentId: string | null, batchId: string | null, outcome: string, decisionComment: string | null, beforeState: { approvalId: string | null, approvalStatus: string | null }, afterState: { approvalId: string | null, approvalStatus: string | null } }> } };

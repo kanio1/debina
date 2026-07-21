@@ -17,6 +17,7 @@ export interface Workspace {
 }
 
 export const WORKSPACES: Workspace[] = [
+  { id: "evidence", label: "Evidence / Audit", number: 8, roles: ["auditor"], path: "/evidence" },
   {
     id: "control-room",
     label: "Ops Control Room",

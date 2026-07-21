@@ -13,6 +13,7 @@ import {
 import { ScreenState } from "@/components/shared/screen-state";
 import { PaymentStatusBadge } from "@/components/payments/payment-status-badge";
 import { formatAmount, formatTimestamp } from "@/lib/format";
+import { AuditDrawer } from "@/components/payments/audit-drawer";
 
 interface IsoIdentifierResponse {
   sourceMessageType: string;
@@ -144,6 +145,7 @@ export default function PaymentDetailPage({ params }: { params: Promise<{ id: st
           <CardTitle data-testid="payment.detail.end-to-end-id">
             <h1 className="m-0 text-base leading-snug font-medium">{detail.endToEndId}</h1>
           </CardTitle>
+          <AuditDrawer paymentId={detail.id} />
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 text-sm">
           <div>

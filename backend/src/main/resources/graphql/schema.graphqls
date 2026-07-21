@@ -2,7 +2,7 @@ type Query {
   approvalQueue(first: Int!, after: String): ApprovalConnection!
   approval(paymentId: ID!): Approval
   paymentAuditTrail(paymentId: ID!, first: Int!, after: String): AuditEntryConnection!
-  auditEntries(filter: AuditEntryFilter!, first: Int!, after: String): AuditEntryConnection!
+  auditEntries(filter: AuditQueryFilter!, first: Int!, after: String): AuditEntryConnection!
 }
 
 type ApprovalConnection { items: [Approval!]!, nextCursor: String }
@@ -24,7 +24,7 @@ type Approval {
   decidedAt: String
 }
 
-input AuditEntryFilter {
+input AuditQueryFilter {
   tenantId: ID
   branchId: ID
   targetType: String

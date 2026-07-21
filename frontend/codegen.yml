@@ -3,10 +3,11 @@ documents: src/graphql/**/*.graphql
 generates:
   src/generated/graphql.ts:
     plugins:
-      - typescript
       - typescript-operations
 config:
   avoidOptionals: true
+  onlyOperationTypes: true
+  preResolveTypes: false
   scalars:
     ID: string
     String: string
