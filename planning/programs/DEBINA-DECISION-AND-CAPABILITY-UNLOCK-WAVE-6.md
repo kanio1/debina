@@ -24,7 +24,7 @@ Official external research, retrieved 2026-07-21: [Keycloak Server Administratio
 
 ## Candidate inventory and queues
 
-Initial primary audit: EPIC-55/55.2, 55.4, 55.3; EPIC-38/38.1, 38.2; EPIC-40/40.2, 40.3. Reserve audit: EPIC-74/74.1, EPIC-50/50.1, EPIC-74/74.5. All were reclassified below; no candidate remains `READY`, so both final queues are empty. No documentation-only work is counted as a story.
+Initial primary audit: EPIC-55/55.2, 55.4, 55.3; EPIC-38/38.1, 38.2; EPIC-40/40.2, 40.3. Reserve audit: EPIC-74/74.1, EPIC-50/50.1, EPIC-74/74.5. The five primary candidates and EPIC-50/50.1 remain blocked as recorded below. Fresh official Keycloak research and a disposable 26.6.4 boot-export/import/token probe changed EPIC-74/74.1 from `SOURCE-BLOCKED` to `READY`; it is now delivered and EPIC-74/74.5 is the primary reserve promotion. No documentation-only work is counted as a story.
 
 ## Primary blocker matrix
 
@@ -40,17 +40,17 @@ Initial primary audit: EPIC-55/55.2, 55.4, 55.3; EPIC-38/38.1, 38.2; EPIC-40/40.
 
 | Candidate | Classification and evidence |
 |---|---|
-| EPIC-74/74.1 | `SOURCE-BLOCKED`: Keycloak §10's later `[CHANGE]` table authorises twelve roles including `payment_approver`, despite stale eleven-role prose. The actual import has four roles and no Organizations state. Public official sources confirm Organizations but not the repository's required reproducible boot-import/claim proof. |
+| EPIC-74/74.1 | **DONE (commit pending):** Official Keycloak documentation gives the supported Organization Membership mapper and its `addOrganizationId`/`addOrganizationAttributes` configuration. A real 26.6.4 boot export proved the import representation (`organizations`, member username records); a fresh import issued a token with `realm_access.roles`, `branch_id`, and nested Organization id/tenant attribute. |
 | EPIC-50/50.1 | `CAPABILITY-BLOCKED`: outbound messages and dispatcher claims exist, while retry persistence, DLQ/dead-letter, delivery attempts and receipts do not. A row listing would not satisfy the delivery/retry/DLQ story. |
-| EPIC-74/74.5 | `CAPABILITY-BLOCKED`: Compose uses Keycloak development storage; no separate Keycloak database, backup convention, restore/readability proof, or unblocked realm-state convention exists. |
+| EPIC-74/74.5 | **READY:** Story 74.1 supplies reproducible realm state; the blueprint binds separate Keycloak database plus realm export. Backup role/artifact/restore mechanics are Class B technical choices and must be implemented with runtime proof. |
 
 ## Decisions, commits and final evidence
 
-- Class A resolved: none independently reachable. Class B ADRs: none; an ADR cannot create absent business semantics.
+- Class A resolved: the Spring Security JWT converter normalizes the frozen one-Organization Keycloak claim shape into the already-consumed tenant/organization claims, and leaves absent or multi-Organization claims unselected. Class B ADRs: none yet; an ADR cannot create absent business semantics.
 - Class C decisions are consolidated in `planning/decisions/DEBINA-WAVE-6-CONSOLIDATED-DECISION-PACKET.md`.
-- Production surfaces/migrations: none. Kafka/ISO evidence: N/A. Two full backend regressions are N/A because no production/test/migration/runtime change occurred; no bounded Maven baseline was needed because the only changes are planning records. `bash tools/agent-config/validate-governance.sh`, `bash tools/skills/validate-all-skills.sh`, and `git diff --check` all passed on 2026-07-21 (logs in the configured `/tmp` state directory).
+- Story 74.1 production surfaces: `infra/keycloak/realm-export.json` and the JWT claim converter; migrations: none. Runtime evidence: `FullRoleModelRealmTest` (2) imports the actual export into Keycloak 26.6.4, creates a disposable direct-grant probe client, and validates the issued token; `MakerCheckerSeedHygieneTest` (1) validates disjoint submitter/approver members through the admin API; `SecurityConfigTest` (3) proves normalization and ambiguity handling. Kafka/ISO/DB role/RLS evidence: N/A to this identity-only slice. Two full backend regressions are deferred until the last production change in the wave.
 - Commit `5e38b5d chore(planning): record wave six decision checkpoint` contains the validated decision packet, program record, planning reconciliation, regenerated inventory and handoff. No push occurred.
 
 ## Next work
 
-Obtain the five packet answers, then re-audit and implement the first newly READY slice: cutoff/cycle outcome, ledger precheck, internal book, file batch, then deferred queue. Obtain a source-backed Organization boot-import/export test convention before EPIC-74/74.1.
+Implement the promoted EPIC-74/74.5 separate-Keycloak-database and backup/restore slice. Then re-audit independent candidates; the five Class C packet decisions still govern cutoff/cycle outcome, ledger precheck, internal book, file batch, and deferred queue.

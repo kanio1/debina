@@ -10,23 +10,24 @@ Rozszerza EPIC-02 (4 role) do pełnego modelu: 12 ról (`sepa-nexus-keycloak-26-
 
 ## Story 74.1 — Realm design + pełny seed (Organizacje, 12 ról)
 
-status: blocked
+status: done
 depends_on: []
 
 Opis: `[MVP]` Iteracja 1. Organization per uczestnik, claim `organization`/`branch_id`→GUC, dwupoziomowy test RLS z tokenem branch.
 
-`[SOURCE-BLOCKED 2026-07-21]`: the later §10 `[CHANGE]` table in the Keycloak
-26.6.4 blueprint authorises twelve roles including `payment_approver`; stale
-eleven-role prose is not used. The import has only four roles and no
-Organizations state. Official Keycloak sources confirm Organizations but the
-repository lacks a reproducible boot-import/export representation and runtime
-proof for its membership/claim seed; do not invent JSON fields or console-only
-state.
+`[DONE 2026-07-21]`: `infra/keycloak/realm-export.json` imports the frozen
+single `demo-bank-org`, its Organization-owned `tenant_id`, user-owned
+`branch_id`, `sepa-guc` Organization Membership mapper, the twelve later-§10
+roles, and all three required clients. `SecurityConfig` normalizes the one-org
+mapper shape into the existing `tenant_id`/`organization_id` entry-point claims
+without choosing an ambiguous organization. Runtime proof uses a real
+Keycloak 26.6.4 container, fresh import, issued access token, Organization
+membership, and role-mapping APIs.
 
 Taski:
-- [ ] **Rozszerz realm z EPIC-02 do pełnego modelu 12 ról + Keycloak Organizations, claim mappery `organization_id`/`branch_id`.**
+- [x] **Rozszerz realm z EPIC-02 do pełnego modelu 12 ról + Keycloak Organizations, claim mappery `organization_id`/`branch_id`.**
       `verify: ./mvnw -f backend test -Dtest=*FullRoleModelRealmTest*`
-- [ ] **Test: `payment_submitter` i `payment_approver` nigdy ten sam użytkownik dla tego samego tenant/branch w seedowanym realmie MVP** (higiena danych seed, nie runtime rule).
+- [x] **Test: `payment_submitter` i `payment_approver` nigdy ten sam użytkownik dla tego samego tenant/branch w seedowanym realmie MVP** (higiena danych seed, nie runtime rule).
       `verify: ./mvnw -f backend test -Dtest=*MakerCheckerSeedHygieneTest*`
 
 ## Story 74.2 — FGAP v2 dla planu admin (`[P1]`)
@@ -62,12 +63,15 @@ Taski:
 
 ## Story 74.5 — Osobna baza Keycloak w skrypcie backupu
 
-status: blocked
+status: not-started
 depends_on: [Story 74.1]
 
-`[CAPABILITY-BLOCKED 2026-07-21]`: Compose uses Keycloak development storage;
-no separate Keycloak database, backup convention or restore/readability proof
-exists, and Story 74.1 is source-blocked. A shell script alone is insufficient.
+`[READY 2026-07-21]`: Story 74.1 now supplies the reproducible realm state.
+The Keycloak blueprint requires a separate Keycloak database and a realm
+export; exact Compose topology, least-privilege backup user, artifact layout
+and restore/readability mechanics are a Class B technical implementation
+choice, to be decided and proven together rather than inferred as business
+semantics. A shell script alone remains insufficient.
 
 Opis: `[MVP]` Iteracja 0 wg starszego blueprintu §16 — mogło zostać pominięte w konkretnym `iteration-0-foundation-plan.md`, patrz otwarte pytanie.
 

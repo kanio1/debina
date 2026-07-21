@@ -4257,14 +4257,14 @@
       "epic": "EPIC-74",
       "story": "74.1",
       "title": "Realm design + pełny seed (Organizacje, 12 ról)",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*FullRoleModelRealmTest*",
         "./mvnw -f backend test -Dtest=*MakerCheckerSeedHygieneTest*"
       ],
       "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-74 Story 74.1 implementation session"
     },
     {
       "epic": "EPIC-74",
@@ -4312,7 +4312,7 @@
       "epic": "EPIC-74",
       "story": "74.5",
       "title": "Osobna baza Keycloak w skrypcie backupu",
-      "status": "blocked",
+      "status": "not-started",
       "depends_on": [
         "Story 74.1"
       ],

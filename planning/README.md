@@ -151,7 +151,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
 | EPIC-73 — Ingress: szyna plikowa | not-started | EPIC-19 | [epics/EPIC-73-ingress-file-rail.md](epics/EPIC-73-ingress-file-rail.md) |
-| EPIC-74 — Adopcja Keycloak (pełny model, poza Iterację 0) | blocked (Story 74.1 `SOURCE-BLOCKED` on reproducible Organization state; Story 74.5 `CAPABILITY-BLOCKED`) | EPIC-02 | [epics/EPIC-74-keycloak-security-adoption.md](epics/EPIC-74-keycloak-security-adoption.md) |
+| EPIC-74 — Adopcja Keycloak (pełny model, poza Iterację 0) | in-progress (Story 74.1 **done** with real Keycloak import/token proof; Story 74.5 analytically `READY`; P1 stories remain not-started) | EPIC-02 | [epics/EPIC-74-keycloak-security-adoption.md](epics/EPIC-74-keycloak-security-adoption.md) |
 | EPIC-75 — Higiena dokumentacji | **done** | — | [epics/EPIC-75-documentation-hygiene.md](epics/EPIC-75-documentation-hygiene.md) |
 
 ---

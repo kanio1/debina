@@ -4,6 +4,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.convert.converter.Converter;
@@ -34,7 +35,10 @@ public class SecurityConfig {
 
     Converter<org.springframework.security.oauth2.jwt.Jwt,
             org.springframework.security.authentication.AbstractAuthenticationToken> jwtAuthenticationConverter() {
-        return jwt -> new JwtAuthenticationToken(jwt, realmRoles(jwt));
+        return jwt -> {
+            var normalized = normalizeOrganizationClaims(jwt);
+            return new JwtAuthenticationToken(normalized, realmRoles(normalized));
+        };
     }
 
     @Bean
@@ -59,5 +63,40 @@ public class SecurityConfig {
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .map(GrantedAuthority.class::cast)
                 .toList();
+    }
+
+    /**
+     * Keycloak's supported Organization Membership mapper emits the Organization id and its
+     * attributes below {@code organization.<alias>}. The frozen realm model keeps the stable
+     * tenant id on that Organization, while existing module entry points consume the normalized
+     * {@code tenant_id}/{@code organization_id} claims. Only the one-Organization MVP shape is
+     * flattened; an absent or ambiguous Organization claim deliberately produces no tenant claim.
+     */
+    private org.springframework.security.oauth2.jwt.Jwt normalizeOrganizationClaims(
+            org.springframework.security.oauth2.jwt.Jwt jwt) {
+        if (jwt.hasClaim("tenant_id")) return jwt;
+        Object organizations = jwt.getClaim("organization");
+        if (!(organizations instanceof Map<?, ?> values) || values.size() != 1) return jwt;
+        Object organization = values.values().iterator().next();
+        if (!(organization instanceof Map<?, ?> details)) return jwt;
+
+        String tenantId = firstString(details.get("tenant_id"));
+        if (tenantId == null) return jwt;
+
+        Map<String, Object> claims = new LinkedHashMap<>(jwt.getClaims());
+        claims.put("tenant_id", tenantId);
+        String organizationId = firstString(details.get("id"));
+        if (organizationId != null) claims.put("organization_id", organizationId);
+        return new org.springframework.security.oauth2.jwt.Jwt(
+                jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), jwt.getHeaders(), claims);
+    }
+
+    private static String firstString(Object value) {
+        if (value instanceof String text && !text.isBlank()) return text;
+        if (value instanceof Collection<?> values) {
+            return values.stream().filter(String.class::isInstance).map(String.class::cast)
+                    .filter(text -> !text.isBlank()).findFirst().orElse(null);
+        }
+        return null;
     }
 }

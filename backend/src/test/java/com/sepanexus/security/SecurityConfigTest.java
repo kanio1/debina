@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -83,6 +84,31 @@ class SecurityConfigTest {
                 .extracting(org.springframework.security.core.GrantedAuthority::getAuthority)
                 .containsExactly("ROLE_payment_submitter");
         org.assertj.core.api.Assertions.assertThat(paymentLifecycleAuthorizationManager).isNotNull();
+    }
+
+    @Test
+    void normalizesTheSingleOrganizationTenantAttributeWithoutSelectingAnAmbiguousOrganization() {
+        Jwt organizationJwt = Jwt.withTokenValue("organization-token").header("alg", "none")
+                .claim("organization", Map.of("demo-bank-org", Map.of(
+                        "id", "00000000-0000-0000-0000-000000000010",
+                        "tenant_id", List.of("00000000-0000-0000-0000-000000000001"))))
+                .build();
+
+        JwtAuthenticationToken normalized = (JwtAuthenticationToken) new SecurityConfig()
+                .jwtAuthenticationConverter().convert(organizationJwt);
+        org.assertj.core.api.Assertions.assertThat(normalized.getToken().getClaimAsString("tenant_id"))
+                .isEqualTo("00000000-0000-0000-0000-000000000001");
+        org.assertj.core.api.Assertions.assertThat(normalized.getToken().getClaimAsString("organization_id"))
+                .isEqualTo("00000000-0000-0000-0000-000000000010");
+
+        Jwt ambiguousJwt = Jwt.withTokenValue("ambiguous-token").header("alg", "none")
+                .claim("organization", Map.of(
+                        "demo-bank-org", Map.of("tenant_id", List.of("00000000-0000-0000-0000-000000000001")),
+                        "another-org", Map.of("tenant_id", List.of("00000000-0000-0000-0000-000000000002"))))
+                .build();
+        JwtAuthenticationToken ambiguous = (JwtAuthenticationToken) new SecurityConfig()
+                .jwtAuthenticationConverter().convert(ambiguousJwt);
+        org.assertj.core.api.Assertions.assertThat(ambiguous.getToken().hasClaim("tenant_id")).isFalse();
     }
 
     private static String paymentJson() {
