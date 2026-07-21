@@ -99,7 +99,7 @@ class ApprovalQueueReadModel implements ApprovalQueueQuery {
         String encode() { return Base64.getUrlEncoder().withoutPadding().encodeToString((submittedAt + "|" + approvalId).getBytes(StandardCharsets.UTF_8)); }
         static Cursor decode(String value) {
             try {
-                String[] parts = new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8).split("\\\\|", -1);
+                String[] parts = new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8).split("\\|", -1);
                 if (parts.length != 2) throw new IllegalArgumentException("Invalid approval cursor");
                 return new Cursor(Instant.parse(parts[0]), UUID.fromString(parts[1]));
             } catch (RuntimeException exception) { throw new IllegalArgumentException("Invalid approval cursor", exception); }

@@ -66,3 +66,11 @@ non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof bef
   bypass depth; `ProductionGraphQlIntrospectionTest` proves an authenticated caller receives a
   GraphQL error for `__schema` under the production profile. Green log:
   `/tmp/DEBINA-READ-ONLY-GRAPHQL-APPROVAL-WORKSPACE-WAVE-9/graphql-hardening-attempt-2.log`.
+
+## Payment query integration checkpoint
+
+- `ApprovalSubmissionIntegrationTest` now invokes `/graphql` against the actual payment-owned JDBC
+  read model and PostgreSQL 18 RLS. It proves deterministic first/second cursor pages and that a
+  foreign-tenant `approval(paymentId)` returns null rather than the target. The first run exposed
+  and fixed the cursor decoder's over-escaped separator. Green log:
+  `/tmp/DEBINA-READ-ONLY-GRAPHQL-APPROVAL-WORKSPACE-WAVE-9/graphql-rls-cursor-attempt-2.log`.

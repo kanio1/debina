@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -34,10 +35,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 /** PostgreSQL 18 proof for the frozen approval prefix gate (EPIC-76 Story 76.2). */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@AutoConfigureMockMvc
 class ApprovalSubmissionIntegrationTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
@@ -58,6 +61,9 @@ class ApprovalSubmissionIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -177,6 +183,48 @@ class ApprovalSubmissionIntegrationTest {
         assertThat(secondPage.nextCursor()).isNull();
         assertThat(approvalQueueReadModel.pending(tenantId, UUID.randomUUID(), 2, null).items()).isEmpty();
         assertThat(approvalQueueReadModel.pending(UUID.randomUUID(), branchId, 2, null).items()).isEmpty();
+    }
+
+    @Test
+    void graphqlQueueUsesPaymentRlsAndTheOwnerCursor() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID firstApproval = insertPending(tenant, branch, rule, Instant.parse("2026-07-01T08:00:00Z"), Instant.parse("2099-07-02T08:00:00Z"));
+        UUID secondApproval = insertPending(tenant, branch, rule, Instant.parse("2026-07-03T08:00:00Z"), Instant.parse("2099-07-04T08:00:00Z"));
+        UUID firstPayment = paymentForApproval(firstApproval);
+
+        String firstQuery = "{\"query\":\"query { approvalQueue(first: 1) { items { approvalId paymentId } nextCursor } }\"}";
+        String firstBody = mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/graphql")
+                        .contentType("application/json").content(firstQuery)
+                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt()
+                                .jwt(jwt -> jwt.claim("tenant_id", tenant.toString()).claim("branch_id", branch.toString()))
+                                .authorities(() -> "ROLE_payment_approver")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.data.approvalQueue.items[0].approvalId").value(firstApproval.toString()))
+                .andReturn().getResponse().getContentAsString();
+        java.util.regex.Matcher cursorMatcher = java.util.regex.Pattern.compile("\\\"nextCursor\\\":\\\"([^\\\"]+)\\\"")
+                .matcher(firstBody);
+        assertThat(cursorMatcher.find()).isTrue();
+        String cursor = cursorMatcher.group(1);
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/graphql")
+                        .contentType("application/json")
+                        .content("{\"query\":\"query($after: String) { approvalQueue(first: 1, after: $after) { items { approvalId } } }\",\"variables\":{\"after\":\"" + cursor + "\"}}")
+                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt()
+                                .jwt(jwt -> jwt.claim("tenant_id", tenant.toString()).claim("branch_id", branch.toString()))
+                                .authorities(() -> "ROLE_payment_approver")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.data.approvalQueue.items[0].approvalId").value(secondApproval.toString()));
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/graphql")
+                        .contentType("application/json")
+                        .content("{\"query\":\"{ approval(paymentId: \\\"" + firstPayment + "\\\") { paymentId } }\"}")
+                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt()
+                                .jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()).claim("branch_id", branch.toString()))
+                                .authorities(() -> "ROLE_payment_approver")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.data.approval").isEmpty());
     }
 
     @Test
