@@ -30,6 +30,12 @@ def main():
                     errors += 1; diagnostic("ERROR", "UCT-008", document, uc, "methodology", f"missing/unsupported {key}")
             if not re.search(r"^1\.\s", doc, re.M):
                 errors += 1; diagnostic("ERROR", "UCT-009", document, uc, "main-flow", "numbered main success scenario missing")
+    backlog_map = ROOT / "docs/requirements/USE-CASE-TO-BACKLOG-MAP.yaml"
+    if backlog_map.exists():
+        for value in re.findall(r"\bslices:\s*\[([^]]*)\]", backlog_map.read_text()):
+            for slice_id in list_value(value):
+                if slice_id not in flat_slices:
+                    errors += 1; diagnostic("ERROR", "UCT-010", backlog_map, slice_id, "backlog-map", "slice does not resolve")
     for path, epic, story, block, meta in story_blocks():
         level = meta.get("semantic_enforcement", "LEGACY")
         traces = list_value(meta.get("use_case_slices"))
