@@ -61,3 +61,9 @@ general audit boundary. ADR-W8-01 is the accepted focused Class B decision.
 Commit `73501af` contains Story 77.1. The next checkpoint is the focused 77.2/76.3 implementation
 slice. Remaining proof is controlled audit failure, foreign tenant/branch/maker denial, HTTP/real
 Keycloak, exact transaction identity and decision races; expiry has not started.
+
+Expiry implementation checkpoint: V59/V60 introduce a payment-owned bounded expiry function and
+a dedicated `approval_expiry_role` datasource/scheduler. `ApprovalSubmissionIntegrationTest` 7/0/0
+proves one due pending approval becomes EXPIRED with one SYSTEM audit row, no business status or
+outbox, and replay returns zero. Initial missing audit-schema usage was a RED migration/runtime
+failure; V60 is its forward-only grant correction. Log: `expiry-runtime-green.log`.

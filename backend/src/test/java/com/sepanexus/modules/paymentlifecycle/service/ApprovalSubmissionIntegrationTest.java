@@ -39,6 +39,9 @@ class ApprovalSubmissionIntegrationTest {
     @Autowired
     private ApprovalDecisionService approvalDecisionService;
 
+    @Autowired
+    private ApprovalExpiryService approvalExpiryService;
+
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
         initializeDatabase();
@@ -191,6 +194,36 @@ class ApprovalSubmissionIntegrationTest {
         assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ? AND outcome = 'DENIED'", payment)).isEqualTo(1);
         assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
         assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
+    }
+
+    @Test
+    void expiryUsesTheNarrowSystemRoleAndIsReplaySafeWithoutStartingTheFsm() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now().minusSeconds(90_000),
+                Instant.now().minusSeconds(1)));
+
+        assertThat(approvalExpiryService.expireDueApprovals(10)).isEqualTo(1);
+        assertThat(approvalExpiryService.expireDueApprovals(10)).isZero();
+        try (Connection connection = admin(); PreparedStatement statement = connection.prepareStatement("""
+                SELECT a.status, p.status, l.actor_type, l.actor_id, l.authorized_role
+                FROM payment.payment_approvals a JOIN payment.payments p ON p.id = a.payment_id
+                JOIN audit.audit_log l ON l.payment_id = p.id
+                WHERE p.id = ?
+                """)) {
+            statement.setObject(1, payment);
+            try (ResultSet result = statement.executeQuery()) {
+                assertThat(result.next()).isTrue();
+                assertThat(result.getString(1)).isEqualTo("EXPIRED");
+                assertThat(result.getString(2)).isNull();
+                assertThat(result.getString(3)).isEqualTo("SYSTEM");
+                assertThat(result.getString(4)).isEqualTo("system_approval_expiry");
+                assertThat(result.getString(5)).isEqualTo("system_approval_expiry");
+            }
+        }
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", payment)).isEqualTo(1);
     }
 
     private static SubmitPaymentCommand command(UUID tenantId, UUID branchId, String maker, String idempotencyKey) {

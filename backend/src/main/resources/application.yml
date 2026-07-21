@@ -44,6 +44,11 @@ gross-instant:
     url: ${GROSS_INSTANT_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
     username: ${GROSS_INSTANT_DB_USER:gross_instant_executor_role}
     password: ${GROSS_INSTANT_DB_PASSWORD:dev-only-gross-instant-executor}
+approval-expiry:
+  datasource:
+    url: ${APPROVAL_EXPIRY_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
+    username: ${APPROVAL_EXPIRY_DB_USER:approval_expiry_role}
+    password: ${APPROVAL_EXPIRY_DB_PASSWORD:dev-only-approval-expiry}
 server:
   port: 8081
 management:
