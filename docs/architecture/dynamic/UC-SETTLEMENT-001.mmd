@@ -1,0 +1,8 @@
+sequenceDiagram
+  participant O as Settlement operator
+  participant S as Settlement
+  participant L as LedgerPort
+  O->>S: UC-SETTLEMENT-001 attempt
+  S->>L: reserve/post/release
+  Note over S,L: same PostgreSQL transaction; failure rolls back; QS-INT-02
+  S-->>O: explicit attempt/finality evidence

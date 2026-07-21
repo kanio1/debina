@@ -1,0 +1,16 @@
+version: 1
+dependencies:
+  - {use_case: UC-SCT-001, depends_on: [], status: critical-path}
+  - {use_case: UC-SCT-002, depends_on: [UC-SCT-001], status: parallelizable}
+  - {use_case: UC-SCT-003, depends_on: [UC-SCT-001], status: source-blocked}
+  - {use_case: UC-SCTINST-001, depends_on: [UC-SCT-001, UC-ROUTING-001], status: critical-path}
+  - {use_case: UC-ROUTING-001, depends_on: [UC-SCT-001], status: critical-path}
+  - {use_case: UC-CLEARING-001, depends_on: [UC-ROUTING-001, UC-EGRESS-001], status: source-blocked}
+  - {use_case: UC-SETTLEMENT-001, depends_on: [UC-ROUTING-001], status: architecture-review-gate}
+  - {use_case: UC-SETTLEMENT-002, depends_on: [], status: source-blocked}
+  - {use_case: UC-STATUS-001, depends_on: [], status: parallelizable}
+  - {use_case: UC-RTRANS-001, depends_on: [UC-STATUS-001], status: source-blocked}
+  - {use_case: UC-RTRANS-002, depends_on: [UC-RTRANS-001], status: source-blocked}
+  - {use_case: UC-EGRESS-001, depends_on: [UC-ROUTING-001], status: architecture-review-gate}
+  - {use_case: UC-RECON-001, depends_on: [UC-AUDIT-001], status: parallelizable}
+  - {use_case: UC-AUDIT-001, depends_on: [], status: parallelizable}

@@ -1,0 +1,8 @@
+sequenceDiagram
+  participant C as External CSM
+  participant ISO as ISO adapter
+  participant P as Payment lifecycle
+  C->>ISO: pacs.002
+  ISO->>ISO: validate/correlate/deduplicate
+  ISO-->>P: source-owned matched classification
+  Note over ISO,P: orphan/ambiguous do not invent lifecycle; outbox where applicable

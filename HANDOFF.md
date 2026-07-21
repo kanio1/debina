@@ -2,21 +2,20 @@
 
 ## Zadanie
 
-Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research platform. Enterprise Rebase Phase C1 has turned the Phase B model into a local, source-backed Use-Case 2.0 and semantic-governance workflow without implementing a payment feature.
+Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research platform. Enterprise Rebase Phase C2 has produced the source-backed enterprise use-case catalogue and implementation sequencing without implementing a payment feature.
 
 ## Zrobione
 
-- Added four discoverable C1 skills, five local validators, a governance runner, and stdlib validator tests.
-- Added `UC-SCT-APPROVAL-001`, its twelve slices, Example Mapping, `BR-APPROVAL-001…008`, enforcement migration model, and EPIC-76 pilot traceability/semantic cleanup.
-- Recorded C1 evidence in `planning/programs/DEBINA-ENTERPRISE-REBASE-PHASE-C1.md`; committed as `c413010` and `3e535a2` on `rebase/enterprise-evolution`.
+- Added 14 ENFORCED actor-goal use cases across SCT, SCT Inst, routing, clearing, settlement, status, R-transactions, egress, reconciliation and audit; retained the C1 approval pilot.
+- Added C2 concept admission, backlog/dependency/implementation maps and six dynamic diagrams. Methodology validation now checks canonical C2 methodology declarations and numbered main flows.
 
 ## Utknęliśmy na
 
-Nothing blocks C1. Legacy migration remains intentionally deferred: the validators report 296 legacy-untraced stories and 69 scoped historical planning-semantic warnings, for Phase E rather than mass rewriting now.
+C2 source-blocked records are deliberate: rail file/group, clearing, deferred-cycle and R-transaction participant semantics need qualified source profiles. Legacy migration remains Phase E (296 traceability and 69 planning warnings).
 
 ## Plan na następny krok
 
-Start Phase C2 by evaluating `EUC-02` signed pain.001 submission first, then single SCT, file SCT, SCT Inst, route/rail selection, clearing, and settlement—do not create specifications until source authority is checked.
+Start Phase D only when authorized: turn the recorded local commands into the Dagger verification platform; do not select remote CI or create Dagger code before that phase.
 
 ## Pułapki, których nie wolno powtórzyć
 

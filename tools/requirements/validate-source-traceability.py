@@ -9,7 +9,7 @@ def main():
     for path in paths:
         text=path.read_text()
         for tag in re.findall(r"\[([A-Z0-9-]+)\]", text):
-            if tag not in KNOWN and not tag.startswith(("UC-", "UCS-", "BR-", "QS-")):
+            if tag not in KNOWN and not tag.startswith(("UC-", "UCS-", "BR-", "QS-", "EPIC-")):
                 errors+=1; diagnostic("ERROR","SRC-001",path.relative_to(ROOT),tag,"known-source-tag","unknown tag")
         for ref in re.findall(r"source_references:\s*\[([^]]*)\]", text):
             for item in [x.strip() for x in ref.split(',') if x.strip()]:

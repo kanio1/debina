@@ -1,0 +1,10 @@
+sequenceDiagram
+  participant S as Submitter
+  participant I as Ingress
+  participant P as Payment lifecycle
+  participant DB as PostgreSQL transaction
+  S->>I: UC-SCT-001 / UCS-SCT-001-A instruction
+  I->>P: validated source and tenant
+  P->>DB: lineage + payment + approval/release
+  DB-->>S: outcome/correlation
+  Note over I,P: failure: replay conflict preserves minimal guarantee; QS-INT-01

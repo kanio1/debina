@@ -1,0 +1,10 @@
+sequenceDiagram
+  participant M as Maker
+  participant P as Payment lifecycle
+  participant A as Audit
+  participant C as Checker
+  M->>P: submitted payment
+  P->>A: source-owned audit
+  C->>P: approve/reject
+  P->>A: atomic decision audit
+  Note over P,A: PostgreSQL command boundary; QS-INT-01/QS-TRC-01

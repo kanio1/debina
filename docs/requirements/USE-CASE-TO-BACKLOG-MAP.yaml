@@ -1,0 +1,8 @@
+version: 1
+bounded_migration:
+  - {use_case: UC-SCT-001, slices: [UCS-SCT-001-A, UCS-SCT-001-B], epics: [EPIC-19], stories: [19.1, 19.2, 19.3], status: PILOT-CANDIDATE, note: existing implementation evidence; metadata not bulk migrated}
+  - {use_case: UC-SCT-002, slices: [UCS-SCT-002-A, UCS-SCT-002-B], epics: [EPIC-26, EPIC-31], stories: [26.1, 31.3A], status: PILOT-CANDIDATE, note: signature checkpoint remains deferred}
+  - {use_case: UC-ROUTING-001, slices: [UCS-ROUTING-001-A, UCS-ROUTING-001-B], epics: [EPIC-51, EPIC-52], stories: [51.1, 52.1], status: LEGACY, note: source-policy gate}
+  - {use_case: UC-STATUS-001, slices: [UCS-STATUS-001-A, UCS-STATUS-001-B], epics: [EPIC-27], stories: [27.1, 27.2A, 27.2C], status: PILOT-CANDIDATE, note: lifecycle consumer remains missing}
+  - {use_case: UC-SCT-APPROVAL-001, slices: [UCS-SCT-APPROVAL-001-A, UCS-SCT-APPROVAL-001-D], epics: [EPIC-76], stories: [76.1, 76.2, 76.3], status: PILOT, note: C1 authoritative pilot}
+unmapped_categories: [missing-stories, duplicated-stories, over-broad-stories, technical-only-stories, future-acceptance-stories]

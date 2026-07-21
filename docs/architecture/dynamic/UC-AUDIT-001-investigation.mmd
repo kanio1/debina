@@ -1,0 +1,9 @@
+sequenceDiagram
+  participant A as Auditor
+  participant B as BFF
+  participant G as Query-only GraphQL
+  participant Q as Source query ports
+  A->>B: UC-AUDIT-001 identifier
+  B->>G: authenticated read
+  G->>Q: source-owned payment/ISO/audit queries
+  Q-->>A: authorized correlation or visible gap

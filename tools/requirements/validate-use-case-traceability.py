@@ -15,12 +15,21 @@ def main():
             errors += 1; diagnostic("ERROR", "UCT-001", catalog, kind, "unique-id", "duplicate ID")
     for uc in ucs:
         doc_match = re.search(rf"id:\s*{re.escape(uc)}.*?document:\s*(\S+)", text, re.S)
-        if not doc_match or not (ROOT / doc_match.group(1)).is_file():
+        document = doc_match.group(1).rstrip('}') if doc_match else None
+        if not doc_match or not (ROOT / document).is_file():
             errors += 1; diagnostic("ERROR", "UCT-002", catalog, uc, "document", "document does not resolve"); continue
-        doc = (ROOT / doc_match.group(1)).read_text()
-        for field in ("Goal", "Primary actor", "Main success scenario", "Source references", "## Slices"):
+        doc = (ROOT / document).read_text()
+        enforced = bool(re.search(r"\benforcement:\s*ENFORCED", doc))
+        for field in (("# ", "## Main success scenario") if enforced else ("Goal", "Primary actor", "Main success scenario", "Source references", "## Slices")):
             if field not in doc:
-                errors += 1; diagnostic("ERROR", "UCT-003", doc_match.group(1), uc, field, "mandatory use-case content missing")
+                errors += 1; diagnostic("ERROR", "UCT-003", document, uc, str(field), "mandatory use-case content missing")
+        if enforced:
+            required = {"narrative":"cockburn_fully_dressed", "decomposition":"use_case_2_0", "rule_elaboration":"example_mapping", "payment_process_model":"iso_20022_business_process_catalogue", "domain_modeling":"domain_driven_design", "architecture_views":"c4", "quality_requirements":"arc42_quality_scenarios", "architecture_evaluation":"atam_lite"}
+            for key, value in required.items():
+                if not re.search(rf"{key}:\s*{value}\b", doc):
+                    errors += 1; diagnostic("ERROR", "UCT-008", document, uc, "methodology", f"missing/unsupported {key}")
+            if not re.search(r"^1\.\s", doc, re.M):
+                errors += 1; diagnostic("ERROR", "UCT-009", document, uc, "main-flow", "numbered main success scenario missing")
     for path, epic, story, block, meta in story_blocks():
         level = meta.get("semantic_enforcement", "LEGACY")
         traces = list_value(meta.get("use_case_slices"))

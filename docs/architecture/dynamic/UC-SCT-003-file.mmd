@@ -1,0 +1,8 @@
+sequenceDiagram
+  participant S as Submitter
+  participant I as File ingress
+  participant ISO as ISO adapter
+  S->>I: UC-SCT-003 file
+  I->>ISO: evidence/profile
+  Note over I,ISO: source-blocked group/item outcome; QS-TRC-01
+  ISO-->>S: source-qualified correlation or rejection
