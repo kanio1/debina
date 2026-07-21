@@ -69,6 +69,17 @@
             "introspection.token.claim": "true",
             "multivalued": "true"
           }
+        },
+        {
+          "name": "stable subject",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-sub-mapper",
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "introspection.token.claim": "true",
+            "subjectType": "public"
+          }
         }
       ]
     }

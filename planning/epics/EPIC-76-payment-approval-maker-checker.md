@@ -43,22 +43,30 @@ depends_on: [Story 76.2]
 
 Description: Implement `POST /api/v1/payments/{paymentId}/approve` and `/reject` through payment-lifecycle with role, tenant/branch, maker≠checker, idempotency, conditional-transition and outbox-release guards.
 
-Wave 8 status: the source-owned audit persistence/API now exists and the basic approve/reject state/outbox/audit/idempotency path has a PostgreSQL 18 proof. The remaining executable work is object-level authorization, denied-command recording, controlled audit-failure rollback, concurrency and HTTP/Keycloak proof; none may be inferred from the basic path.
+Wave 8 status: the source-owned audit persistence/API, object-level authorization, separate denied-command
+audit path, controlled approve audit-failure rollback, PostgreSQL races and a real Keycloak approver
+token proof now exist. The remaining completion evidence is the dedicated transaction-identity and
+expiry-audit-failure proof plus the final regression/validator gate; none may be inferred from the
+basic path.
 
 Tasks:
 - [ ] **Provide the evidence-audit command-audit capability.** Add it only under a source-derived owner with an explicit transaction boundary; do not substitute logs, status history, payment events, or outbox rows for audit.
       `verify: ./mvnw -f backend test -Dtest=ApprovalDecisionAuditIntegrationTest` → same-transaction audit/outbox/rollback proof passes.
-- [ ] **Implement approve/reject once the audit port exists.** Use the source-defined conditional `PENDING_APPROVAL` update; first committed checker wins and a second gets a typed conflict.
-      `verify: ./mvnw -f backend test -Dtest=ApprovalDecisionIntegrationTest` → authorization, idempotency, PostgreSQL race, rollback, and outbox-count proof passes.
+- [x] **Implement approve/reject once the audit port exists.** The conditional `PENDING_APPROVAL` update
+      is first-writer-wins; before-method object authorization, maker separation, tenant/branch denial,
+      idempotency, rollback and real PostgreSQL two-checker/expiry races are exercised.
+      `verify: ./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest,ApprovalDecisionKeycloakRuntimeTest` → PASS (13 PostgreSQL 18 tests plus a real Keycloak 26.6.4 signature-validated approver-token proof).
 
 ## Story 76.4 — Approval expiry
 
-status: blocked
+status: in-progress
 depends_on: [Story 76.2, Story 76.3]
 
 Description: A narrow service-role expiry capability changes only `PENDING_APPROVAL` rows past the frozen 24-hour limit to `EXPIRED`; it never starts the payment FSM or releases `payment.received`.
 
-Blocker: expiry also requires the same authoritative application audit capability as decision commands.
+Wave 8 status: V59/V60 provide the bounded dedicated-role expiry command with a SYSTEM audit
+append, replay proof and real approve/reject-versus-expiry races. The remaining completion evidence
+is controlled audit-append rollback and final gate proof.
 
 Tasks:
 - [ ] **Implement replay-safe expiry after the audit capability exists.** Use `ClockPort`, a narrow system identity and conditional transition semantics that cannot overwrite interactive terminal decisions.

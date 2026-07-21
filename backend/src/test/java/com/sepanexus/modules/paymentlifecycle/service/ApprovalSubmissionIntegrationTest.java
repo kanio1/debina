@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sepanexus.SepaNexusApplication;
 import com.sepanexus.evidenceaudit.CommandAuditPort;
+import com.sepanexus.evidenceaudit.DeniedCommandAuditPort;
+import com.sepanexus.shared.ClockPort;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,6 +15,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +52,12 @@ class ApprovalSubmissionIntegrationTest {
 
     @MockitoSpyBean
     private CommandAuditPort commandAuditPort;
+
+    @MockitoSpyBean
+    private DeniedCommandAuditPort deniedCommandAuditPort;
+
+    @MockitoSpyBean
+    private ClockPort clock;
 
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
@@ -202,6 +214,26 @@ class ApprovalSubmissionIntegrationTest {
     }
 
     @Test
+    void unavailableDeniedAuditFailsClosedWithoutAuthorizingOrMutating() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+        org.mockito.Mockito.doThrow(new IllegalStateException("controlled denial audit failure"))
+                .when(deniedCommandAuditPort).appendDenied(org.mockito.ArgumentMatchers.any());
+
+        var command = new ApprovalDecisionCommand(tenant, branch, payment, "submitter", "sid-denied", UUID.randomUUID(),
+                "denied-audit-failure", null, ApprovalDecisionCommand.Decision.APPROVE);
+        withJwt(tenant, branch, "submitter", "payment_submitter", () -> assertThatThrownBy(() -> decisions(command))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("controlled denial audit failure"));
+
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = ? AND status = 'PENDING_APPROVAL'", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", payment)).isZero();
+    }
+
+    @Test
     void makerAndForeignBranchApproversAreDeniedBeforeAnyDecisionMutation() throws Exception {
         UUID tenant = UUID.randomUUID();
         UUID branch = UUID.randomUUID();
@@ -242,6 +274,44 @@ class ApprovalSubmissionIntegrationTest {
         assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
         assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", payment)).isZero();
         assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
+    }
+
+    @Test
+    void twoDistinctCheckersRaceAndOnlyOneAuditedApprovalCommits() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executors = Executors.newFixedThreadPool(2);
+        try {
+            Future<Throwable> first = executors.submit(() -> raceDecision(start, tenant, branch, payment, "checker-race-a"));
+            Future<Throwable> second = executors.submit(() -> raceDecision(start, tenant, branch, payment, "checker-race-b"));
+            start.countDown();
+
+            Throwable firstResult = first.get();
+            Throwable secondResult = second.get();
+            assertThat(firstResult == null ? 1 : 0).isEqualTo(1 - (secondResult == null ? 1 : 0));
+            assertThat(firstResult == null ? secondResult : firstResult).isInstanceOf(ApprovalDecisionConflictException.class);
+        } finally {
+            executors.shutdownNow();
+        }
+
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = ? AND status = 'APPROVED'", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = ? AND checker_user_id IN ('checker-race-a', 'checker-race-b')", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ? AND outcome = 'SUCCESS'", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isEqualTo(1);
+    }
+
+    @Test
+    void approveVersusExpiryLeavesOneTerminalAuditAndAtMostOneReceivedEvent() throws Exception {
+        approvalExpiryRace(ApprovalDecisionCommand.Decision.APPROVE);
+    }
+
+    @Test
+    void rejectVersusExpiryLeavesOneTerminalAuditAndNoReceivedEvent() throws Exception {
+        approvalExpiryRace(ApprovalDecisionCommand.Decision.REJECT);
     }
 
     @Test
@@ -356,6 +426,74 @@ class ApprovalSubmissionIntegrationTest {
 
     private static void withApproverJwt(UUID tenant, UUID branch, String subject, Runnable assertion) {
         withJwt(tenant, branch, subject, "payment_approver", assertion);
+    }
+
+    private Throwable raceDecision(CountDownLatch start, UUID tenant, UUID branch, UUID payment, String checker) {
+        try {
+            start.await();
+            withApproverJwt(tenant, branch, checker, () -> approvalDecisionService.decide(new ApprovalDecisionCommand(
+                    tenant, branch, payment, checker, "sid-" + checker, UUID.randomUUID(), "race-" + checker,
+                    null, ApprovalDecisionCommand.Decision.APPROVE)));
+            return null;
+        } catch (Throwable throwable) {
+            return throwable;
+        }
+    }
+
+    private void decisions(ApprovalDecisionCommand command) {
+        approvalDecisionService.decide(command);
+    }
+
+    private void approvalExpiryRace(ApprovalDecisionCommand.Decision decision) throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        Instant expiry = Instant.parse("2040-01-01T00:00:00Z");
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, expiry.minusSeconds(60), expiry));
+        org.mockito.Mockito.doAnswer(invocation -> Thread.currentThread().getName().contains("expiry-race")
+                ? expiry : expiry.minusMillis(1)).when(clock).now();
+
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executors = Executors.newFixedThreadPool(2);
+        try {
+            Future<Throwable> interactive = executors.submit(() -> {
+                Thread.currentThread().setName("interactive-decision-race");
+                try {
+                    start.await();
+                    withApproverJwt(tenant, branch, "checker-expiry-race", () -> approvalDecisionService.decide(
+                            new ApprovalDecisionCommand(tenant, branch, payment, "checker-expiry-race", "sid-race",
+                                    UUID.randomUUID(), "expiry-race-" + decision, decision == ApprovalDecisionCommand.Decision.REJECT
+                                            ? "reject in race" : null, decision)));
+                    return null;
+                } catch (Throwable throwable) {
+                    return throwable;
+                }
+            });
+            Future<Throwable> expiryWorker = executors.submit(() -> {
+                Thread.currentThread().setName("expiry-race");
+                try {
+                    start.await();
+                    approvalExpiryService.expireDueApprovals(10);
+                    return null;
+                } catch (Throwable throwable) {
+                    return throwable;
+                }
+            });
+            start.countDown();
+
+            assertThat(expiryWorker.get()).isNull();
+            Throwable interactiveFailure = interactive.get();
+            assertThat(interactiveFailure == null || interactiveFailure instanceof ApprovalDecisionConflictException).isTrue();
+        } finally {
+            executors.shutdownNow();
+        }
+
+        String terminal = decision == ApprovalDecisionCommand.Decision.APPROVE ? "APPROVED" : "REJECTED";
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = ? AND status IN (?, 'EXPIRED')", payment, terminal)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ? AND outcome = 'SUCCESS'", payment)).isEqualTo(1);
+        int events = count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment);
+        if (decision == ApprovalDecisionCommand.Decision.APPROVE) assertThat(events).isLessThanOrEqualTo(1);
+        else assertThat(events).isZero();
     }
 
     private static void withJwt(UUID tenant, UUID branch, String subject, String role, Runnable assertion) {

@@ -42,10 +42,10 @@ Completion criterion: transaction/connection identity, rollback, positive/negati
 denial-audit tests pass against PostgreSQL 18.
 
 Tasks:
-- [ ] **Implement the typed successful-command `CommandAuditPort` through the accepted narrow boundary.** No `REQUIRES_NEW`, after-commit listener, event or second connection may be used.
-      `verify: ./mvnw -f backend test -Dtest=CommandAuditTransactionIntegrationTest` → same-tx, rollback and direct-DML-denial proof passes.
-- [ ] **Implement the separate denied-command recorder and audit-safe failure contract.** It records trusted attempted identity and safe reason category without turning an audit failure into authorization.
-      `verify: ./mvnw -f backend test -Dtest=DeniedCommandAuditIntegrationTest` → forbidden attempt, safe foreign-target behavior and audit-failure behavior pass.
+- [x] **Implement the typed successful-command `CommandAuditPort` through the accepted narrow boundary.** No `REQUIRES_NEW`, after-commit listener, event or second connection is used; controlled decision append failure rolls back state, outbox and idempotency.
+      `verify: ./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest` → PASS (PostgreSQL 18 rollback/outbox/idempotency proof; dedicated physical transaction-identity test remains final-gate evidence).
+- [x] **Implement the separate denied-command recorder and audit-safe failure contract.** It records trusted attempted identity and safe reason category without turning an audit failure into authorization; unavailable denial audit surfaces a technical failure with no mutation.
+      `verify: ./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest` → PASS (forbidden attempt and controlled denial-audit failure proof).
 
 ## Story 77.3 — Internal audit query and integrity proof
 

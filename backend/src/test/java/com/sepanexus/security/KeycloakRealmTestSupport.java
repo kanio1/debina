@@ -64,6 +64,9 @@ final class KeycloakRealmTestSupport {
     }
 
     static void createDirectGrantProbeClient() throws Exception {
+        if (adminGet("clients?clientId=realm-runtime-probe").size() > 0) {
+            return;
+        }
         var client = JSON.createObjectNode();
         client.put("clientId", "realm-runtime-probe");
         client.put("enabled", true);
@@ -81,14 +84,15 @@ final class KeycloakRealmTestSupport {
         }
 
         String clientId = adminGet("clients?clientId=realm-runtime-probe").get(0).path("id").asText();
-        String scopeId = adminGet("client-scopes").findValues("name").isEmpty()
-                ? null : adminGet("client-scopes").findParents("name").stream()
-                .filter(scope -> "sepa-guc".equals(scope.path("name").asText()))
-                .findFirst().orElseThrow().path("id").asText();
-        adminPut("clients/" + clientId + "/default-client-scopes/" + scopeId, JSON.nullNode());
+        addDefaultScope(clientId, "sepa-guc");
     }
 
     static JsonNode passwordGrantClaims(String username, String password) throws Exception {
+        String token = passwordGrantToken(username, password);
+        return JSON.readTree(new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]), StandardCharsets.UTF_8));
+    }
+
+    static String passwordGrantToken(String username, String password) throws Exception {
         String form = "grant_type=password&client_id=realm-runtime-probe&username=" + encode(username)
                 + "&password=" + encode(password) + "&scope=openid";
         HttpResponse<String> response = send(HttpRequest.newBuilder(realmUri("protocol/openid-connect/token"))
@@ -98,8 +102,16 @@ final class KeycloakRealmTestSupport {
         if (response.statusCode() != 200) {
             throw new AssertionError("Keycloak password grant failed: " + response.statusCode() + " " + response.body());
         }
-        String token = JSON.readTree(response.body()).path("access_token").asText();
-        return JSON.readTree(new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]), StandardCharsets.UTF_8));
+        return JSON.readTree(response.body()).path("access_token").asText();
+    }
+
+    static String issuerUri() { return baseUri("realms/" + REALM).toString(); }
+
+    private static void addDefaultScope(String clientId, String scopeName) throws Exception {
+        String scopeId = adminGet("client-scopes").findParents("name").stream()
+                .filter(scope -> scopeName.equals(scope.path("name").asText()))
+                .findFirst().orElseThrow().path("id").asText();
+        adminPut("clients/" + clientId + "/default-client-scopes/" + scopeId, JSON.nullNode());
     }
 
     private static String adminToken() throws Exception {

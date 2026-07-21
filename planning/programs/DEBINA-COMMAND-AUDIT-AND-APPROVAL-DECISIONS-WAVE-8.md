@@ -71,3 +71,25 @@ failure; V60 is its forward-only grant correction. Log: `expiry-runtime-green.lo
 Authorization checkpoint: `ApprovalSubmissionIntegrationTest` 8/0/0 proves submitter, maker and
 foreign-branch approver denials occur before domain/idempotency mutation and leave a separate
 `DENIED` audit row. Log: `approval-auth-matrix-green.log`.
+
+## Proof extension checkpoint
+
+- `ApprovalSubmissionIntegrationTest` is now **13/0/0** on PostgreSQL 18. It proves a true
+  two-checker concurrent conditional decision (one terminal state, audit, outbox and idempotency
+  record), approve-vs-expiry and reject-vs-expiry races (one terminal audit; no reject/expiry
+  outbox), denial-audit unavailability fails closed, and controlled successful-audit failure rolls
+  the approve transaction back. Logs: `two-checker-race.log`, `approval-expiry-races.log`,
+  `denial-audit-failure-green.log`, `audit-rollback-proof.log`.
+- Mutation proof: temporarily suppressing the approve append made the focused decision test fail
+  (`Failures: 1`, expected audit count 1); production code was restored and the 12-test GREEN run
+  passed. Logs: `mutation-remove-audit-expected-red.log`, `mutation-restored-green.log`.
+- Real Keycloak 26.6.4 proof: `ApprovalDecisionKeycloakRuntimeTest` validates a Keycloak-issued
+  `payment_approver` token against the issuer/JWK, then uses it to approve another maker's
+  payment through the before-method authorization interceptor (**1/0/0**). The proof exposed the
+  realm scope omission of `sub`; `sepa-guc` now owns the standard public subject mapper, preserving
+  the frozen stable-token-sub identity source. Log: `keycloak-approval-runtime-green.log`.
+- Consecutive full backend regressions are green at 505/0/0 in
+  `full-backend-regression-2.log` and `full-backend-regression-3.log` before these proof-only
+  additions. Current remaining final-gate work: dedicated physical transaction identity,
+  reject/expiry audit-append failure injection, HTTP boundary proof and rerunning final regressions
+  after the proof additions.
