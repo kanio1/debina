@@ -1,0 +1,38 @@
+query ApprovalQueue($first: Int!, $after: String) {
+  approvalQueue(first: $first, after: $after) {
+    items {
+      approvalId
+      paymentId
+      approvalStatus
+      makerUserId
+      submittedAt
+      expiresAt
+      expiredButUnprocessed
+      matrixRuleId
+      amount
+      currency
+      debtorIban
+      creditorIban
+    }
+    nextCursor
+  }
+}
+
+query Approval($paymentId: ID!) {
+  approval(paymentId: $paymentId) {
+    approvalId
+    paymentId
+    approvalStatus
+    makerUserId
+    submittedAt
+    expiresAt
+    expiredButUnprocessed
+    matrixRuleId
+    amount
+    currency
+    debtorIban
+    creditorIban
+    decisionComment
+    decidedAt
+  }
+}
