@@ -25,3 +25,10 @@
 
 - Run live Keycloak+BFF+Spring+isolated PostgreSQL JSON_DIRECT and signed pain.001 proofs; run two full backend regressions, governance validators, database review and cleanup.
 - No migration is added (`N/A`): this read uses existing source tables and indexes. Correlation is intentionally not exposed because no payment-scoped source-ready runtime evidence was verified.
+
+## Checkpoint 2 — live runtime and version correction (2026-07-21)
+
+- First meaningful live failure: `pain.001` returned no version because V60 catalogues only `JSON_DIRECT`. No catalog row or migration was invented. `messageVersion` is instead the source-owned parser fact: persisted `pain.001` passed the pinned `pain.001.001.09` namespace; `JSON_DIRECT` remains null.
+- Real isolated PostgreSQL 18 + Keycloak 26.6.4 + Spring + Next BFF: JSON BFF submission persisted `JSON_DIRECT` / `ORIGINAL_INSTRUCTION` / `W11-JSON-E2E-001`; its BFF GraphQL response matches those source facts.
+- Real signed pain.001: Keycloak authorization-code + PKCE submitter authentication and a temporary isolated-DB Ed25519 verification key produced 201. Source rows prove `pain.001`, ORIGINAL_INSTRUCTION, MsgId, PmtInfId, EndToEndId, null InstrId/TxId/UETR, and one VERIFIED event. BFF returns `messageVersion: pain.001.001.09` and only the three persisted identifiers.
+- Negative BFF probes: unauthenticated 401, unknown operation 400; `/api/session` exposes claims only. Focused backend gate: 32 tests, 0 failures/errors/skips.

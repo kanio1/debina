@@ -134,7 +134,7 @@ class ApprovalGraphQlRuntimeTest {
         UUID payment = UUID.randomUUID(); UUID message = UUID.randomUUID();
         when(paymentIsoEvidenceQuery.evidence(any(), any(), any())).thenReturn(
                 new PaymentIsoEvidenceQuery.PaymentIsoEvidence(payment, List.of(
-                        new PaymentIsoEvidenceQuery.IsoMessageEvidence(message, "JSON_DIRECT", java.time.LocalDate.of(2000, 1, 1),
+                        new PaymentIsoEvidenceQuery.IsoMessageEvidence(message, "JSON_DIRECT", null, java.time.LocalDate.of(2000, 1, 1),
                                 "ORIGINAL_INSTRUCTION", Instant.parse("2026-07-21T10:00:00Z"))), List.of(
                         new PaymentIsoEvidenceQuery.IsoIdentifierEvidence(message,
                                 PaymentIsoEvidenceQuery.IsoIdentifierType.END_TO_END_ID, "E2E-1"))));

@@ -33,6 +33,8 @@ import org.w3c.dom.NodeList;
 public class Pain001CanonicalMapper implements CanonicalMapper {
 
     static final String SUPPORTED_NAMESPACE = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09";
+    /** Exact version accepted by this channel; every persisted {@code pain.001} row passed this parser. */
+    static final String MESSAGE_VERSION = "pain.001.001.09";
     private static final String PAIN001_NAMESPACE_PREFIX = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.";
 
     @Override

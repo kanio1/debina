@@ -47,7 +47,7 @@ query PaymentAuditTrail($paymentId: ID!, $first: Int!, $after: String) {
 query PaymentIsoEvidence($paymentId: ID!) {
   paymentIsoEvidence(paymentId: $paymentId) {
     paymentId
-    messages { isoMessageId messageType versionEffectiveFrom lineageRole lineageRecordedAt }
+    messages { isoMessageId messageType messageVersion versionEffectiveFrom lineageRole lineageRecordedAt }
     identifiers { isoMessageId type value }
   }
 }

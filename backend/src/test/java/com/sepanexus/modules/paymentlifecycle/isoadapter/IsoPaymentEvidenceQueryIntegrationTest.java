@@ -67,15 +67,17 @@ class IsoPaymentEvidenceQueryIntegrationTest {
         message(jsonMessage, "JSON_DIRECT", TENANT_A, jsonAt, null);
         identifier(payment, jsonMessage, "JSON_DIRECT", null, null, null, "E2E-JSON", null, null);
         lineage(payment, jsonMessage, jsonAt);
-        version("pain.001.001.09", LocalDate.of(2025, 1, 1));
-        message(painMessage, "pain.001.001.09", TENANT_A, painAt, painAt);
-        identifier(payment, painMessage, "pain.001.001.09", "MSG-1", "PMT-1", null, "E2E-PAIN", null, null);
+        version("pain.001", LocalDate.of(2025, 1, 1));
+        message(painMessage, "pain.001", TENANT_A, painAt, painAt);
+        identifier(payment, painMessage, "pain.001", "MSG-1", "PMT-1", null, "E2E-PAIN", null, null);
         lineage(payment, painMessage, painAt);
 
         PaymentIsoEvidenceQuery.PaymentIsoEvidence evidence = evidenceQuery.evidence(TENANT_A, BRANCH_A, payment);
 
         assertThat(evidence.messages()).extracting(PaymentIsoEvidenceQuery.IsoMessageEvidence::messageType)
-                .containsExactly("JSON_DIRECT", "pain.001.001.09");
+                .containsExactly("JSON_DIRECT", "pain.001");
+        assertThat(evidence.messages().get(0).messageVersion()).isNull();
+        assertThat(evidence.messages().get(1).messageVersion()).isEqualTo("pain.001.001.09");
         assertThat(evidence.messages().get(0).lineageRole()).isEqualTo("ORIGINAL_INSTRUCTION");
         assertThat(evidence.messages().get(0).versionEffectiveFrom()).isEqualTo(LocalDate.of(2000, 1, 1));
         assertThat(evidence.messages().get(1).versionEffectiveFrom()).isEqualTo(LocalDate.of(2025, 1, 1));

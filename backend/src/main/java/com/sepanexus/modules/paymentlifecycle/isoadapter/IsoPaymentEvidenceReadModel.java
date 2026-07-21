@@ -37,9 +37,13 @@ class IsoPaymentEvidenceReadModel implements PaymentIsoEvidenceQuery {
                 ) version ON true
                 WHERE ml.payment_id = ? AND im.tenant_id = ?
                 ORDER BY ml.created_at ASC, ml.iso_message_id ASC, ml.id ASC
-                """, (rs, ignored) -> new IsoMessageEvidence(UUID.fromString(rs.getString(1)), rs.getString(2),
-                rs.getObject(3, Date.class) == null ? null : rs.getObject(3, Date.class).toLocalDate(), rs.getString(4),
-                rs.getObject(5, Timestamp.class).toInstant()), paymentId, tenantId);
+                """, (rs, ignored) -> {
+                    String messageType = rs.getString(2);
+                    return new IsoMessageEvidence(UUID.fromString(rs.getString(1)), messageType,
+                            messageVersion(messageType),
+                            rs.getObject(3, Date.class) == null ? null : rs.getObject(3, Date.class).toLocalDate(),
+                            rs.getString(4), rs.getObject(5, Timestamp.class).toInstant());
+                }, paymentId, tenantId);
         List<IsoIdentifierEvidence> identifiers = jdbcTemplate.query("""
                 SELECT pii.iso_message_id, identifier.type, identifier.value
                 FROM iso.payment_iso_identifiers pii
@@ -53,5 +57,9 @@ class IsoPaymentEvidenceReadModel implements PaymentIsoEvidenceQuery {
                 """, (rs, ignored) -> new IsoIdentifierEvidence(UUID.fromString(rs.getString(1)),
                 IsoIdentifierType.valueOf(rs.getString(2)), rs.getString(3)), paymentId, tenantId);
         return new PaymentIsoEvidence(paymentId, messages, identifiers);
+    }
+
+    private static String messageVersion(String messageType) {
+        return Pain001LineageRecorder.MESSAGE_TYPE.equals(messageType) ? Pain001CanonicalMapper.MESSAGE_VERSION : null;
     }
 }

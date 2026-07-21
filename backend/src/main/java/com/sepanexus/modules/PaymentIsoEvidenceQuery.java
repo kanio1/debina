@@ -11,7 +11,7 @@ public interface PaymentIsoEvidenceQuery {
 
     record PaymentIsoEvidence(UUID paymentId, List<IsoMessageEvidence> messages,
                               List<IsoIdentifierEvidence> identifiers) { }
-    record IsoMessageEvidence(UUID isoMessageId, String messageType, LocalDate versionEffectiveFrom,
+    record IsoMessageEvidence(UUID isoMessageId, String messageType, String messageVersion, LocalDate versionEffectiveFrom,
                               String lineageRole, Instant lineageRecordedAt) { }
     record IsoIdentifierEvidence(UUID isoMessageId, IsoIdentifierType type, String value) { }
     enum IsoIdentifierType { MSG_ID, PMT_INF_ID, INSTR_ID, END_TO_END_ID, TX_ID, UETR }

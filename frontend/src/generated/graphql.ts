@@ -54,7 +54,7 @@ export type PaymentIsoEvidenceQueryVariables = Exact<{
 }>;
 
 
-export type PaymentIsoEvidenceQuery = { paymentIsoEvidence: { paymentId: string, messages: Array<{ isoMessageId: string, messageType: string, versionEffectiveFrom: string | null, lineageRole: string, lineageRecordedAt: string }>, identifiers: Array<{ isoMessageId: string, type: IsoIdentifierType, value: string }> } | null };
+export type PaymentIsoEvidenceQuery = { paymentIsoEvidence: { paymentId: string, messages: Array<{ isoMessageId: string, messageType: string, messageVersion: string | null, versionEffectiveFrom: string | null, lineageRole: string, lineageRecordedAt: string }>, identifiers: Array<{ isoMessageId: string, type: IsoIdentifierType, value: string }> } | null };
 
 export type AuditEntriesQueryVariables = Exact<{
   auditFilter: AuditQueryFilter;

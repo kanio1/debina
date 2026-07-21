@@ -20,6 +20,7 @@ class PaymentLineageGraphQLTest {
         assertThat(schema).contains("paymentIsoEvidence(paymentId: ID!): PaymentIsoEvidence");
         assertThat(schema).contains("type PaymentIsoEvidence");
         assertThat(schema).contains("type IsoMessageEvidence");
+        assertThat(schema).contains("messageVersion: String");
         assertThat(schema).contains("enum IsoIdentifierType");
     }
 }
