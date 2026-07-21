@@ -147,8 +147,9 @@ capabilities:
         produces: cap.audit.same-transaction-command-append
       - id: 77.3
         title: "Internal audit query and integrity proof"
-        status: not-started
+        status: done
         requires: [cap.audit.same-transaction-command-append]
+        produces: cap.audit.internal-query
 
   - epic: EPIC-76
     title: "Payment approval: maker–checker prefix gate"

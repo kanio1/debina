@@ -1,6 +1,9 @@
 package com.sepanexus.graphql;
 
 import com.sepanexus.modules.ApprovalQueueQuery;
+import com.sepanexus.evidenceaudit.AuditQueryPort;
+import com.sepanexus.evidenceaudit.CommandAuditOutcome;
+import java.time.Instant;
 import java.util.UUID;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -14,8 +17,12 @@ import org.springframework.stereotype.Controller;
 @Controller
 class ApprovalGraphQlController {
     private final ApprovalQueueQuery approvalQueue;
+    private final AuditQueryPort auditQuery;
 
-    ApprovalGraphQlController(ApprovalQueueQuery approvalQueue) { this.approvalQueue = approvalQueue; }
+    ApprovalGraphQlController(ApprovalQueueQuery approvalQueue, AuditQueryPort auditQuery) {
+        this.approvalQueue = approvalQueue;
+        this.auditQuery = auditQuery;
+    }
 
     @QueryMapping
     @PreAuthorize("hasRole('payment_approver')")
@@ -29,6 +36,19 @@ class ApprovalGraphQlController {
     ApprovalQueueQuery.ApprovalDetail approval(@Argument UUID paymentId) {
         Jwt jwt = currentJwt();
         return approvalQueue.approval(UUID.fromString(jwt.getClaimAsString("tenant_id")), branchId(jwt), paymentId);
+    }
+
+    @QueryMapping
+    AuditQueryPort.AuditPage paymentAuditTrail(@Argument UUID paymentId, @Argument int first, @Argument String after) {
+        return auditQuery.paymentTrail(paymentId, first, after);
+    }
+
+    @QueryMapping
+    AuditQueryPort.AuditPage auditEntries(@Argument AuditEntryFilterInput filter, @Argument int first, @Argument String after) {
+        return auditQuery.search(new AuditQueryPort.AuditSearchFilter(filter.tenantId(), filter.branchId(),
+                filter.targetType(), filter.targetId(), filter.paymentId(), filter.batchId(), filter.actorId(),
+                filter.commandType(), filter.outcome() == null ? null : CommandAuditOutcome.valueOf(filter.outcome()),
+                filter.correlationId(), parseInstant(filter.occurredFrom()), parseInstant(filter.occurredTo())), first, after);
     }
 
     @SchemaMapping(typeName = "Approval", field = "decisionComment")
@@ -51,4 +71,12 @@ class ApprovalGraphQlController {
         String value = jwt.getClaimAsString("branch_id");
         return value == null || value.isBlank() ? null : UUID.fromString(value);
     }
+
+    private static Instant parseInstant(String value) {
+        return value == null || value.isBlank() ? null : Instant.parse(value);
+    }
+
+    record AuditEntryFilterInput(UUID tenantId, UUID branchId, String targetType, UUID targetId, UUID paymentId,
+                                 UUID batchId, String actorId, String commandType, String outcome,
+                                 UUID correlationId, String occurredFrom, String occurredTo) { }
 }

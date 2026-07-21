@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sepanexus.SepaNexusApplication;
+import com.sepanexus.evidenceaudit.AuditQueryPort;
 import com.sepanexus.modules.ApprovalQueueQuery;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -41,6 +42,7 @@ class ApprovalGraphQlRuntimeTest {
 
     @Autowired MockMvc mockMvc;
     @MockitoBean ApprovalQueueQuery approvalQueue;
+    @MockitoBean AuditQueryPort auditQuery;
 
     @Test
     void authenticatedApproverReceivesPaymentOwnedQueueDto() throws Exception {
@@ -89,6 +91,38 @@ class ApprovalGraphQlRuntimeTest {
                         .content("{\"query\":\"query { approvalQueue(first: 1) { nextCursor } }\"}")
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
                                 .authorities(() -> "ROLE_payment_submitter")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0].message").exists());
+    }
+
+    @Test
+    void operatorCanReadOnlyTheSourceOwnedPaymentAuditDto() throws Exception {
+        UUID payment = UUID.randomUUID();
+        when(auditQuery.paymentTrail(any(), any(), any())).thenReturn(new AuditQueryPort.AuditPage(List.of(
+                new AuditQueryPort.AuditEntry(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
+                        Instant.parse("2026-07-21T10:00:00Z"), com.sepanexus.evidenceaudit.ActorType.HUMAN,
+                        "operator", "operator", UUID.randomUUID(), "PAYMENT_APPROVAL_APPROVE",
+                        "PAYMENT_APPROVAL", UUID.randomUUID(), payment, null,
+                        com.sepanexus.evidenceaudit.CommandAuditOutcome.SUCCESS, "approved",
+                        new AuditQueryPort.AuditSnapshot("before", "PENDING_APPROVAL"),
+                        new AuditQueryPort.AuditSnapshot("after", "APPROVED"))), null));
+
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"query { paymentAuditTrail(paymentId: \\\"" + payment + "\\\", first: 10) { items { paymentId commandType beforeState { approvalStatus } } } }\"}")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_operator")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.paymentAuditTrail.items[0].paymentId").value(payment.toString()))
+                .andExpect(jsonPath("$.data.paymentAuditTrail.items[0].commandType").value("PAYMENT_APPROVAL_APPROVE"))
+                .andExpect(jsonPath("$.data.paymentAuditTrail.items[0].beforeState.approvalStatus").value("PENDING_APPROVAL"));
+    }
+
+    @Test
+    void nonAuditorCannotUseCrossTenantAuditSearch() throws Exception {
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"query { auditEntries(filter: {}, first: 10) { nextCursor } }\"}")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_operator")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[0].message").exists());
     }

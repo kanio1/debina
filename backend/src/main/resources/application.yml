@@ -61,6 +61,11 @@ approval-expiry:
     url: ${APPROVAL_EXPIRY_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
     username: ${APPROVAL_EXPIRY_DB_USER:approval_expiry_role}
     password: ${APPROVAL_EXPIRY_DB_PASSWORD:dev-only-approval-expiry}
+audit-auditor:
+  datasource:
+    url: ${AUDIT_AUDITOR_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
+    username: ${AUDIT_AUDITOR_DB_USER:audit_auditor_role}
+    password: ${AUDIT_AUDITOR_DB_PASSWORD:dev-only-audit-auditor}
 server:
   port: 8081
 management:
