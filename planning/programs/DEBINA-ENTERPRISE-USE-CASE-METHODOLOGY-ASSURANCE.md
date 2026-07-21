@@ -19,3 +19,7 @@ Deep-corrected: `UC-SCT-APPROVAL-001`, `UC-SCT-001`, `UC-SCT-003`, `UC-SCTINST-0
 ## Remaining review and Phase D recommendation
 
 Human review remains required for all AI drafts, qualified participant rail profiles, diagram readability and quality measures marked as gaps. Phase D may use the governance runner only after separate authorization; this assurance phase does not create Dagger code.
+
+## Commit record
+
+- `c011c9b feat(governance): assure enterprise use-case methodology` — assurance policies, skill/template remediation, audits, representative use-case corrections, validators and adversarial proofs.

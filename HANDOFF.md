@@ -8,7 +8,7 @@ Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research plat
 
 - Audited all 15 use cases and 38 slices in `docs/governance/methodology-assurance/`; deep-corrected approval, single/file SCT, SCT Inst, inbound status and audit investigation use cases.
 - Added adaptive `OUTLINE`/`ESSENTIAL`/`FULLY_DRESSED` templates, honest AI/human discovery states, per-claim source evidence, structured quality scenarios, C4 review metadata and `ATAM_INSPIRED_DESK_REVIEW` classification.
-- Enhanced the four enterprise governance skills and added methodology/C4 structural validators with ten adversarial fixtures. The governance runner and skill discovery pass; legacy warnings remain 296 traceability and 69 planning semantic warnings.
+- Enhanced the four enterprise governance skills and added methodology/C4 structural validators with ten adversarial fixtures in `c011c9b`. The governance runner and skill discovery pass; legacy warnings remain 296 traceability and 69 planning semantic warnings.
 
 ## Utknęliśmy na
 
