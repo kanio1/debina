@@ -126,7 +126,7 @@ class EgressCannotWritePaymentStatusTest {
     void egressRoleCannotTruncatePaymentPayments() {
         assertThatThrownBy(() -> {
             try (Connection connection = egressConnection(); Statement statement = connection.createStatement()) {
-                statement.executeUpdate("TRUNCATE payment.payments");
+                statement.executeUpdate("TRUNCATE payment.payment_approvals, payment.payments");
             }
         }).isInstanceOf(SQLException.class).hasFieldOrPropertyWithValue("SQLState", "42501");
     }

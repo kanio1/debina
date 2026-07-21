@@ -53,7 +53,7 @@ class PaymentAuthorizationTest {
     @BeforeEach
     void seedPayment() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payments, iso.payment_iso_identifiers, iso.message_lineage, "
+            statement.execute("TRUNCATE payment.payment_approvals, payment.payments, iso.payment_iso_identifiers, iso.message_lineage, "
                     + "iso.iso_messages, payment.payment_status_history CASCADE");
         }
         paymentId = insertPayment(TENANT, "e2e-oq14");

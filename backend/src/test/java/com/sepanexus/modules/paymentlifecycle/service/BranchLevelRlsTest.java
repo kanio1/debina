@@ -48,7 +48,7 @@ class BranchLevelRlsTest {
     @BeforeEach
     void seedBranchRows() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payments");
+            statement.execute("TRUNCATE payment.payment_approvals, payment.payments");
         }
         insertPayment(BRANCH_A);
         insertPayment(BRANCH_B);

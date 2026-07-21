@@ -40,7 +40,9 @@ public class PaymentEntity {
     private String creditorIban;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    // §2.2b's approval-gated pre-FSM representation is the sole null case.  The existing
+    // no-approval ingress path still creates RECEIVED; no fake lifecycle status is introduced.
+    @Column
     private PaymentStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)

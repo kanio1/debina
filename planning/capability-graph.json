@@ -435,6 +435,11 @@
       "granularity": "epic-only"
     },
     {
+      "id": "EPIC-76",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
       "id": "EPIC-10.10.1A",
       "type": "STORY",
       "status": "blocked"
@@ -2049,6 +2054,11 @@
     {
       "from": "EPIC-74",
       "to": "EPIC-02",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-76",
+      "to": "EPIC-19",
       "type": "REQUIRES"
     },
     {

@@ -1,8 +1,8 @@
 {
   "generated_by": "tools/agent-config/generate-story-inventory.py",
   "generated_note": "Programmatically extracted from planning/epics/*.md -- no invented data.",
-  "epic_count": 76,
-  "story_count": 285,
+  "epic_count": 77,
+  "story_count": 293,
   "epics": [
     {
       "epic": "EPIC-00",
@@ -383,6 +383,11 @@
       "epic": "EPIC-75",
       "status": "done",
       "source_file": "planning/epics/EPIC-75-documentation-hygiene.md"
+    },
+    {
+      "epic": "EPIC-76",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md"
     }
   ],
   "stories": [
@@ -4332,6 +4337,123 @@
         "grep -n \"3.7.*v2\\|Topic Catalog v2\" sepa-nexus-message-flow-and-data-blueprint.md"
       ],
       "source_file": "planning/epics/EPIC-75-documentation-hygiene.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.1",
+      "title": "Approval persistence, matrix catalog, and pre-FSM representation",
+      "status": "done",
+      "depends_on": [],
+      "verify": [
+        "./mvnw -f backend test -Dtest=ApprovalPersistenceMigrationTest",
+        "./mvnw -f backend test -Dtest=ApprovalPersistenceMigrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.2",
+      "title": "Approval-matrix evaluation and submission prefix gate",
+      "status": "not-started",
+      "depends_on": [
+        "Story 76.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.3",
+      "title": "Approve and reject commands with same-transaction audit",
+      "status": "blocked",
+      "depends_on": [
+        "Story 76.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=ApprovalDecisionAuditIntegrationTest",
+        "./mvnw -f backend test -Dtest=ApprovalDecisionIntegrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.4",
+      "title": "Approval expiry",
+      "status": "blocked",
+      "depends_on": [
+        "Story 76.2",
+        "Story 76.3"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=ApprovalExpiryIntegrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.5",
+      "title": "Module-owned approval queue/detail read model",
+      "status": "not-started",
+      "depends_on": [
+        "Story 76.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=ApprovalQueueReadModelIntegrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.6",
+      "title": "Payments workspace approval queue and command UI",
+      "status": "blocked",
+      "depends_on": [
+        "Story 76.3",
+        "Story 76.5",
+        "gate.graphql-owner"
+      ],
+      "verify": [
+        "pnpm run build && pnpm run lint && pnpm run typecheck"
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.7",
+      "title": "Playwright maker–checker acceptance",
+      "status": "blocked",
+      "depends_on": [
+        "Story 76.6",
+        "Story 24.1"
+      ],
+      "verify": [
+        "pnpm run test:e2e -- --grep \"@smoke.*maker-checker\""
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-76",
+      "story": "76.8",
+      "title": "Batch approval and item override",
+      "status": "blocked",
+      "depends_on": [
+        "Story 76.3",
+        "EPIC-73-ingress-file-rail"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=BatchApprovalIntegrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
       "capability_analysis": "NOT_DEEP_DIVED"
     }
   ]

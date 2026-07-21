@@ -46,7 +46,7 @@ class PaymentsRlsTest {
     @BeforeEach
     void seedTenantRows() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payments");
+            statement.execute("TRUNCATE payment.payment_approvals, payment.payments");
         }
         insertPayment(TENANT_A);
         insertPayment(TENANT_B);

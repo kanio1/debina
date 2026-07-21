@@ -82,7 +82,7 @@ class Pain001SubmissionEndpointTest {
     @BeforeEach
     void cleanTables() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payments, payment.outbox_events, "
+            statement.execute("TRUNCATE payment.payment_approvals, payment.payments, payment.outbox_events, "
                     + "payment.payment_status_history, payment.payment_events, "
                     + "ingress.idempotency_keys, ingress.raw_inbound_messages, "
                     + "iso.payment_iso_identifiers, iso.message_lineage, iso.iso_messages, "

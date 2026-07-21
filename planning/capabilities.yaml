@@ -119,6 +119,37 @@ decision_resolutions_2026_07_20:
       scope and a physical payment.received writer move remain outside this program.
 
 capabilities:
+  - epic: EPIC-76
+    title: "Payment approval: maker–checker prefix gate"
+    granularity: story-backed
+    source: "message-flow §2.2b [FREEZE]; Keycloak security §§5, 10, 12"
+    stories:
+      - id: 76.1
+        title: "Approval persistence, matrix catalog, and pre-FSM representation"
+        status: done
+        produces: cap.payment.approval-persistence
+        note: "V53/V54 plus ADR-W7-01: approval status is independent; a pending approval has no business status."
+      - id: 76.2
+        title: "Approval-matrix evaluation and submission prefix gate"
+        status: not-started
+        requires: [cap.payment.approval-persistence]
+      - id: 76.3
+        title: "Approve/reject commands with same-transaction audit"
+        status: blocked
+        requires: ["76.2", cap.audit.command-log]
+        note: "CAPABILITY-BLOCKED: audit.audit_log is evidence-audit owned but no module/port/schema capability exists."
+      - id: 76.4
+        title: "Approval expiry"
+        status: blocked
+        requires: ["76.2", "76.3"]
+      - id: 76.5
+        title: "Module-owned approval queue/detail read model"
+        status: not-started
+        requires: [cap.payment.approval-persistence]
+      - id: 76.6
+        title: "Payments workspace approval queue and command UI"
+        status: blocked
+        requires: ["76.3", "76.5", gate.graphql-owner]
   - epic: EPIC-10
     title: "Ownership: ISO lineage split"
     granularity: story-backed

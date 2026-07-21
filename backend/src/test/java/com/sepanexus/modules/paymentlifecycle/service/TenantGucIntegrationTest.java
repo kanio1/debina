@@ -47,7 +47,7 @@ class TenantGucIntegrationTest {
     @BeforeEach
     void seedTenantRows() throws Exception {
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payments, iso.payment_iso_identifiers, iso.message_lineage, "
+            statement.execute("TRUNCATE payment.payment_approvals, payment.payments, iso.payment_iso_identifiers, iso.message_lineage, "
                     + "iso.iso_messages CASCADE");
         }
         insertPayment(TENANT_A, "e2e-tenant-a");
