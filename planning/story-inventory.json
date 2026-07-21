@@ -1,8 +1,8 @@
 {
   "generated_by": "tools/agent-config/generate-story-inventory.py",
   "generated_note": "Programmatically extracted from planning/epics/*.md -- no invented data.",
-  "epic_count": 77,
-  "story_count": 293,
+  "epic_count": 78,
+  "story_count": 296,
   "epics": [
     {
       "epic": "EPIC-00",
@@ -388,6 +388,11 @@
       "epic": "EPIC-76",
       "status": "in-progress",
       "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md"
+    },
+    {
+      "epic": "EPIC-77",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-77-evidence-audit-command-log.md"
     }
   ],
   "stories": [
@@ -4454,6 +4459,50 @@
         "./mvnw -f backend test -Dtest=BatchApprovalIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-77",
+      "story": "77.1",
+      "title": "Immutable audit persistence, ownership, RLS and grants",
+      "status": "done",
+      "depends_on": [
+        "EPIC-09"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=CommandAuditMigrationTest",
+        "./mvnw -f backend test -Dtest=CommandAuditArchitectureTest,ModularityTest"
+      ],
+      "source_file": "planning/epics/EPIC-77-evidence-audit-command-log.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-77",
+      "story": "77.2",
+      "title": "Same-transaction command audit and denied-command boundary",
+      "status": "not-started",
+      "depends_on": [
+        "Story 77.1"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=CommandAuditTransactionIntegrationTest",
+        "./mvnw -f backend test -Dtest=DeniedCommandAuditIntegrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-77-evidence-audit-command-log.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-77",
+      "story": "77.3",
+      "title": "Internal audit query and integrity proof",
+      "status": "not-started",
+      "depends_on": [
+        "Story 77.2"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=CommandAuditQueryIntegrationTest"
+      ],
+      "source_file": "planning/epics/EPIC-77-evidence-audit-command-log.md",
       "capability_analysis": "NOT_DEEP_DIVED"
     }
   ]

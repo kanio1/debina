@@ -55,6 +55,11 @@
   ],
   "nodes": [
     {
+      "id": "EPIC-77",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
       "id": "EPIC-00",
       "type": "EPIC",
       "granularity": "epic-only"
@@ -2059,6 +2064,16 @@
     {
       "from": "EPIC-76",
       "to": "EPIC-19",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-76",
+      "to": "EPIC-77",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-77",
+      "to": "EPIC-09",
       "type": "REQUIRES"
     },
     {

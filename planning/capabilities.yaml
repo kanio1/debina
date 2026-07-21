@@ -119,6 +119,26 @@ decision_resolutions_2026_07_20:
       scope and a physical payment.received writer move remain outside this program.
 
 capabilities:
+  - epic: EPIC-77
+    title: "Evidence-audit: immutable application command log"
+    granularity: story-backed
+    source: "message-flow §§3.5, 3.6.1-3.6.3, 4.7; Keycloak security §§6, 9, 12-13"
+    stories:
+      - id: 77.1
+        title: "Immutable audit persistence, ownership, RLS and grants"
+        status: done
+        produces: cap.audit.command-log
+        note: "Source-owned audit.audit_log; no Keycloak-event duplication, raw payload retention or hash chaining."
+      - id: 77.2
+        title: "Same-transaction command audit and denied-command boundary"
+        status: not-started
+        requires: [cap.audit.command-log]
+        produces: cap.audit.same-transaction-command-append
+      - id: 77.3
+        title: "Internal audit query and integrity proof"
+        status: not-started
+        requires: [cap.audit.same-transaction-command-append]
+
   - epic: EPIC-76
     title: "Payment approval: maker–checker prefix gate"
     granularity: story-backed
@@ -136,8 +156,8 @@ capabilities:
       - id: 76.3
         title: "Approve/reject commands with same-transaction audit"
         status: blocked
-        requires: ["76.2", cap.audit.command-log]
-        note: "CAPABILITY-BLOCKED: audit.audit_log is evidence-audit owned but no module/port/schema capability exists."
+        requires: ["76.2", cap.audit.same-transaction-command-append]
+        note: "CAPABILITY-BLOCKED until EPIC-77 Story 77.2 proves the source-owned same-transaction audit boundary."
       - id: 76.4
         title: "Approval expiry"
         status: blocked

@@ -5,5 +5,5 @@
  * as later ownership epics (EPIC-10+) introduce real ports this module needs (e.g. iso-adapter,
  * reference-data).
  */
-@org.springframework.modulith.ApplicationModule(allowedDependencies = {"shared", "signature"})
+@org.springframework.modulith.ApplicationModule(allowedDependencies = {"shared", "signature", "evidenceaudit"})
 package com.sepanexus.modules;
