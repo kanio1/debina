@@ -93,3 +93,17 @@ foreign-branch approver denials occur before domain/idempotency mutation and lea
   additions. Current remaining final-gate work: dedicated physical transaction identity,
   reject/expiry audit-append failure injection, HTTP boundary proof and rerunning final regressions
   after the proof additions.
+
+## Final runtime gate
+
+- Physical same-transaction proof: the command transaction's `txid_current()` equals the inserted
+  audit row's `xmin`; marking that transaction rollback-only leaves no audit row.
+- Controlled audit failure now covers approve, reject and expiry. Each preserves
+  `PENDING_APPROVAL`, leaves no successful audit/idempotency/outbox state, and restores the
+  temporary expiry-function grant. `ApprovalSubmissionIntegrationTest` is **16/0/0**.
+- `PaymentControllerTest` is **8/0/0**, covering the role-bound approve HTTP DTO and mandatory
+  `Idempotency-Key` boundary. Logs: `physical-transaction-proof.log`,
+  `decision-and-expiry-audit-failures-green.log`, `http-decision-boundary.log`.
+- Final governance, inventory, capability graph, skill and diff validators pass. Two consecutive
+  full backend runs from `e014a89` are **514/0/0** in `final-backend-regression-1.log` and
+  `final-backend-regression-2.log`. No push occurred.
