@@ -5,6 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sepanexus.SepaNexusApplication;
 import com.sepanexus.evidenceaudit.CommandAuditPort;
+import com.sepanexus.evidenceaudit.ActorType;
+import com.sepanexus.evidenceaudit.CommandAuditEntry;
+import com.sepanexus.evidenceaudit.CommandAuditOutcome;
 import com.sepanexus.evidenceaudit.DeniedCommandAuditPort;
 import com.sepanexus.shared.ClockPort;
 import java.math.BigDecimal;
@@ -28,6 +31,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 /** PostgreSQL 18 proof for the frozen approval prefix gate (EPIC-76 Story 76.2). */
@@ -49,6 +55,12 @@ class ApprovalSubmissionIntegrationTest {
 
     @Autowired
     private ApprovalExpiryService approvalExpiryService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @MockitoSpyBean
     private CommandAuditPort commandAuditPort;
@@ -277,6 +289,48 @@ class ApprovalSubmissionIntegrationTest {
     }
 
     @Test
+    void auditAppendFailureRollsBackRejectAndIdempotency() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+        var command = new ApprovalDecisionCommand(tenant, branch, payment, "checker", "sid-reject-failure", UUID.randomUUID(),
+                "reject-audit-failure-key", "reject must roll back", ApprovalDecisionCommand.Decision.REJECT);
+        org.mockito.Mockito.doThrow(new IllegalStateException("controlled reject audit failure"))
+                .when(commandAuditPort).append(org.mockito.ArgumentMatchers.any());
+
+        withApproverJwt(tenant, branch, "checker", () -> assertThatThrownBy(() -> approvalDecisionService.decide(command))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("controlled reject audit failure"));
+
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = ? AND status = 'PENDING_APPROVAL'", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
+    }
+
+    @Test
+    void successfulAuditAppendUsesThePhysicalCommandTransactionAndRollsBackWithIt() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID auditId = new TransactionTemplate(transactionManager).execute(status -> {
+            jdbcTemplate.queryForObject("SELECT set_config('app.tenant_id', ?, true)", String.class, tenant.toString());
+            jdbcTemplate.queryForObject("SELECT set_config('app.branch_id', ?, true)", String.class, branch.toString());
+            Long transactionId = jdbcTemplate.queryForObject("SELECT txid_current()", Long.class);
+            UUID written = commandAuditPort.append(new CommandAuditEntry(tenant, branch, ActorType.HUMAN, "checker-tx",
+                    "payment_approver", "sid-tx", UUID.randomUUID(), "PAYMENT_APPROVAL_APPROVED", "PAYMENT_APPROVAL",
+                    UUID.randomUUID(), UUID.randomUUID(), null, null, java.util.Map.of("status", "PENDING_APPROVAL"),
+                    java.util.Map.of("status", "APPROVED"), CommandAuditOutcome.SUCCESS, UUID.randomUUID(), Instant.now()));
+            Long insertedTransactionId = jdbcTemplate.queryForObject(
+                    "SELECT xmin::text::bigint FROM audit.audit_log WHERE audit_entry_id = ?", Long.class, written);
+            assertThat(insertedTransactionId).isEqualTo(transactionId);
+            status.setRollbackOnly();
+            return written;
+        });
+        assertThat(auditId).isNotNull();
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE audit_entry_id = ?", auditId)).isZero();
+    }
+
+    @Test
     void twoDistinctCheckersRaceAndOnlyOneAuditedApprovalCommits() throws Exception {
         UUID tenant = UUID.randomUUID();
         UUID branch = UUID.randomUUID();
@@ -342,6 +396,29 @@ class ApprovalSubmissionIntegrationTest {
         }
         assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
         assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", payment)).isEqualTo(1);
+    }
+
+    @Test
+    void expiryAuditAppendFailureRollsBackTheExpiryTransition() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now().minusSeconds(90_000),
+                Instant.now().minusSeconds(1)));
+        String appendFunction = "audit.append_command_audit(uuid,uuid,text,text,text,text,uuid,text,text,uuid,uuid,uuid,text,jsonb,jsonb,text,uuid,timestamptz)";
+        try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+            statement.execute("REVOKE EXECUTE ON FUNCTION " + appendFunction + " FROM payment_approval_expiry_function_owner");
+        }
+        try {
+            assertThatThrownBy(() -> approvalExpiryService.expireDueApprovals(10)).isInstanceOf(RuntimeException.class);
+        } finally {
+            try (Connection connection = admin(); Statement statement = connection.createStatement()) {
+                statement.execute("GRANT EXECUTE ON FUNCTION " + appendFunction + " TO payment_approval_expiry_function_owner");
+            }
+        }
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = ? AND status = 'PENDING_APPROVAL'", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
     }
 
     private static SubmitPaymentCommand command(UUID tenantId, UUID branchId, String maker, String idempotencyKey) {
