@@ -37,7 +37,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ type: "about:blank", title: "Request too large", status: 413 }, { status: 413 });
   }
   let body: { operationName?: unknown; variables?: unknown };
-  try { body = await request.json(); } catch {
+  let rawBody: string;
+  try {
+    rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ type: "about:blank", title: "Request too large", status: 413 }, { status: 413 });
+    }
+    body = JSON.parse(rawBody) as { operationName?: unknown; variables?: unknown };
+  } catch {
     return NextResponse.json({ type: "about:blank", title: "Malformed JSON body", status: 400 }, { status: 400 });
   }
   if (!isOperationName(body.operationName) || (body.variables !== undefined && (typeof body.variables !== "object" || body.variables === null || Array.isArray(body.variables)))) {

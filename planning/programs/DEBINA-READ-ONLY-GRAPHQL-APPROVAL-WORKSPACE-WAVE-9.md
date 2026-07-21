@@ -90,3 +90,11 @@ non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof bef
   blocks self-approval; confirms approve; requires a rejection comment; and never alters an item
   until the REST response succeeds and the GraphQL queue is refetched. Frontend lint, typecheck
   and production build are GREEN (one pre-existing TanStack React Compiler lint warning only).
+
+## Detail and BFF hardening checkpoint
+
+- The Spring schema inspection now reports no unmapped fields: explicit source-DTO mappings expose
+  the nullable `decisionComment` and `decidedAt` detail fields without exposing an entity. The
+  focused runtime test covers the detail contract as well as a submitter-role denial.
+- The GraphQL BFF checks both declared and actual UTF-8 body size before parsing JSON, so a missing
+  or false `Content-Length` cannot bypass its 16 KiB request bound.

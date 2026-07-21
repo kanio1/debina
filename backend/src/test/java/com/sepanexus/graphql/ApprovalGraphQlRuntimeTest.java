@@ -61,9 +61,36 @@ class ApprovalGraphQlRuntimeTest {
     }
 
     @Test
+    void authenticatedApproverReceivesPaymentOwnedDetailDto() throws Exception {
+        UUID payment = UUID.randomUUID();
+        when(approvalQueue.approval(any(), any(), any())).thenReturn(new ApprovalQueueQuery.ApprovalDetail(
+                UUID.randomUUID(), payment, "APPROVED", "maker", Instant.parse("2026-07-21T10:00:00Z"),
+                Instant.parse("2026-07-22T10:00:00Z"), UUID.randomUUID(), new BigDecimal("10.00"), "EUR",
+                "DE89370400440532013000", "FR7630006000011234567890189", false, "approved", Instant.parse("2026-07-21T11:00:00Z")));
+
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"query { approval(paymentId: \\\"" + payment + "\\\") { paymentId decisionComment decidedAt } }\"}")
+                        .with(approverJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.approval.paymentId").value(payment.toString()))
+                .andExpect(jsonPath("$.data.approval.decisionComment").value("approved"))
+                .andExpect(jsonPath("$.data.approval.decidedAt").value("2026-07-21T11:00:00Z"));
+    }
+
+    @Test
     void missingBearerIsRejectedBeforeGraphqlExecution() throws Exception {
         mockMvc.perform(post("/graphql").contentType("application/json").content("{\"query\":\"{ __typename }\"}"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void submitterCannotReadTheApproverQueue() throws Exception {
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"query { approvalQueue(first: 1) { nextCursor } }\"}")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_payment_submitter")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0].message").exists());
     }
 
     @Test
