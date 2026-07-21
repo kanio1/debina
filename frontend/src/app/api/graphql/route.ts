@@ -20,6 +20,7 @@ const OPERATIONS = {
     }
   }`,
   PaymentAuditTrail: `query PaymentAuditTrail($paymentId: ID!, $first: Int!, $after: String) { paymentAuditTrail(paymentId: $paymentId, first: $first, after: $after) { items { auditEntryId tenantId branchId occurredAt actorType actorId authorizedRole correlationId commandType targetType targetId paymentId batchId outcome decisionComment beforeState { approvalId approvalStatus } afterState { approvalId approvalStatus } } nextCursor } }`,
+  PaymentIsoEvidence: `query PaymentIsoEvidence($paymentId: ID!) { paymentIsoEvidence(paymentId: $paymentId) { paymentId messages { isoMessageId messageType versionEffectiveFrom lineageRole lineageRecordedAt } identifiers { isoMessageId type value } } }`,
   AuditEntries: `query AuditEntries($auditFilter: AuditQueryFilter!, $first: Int!, $after: String) { auditEntries(filter: $auditFilter, first: $first, after: $after) { items { auditEntryId tenantId branchId occurredAt actorType actorId authorizedRole correlationId commandType targetType targetId paymentId batchId outcome decisionComment beforeState { approvalId approvalStatus } afterState { approvalId approvalStatus } } nextCursor } }`,
 } as const;
 

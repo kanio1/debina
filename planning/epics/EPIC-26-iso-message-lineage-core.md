@@ -43,12 +43,14 @@ Taski:
 
 ## Story 26.4 — Panel lineage w GraphQL szczegółu płatności
 
-status: blocked
+status: in-progress
 depends_on: [Story 26.2, Story 26.3]
 
 `[PLANNING-DEFECT 2026-07-14]`: GraphQL **nie istnieje w ogóle** w tym repo (potwierdzone wcześniej w `EPIC-16`: brak `spring-graphql`/`graphql-java` w `backend/pom.xml`) — budowanie panelu GraphQL teraz byłoby wynajdywaniem architektury na wyrost, w dodatku Story 26.3 (od którego to zależy) też jest `blocked`. **Status `blocked`** — odblokuj razem z pierwszym epikiem budującym warstwę GraphQL (prawdopodobnie `EPIC-16`/frontend-owy epik read-model).
 
 `[H8, 2026-07-16 — dual-agent governance/backlog-redesign session]`: this story's own deliverable (a read-model/GraphQL/frontend-facing lineage panel) is a different kind of work than its three sibling stories in this epic (26.1–26.3, all DB-migration/lineage-write concerns) — noted, not moved, since renumbering it into another epic file is a bigger structural change than this session's scope covers. Surfaced a real, previously-untracked planning gap while checking this: **`[OPEN-QUESTION]` — no epic in `/planning/` currently owns *building* the GraphQL layer itself.** `EPIC-16` only covers *ownership enforcement* of a GraphQL layer once one exists (grants/RLS on read models), and `EPIC-23` Story 23.1B only covers *codegen* once a GraphQL schema exists. Nothing currently specifies who writes the first `spring-graphql` schema/resolver. Not resolved here — recorded for `HANDOFF.md`/a future planning session, per this repo's own "don't invent architecture, record open questions" rule.
+
+`[READY → IMPLEMENTED-BUT-UNVERIFIED WAVE-11 2026-07-21]`: the GraphQL-missing blocker above was stale after Wave 9 (`EPIC-78` Query-only transport/codegen/BFF) and Wave 10 (Evidence Drawer). Direct dependencies 26.2/26.3 are done. Wave 11 added the ISO-owned typed read port, Query-only field, fixed BFF operation and independent drawer section, with structural RED/GREEN and frontend build proof. It is **not done** until Testcontainers/runtime JSON_DIRECT + signed pain.001, tenant/branch and role evidence, and the required full regressions pass; see `planning/programs/DEBINA-ISO-LINEAGE-IDENTIFIER-EVIDENCE-WAVE-11.md`.
 
 Taski:
 - [ ] **Read model GraphQL: timeline lineage + panel identyfikatorów na szczególe płatności.**

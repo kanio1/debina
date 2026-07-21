@@ -1,6 +1,7 @@
 package com.sepanexus.graphql;
 
 import com.sepanexus.modules.ApprovalQueueQuery;
+import com.sepanexus.modules.PaymentIsoEvidenceQuery;
 import com.sepanexus.evidenceaudit.AuditQueryPort;
 import com.sepanexus.evidenceaudit.CommandAuditOutcome;
 import java.time.Instant;
@@ -18,10 +19,13 @@ import org.springframework.stereotype.Controller;
 class ApprovalGraphQlController {
     private final ApprovalQueueQuery approvalQueue;
     private final AuditQueryPort auditQuery;
+    private final PaymentIsoEvidenceQuery paymentIsoEvidenceQuery;
 
-    ApprovalGraphQlController(ApprovalQueueQuery approvalQueue, AuditQueryPort auditQuery) {
+    ApprovalGraphQlController(ApprovalQueueQuery approvalQueue, AuditQueryPort auditQuery,
+            PaymentIsoEvidenceQuery paymentIsoEvidenceQuery) {
         this.approvalQueue = approvalQueue;
         this.auditQuery = auditQuery;
+        this.paymentIsoEvidenceQuery = paymentIsoEvidenceQuery;
     }
 
     @QueryMapping
@@ -41,6 +45,13 @@ class ApprovalGraphQlController {
     @QueryMapping
     AuditQueryPort.AuditPage paymentAuditTrail(@Argument UUID paymentId, @Argument int first, @Argument String after) {
         return auditQuery.paymentTrail(paymentId, first, after);
+    }
+
+    @QueryMapping
+    @PreAuthorize("hasAnyRole('payment_viewer','payment_submitter','payment_approver','operator','auditor')")
+    PaymentIsoEvidenceQuery.PaymentIsoEvidence paymentIsoEvidence(@Argument UUID paymentId) {
+        Jwt jwt = currentJwt();
+        return paymentIsoEvidenceQuery.evidence(UUID.fromString(jwt.getClaimAsString("tenant_id")), branchId(jwt), paymentId);
     }
 
     @QueryMapping

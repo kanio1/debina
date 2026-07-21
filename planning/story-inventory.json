@@ -2008,7 +2008,7 @@
       "epic": "EPIC-26",
       "story": "26.4",
       "title": "Panel lineage w GraphQL szczegółu płatności",
-      "status": "blocked",
+      "status": "in-progress",
       "depends_on": [
         "Story 26.2",
         "Story 26.3"

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.sepanexus.modules.ApprovalQueueQuery;
+import com.sepanexus.modules.PaymentIsoEvidenceQuery;
 import com.sepanexus.evidenceaudit.AuditQueryPort;
 import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionService;
 import org.junit.jupiter.api.Test;
@@ -43,5 +44,14 @@ class GraphQLReadModelOwnershipTest {
         assertThat(production.get("com.sepanexus.graphql.ApprovalGraphQlController")
                 .getDirectDependenciesFromSelf().stream().map(dependency -> dependency.getTargetClass().getName()))
                 .contains(AuditQueryPort.class.getName());
+    }
+
+    @Test
+    void transportDependsOnTheExplicitIsoEvidencePortRatherThanIsoInfrastructure() {
+        var production = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .importPackages("com.sepanexus.graphql", "com.sepanexus.modules");
+        assertThat(production.get("com.sepanexus.graphql.ApprovalGraphQlController")
+                .getDirectDependenciesFromSelf().stream().map(dependency -> dependency.getTargetClass().getName()))
+                .contains(PaymentIsoEvidenceQuery.class.getName());
     }
 }

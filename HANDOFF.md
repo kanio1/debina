@@ -2,29 +2,26 @@
 
 ## Zadanie
 
-Wave 10 completed the immutable audit-log read path through `AuditQueryPort`, Query-only GraphQL and fixed BFF operations, the Payment Detail Evidence Drawer, and the auditor `/evidence` workspace.
+SEPA Nexus is a synthetic payment-testing platform. Wave 11 is extending Payment Detail's existing Evidence Drawer with source-owned ISO message lineage and identifiers through Query-only GraphQL and the Next.js BFF.
 
 ## Zrobione
 
-- Recovery start SHA: `7e61ecb85e9eb1e5a31cfcaf18d60863c6e4fa52`; existing Wave 10 commits and interrupted UI/planning work were preserved.
-- Correlation ID copy now uses a guarded Clipboard API call, selectable text, `aria-live="polite"` success/failure feedback, stable test IDs and an honest `—` for a missing value. The evidence workspace uses `useSearchParams`/router URL state, avoiding direct `window` access and hydration mismatch.
-- Focused backend gate passed: **39 tests, 0 failures/errors/skips**. Temporary GraphQL Mutation injection made the read-only structural test RED, was removed, and the GREEN rerun passed.
-- Real Keycloak 26.6.4 + Next BFF + Spring + isolated PostgreSQL 18 proof completed: maker submit, approver approval, permitted operator drawer, auditor workspace/filter/cursor, normal-user denial, unknown-operation rejection and direct-backend 401.
-- Final frontend gate: codegen twice deterministic, codegen check/typecheck/build PASS; lint PASS with only the known TanStack warning. Final backend regressions: **two consecutive runs, each 533 tests, 0 failures/errors/skips**.
-- Story 24.8 is split: 24.8A/24.8B done; 24.8C SOURCE-BLOCKED, 24.8D ITERATION-BLOCKED, 24.8E DECISION-BLOCKED. Governance, story inventory, capability graph and skills validators PASS.
+- Wave 11 began at clean SHA `1a35cda93b4d4e23b3d11b6ffcac93e116f9f8a4`. Story 26.4's old “GraphQL does not exist” blocker was reclassified as stale because Wave 9/10 supply GraphQL, codegen, BFF and the drawer; it is now formally `in-progress` and analytically `IMPLEMENTED-BUT-UNVERIFIED` in `planning/epics/EPIC-26-iso-message-lineage-core.md`.
+- Added `PaymentIsoEvidenceQuery` and the ISO-only `IsoPaymentEvidenceReadModel`; payment tenant/branch object visibility is checked only through the new public `PaymentVisibilityQuery`, not a foreign repository. Query-only GraphQL, BFF allowlist, generated TypeScript and independent Evidence Drawer ISO tables are implemented.
+- RED/GREEN evidence: missing-field structural test first failed; focused GraphQL suite then passed 7/7. A temporary Mutation root correctly made the read-only structural test fail and was removed. Frontend codegen ran twice; lint (known unchanged TanStack warning), typecheck and build passed.
+- Durable state is in `planning/programs/DEBINA-ISO-LINEAGE-IDENTIFIER-EVIDENCE-WAVE-11.md` and `/tmp/DEBINA-ISO-LINEAGE-IDENTIFIER-EVIDENCE-WAVE-11/checkpoint-1.md`.
 
 ## Utknęliśmy na
 
-No technical blocker. Remaining roadmap blockers are intentional: source-owned message evidence (24.8C), Playwright sequence (24.8D), evidence export PII/format decision (24.8E), and the separately tracked Control Room scope.
+Wave 11 is not complete: no Testcontainers ISO read/security test has yet proven JSON_DIRECT/pain.001 facts, ordering, tenant/branch and empty-GUC behaviour; the real Keycloak+BFF+Spring+isolated PostgreSQL runtime and two full backend regressions are also unrun. Do not call Story 26.4 done or broaden the ISO schema/roles to make tests easier.
 
 ## Plan na następny krok
 
-Start only the next analytically READY capability; do not reopen Wave 10 or relabel the blocked 24.8C/D/E capabilities as delivered.
+Open the Wave 11 program record, add a PostgreSQL Testcontainers integration test for `PaymentIsoEvidenceQuery` that creates both JSON_DIRECT and signed pain.001 source rows and proves tenant/branch visibility before starting the live runtime proof.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- A clean isolated Wave 10 PostgreSQL runtime needs Flyway V1–V60 before Spring starts its `sepa_app` datasource. Do not change the persistent compose database.
-- Compose may leave the existing Keycloak PostgreSQL service stopped; inspect container state before classifying connection failures as transient.
-- The BFF session store is intentionally in-memory; restarting Next requires a new Keycloak login.
-- Audit GraphQL uses `variables.auditFilter` with `commandType`, not `filter`/`command`; cursors use JSON `null` for the first page.
-- Preserve the Query-only/allowlist boundary: no mutation, subscription, direct browser backend call, raw evidence payload or audit write surface.
+- `iso.iso_messages` has tenant but no branch column. Preserve branch isolation through the public payment visibility port; never add a GraphQL repository shortcut or broad ISO grant without an accepted owner decision.
+- `TX_ID` exists structurally but no current pain.001 channel populates it; `UETR` and `INSTR_ID` are optional. Do not synthesize them or render absent values as facts.
+- Spring Modulith test execution rewrites `build/generated-spring-modulith/javadoc.json`; restore it before committing if it changes incidentally.
+- Preserve the Query-only allowlist boundary: browser posts only operation name/variables to `/api/graphql`; no raw message payload, token exposure, Mutation or Subscription.

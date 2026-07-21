@@ -3,7 +3,13 @@ type Query {
   approval(paymentId: ID!): Approval
   paymentAuditTrail(paymentId: ID!, first: Int!, after: String): AuditEntryConnection!
   auditEntries(filter: AuditQueryFilter!, first: Int!, after: String): AuditEntryConnection!
+  paymentIsoEvidence(paymentId: ID!): PaymentIsoEvidence
 }
+
+type PaymentIsoEvidence { paymentId: ID!, messages: [IsoMessageEvidence!]!, identifiers: [IsoIdentifierEvidence!]! }
+type IsoMessageEvidence { isoMessageId: ID!, messageType: String!, versionEffectiveFrom: String, lineageRole: String!, lineageRecordedAt: String! }
+type IsoIdentifierEvidence { isoMessageId: ID!, type: IsoIdentifierType!, value: String! }
+enum IsoIdentifierType { MSG_ID PMT_INF_ID INSTR_ID END_TO_END_ID TX_ID UETR }
 
 type ApprovalConnection { items: [Approval!]!, nextCursor: String }
 

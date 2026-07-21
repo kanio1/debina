@@ -17,6 +17,14 @@ export type AuditQueryFilter = {
   tenantId: string | null | undefined;
 };
 
+export type IsoIdentifierType =
+  | 'END_TO_END_ID'
+  | 'INSTR_ID'
+  | 'MSG_ID'
+  | 'PMT_INF_ID'
+  | 'TX_ID'
+  | 'UETR';
+
 export type ApprovalQueueQueryVariables = Exact<{
   first: number;
   after: string | null | undefined;
@@ -40,6 +48,13 @@ export type PaymentAuditTrailQueryVariables = Exact<{
 
 
 export type PaymentAuditTrailQuery = { paymentAuditTrail: { nextCursor: string | null, items: Array<{ auditEntryId: string, tenantId: string, branchId: string | null, occurredAt: string, actorType: string, actorId: string, authorizedRole: string, correlationId: string, commandType: string, targetType: string, targetId: string, paymentId: string | null, batchId: string | null, outcome: string, decisionComment: string | null, beforeState: { approvalId: string | null, approvalStatus: string | null }, afterState: { approvalId: string | null, approvalStatus: string | null } }> } };
+
+export type PaymentIsoEvidenceQueryVariables = Exact<{
+  paymentId: string;
+}>;
+
+
+export type PaymentIsoEvidenceQuery = { paymentIsoEvidence: { paymentId: string, messages: Array<{ isoMessageId: string, messageType: string, versionEffectiveFrom: string | null, lineageRole: string, lineageRecordedAt: string }>, identifiers: Array<{ isoMessageId: string, type: IsoIdentifierType, value: string }> } | null };
 
 export type AuditEntriesQueryVariables = Exact<{
   auditFilter: AuditQueryFilter;
