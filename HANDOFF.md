@@ -6,17 +6,17 @@ Wave 9 dostarcza read-only GraphQL approval spine i maker-checker workspace w Pa
 
 ## Zrobione
 
-- Commity `bdb38ae`..`2e10738` tworzą secured Query-only GraphQL, source-owned payment port, query limits, prod introspection restriction oraz PostgreSQL 18 RLS/cursor/detail proof.
-- `bd5d3aa` tworzy deterministic GraphQL TypeScript codegen (`pnpm run codegen:graphql`), drugi run ma ten sam SHA, typecheck przechodzi.
-- `259b618` BFF proxy ma dwa allowlisted read operations; `92c2880` BFF ma CSRF/session/idempotency-protected approve/reject routes.
+- Commity `bdb38ae`..`20acee5` dostarczają secured Query-only GraphQL, source-owned payment port, query limits, prod introspection, PostgreSQL 18 RLS/cursor/detail proof, deterministic GraphQL codegen oraz BFF GraphQL/approve/reject routes.
+- `298d1c4` dodaje role-gated approval queue do Payments & Files: wyraźne loading/empty/error/unauthorized, cursor load more, self-approval block, confirm/reject comment i refetch po server-confirmed command bez optimistic update.
+- Fresh PostgreSQL 18 wykonał V1–V60; real Keycloak PKCE utworzył BFF HttpOnly session, a approver BFF GraphQL queue zwrócił `200` i pustą connection. Naprawiono runtime Flyway classpath oraz BFF scope `openid sepa-guc`.
 
 ## Utknęliśmy na
 
-Nie ma Class C blokera. Brakuje UI approval queue/detail i server-confirmed command refresh, BFF route tests/runtime proof, real Keycloak+BFF+backend journey, full regressions/validators. Lint jest GREEN z jednym istniejącym warningiem TanStack `useReactTable`.
+Nie ma Class C blokera. Nie udowodniono jeszcze pełnego maker→approver approve/reject na realnym runtime: świeża baza nie ma source-seeded approval matrix, a live `sepa-guc` session ma `tenantId: null` (mimo roli i branch), więc trzeba zdiagnozować source-owned tenant claim. Brak też dwóch pełnych backend regressions i validatorów. Lint jest GREEN z jednym istniejącym warningiem TanStack `useReactTable`.
 
 ## Plan na następny krok
 
-Zbuduj client component approval queue w `frontend/src/components/payments/` i włącz go do `/payments`: fetch przez `/api/graphql`, approve/reject przez nowe BFF routes, bez optimistic update, z distinct loading/empty/error/unauthorized states.
+Uruchom focused + full test/validator gate; następnie dokończ real runtime przez source-backed approval-matrix seed i tenant-claim diagnosis, wykonaj maker submit oraz approver approve/reject przez BFF i zapisz evidence. Sprzątnij własny tymczasowy kontener `debina-wave9-postgres` i procesy dev po proof.
 
 ## Pułapki, których nie wolno powtórzyć
 
@@ -24,3 +24,4 @@ Zbuduj client component approval queue w `frontend/src/components/payments/` i w
 - Cursor decoder musi używać Java regex `"\\|"`, nie nadmiernie escaped `"\\\\|"`.
 - BFF GraphQL nie przyjmuje browser query text ani backend URL; tylko allowlisted operation names i variables.
 - Adapter GraphQL używa tylko `com.sepanexus.modules.ApprovalQueueQuery`, nie package `.service`.
+- Persistent compose PostgreSQL jest tylko na V20; nie migruj go bez świadomej decyzji. Użyty świeży, własny kontener to `debina-wave9-postgres` na porcie 15432.
