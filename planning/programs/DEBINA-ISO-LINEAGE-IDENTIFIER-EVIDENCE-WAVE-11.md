@@ -18,9 +18,10 @@
 - GREEN: focused GraphQL suite: 7 tests, 0 failures/errors/skips.
 - Mutation proof: temporary `Mutation { wave11Probe: Boolean }` made `GraphQLReadOnlyStructureTest` fail; it was removed immediately.
 - Frontend: codegen ran twice; lint passed with the pre-existing TanStack warning only; typecheck and production build passed.
+- PostgreSQL 18 Testcontainers: `IsoPaymentEvidenceQueryIntegrationTest` 3/3 PASS. It proves JSON_DIRECT and pain.001 source rows, version selection, controlled identifiers without TxId/UETR fabrication, repeatable equal-timestamp ordering, and tenant/branch/empty-context denial through the public payment visibility boundary.
+- GraphQL HTTP/runtime: `ApprovalGraphQlRuntimeTest` 10/10 PASS, including permitted `payment_viewer` DTO mapping and denial for `security_admin`.
 
 ## Remaining mandatory proof
 
-- Add Testcontainers query tests for JSON_DIRECT/pain.001 field fidelity, deterministic ordering, tenant/branch/empty-context denial and role authorization.
 - Run live Keycloak+BFF+Spring+isolated PostgreSQL JSON_DIRECT and signed pain.001 proofs; run two full backend regressions, governance validators, database review and cleanup.
 - No migration is added (`N/A`): this read uses existing source tables and indexes. Correlation is intentionally not exposed because no payment-scoped source-ready runtime evidence was verified.

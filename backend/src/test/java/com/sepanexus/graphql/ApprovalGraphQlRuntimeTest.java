@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.sepanexus.SepaNexusApplication;
 import com.sepanexus.evidenceaudit.AuditQueryPort;
 import com.sepanexus.modules.ApprovalQueueQuery;
+import com.sepanexus.modules.PaymentIsoEvidenceQuery;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -43,6 +44,7 @@ class ApprovalGraphQlRuntimeTest {
     @Autowired MockMvc mockMvc;
     @MockitoBean ApprovalQueueQuery approvalQueue;
     @MockitoBean AuditQueryPort auditQuery;
+    @MockitoBean PaymentIsoEvidenceQuery paymentIsoEvidenceQuery;
 
     @Test
     void authenticatedApproverReceivesPaymentOwnedQueueDto() throws Exception {
@@ -123,6 +125,37 @@ class ApprovalGraphQlRuntimeTest {
                         .content("{\"query\":\"query { auditEntries(filter: {}, first: 10) { nextCursor } }\"}")
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
                                 .authorities(() -> "ROLE_operator")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0].message").exists());
+    }
+
+    @Test
+    void permittedPaymentViewerReceivesOnlyTheTypedIsoEvidenceDto() throws Exception {
+        UUID payment = UUID.randomUUID(); UUID message = UUID.randomUUID();
+        when(paymentIsoEvidenceQuery.evidence(any(), any(), any())).thenReturn(
+                new PaymentIsoEvidenceQuery.PaymentIsoEvidence(payment, List.of(
+                        new PaymentIsoEvidenceQuery.IsoMessageEvidence(message, "JSON_DIRECT", java.time.LocalDate.of(2000, 1, 1),
+                                "ORIGINAL_INSTRUCTION", Instant.parse("2026-07-21T10:00:00Z"))), List.of(
+                        new PaymentIsoEvidenceQuery.IsoIdentifierEvidence(message,
+                                PaymentIsoEvidenceQuery.IsoIdentifierType.END_TO_END_ID, "E2E-1"))));
+
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"query { paymentIsoEvidence(paymentId: \\\"" + payment + "\\\") { messages { messageType lineageRole } identifiers { type value } } }\"}")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_payment_viewer")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.paymentIsoEvidence.messages[0].messageType").value("JSON_DIRECT"))
+                .andExpect(jsonPath("$.data.paymentIsoEvidence.messages[0].lineageRole").value("ORIGINAL_INSTRUCTION"))
+                .andExpect(jsonPath("$.data.paymentIsoEvidence.identifiers[0].type").value("END_TO_END_ID"))
+                .andExpect(jsonPath("$.data.paymentIsoEvidence.identifiers[0].value").value("E2E-1"));
+    }
+
+    @Test
+    void unrelatedRoleCannotReadIsoEvidence() throws Exception {
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"query { paymentIsoEvidence(paymentId: \\\"" + UUID.randomUUID() + "\\\") { paymentId } }\"}")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                                .authorities(() -> "ROLE_security_admin")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[0].message").exists());
     }
