@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScreenState } from "@/components/shared/screen-state";
@@ -31,7 +32,9 @@ export default function EvidencePage() {
   const [state, setState] = useState<State>("loading");
   const [items, setItems] = useState<Entry[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [search, setSearch] = useState(() => new URLSearchParams(window.location.search));
+  const router = useRouter();
+  const pathname = usePathname();
+  const search = useSearchParams();
   const filter = useMemo(() => filtersFromSearch(search), [search]);
 
   const load = useCallback(async (after: string | null, append: boolean) => {
@@ -54,8 +57,7 @@ export default function EvidencePage() {
   function updateFilter(name: string, value: string) {
     const next = new URLSearchParams(search);
     if (value) next.set(name, value); else next.delete(name);
-    window.history.replaceState(null, "", `/evidence?${next.toString()}`);
-    setSearch(next);
+    router.replace(`${pathname}?${next.toString()}`);
   }
 
   return (
@@ -66,6 +68,10 @@ export default function EvidencePage() {
         <Input aria-label="Payment ID" data-testid="evidence.filter.payment-id" defaultValue={filter.paymentId ?? ""} onChange={e => updateFilter("paymentId", e.target.value)} placeholder="Payment ID" />
         <Input aria-label="Actor" data-testid="evidence.filter.actor" defaultValue={filter.actorId ?? ""} onChange={e => updateFilter("actor", e.target.value)} placeholder="Actor" />
         <Input aria-label="Command type" data-testid="evidence.filter.command" defaultValue={filter.commandType ?? ""} onChange={e => updateFilter("command", e.target.value)} placeholder="Command type" />
+        <Input aria-label="Target type" data-testid="evidence.filter.target-type" defaultValue={filter.targetType ?? ""} onChange={e => updateFilter("targetType", e.target.value)} placeholder="Target type" />
+        <Input aria-label="Target ID" data-testid="evidence.filter.target-id" defaultValue={filter.targetId ?? ""} onChange={e => updateFilter("targetId", e.target.value)} placeholder="Target ID" />
+        <Input aria-label="Outcome" data-testid="evidence.filter.outcome" defaultValue={filter.outcome ?? ""} onChange={e => updateFilter("outcome", e.target.value)} placeholder="Outcome" />
+        <Input aria-label="Correlation ID" data-testid="evidence.filter.correlation-id" defaultValue={filter.correlationId ?? ""} onChange={e => updateFilter("correlationId", e.target.value)} placeholder="Correlation ID" />
       </div>
       {state !== "ready" && <ScreenState kind={state} testIdPrefix="evidence.workspace" message={state === "empty" ? "No audit records match." : undefined} />}
       {state === "ready" && <><div className="overflow-auto"><table data-testid="evidence.audit.table" className="w-full text-left text-sm"><caption className="sr-only">Cross-tenant audit records</caption><thead><tr><th>Tenant</th><th>When</th><th>Actor</th><th>Command</th><th>Outcome</th></tr></thead><tbody>{items.map(e => <tr key={e.auditEntryId} data-testid="evidence.audit.row"><td>{e.tenantId}</td><td>{new Date(e.occurredAt).toLocaleString()}</td><td>{e.actorId}</td><td>{e.commandType}</td><td>{e.outcome}</td></tr>)}</tbody></table></div>{nextCursor && <Button variant="outline" data-testid="evidence.audit.load-more" onClick={() => void load(nextCursor, true).catch(() => setState("error"))}>Load more</Button>}</>}
