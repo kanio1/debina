@@ -27,3 +27,7 @@ Current LEGACY warnings remain explicit: 296 untraced stories and 69 scoped hist
 ## Boundaries
 
 No production Java/tests/migrations/GraphQL/frontend/infra/workflows changed; no `act`, Dagger, remote CI, push, or Wave 12 action occurred. The pre-existing `build/generated-spring-modulith/javadoc.json` remains excluded and its initial patch/hash are preserved in `/tmp`.
+
+## Commits
+
+`c413010 feat(governance): complete C1 use-case semantic workflow`; `3e535a2 chore(governance): exclude validator bytecode`.
