@@ -49,6 +49,7 @@ class FullRoleModelRealmTest {
         var claims = KeycloakRealmTestSupport.passwordGrantClaims("submitter", "dev-only-submitter");
         assertThat(claims.path("realm_access").path("roles")).extracting(node -> node.asText())
                 .containsExactly("payment_submitter");
+        assertThat(claims.path("sub").asText()).isNotBlank();
         assertThat(claims.path("branch_id").asText()).isEqualTo("00000000-0000-0000-0000-000000000101");
         assertThat(claims.path("organization").path("demo-bank-org").path("id").asText())
                 .isEqualTo("00000000-0000-0000-0000-000000000010");

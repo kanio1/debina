@@ -113,3 +113,17 @@ non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof bef
   normalizes before a backend request. The BFF session now performs the identical one-organization
   derivation for its trusted display metadata. Frontend lint, typecheck and production build stay
   GREEN (with the existing TanStack warning only).
+
+## Real maker–checker runtime checkpoint
+
+- Keycloak 26.6 no longer emitted `sub` in access tokens because the realm export had replaced
+  built-in default scopes with only `sepa-guc`. A source-owned `basic` client scope now carries
+  Keycloak's supported `Subject (sub)` access-token mapper, and the realm import test proves a
+  submitter token has a nonblank subject.
+- On isolated PostgreSQL 18 with one source-schema approval-matrix setup rule, real PKCE BFF
+  sessions completed both paths: submitter `202 PENDING_APPROVAL` → approver BFF GraphQL queue
+  → REST BFF approve `200 APPROVED` → GraphQL refetch empty; then submitter `202 PENDING_APPROVAL`
+  → REST BFF reject with comment `200 REJECTED` → GraphQL refetch empty. Evidence files are
+  `submitter3.payment.json`, `approver3.queue-before.json`, `approver3.approve.json`,
+  `approver3.queue-after.json`, `submitter3.reject-payment.json`, `approver3.reject.json` and
+  `approver3.queue-after-reject.json` in the Wave 9 temp directory.

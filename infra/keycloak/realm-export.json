@@ -23,6 +23,23 @@
   },
   "clientScopes": [
     {
+      "name": "basic",
+      "description": "Stable subject claim required by server-side command and audit boundaries",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" },
+      "protocolMappers": [
+        {
+          "name": "Subject (sub)",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-sub-mapper",
+          "config": {
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
       "name": "sepa-guc",
       "description": "SEPA Nexus organization and branch claims for the BFF and resource server",
       "protocol": "openid-connect",
@@ -96,7 +113,7 @@
       "directAccessGrantsEnabled": false,
       "redirectUris": ["http://localhost:3000/*"],
       "webOrigins": ["http://localhost:3000"],
-      "defaultClientScopes": ["sepa-guc"]
+      "defaultClientScopes": ["basic", "sepa-guc"]
     },
     {
       "clientId": "sepa-api",
