@@ -9,6 +9,7 @@
 - Honest pilot cleanup: 76.3, 76.4 and 76.6 are `in-progress` because their unchecked evidence tasks remain; 76.7/76.8 have explicit blocked classifications.
 - Enforcement: `LEGACY`, `PILOT`, `ENFORCED`, explicit metadata marker, and forward-only migration policy.
 - Validators: use-case traceability, planning semantics, source traceability, module catalogue, ADR lifecycle; direct local runner and stdlib unittest repository checks.
+- GraphQL skill assessment: deferred. ADR-N17 and the module catalogue provide stable Query-only/source-owned adapter rules, but C1 has no separate recurring demand beyond the pilot; no generic CRUD skill was added.
 
 ## Mutation / red-green evidence
 
