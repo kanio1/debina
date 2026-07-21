@@ -8,6 +8,7 @@ Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research plat
 
 - Added 14 ENFORCED actor-goal use cases across SCT, SCT Inst, routing, clearing, settlement, status, R-transactions, egress, reconciliation and audit; retained the C1 approval pilot.
 - Added C2 concept admission, backlog/dependency/implementation maps and six dynamic diagrams. Methodology validation now checks canonical C2 methodology declarations and numbered main flows.
+- C2 mutation proofs cover missing/invalid methodology, missing backlog slice, duplicate slice and invalid rail applicability; final governance runner passed with 296 LEGACY traceability and 69 LEGACY planning warnings.
 
 ## Utknęliśmy na
 

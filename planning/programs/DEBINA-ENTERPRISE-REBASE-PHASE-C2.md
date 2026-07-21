@@ -9,3 +9,5 @@ Validation and mutation evidence: the complete local governance runner passes wi
 Architecture findings: no new aggregate was admitted; file/group, clearing and deferred-cycle boundaries are source/aggregate review candidates; no ADR is changed. Six high-value dynamic diagrams cover single SCT, file, approval, instant settlement, inbound status and audit investigation. Bounded backlog map covers five representative groups with no story metadata bulk migration.
 
 Phase D entry commands: enterprise governance runner; backend fast/integration regression; frontend codegen/lint/typecheck/build; local smoke; minimal Playwright smoke. C2 adds no Dagger implementation or remote CI choice.
+
+Commits: `264659a docs(requirements): complete C2 enterprise use-case catalogue`; `3fb17fd feat(governance): prove C2 methodology traceability`.
