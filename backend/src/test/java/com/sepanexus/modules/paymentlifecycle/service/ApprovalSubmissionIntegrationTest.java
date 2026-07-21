@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sepanexus.SepaNexusApplication;
+import com.sepanexus.evidenceaudit.CommandAuditPort;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 /** PostgreSQL 18 proof for the frozen approval prefix gate (EPIC-76 Story 76.2). */
@@ -41,6 +43,9 @@ class ApprovalSubmissionIntegrationTest {
 
     @Autowired
     private ApprovalExpiryService approvalExpiryService;
+
+    @MockitoSpyBean
+    private CommandAuditPort commandAuditPort;
 
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
@@ -216,6 +221,26 @@ class ApprovalSubmissionIntegrationTest {
 
         assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ? AND outcome = 'DENIED'", payment)).isEqualTo(2);
         assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
+    }
+
+    @Test
+    void auditAppendFailureRollsBackApprovalOutboxAndIdempotency() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+        var command = new ApprovalDecisionCommand(tenant, branch, payment, "checker", "sid-failure", UUID.randomUUID(),
+                "audit-failure-key", null, ApprovalDecisionCommand.Decision.APPROVE);
+        org.mockito.Mockito.doThrow(new IllegalStateException("controlled audit failure"))
+                .when(commandAuditPort).append(org.mockito.ArgumentMatchers.any());
+
+        withApproverJwt(tenant, branch, "checker", () -> assertThatThrownBy(() -> approvalDecisionService.decide(command))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("controlled audit failure"));
+
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = ? AND status = 'PENDING_APPROVAL'", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", payment)).isZero();
         assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
     }
 
