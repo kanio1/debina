@@ -2,6 +2,7 @@ package com.sepanexus.evidenceaudit.internal;
 
 import com.sepanexus.evidenceaudit.CommandAuditEntry;
 import com.sepanexus.evidenceaudit.CommandAuditPort;
+import java.sql.Timestamp;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class JdbcCommandAuditPort implements CommandAuditPort {
                 entry.authorizedRole(), entry.sessionId(), entry.correlationId(), entry.commandType(),
                 entry.targetType(), entry.targetId(), entry.paymentId(), entry.batchId(), entry.decisionComment(),
                 canonicalJson(entry.beforeState()), canonicalJson(entry.afterState()), entry.outcome().name(),
-                entry.commandExecutionId(), entry.occurredAt());
+                entry.commandExecutionId(), Timestamp.from(entry.occurredAt()));
     }
 
     private String canonicalJson(Object value) {

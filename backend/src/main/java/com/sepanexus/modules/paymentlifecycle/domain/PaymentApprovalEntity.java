@@ -89,4 +89,20 @@ public class PaymentApprovalEntity {
     public Instant getSubmittedForApprovalAt() { return submittedForApprovalAt; }
     public Instant getDecidedAt() { return decidedAt; }
     public Instant getExpiresAt() { return expiresAt; }
+
+    public void decide(ApprovalStatus decision, String checkerUserId, String comment, Instant decidedAt) {
+        if (status != ApprovalStatus.PENDING_APPROVAL) {
+            throw new IllegalStateException("Approval is no longer pending");
+        }
+        if (checkerUserId.equals(makerUserId)) {
+            throw new IllegalArgumentException("Maker cannot decide their own payment");
+        }
+        if (decision == ApprovalStatus.REJECTED && (comment == null || comment.isBlank())) {
+            throw new IllegalArgumentException("Reject decision comment is required");
+        }
+        status = decision;
+        this.checkerUserId = checkerUserId;
+        decisionComment = comment;
+        this.decidedAt = decidedAt;
+    }
 }

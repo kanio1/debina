@@ -5,6 +5,8 @@ import com.sepanexus.modules.paymentlifecycle.service.Pain001IngestionService;
 import com.sepanexus.modules.paymentlifecycle.service.Pain001SubmissionCommand;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentSubmissionResult;
+import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionCommand;
+import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionService;
 import com.sepanexus.modules.paymentlifecycle.service.SubmitPaymentCommand;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -34,10 +36,13 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final Pain001IngestionService pain001IngestionService;
+    private final ApprovalDecisionService approvalDecisionService;
 
-    public PaymentController(PaymentService paymentService, Pain001IngestionService pain001IngestionService) {
+    public PaymentController(PaymentService paymentService, Pain001IngestionService pain001IngestionService,
+            ApprovalDecisionService approvalDecisionService) {
         this.paymentService = paymentService;
         this.pain001IngestionService = pain001IngestionService;
+        this.approvalDecisionService = approvalDecisionService;
     }
 
     @PostMapping("/api/v1/payments")
@@ -94,6 +99,30 @@ public class PaymentController {
         return paymentService.visiblePayments(jwt.getClaimAsString("tenant_id")).stream()
                 .map(PaymentSummaryResponse::from)
                 .toList();
+    }
+
+    @PostMapping("/api/v1/payments/{paymentId}/approve")
+    public ApprovalDecisionResponse approve(@PathVariable UUID paymentId, @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @RequestBody(required = false) ApprovalDecisionRequest request, @AuthenticationPrincipal Jwt jwt,
+            jakarta.servlet.http.HttpServletRequest servletRequest) {
+        return decision(paymentId, idempotencyKey, request, jwt, servletRequest, ApprovalDecisionCommand.Decision.APPROVE);
+    }
+
+    @PostMapping("/api/v1/payments/{paymentId}/reject")
+    public ApprovalDecisionResponse reject(@PathVariable UUID paymentId, @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @RequestBody ApprovalDecisionRequest request, @AuthenticationPrincipal Jwt jwt,
+            jakarta.servlet.http.HttpServletRequest servletRequest) {
+        return decision(paymentId, idempotencyKey, request, jwt, servletRequest, ApprovalDecisionCommand.Decision.REJECT);
+    }
+
+    private ApprovalDecisionResponse decision(UUID paymentId, String key, ApprovalDecisionRequest request, Jwt jwt,
+            jakarta.servlet.http.HttpServletRequest servletRequest, ApprovalDecisionCommand.Decision decision) {
+        String sessionId = jwt.getClaimAsString("sid");
+        String correlation = (String) servletRequest.getAttribute(CorrelationIdFilter.ATTRIBUTE);
+        var result = approvalDecisionService.decide(new ApprovalDecisionCommand(UUID.fromString(jwt.getClaimAsString("tenant_id")),
+                branchIdClaim(jwt), paymentId, jwt.getSubject(), sessionId, UUID.fromString(correlation), key,
+                request == null ? null : request.decisionComment(), decision));
+        return ApprovalDecisionResponse.from(result);
     }
 
     @GetMapping("/api/v1/payments/{id}")

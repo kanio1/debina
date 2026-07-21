@@ -6,6 +6,7 @@ import com.sepanexus.modules.paymentlifecycle.isoadapter.CanonicalMappingExcepti
 import com.sepanexus.modules.paymentlifecycle.isoadapter.MissingPrimaryIdentifierException;
 import com.sepanexus.modules.paymentlifecycle.service.IdempotencyConflictException;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentNotFoundException;
+import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionConflictException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -24,6 +25,11 @@ public class PaymentProblemHandler {
     @ExceptionHandler(PaymentNotFoundException.class)
     ProblemDetail notFound(PaymentNotFoundException exception, HttpServletRequest request) {
         return problem(HttpStatus.NOT_FOUND, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(ApprovalDecisionConflictException.class)
+    ProblemDetail approvalConflict(ApprovalDecisionConflictException exception, HttpServletRequest request) {
+        return problem(HttpStatus.CONFLICT, exception.getMessage(), request);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})

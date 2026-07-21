@@ -38,12 +38,12 @@ Tasks:
 
 ## Story 76.3 — Approve and reject commands with same-transaction audit
 
-status: blocked
+status: in-progress
 depends_on: [Story 76.2]
 
 Description: Implement `POST /api/v1/payments/{paymentId}/approve` and `/reject` through payment-lifecycle with role, tenant/branch, maker≠checker, idempotency, conditional-transition and outbox-release guards.
 
-Blocker: `audit.audit_log` is owned by the absent `evidence-audit` module, but the frozen security source requires every command to write an application audit row in the same transaction.  No existing audit port, schema, migration, module or independently owned planning story exists.  A payment-owned substitute would violate the accepted owner map.
+Wave 8 status: the source-owned audit persistence/API now exists and the basic approve/reject state/outbox/audit/idempotency path has a PostgreSQL 18 proof. The remaining executable work is object-level authorization, denied-command recording, controlled audit-failure rollback, concurrency and HTTP/Keycloak proof; none may be inferred from the basic path.
 
 Tasks:
 - [ ] **Provide the evidence-audit command-audit capability.** Add it only under a source-derived owner with an explicit transaction boundary; do not substitute logs, status history, payment events, or outbox rows for audit.

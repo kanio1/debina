@@ -36,6 +36,9 @@ class ApprovalSubmissionIntegrationTest {
     @Autowired
     private ApprovalQueueReadModel approvalQueueReadModel;
 
+    @Autowired
+    private ApprovalDecisionService approvalDecisionService;
+
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
         initializeDatabase();
@@ -50,7 +53,7 @@ class ApprovalSubmissionIntegrationTest {
     @BeforeEach
     void cleanTables() throws Exception {
         try (Connection connection = admin(); Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE payment.payment_approvals, payment.payments, payment.outbox_events, "
+            statement.execute("TRUNCATE audit.audit_log, payment.payment_approvals, payment.payments, payment.outbox_events, "
                     + "payment.payment_status_history, payment.payment_events, ingress.idempotency_keys, "
                     + "ingress.raw_inbound_messages, iso.payment_iso_identifiers, iso.message_lineage, "
                     + "iso.iso_messages, reference_data.approval_matrix_rules CASCADE");
@@ -144,6 +147,52 @@ class ApprovalSubmissionIntegrationTest {
         assertThat(approvalQueueReadModel.pending(UUID.randomUUID(), branchId, 2, null).items()).isEmpty();
     }
 
+    @Test
+    @WithMockUser(roles = "payment_approver")
+    void approveAndRejectAreAuditedIdempotentAndOnlyApproveReleasesTheExistingEvent() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID approvePayment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+        ApprovalDecisionCommand approve = new ApprovalDecisionCommand(tenant, branch, approvePayment, "checker-a",
+                "sid-a", UUID.randomUUID(), "approve-key", null, ApprovalDecisionCommand.Decision.APPROVE);
+        withApproverJwt(tenant, branch, "checker-a", () -> {
+            var first = approvalDecisionService.decide(approve);
+            var replay = approvalDecisionService.decide(approve);
+            assertThat(first).isEqualTo(replay);
+            assertThat(first.approvalStatus().name()).isEqualTo("APPROVED");
+        });
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", approvePayment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", approvePayment)).isEqualTo(1);
+
+        UUID rejectPayment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+        withApproverJwt(tenant, branch, "checker-b", () -> {
+            var reject = approvalDecisionService.decide(new ApprovalDecisionCommand(tenant, branch, rejectPayment, "checker-b",
+                    "sid-b", UUID.randomUUID(), "reject-key", "not acceptable", ApprovalDecisionCommand.Decision.REJECT));
+            assertThat(reject.approvalStatus().name()).isEqualTo("REJECTED");
+        });
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", rejectPayment)).isZero();
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ?", rejectPayment)).isEqualTo(1);
+    }
+
+    @Test
+    void deniedApproverAttemptIsRecordedWithoutRevealingOrMutatingTheTarget() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+        var command = new ApprovalDecisionCommand(tenant, branch, payment, "submitter", "sid-denied", UUID.randomUUID(),
+                "denied-key", null, ApprovalDecisionCommand.Decision.APPROVE);
+
+        withJwt(tenant, branch, "submitter", "payment_submitter", () ->
+                assertThatThrownBy(() -> approvalDecisionService.decide(command))
+                        .isInstanceOf(org.springframework.security.authorization.AuthorizationDeniedException.class));
+
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ? AND outcome = 'DENIED'", payment)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
+    }
+
     private static SubmitPaymentCommand command(UUID tenantId, UUID branchId, String maker, String idempotencyKey) {
         return new SubmitPaymentCommand(tenantId, branchId, "E2E-APPROVAL", new BigDecimal("10.00"), "EUR",
                 "DE89370400440532013000", "FR7630006000011234567890189", maker, idempotencyKey);
@@ -211,6 +260,33 @@ class ApprovalSubmissionIntegrationTest {
                 return result.getInt(1);
             }
         }
+    }
+
+    private static UUID paymentForApproval(UUID approvalId) throws Exception {
+        try (Connection connection = admin(); PreparedStatement statement = connection.prepareStatement(
+                "SELECT payment_id FROM payment.payment_approvals WHERE id = ?")) {
+            statement.setObject(1, approvalId);
+            try (ResultSet result = statement.executeQuery()) {
+                assertThat(result.next()).isTrue();
+                return (UUID) result.getObject(1);
+            }
+        }
+    }
+
+    private static void withApproverJwt(UUID tenant, UUID branch, String subject, Runnable assertion) {
+        withJwt(tenant, branch, subject, "payment_approver", assertion);
+    }
+
+    private static void withJwt(UUID tenant, UUID branch, String subject, String role, Runnable assertion) {
+        var jwt = new org.springframework.security.oauth2.jwt.Jwt("test-token", Instant.now(), Instant.now().plusSeconds(60),
+                java.util.Map.of("alg", "none"), java.util.Map.of("sub", subject, "tenant_id", tenant.toString(),
+                        "branch_id", branch.toString(), "sid", "test-session"));
+        var authentication = new org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken(jwt,
+                java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + role)));
+        var context = org.springframework.security.core.context.SecurityContextHolder.getContext();
+        var previous = context.getAuthentication();
+        context.setAuthentication(authentication);
+        try { assertion.run(); } finally { context.setAuthentication(previous); }
     }
 
     static synchronized void initializeDatabase() {

@@ -34,8 +34,9 @@ general audit boundary. ADR-W8-01 is the accepted focused Class B decision.
 - Successful audit appends use the evidence-audit-owned typed `SECURITY DEFINER` function through
   the caller's existing transaction-bound connection. No direct payment DML on audit, no event,
   no after-commit listener and no second transaction.
-- Denied-command audit remains a separately pending 77.2 surface; it is never represented as a
-  successful decision.
+- V58 adds a separate evidence-audit-owned `append_denied_command_audit` SECURITY DEFINER
+  boundary. It uses an independent transaction because no domain mutation exists; its failure
+  surfaces as a technical error and does not authorize the request.
 
 ## Evidence
 
@@ -49,9 +50,14 @@ general audit boundary. ADR-W8-01 is the accepted focused Class B decision.
   Log: `/tmp/DEBINA-COMMAND-AUDIT-AND-APPROVAL-DECISIONS-WAVE-8/audit-slice-focused-green.log`.
 - Mutation, successful-command transaction, denial, approval/race, expiry, Keycloak and final
   regression evidence: pending.
+- Partial 77.2/76.3 GREEN (not story completion): `ApprovalSubmissionIntegrationTest` **6/0/0**
+  proves the before-method `AuthorizationManager`, conditional first-writer-wins decision update,
+  one approve outbox/audit row, reject outbox suppression, stable idempotent replay, and a denied
+  submitter attempt with a separate `DENIED` audit row and no idempotency/domain mutation. Logs:
+  `approval-decision-conditional-green.log`, `denied-audit-red-green.log`.
 
 ## Current checkpoint
 
-Story 77.1 is complete and awaiting its focused local commit. First remaining action: write the
-same-transaction failure proof for Story 77.2, then wire the port into approve/reject rather than
-claiming the function alone is a complete command-audit capability.
+Commit `73501af` contains Story 77.1. The next checkpoint is the focused 77.2/76.3 implementation
+slice. Remaining proof is controlled audit failure, foreign tenant/branch/maker denial, HTTP/real
+Keycloak, exact transaction identity and decision races; expiry has not started.

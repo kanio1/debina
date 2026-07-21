@@ -3,6 +3,10 @@ package com.sepanexus.security;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.aop.support.StaticMethodMatcherPointcut;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionService;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentApprovalAuthorizationManager;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,6 +49,20 @@ public class SecurityConfig {
     AuthorizationManager<MethodInvocation> paymentLifecycleAuthorizationManager() {
         // Deliberately deny if this future Iteration 1 policy is accidentally wired early.
         return (authentication, invocation) -> new AuthorizationDecision(false);
+    }
+
+    @Bean
+    AuthorizationManagerBeforeMethodInterceptor paymentApprovalObjectAuthorization(
+            PaymentApprovalAuthorizationManager manager) {
+        StaticMethodMatcherPointcut pointcut = new StaticMethodMatcherPointcut() {
+            @Override
+            public boolean matches(java.lang.reflect.Method method, Class<?> targetClass) {
+                return method.getName().equals("decide") && ApprovalDecisionService.class.isAssignableFrom(targetClass);
+            }
+        };
+        AuthorizationManagerBeforeMethodInterceptor interceptor = new AuthorizationManagerBeforeMethodInterceptor(pointcut, manager);
+        interceptor.setOrder(100);
+        return interceptor;
     }
 
     @SuppressWarnings("unchecked")
