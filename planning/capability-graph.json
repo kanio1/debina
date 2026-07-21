@@ -25,7 +25,7 @@
         "EPIC-53"
       ],
       "requires": "A user/team decision on who owns building the first GraphQL schema/resolver layer -- see planning/decisions/GRAPHQL-OWNER-DECISION.md for the three candidate ownership options and consequences.",
-      "status": "OPEN"
+      "status": "RESOLVED"
     }
   ],
   "resolved_cycles": [
@@ -56,6 +56,11 @@
   "nodes": [
     {
       "id": "EPIC-77",
+      "type": "EPIC_AGGREGATE",
+      "granularity": "story-backed"
+    },
+    {
+      "id": "EPIC-78",
       "type": "EPIC_AGGREGATE",
       "granularity": "story-backed"
     },
@@ -506,6 +511,26 @@
     },
     {
       "id": "EPIC-23.23.1A",
+      "type": "STORY",
+      "status": "blocked"
+    },
+    {
+      "id": "EPIC-78.78.1",
+      "type": "STORY",
+      "status": "in-progress"
+    },
+    {
+      "id": "EPIC-78.78.2",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-78.78.3",
+      "type": "STORY",
+      "status": "not-started"
+    },
+    {
+      "id": "EPIC-78.78.4",
       "type": "STORY",
       "status": "blocked"
     },
@@ -2074,6 +2099,56 @@
     {
       "from": "EPIC-77",
       "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78",
+      "to": "EPIC-76",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78",
+      "to": "EPIC-78.78.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78",
+      "to": "EPIC-78.78.2",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78",
+      "to": "EPIC-78.78.3",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78",
+      "to": "EPIC-78.78.4",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78.78.1",
+      "to": "EPIC-09",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78.78.2",
+      "to": "EPIC-78.78.1",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78.78.2",
+      "to": "EPIC-76",
+      "type": "REQUIRES"
+    },
+    {
+      "from": "EPIC-78.78.3",
+      "to": "EPIC-78.78.2",
       "type": "REQUIRES"
     },
     {

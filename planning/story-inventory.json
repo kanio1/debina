@@ -1,8 +1,8 @@
 {
   "generated_by": "tools/agent-config/generate-story-inventory.py",
   "generated_note": "Programmatically extracted from planning/epics/*.md -- no invented data.",
-  "epic_count": 78,
-  "story_count": 296,
+  "epic_count": 79,
+  "story_count": 300,
   "epics": [
     {
       "epic": "EPIC-00",
@@ -393,6 +393,11 @@
       "epic": "EPIC-77",
       "status": "in-progress",
       "source_file": "planning/epics/EPIC-77-evidence-audit-command-log.md"
+    },
+    {
+      "epic": "EPIC-78",
+      "status": "in-progress",
+      "source_file": "planning/epics/EPIC-78-read-only-graphql-delivery.md"
     }
   ],
   "stories": [
@@ -4503,6 +4508,63 @@
         "./mvnw -f backend test -Dtest=CommandAuditQueryIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-77-evidence-audit-command-log.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-78",
+      "story": "78.1",
+      "title": "Secured read-only Spring GraphQL foundation",
+      "status": "in-progress",
+      "depends_on": [
+        "EPIC-09-ownership-schema-grants"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*GraphQL*Test*"
+      ],
+      "source_file": "planning/epics/EPIC-78-read-only-graphql-delivery.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-78",
+      "story": "78.2",
+      "title": "Payment-owned approval GraphQL queries",
+      "status": "not-started",
+      "depends_on": [
+        "Story 78.1",
+        "EPIC-76/Story 76.5"
+      ],
+      "verify": [
+        "./mvnw -f backend test -Dtest=*Approval*GraphQL*Test*"
+      ],
+      "source_file": "planning/epics/EPIC-78-read-only-graphql-delivery.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-78",
+      "story": "78.3",
+      "title": "Fixed-destination BFF GraphQL proxy and runtime contract",
+      "status": "not-started",
+      "depends_on": [
+        "Story 78.2",
+        "EPIC-23/Story 23.1B"
+      ],
+      "verify": [
+        "cd frontend && pnpm run lint && pnpm run typecheck && pnpm run build"
+      ],
+      "source_file": "planning/epics/EPIC-78-read-only-graphql-delivery.md",
+      "capability_analysis": "NOT_DEEP_DIVED"
+    },
+    {
+      "epic": "EPIC-78",
+      "story": "78.4",
+      "title": "Conditional audit query exposure",
+      "status": "blocked",
+      "depends_on": [
+        "EPIC-77/Story 77.3",
+        "Story 78.1"
+      ],
+      "verify": null,
+      "source_file": "planning/epics/EPIC-78-read-only-graphql-delivery.md",
       "capability_analysis": "NOT_DEEP_DIVED"
     }
   ]

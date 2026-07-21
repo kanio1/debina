@@ -155,6 +155,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-75 — Higiena dokumentacji | **done** | — | [epics/EPIC-75-documentation-hygiene.md](epics/EPIC-75-documentation-hygiene.md) |
 | EPIC-76 — Payment approval: maker–checker prefix gate | in-progress (Story 76.1 **done** with V53/V54 PostgreSQL 18 fresh/upgrade/RLS/grant/mutation proof; 76.3/76.4 blocked on absent evidence-audit capability; UI/Playwright/batch gated) | EPIC-19 | [epics/EPIC-76-payment-approval-maker-checker.md](epics/EPIC-76-payment-approval-maker-checker.md) |
 | EPIC-77 — Evidence-audit: immutable application command log | in-progress (Story 77.1 **done** with V55-V57 PostgreSQL 18 fresh/upgrade/RLS/grant/API proof; same-transaction and denial boundary remain active) | EPIC-09 | [epics/EPIC-77-evidence-audit-command-log.md](epics/EPIC-77-evidence-audit-command-log.md) |
+| EPIC-78 — Read-only GraphQL delivery | in-progress (Wave 9 source-derived transport owner; secured Query-only foundation is active) | EPIC-09, EPIC-76 | [epics/EPIC-78-read-only-graphql-delivery.md](epics/EPIC-78-read-only-graphql-delivery.md) |
 
 ---
 

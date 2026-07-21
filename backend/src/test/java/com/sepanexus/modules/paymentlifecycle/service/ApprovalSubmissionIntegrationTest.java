@@ -165,15 +165,15 @@ class ApprovalSubmissionIntegrationTest {
         UUID third = insertPending(tenantId, branchId, ruleId, Instant.parse("2026-07-05T08:00:00Z"),
                 Instant.parse("2099-07-06T08:00:00Z"));
 
-        ApprovalQueueReadModel.QueuePage firstPage = approvalQueueReadModel.pending(tenantId, branchId, 2, null);
-        ApprovalQueueReadModel.QueuePage secondPage = approvalQueueReadModel.pending(tenantId, branchId, 2,
+        com.sepanexus.modules.ApprovalQueueQuery.QueuePage firstPage = approvalQueueReadModel.pending(tenantId, branchId, 2, null);
+        com.sepanexus.modules.ApprovalQueueQuery.QueuePage secondPage = approvalQueueReadModel.pending(tenantId, branchId, 2,
                 firstPage.nextCursor());
 
-        assertThat(firstPage.items()).extracting(ApprovalQueueReadModel.QueueItem::approvalId)
+        assertThat(firstPage.items()).extracting(com.sepanexus.modules.ApprovalQueueQuery.QueueItem::approvalId)
                 .containsExactly(first, second);
-        assertThat(firstPage.items().getFirst().expired()).isTrue();
+        assertThat(firstPage.items().getFirst().expiredButUnprocessed()).isTrue();
         assertThat(firstPage.nextCursor()).isNotNull();
-        assertThat(secondPage.items()).extracting(ApprovalQueueReadModel.QueueItem::approvalId).containsExactly(third);
+        assertThat(secondPage.items()).extracting(com.sepanexus.modules.ApprovalQueueQuery.QueueItem::approvalId).containsExactly(third);
         assertThat(secondPage.nextCursor()).isNull();
         assertThat(approvalQueueReadModel.pending(tenantId, UUID.randomUUID(), 2, null).items()).isEmpty();
         assertThat(approvalQueueReadModel.pending(UUID.randomUUID(), branchId, 2, null).items()).isEmpty();

@@ -1,0 +1,23 @@
+type Query {
+  approvalQueue(first: Int!, after: String): ApprovalConnection!
+  approval(paymentId: ID!): Approval
+}
+
+type ApprovalConnection { items: [Approval!]!, nextCursor: String }
+
+type Approval {
+  approvalId: ID!
+  paymentId: ID!
+  approvalStatus: String!
+  makerUserId: String!
+  submittedAt: String!
+  expiresAt: String!
+  expiredButUnprocessed: Boolean!
+  matrixRuleId: ID!
+  amount: String!
+  currency: String!
+  debtorIban: String!
+  creditorIban: String!
+  decisionComment: String
+  decidedAt: String
+}

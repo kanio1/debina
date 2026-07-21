@@ -1,0 +1,56 @@
+# Debina Read-only GraphQL Approval Workspace — Wave 9
+
+## Baseline and source record
+
+- Actual baseline: `ade6218e822d26dfd348947e684a04cc0da099d3` on `main`; clean before Wave 9.
+- Wave 8 reconciled from local commits `73501af` through `ade6218`; approval persistence, commands,
+  queue model, audit and expiry are complete historical capability, not re-counted.
+- `.agents/skills -> ../.claude/skills` remains the canonical discovery bridge.
+
+| Binding source | Relevant sections | Blob |
+|---|---|---|
+| `README.md` | frozen GraphQL read-only, BFF, one-writer and five-axis rules | `d575e449903c727af7e4f7dfad05ff27be4a6d73` |
+| `sepa-nexus-message-flow-and-data-blueprint.md` | §§3.6.5, 4.7, 6.6, 7.2, §8 | `f8667131109858da5ff7f3d3a92d74d31a1df900` |
+| `sepa-nexus-blueprint-ownership-integration.md` | §3.6 read ownership and architecture gates | `fc88d643a0e5c24e73f3f5cb32a2056ab646428b` |
+| `sepa-nexus-keycloak-26-security-architecture-blueprint.md` | §§7, 9-13 | `4f7250d967d3bd2369ce70f5889df6965e78e35c` |
+| `sepa-nexus-react-nextjs-frontend-blueprint.md` | §§3a-3b, 9-10, 12-19 | `93473408711c6a5b474680e090de3b6b1615a138` |
+
+## Planning-owner result and decision
+
+- No pre-existing story built the GraphQL runtime: EPIC-16 enforces a runtime after it exists,
+  EPIC-23/23.1B generates types after SDL, and EPIC-76/76.6 owns UI after a read contract.
+- New source-derived owner: `EPIC-78`; ADR-W9-01 accepts a thin technical adapter depending only
+  on public, source-owned query ports/DTOs. Reporting ownership and repository-direct resolvers
+  are rejected.
+- Primary chain: 78.1 foundation → 16.1/16.2 ownership/read-only enforcement → 78.2 approval
+  queries → 23.1B codegen + 78.3 BFF → 76.6 workspace UI. Reserve: 77.3/78.4 audit query.
+
+## RED evidence
+
+- `GraphQLReadOnlyStructureTest` failed as required before implementation: no
+  `graphql/schema.graphqls` resource existed. Log:
+  `/tmp/DEBINA-READ-ONLY-GRAPHQL-APPROVAL-WORKSPACE-WAVE-9/red-graphql-structure.log`.
+
+## Security and contract constraints
+
+- Query only: no Mutation or Subscription; DTOs only; no command service/repository/native SQL in
+  adapter; no GraphQL arguments may establish tenant/branch.
+- Approval reads require `payment_approver`; owner port sets current tenant/branch GUC and relies
+  on RLS. Commands remain existing audited REST BFF calls and server-confirmed refresh is mandatory.
+- Candidate contract: `approvalQueue(first, after)` and `approval(paymentId)`, with the existing
+  `(submitted_at, approval_id)` cursor order and bounded page size.
+
+## Current checkpoint
+
+Planning owner and red structural proof are present. The first runtime slice is GREEN:
+
+- Spring Boot's managed `spring-boot-starter-graphql` exposes fixed `POST /graphql` from a Query-only
+  SDL. `ApprovalGraphQlRuntimeTest` proves a bearer-authenticated `payment_approver` gets a DTO
+  response and missing bearer receives 401 against isolated PostgreSQL 18.
+- `GraphQLReadOnlyStructureTest` parses the schema and proves Query exists while Mutation and
+  Subscription roots do not. `GraphQLReadModelOwnershipTest` plus `ModularityTest` prove the
+  transport depends on the public `modules.ApprovalQueueQuery`, not repositories or approval commands.
+- Green log: `/tmp/DEBINA-READ-ONLY-GRAPHQL-APPROVAL-WORKSPACE-WAVE-9/graphql-runtime-attempt-2.log`
+
+Remaining in 78.1: bounded depth/complexity, production introspection restriction and their
+non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof before frontend work.

@@ -51,21 +51,10 @@ decision_gates:
       only by the pending human decision.
     status: OPEN
   - id: gate.graphql-owner
-    blocks: [EPIC-26.26.4, EPIC-16, EPIC-23.23.1B, EPIC-53]
-    requires: >
-      A user/team decision on who owns building the first GraphQL schema/resolver layer —
-      see planning/decisions/GRAPHQL-OWNER-DECISION.md for the problem statement, the three
-      candidate ownership options (extend EPIC-16, extend EPIC-23, or a new dedicated epic),
-      and the consequences of each. Not an architecture decision this session is authorized
-      to make on its own.
-    evidence: >
-      No spring-graphql/graphql-java dependency exists in backend/pom.xml (confirmed by
-      grep). EPIC-16 only covers ownership enforcement of a schema once one exists; EPIC-23
-      Story 23.1B only covers codegen once an SDL exists. Neither epic's own source
-      citation describes building the schema itself. First surfaced as an [OPEN-QUESTION]
-      inside EPIC-26 Story 26.4 (2026-07-16 backlog-redesign session); this decision gate
-      formalizes it with a dedicated writeup and links it into the capability graph.
-    status: OPEN
+    blocks: []
+    requires: "Resolved by ADR-W9-01: thin GraphQL transport depends only on source-owned public query ports and DTOs."
+    evidence: "EPIC-78 is the source-derived runtime owner; EPIC-16 remains enforcement and EPIC-23/23.1B remains frontend codegen."
+    status: RESOLVED
 
 resolved_cycles:
   - id: cycle.signature-egress
@@ -119,6 +108,28 @@ decision_resolutions_2026_07_20:
       scope and a physical payment.received writer move remain outside this program.
 
 capabilities:
+  - epic: EPIC-78
+    title: "Read-only GraphQL delivery"
+    granularity: story-backed
+    source: "message-flow §§3.6.5, 6.6, 7.2; ownership integration §3.6; Keycloak §§7, 9-10, 13"
+    stories:
+      - id: 78.1
+        title: "Secured read-only Spring GraphQL foundation"
+        status: in-progress
+        produces: cap.graphql.read-only-foundation
+      - id: 78.2
+        title: "Payment-owned approval GraphQL queries"
+        status: not-started
+        requires: [cap.graphql.read-only-foundation, cap.payment.approval-queue]
+        produces: cap.graphql.approval-reads
+      - id: 78.3
+        title: "Fixed-destination BFF GraphQL proxy"
+        status: not-started
+        requires: [cap.graphql.approval-reads]
+      - id: 78.4
+        title: "Conditional audit query exposure"
+        status: blocked
+        requires: [cap.audit.internal-query, cap.graphql.read-only-foundation]
   - epic: EPIC-77
     title: "Evidence-audit: immutable application command log"
     granularity: story-backed
@@ -166,6 +177,7 @@ capabilities:
         title: "Module-owned approval queue/detail read model"
         status: not-started
         requires: [cap.payment.approval-persistence]
+        produces: cap.payment.approval-queue
       - id: 76.6
         title: "Payments workspace approval queue and command UI"
         status: blocked
