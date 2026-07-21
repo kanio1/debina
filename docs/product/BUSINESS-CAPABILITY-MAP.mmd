@@ -1,0 +1,9 @@
+flowchart LR
+  I[Initiate & control] --> P[Process payment meaning]
+  P --> S[Clear & settle]
+  S --> D[Deliver & evidence]
+  P --> X[Resolve exceptions]
+  G[Govern & operate] --> I
+  G --> P
+  G --> S
+  G --> D

@@ -1,0 +1,9 @@
+flowchart LR
+  browser[Browser] --> bff[Next.js frontend + BFF]
+  bff --> backend[Spring Modulith backend]
+  bff --> keycloak[Keycloak]
+  backend --> pg[(PostgreSQL)]
+  backend <--> kafka[Kafka]
+  backend <--> csm[Simulated CSM]
+  dev[Developer workstation / Codex CLI] --> dagger[Local Dagger Go SDK: planned]
+  dagger --> backend

@@ -1,13 +1,12 @@
 flowchart LR
-  Ingress --> PaymentLifecycle
-  IsoAdapter --> PaymentLifecycle
-  Signature --> Ingress
-  PaymentLifecycle --> Routing
-  PaymentLifecycle --> Settlement
-  Settlement --> LedgerPort[LedgerPort / Ledger]
-  PaymentLifecycle --> EvidenceAudit
-  GraphQL --> PaymentLifecycle
-  GraphQL --> EvidenceAudit
-  BFF[Next.js BFF] --> GraphQL
-  BFF --> PaymentLifecycle
-  PaymentLifecycle --> Egress
+  ingress[Ingress adapter] --> signature[Signature adapter]
+  ingress --> iso[ISO adapter]
+  iso --> payment[Payment lifecycle]
+  payment --> routing[Routing]
+  routing --> settlement[Settlement]
+  settlement --> ledger[Ledger]
+  settlement --> finality[Finality: settlement-owned]
+  payment --> egress[Egress adapter]
+  signature --> evidence[Evidence & audit]
+  payment --> graphql[GraphQL adapter] --> bff[Next.js BFF]
+  keycloak[Keycloak] --> bff

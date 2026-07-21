@@ -1,0 +1,8 @@
+flowchart TB
+  operator[Developer / Codex] --> dagger[Manual local Dagger: planned]
+  dagger --> lab[Provider-neutral Linux lab]
+  lab --> app[Next.js + Spring]
+  lab --> db[(PostgreSQL)]
+  lab --> broker[Kafka]
+  lab --> idp[Keycloak]
+  lab --> obs[Planned observability]

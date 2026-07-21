@@ -1,0 +1,8 @@
+flowchart LR
+  BP01[BP-01 Initiate] --> BP03[BP-03 Approve]
+  BP03 --> BP04[BP-04 Route]
+  BP04 --> BP05[BP-05 Gross instant]
+  BP04 --> BP06[BP-06 Deferred cycle]
+  BP05 --> BP09[BP-09 Egress]
+  BP06 --> BP09
+  BP07[BP-07 pacs.002 correlation] --> BP10[BP-10 Investigate]

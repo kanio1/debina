@@ -1,0 +1,11 @@
+flowchart LR
+  customer[Customer channel] --> psp[Participant PSP/bank]
+  psp --> debina[Debina research platform]
+  epc[EPC scheme context] -. authority .-> debina
+  iso[ISO 20022 context] -. authority .-> debina
+  tips[TIPS] --- csm[Simulated CSM]
+  step2[STEP2] --- csm
+  rt1[RT1] --- csm
+  stet[STET] --- csm
+  csm --> debina
+  operator[Operator/auditor] --> debina

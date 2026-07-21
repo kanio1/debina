@@ -1,23 +1,14 @@
 # Debina Enterprise Rebase Program
 
-This program pauses feature expansion, including Wave 12, until governance work is complete. It preserves existing implementation and frozen invariants.
+Feature expansion remains paused through Phase F evaluation of Wave 12.
 
-| Phase | Outcome | Completion criteria |
-|---|---|---|
-| A — stop expansion and adopt constitution | ADR-N15–N17, authority and governance policy accepted | constitution links valid; no feature work started |
-| B — product/domain/architecture model | concept model, module taxonomy, C4/context/quality method | source-backed assumptions and catalog review complete |
-| C — top enterprise use-case catalogue | ranked business/system UCs, slices/rules/traces | top catalogue accepted, no invented rail behaviours |
-| D — minimal smoke only | executable narrow smoke design/implementation when separately authorized | six approved smoke journeys evidenced |
-| E — semantic governance and Dagger | validators and Go Dagger implementation | SV-01–SV-12 cover the recorded baseline and CI mapping passes |
-| F — backlog migration | selected backlog slices traced and stale claims reconciled | migration cohort validated; no mass cosmetic rewrite |
-| G — resumed feature delivery | next READY slice selected through UC2 | dependencies, ownership and verify are executable |
+| Phase | Inputs | Outputs | Non-goals | Completion / branch |
+|---|---|---|---|---|
+| C1 — BA/use-case skills and semantic validators | Phase B catalogues, maker-checker | enterprise-use-case-engineering, source-backed-payments-modeling, planning-semantic-integrity, architecture-evolution-review skills; five validators | UC mass migration, features | pilot maker-checker works; `rebase/phase-c1-ba-semantic-governance` |
+| C2 — pilot/top enterprise use cases | C1 | UC2 specs/slices/rules/examples/qualities/realizations for maker-checker, signed pain.001, single SCT, file SCT, SCT Inst | production changes | reviewed source-backed records; `rebase/phase-c2-enterprise-use-cases` |
+| D — local Dagger Go SDK | C1/C2 and supported commands | local fast/integration/smoke/all | GitHub Actions, act, remote CI, deployment/release | direct local invocation works; `rebase/phase-d-local-dagger` |
+| E — controlled backlog migration | C1 validators + C2 records | traced cohorts: completed, in-progress, READY, MVP, P1, P2 | 304-story bulk rewrite | each cohort validates; `rebase/phase-e-backlog-migration` |
+| F — evaluate Wave 12 WIP | all above + `wip/wave-12-signature-verdict-evidence` at `5ebebb0` | evidence/decision packet | switching, merging, copying or resuming Wave 12 before review | accepted evaluation; `rebase/phase-f-wave12-evaluation` |
+| G — resume enterprise features | approved UC2 slice + readiness | use-case-slice delivery | broad backlog implementation | executable verify/evidence; per-slice branch |
 
-## Follow-up goals in recommended order
-
-1. **Governance implementation** — inputs: this constitution, inventory, capability graph, semantic-validation baseline; done when SV-01–SV-12 are implemented or explicitly staged with CI integration.
-2. **Use-case catalogue and traceability migration pilot** — inputs: source registry, top existing payment/approval flows; done when a small prioritized cohort has approved UC2 records and trace links.
-3. **Architecture evidence pack** — inputs: module catalog/context map; done when C4 landscape/context/container/deployment and selected dynamics are reviewed.
-4. **Dagger Go pipeline** — inputs: supported local commands and quality scenarios; done when targets run locally/CI through thin triggers.
-5. **Minimal smoke implementation** — inputs: accepted ADR-N16 and stable runtime routes; done when the six-scope smoke has runtime evidence.
-6. **Backlog migration** — inputs: validators and catalogue; done when feature queue is slice/quality-use-case traced and semantic drift is resolved.
-7. **Resume feature delivery** — inputs: all previous phases; done per the next UC2 slice, never this program alone.
+Remote CI provider selection is `DEFERRED` throughout. Minimal Playwright smoke is Phase D scope only; full acceptance remains deferred.

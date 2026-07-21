@@ -1,0 +1,11 @@
+flowchart TB
+  host[Fedora/Linux workstation]
+  host --> podman[Podman-compatible runtime]
+  podman --> nextjs[Next.js]
+  podman --> spring[Spring backend]
+  podman --> pg[(PostgreSQL)]
+  podman --> kafka[Kafka]
+  podman --> kc[Keycloak]
+  podman --> csm[Simulated CSM]
+  host --> tc[Testcontainers]
+  host --> dagger[Dagger engine: planned]

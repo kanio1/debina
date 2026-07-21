@@ -1,0 +1,6 @@
+flowchart LR
+  submitter[Submitter/Approver] --> debina[Debina]
+  ops[Operator/Auditor] --> debina
+  bff[Customer/BFF channel] --> debina
+  keycloak[Keycloak] --> debina
+  simulated[Simulated external participant/CSM] <--> debina
