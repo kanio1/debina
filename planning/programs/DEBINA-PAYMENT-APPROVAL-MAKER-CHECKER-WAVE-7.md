@@ -57,8 +57,8 @@ Primary queue: 76.1, 76.2, 76.5.  Reserve queue: source-derived evidence-audit o
 
 - Planning owner created before implementation; first proof was RED, not plan-only.
 - `d87bb441b01cb9df58e708be748cc852c4dee656` — `feat(payment): add maker-checker approval persistence` (verified Story 76.1).
-- Commit pending for verified Story 76.2.
-- Commit pending for verified Story 76.5; the wave reaches READY-EXHAUSTED after this slice because all remaining maker-checker stories carry the stated audit, GraphQL, Playwright, batch, or step-up gates.
+- `26d4a9c5139042e76c0c147a66ee8a7725c87f8e` — `feat(payment): gate submission on maker-checker approval` (verified Story 76.2).
+- `39621a6` — `feat(payment): add approval queue read model` (verified Story 76.5). READY-EXHAUSTED: remaining maker-checker stories carry the stated audit, GraphQL, Playwright, batch, or step-up gates.
 
 ## Current blockers and next work
 
