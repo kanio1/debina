@@ -57,3 +57,12 @@ Planning owner and red structural proof are present. The first runtime slice is 
 
 Remaining in 78.1: bounded depth/complexity, production introspection restriction and their
 non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof before frontend work.
+
+## Hardening checkpoint
+
+- `MaxQueryDepthInstrumentation(10)` and `MaxQueryComplexityInstrumentation(100)` are installed
+  in the GraphQL source builder. `application-prod.yml` disables SDL introspection.
+- `ApprovalGraphQlRuntimeTest` proves aliases cannot bypass complexity and deep introspection cannot
+  bypass depth; `ProductionGraphQlIntrospectionTest` proves an authenticated caller receives a
+  GraphQL error for `__schema` under the production profile. Green log:
+  `/tmp/DEBINA-READ-ONLY-GRAPHQL-APPROVAL-WORKSPACE-WAVE-9/graphql-hardening-attempt-2.log`.

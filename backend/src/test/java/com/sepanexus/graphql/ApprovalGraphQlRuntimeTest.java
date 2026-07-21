@@ -65,4 +65,34 @@ class ApprovalGraphQlRuntimeTest {
         mockMvc.perform(post("/graphql").contentType("application/json").content("{\"query\":\"{ __typename }\"}"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void aliasesCannotBypassQueryComplexityLimit() throws Exception {
+        StringBuilder query = new StringBuilder("query {");
+        for (int index = 0; index <= GraphQlSecurityConfiguration.MAX_COMPLEXITY; index++) {
+            query.append("q").append(index).append(": approvalQueue(first: 1) { nextCursor }");
+        }
+        query.append('}');
+
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"" + query + "\"}")
+                        .with(approverJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0].message").exists());
+    }
+
+    @Test
+    void deeplyNestedIntrospectionCannotBypassQueryDepthLimit() throws Exception {
+        String nested = "{ __schema { types { fields { type { ofType { ofType { ofType { ofType { ofType { ofType { ofType { ofType { ofType { name } } } } } } } } } } } } } }";
+        mockMvc.perform(post("/graphql").contentType("application/json")
+                        .content("{\"query\":\"" + nested + "\"}")
+                        .with(approverJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0].message").exists());
+    }
+
+    private static org.springframework.test.web.servlet.request.RequestPostProcessor approverJwt() {
+        return jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
+                .authorities(() -> "ROLE_payment_approver");
+    }
 }
