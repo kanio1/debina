@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class SettlementFinalityService {
 
     private static final String LEDGER_ENTRY_SOURCE = "LEDGER_ENTRY";
+    private static final String CYCLE_ITEM_SETTLED_SOURCE = "CYCLE_ITEM_SETTLED";
     private final SettlementConnectionFactory connections;
     private final PaymentFinalityPort paymentFinalityPort;
     private final FinalityRulePolicy policy = new FinalityRulePolicy();
@@ -39,36 +40,57 @@ public class SettlementFinalityService {
             throw new IllegalArgumentException("evidenceHash is required");
         }
         FinalityOutcome outcome = recordAuthority(tenantId, settlementAttemptId, paymentId,
-                FinalityRulePolicy.ON_LEDGER_POST, 1, LEDGER_ENTRY_SOURCE, terminal.terminalEntryId(),
-                terminal.sourceOccurredAt(), evidenceHash);
+                FinalityRulePolicy.ON_LEDGER_POST, 1, connection -> new AuthoritativeSource(
+                        LEDGER_ENTRY_SOURCE, terminal.terminalEntryId(), terminal.sourceOccurredAt()), evidenceHash,
+                connection -> { });
+        paymentFinalityPort.project(tenantId, paymentId, outcome.recordId(), outcome.finalityAt());
+        return outcome;
+    }
+
+    /**
+     * The authoritative time and source are read from a durable SETTLED cycle/item fact, never
+     * supplied by routing, ISO, delivery or a caller clock.
+     */
+    public FinalityOutcome recordCycleItemSettled(UUID tenantId, UUID cycleId, UUID settlementItemId,
+            UUID settlementAttemptId, UUID paymentId, byte[] evidenceHash) {
+        if (cycleId == null || settlementItemId == null) throw new IllegalArgumentException("cycle and item are required");
+        FinalityOutcome outcome = recordAuthority(tenantId, settlementAttemptId, paymentId,
+                FinalityRulePolicy.ON_CYCLE_SETTLED, 1,
+                connection -> cycleItemSource(connection, cycleId, settlementItemId, settlementAttemptId, paymentId), evidenceHash,
+                connection -> markDeferredAttemptFinal(connection, settlementAttemptId, paymentId));
         paymentFinalityPort.project(tenantId, paymentId, outcome.recordId(), outcome.finalityAt());
         return outcome;
     }
 
     private FinalityOutcome recordAuthority(UUID tenantId, UUID attemptId, UUID paymentId, String ruleCode,
-            int ruleVersion, String sourceType, UUID sourceId, Instant sourceOccurredAt, byte[] evidenceHash) {
+            int ruleVersion, SourceReader sourceReader, byte[] evidenceHash, RecordFinalizer finalizer) {
+        if (tenantId == null || attemptId == null || paymentId == null) throw new IllegalArgumentException("tenant, attempt and payment are required");
+        if (evidenceHash == null || evidenceHash.length == 0) throw new IllegalArgumentException("evidenceHash is required");
         if (!policy.isCatalogued(ruleCode, ruleVersion) || !policy.isExecutableNow(ruleCode)) {
             throw new IllegalArgumentException("Finality rule has no executable laboratory trigger: " + ruleCode);
         }
-        Instant authoritativeTime = sourceOccurredAt.truncatedTo(ChronoUnit.MILLIS);
         for (int tries = 0; tries < 2; tries++) {
             try (Connection connection = connections.open()) {
                 connection.setAutoCommit(false);
                 try {
+                    AuthoritativeSource source = sourceReader.read(connection);
+                    Instant authoritativeTime = source.occurredAt().truncatedTo(ChronoUnit.MILLIS);
                     if (!ruleExists(connection, ruleCode, ruleVersion)) {
                         throw new IllegalArgumentException("Finality rule is absent from the versioned catalog: " + ruleCode);
                     }
                     Snapshot snapshot = snapshot(connection, attemptId, ruleCode, ruleVersion);
-                    FinalityRecord existing = existing(connection, paymentId, sourceType, sourceId);
+                    FinalityRecord existing = existing(connection, paymentId, source.type(), source.id());
                     if (existing != null) {
                         FinalityOutcome outcome = matchOrConflict(existing, paymentId, attemptId, snapshot, ruleCode,
-                                ruleVersion, sourceType, sourceId, authoritativeTime, evidenceHash);
+                                ruleVersion, source.type(), source.id(), authoritativeTime, evidenceHash);
+                        finalizer.finish(connection);
                         connection.commit();
                         return outcome;
                     }
                     UUID recordId = UUID.randomUUID();
-                    insertRecord(connection, recordId, paymentId, snapshot, ruleCode, ruleVersion, sourceType, sourceId,
+                    insertRecord(connection, recordId, paymentId, snapshot, ruleCode, ruleVersion, source.type(), source.id(),
                             authoritativeTime, evidenceHash);
+                    finalizer.finish(connection);
                     connection.commit();
                     return new FinalityOutcome(recordId, authoritativeTime, false);
                 } catch (SQLException failure) {
@@ -86,6 +108,53 @@ public class SettlementFinalityService {
             }
         }
         throw new IllegalStateException("Could not resolve concurrent settlement finality recording");
+    }
+
+    private static AuthoritativeSource cycleItemSource(Connection connection, UUID cycleId, UUID itemId,
+            UUID attemptId, UUID paymentId) throws SQLException {
+        try (PreparedStatement select = connection.prepareStatement("""
+                SELECT cycle.state, cycle.settled_at, item.settlement_attempt_id, item.payment_id
+                FROM settlement.settlement_cycles cycle
+                JOIN settlement.settlement_items item ON item.cycle_id = cycle.id
+                WHERE cycle.id = ? AND item.id = ? FOR UPDATE OF cycle
+                """)) {
+            select.setObject(1, cycleId); select.setObject(2, itemId);
+            try (ResultSet row = select.executeQuery()) {
+                if (!row.next()) throw new IllegalArgumentException("settlement item is not a member of the supplied cycle");
+                if (!DeferredCycleState.SETTLED.name().equals(row.getString(1)) || row.getTimestamp(2) == null) {
+                    throw new IllegalArgumentException("only a persisted SETTLED cycle can establish ON_CYCLE_SETTLED finality");
+                }
+                if (!attemptId.equals(row.getObject(3, UUID.class)) || !paymentId.equals(row.getObject(4, UUID.class))) {
+                    throw new FinalityConflictException(paymentId);
+                }
+                return new AuthoritativeSource(CYCLE_ITEM_SETTLED_SOURCE, itemId, row.getTimestamp(2).toInstant());
+            }
+        }
+    }
+
+    private static void markDeferredAttemptFinal(Connection connection, UUID attemptId, UUID paymentId) throws SQLException {
+        try (PreparedStatement select = connection.prepareStatement("""
+                SELECT payment_id, state FROM settlement.deferred_cycle_attempts WHERE id = ? FOR UPDATE
+                """)) {
+            select.setObject(1, attemptId);
+            try (ResultSet row = select.executeQuery()) {
+                if (!row.next() || !paymentId.equals(row.getObject(1, UUID.class))) throw new FinalityConflictException(paymentId);
+                if ("FINAL".equals(row.getString(2))) return;
+                if (!"CYCLE_ASSIGNED".equals(row.getString(2))) throw new FinalityConflictException(paymentId);
+            }
+        }
+        try (PreparedStatement update = connection.prepareStatement("""
+                UPDATE settlement.deferred_cycle_attempts SET state = 'FINAL' WHERE id = ?
+                """)) {
+            update.setObject(1, attemptId); update.executeUpdate();
+        }
+        try (PreparedStatement event = connection.prepareStatement("""
+                INSERT INTO settlement.deferred_cycle_attempt_events (settlement_attempt_id, seq, state, at)
+                SELECT ?, coalesce(max(seq), 0) + 1, 'FINAL', now()
+                FROM settlement.deferred_cycle_attempt_events WHERE settlement_attempt_id = ?
+                """)) {
+            event.setObject(1, attemptId); event.setObject(2, attemptId); event.executeUpdate();
+        }
     }
 
     private static Snapshot snapshot(Connection connection, UUID attemptId, String ruleCode, int ruleVersion)
@@ -180,6 +249,9 @@ public class SettlementFinalityService {
     }
 
     public record FinalityOutcome(UUID recordId, Instant finalityAt, boolean replayed) { }
+    private record AuthoritativeSource(String type, UUID id, Instant occurredAt) { }
+    @FunctionalInterface private interface SourceReader { AuthoritativeSource read(Connection connection) throws SQLException; }
+    @FunctionalInterface private interface RecordFinalizer { void finish(Connection connection) throws SQLException; }
     private record Snapshot(UUID id, UUID attemptId, String ruleCode, int ruleVersion) { }
     private record FinalityRecord(UUID id, UUID paymentId, UUID attemptId, UUID snapshotId, String ruleCode,
             int ruleVersion, String sourceType, UUID sourceId, Instant sourceOccurredAt, Instant finalityAt,

@@ -2,10 +2,7 @@
 
 ## Zadanie
 
-SEPA Nexus jest syntetyczną platformą płatności ISO 20022 do nauki testów
-enterprise. Wave 4 rozszerzył źródłowo potwierdzony routing o jawny fallback,
-niezmienne dowody decyzji oraz test lab, zachowując historyczne Wave 3 i aktywne
-skills ISO/Kafka.
+SEPA Nexus jest syntetyczną platformą płatności ISO 20022 do nauki testów enterprise. Wave 5 dostarcza źródłowo potwierdzony deferred-settlement cycle slice i settlement-owned cutoff read boundary.
 
 ## Zrobione
 
@@ -34,12 +31,16 @@ skills ISO/Kafka.
   `backend-regression-2.log`). Governance, inventory, capability graph oraz
   `bash tools/skills/validate-all-skills.sh` są PASS; wygenerowany
   `build/generated-spring-modulith/javadoc.json` przywrócono.
-- Commit implementacyjny Wave 4: `5491d21 feat(routing): add explicit fallback decision evidence`.
-  Kolejny lokalny commit zapisuje ten handoff; nic nie zostało wypchnięte.
+- Wave 5 (niezacommitowany jeszcze w chwili zapisu): ADR-N13, V51/V52,
+  `NetDeferredStrategy`, G6 cycle FSM, one-statement netting, item-based
+  `ON_CYCLE_SETTLED` authority and `CutoffStateReader`. Done: EPIC-37/37.1--37.4,
+  shared EPIC-34/34.1--34.2, EPIC-55/55.1. Focused Testcontainers tests pass;
+  V50→V52 keeps routing evidence; two full backend regressions are `485/0/0`.
 
 ## Utknęliśmy na
 
-Brak READY pracy z audytowanego routing cluster. EPIC-51/51.3 pozostaje
+EPIC-55/55.2 is SOURCE-BLOCKED: source lacks cutoff-vs-cycle disagreement precedence.
+EPIC-55/55.3 is SOURCE-BLOCKED: no account/amount/result/consistency contract; 55.4 is capability-blocked. EPIC-51/51.3 remains
 `SOURCE-BLOCKED` (allowed-message-set), EPIC-54/54.4 `SOURCE-BLOCKED`
 (multi-CSM), EPIC-56/56.3 `SOURCE-BLOCKED` (amount/currency boundary
 vocabulary), a 52.4, 53.4, 55.1 i 56.4 są `CAPABILITY-BLOCKED`. Nie wolno
@@ -49,9 +50,7 @@ reconciliation DDL, case DDL ani file-intake policy.
 
 ## Plan na następny krok
 
-Otwórz `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-4.md` i wybierz
-najwyżej wartościowy kandydat spoza routing cluster dopiero po ponownym
-potwierdzeniu źródła, zależności i wykonywalnego `verify:`.
+Run governance and skills validators, restore generated Modulith output if Maven changes it, inspect the complete diff, then commit the coherent Wave 5 verified slice and update this handoff with the commit SHA.
 
 ## Pułapki, których nie wolno powtórzyć
 

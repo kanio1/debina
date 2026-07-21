@@ -17,8 +17,8 @@ public final class FinalityRulePolicy {
         return version == 1 && CATALOG_RULES.contains(code);
     }
 
-    /** Only the real LedgerPort POST source exists in the current laboratory build. */
+    /** Only persisted, authoritative settlement facts are executable laboratory triggers. */
     public boolean isExecutableNow(String code) {
-        return ON_LEDGER_POST.equals(code);
+        return ON_LEDGER_POST.equals(code) || ON_CYCLE_SETTLED.equals(code);
     }
 }

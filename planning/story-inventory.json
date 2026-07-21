@@ -176,7 +176,7 @@
     },
     {
       "epic": "EPIC-34",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-34-deferred-settlement.md"
     },
     {
@@ -191,7 +191,7 @@
     },
     {
       "epic": "EPIC-37",
-      "status": "not-started",
+      "status": "done",
       "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md"
     },
     {
@@ -281,7 +281,7 @@
     },
     {
       "epic": "EPIC-55",
-      "status": "not-started",
+      "status": "in-progress",
       "source_file": "planning/epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md"
     },
     {
@@ -2400,27 +2400,27 @@
       "epic": "EPIC-34",
       "story": "34.1",
       "title": "FSM cyklu + blokada G6",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "./mvnw -f backend test -Dtest=*CycleCloseRaceTest*"
+        "./mvnw -f backend test -Dtest=DeferredSettlementCycleIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-34-deferred-settlement.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-34 Story 34.1 implementation session"
     },
     {
       "epic": "EPIC-34",
       "story": "34.2",
       "title": "Netting → pozycje",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 34.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*NettingSqlTest*"
+        "./mvnw -f backend test -Dtest=DeferredSettlementCycleIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-34-deferred-settlement.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-34 Story 34.2 implementation session"
     },
     {
       "epic": "EPIC-34",
@@ -2537,55 +2537,55 @@
       "epic": "EPIC-37",
       "story": "37.1",
       "title": "`NetDeferredStrategy`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "./mvnw -f backend test -Dtest=*NetDeferredStrategyTest*"
+        "./mvnw -f backend test -Dtest=NetDeferredStrategyTest"
       ],
       "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-37 Story 37.1 implementation session"
     },
     {
       "epic": "EPIC-37",
       "story": "37.2",
       "title": "FSM cyklu (blokada G6)",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 37.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*CycleCloseRaceTest*"
+        "./mvnw -f backend test -Dtest=DeferredSettlementCycleIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-37 Story 37.2 implementation session"
     },
     {
       "epic": "EPIC-37",
       "story": "37.3",
       "title": "Netting → pozycje",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 37.2"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*NettingSqlTest*"
+        "./mvnw -f backend test -Dtest=DeferredSettlementCycleIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-37 Story 37.3 implementation session"
     },
     {
       "epic": "EPIC-37",
       "story": "37.4",
       "title": "`ON_CYCLE_SETTLED`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 37.3"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*OnCycleSettledEventTest*"
+        "./mvnw -f backend test -Dtest=DeferredSettlementCycleIntegrationTest,SettlementFinalityServiceTest"
       ],
       "source_file": "planning/epics/EPIC-37-settlement-deferred-net-cycles.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-37 Story 37.4 implementation session"
     },
     {
       "epic": "EPIC-38",
@@ -3375,19 +3375,19 @@
       "epic": "EPIC-55",
       "story": "55.1",
       "title": "Port `CutoffStateReader`",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [],
       "verify": [
-        "./mvnw -f backend test -Dtest=*CutoffStateReaderPortTest*"
+        "./mvnw -f backend test -Dtest=CutoffStateReaderPortTest"
       ],
       "source_file": "planning/epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-55 Story 55.1 implementation session"
     },
     {
       "epic": "EPIC-55",
       "story": "55.2",
       "title": "Wyniki `CUTOFF_REACHED`/`CYCLE_CLOSED`",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 55.1"
       ],
@@ -3401,7 +3401,7 @@
       "epic": "EPIC-55",
       "story": "55.3",
       "title": "`LiquidityModePrecheckPort` (`[P1]`)",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 55.1"
       ],
@@ -3415,7 +3415,7 @@
       "epic": "EPIC-55",
       "story": "55.4",
       "title": "Zachowanie routingu przy zamkniętym cyklu",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 55.2"
       ],

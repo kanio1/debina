@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: in-progress
 depends_on: [EPIC-32-ledger-core, EPIC-37-settlement-deferred-net-cycles]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-MONEY-3, line 1252), [MVP], Iteracja 4"
 ---
@@ -8,23 +8,30 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-MONEY-3, line 1
 
 ## Story 34.1 — FSM cyklu + blokada G6
 
-status: not-started
+status: done
 depends_on: []
 
 Opis: test wyścigu na zamknięciu cyklu.
 
 Taski:
-- [ ] **FSM cyklu rozliczeniowego z semantyką blokady G6.**
-      `verify: ./mvnw -f backend test -Dtest=*CycleCloseRaceTest*`
+- [x] **FSM cyklu rozliczeniowego z semantyką blokady G6.**
+      `verify: ./mvnw -f backend test -Dtest=DeferredSettlementCycleIntegrationTest` → `7/0/0 PASS` (2026-07-21; shared capability with EPIC-37 Story 37.2).
+
+`[DONE 2026-07-21]`: one implementation and one PostgreSQL 18 G6 proof are
+shared with EPIC-37 Story 37.2; do not duplicate a cycle FSM for this story.
 
 ## Story 34.2 — Netting → pozycje
 
-status: not-started
+status: done
 depends_on: [Story 34.1]
 
 Taski:
-- [ ] **Netting jako jedno zapytanie SQL → pozycje.**
-      `verify: ./mvnw -f backend test -Dtest=*NettingSqlTest*`
+- [x] **Netting jako jedno zapytanie SQL → pozycje.**
+      `verify: ./mvnw -f backend test -Dtest=DeferredSettlementCycleIntegrationTest` → `7/0/0 PASS` (2026-07-21; shared capability with EPIC-37 Story 37.3).
+
+`[DONE 2026-07-21]`: one implementation and one PostgreSQL 18 netting proof are
+shared with EPIC-37 Story 37.3; item-derived positions are deterministic,
+duplicate-free and sum to zero.
 
 ## Story 34.3 — Wpis dziennika wsadowy + fan-out statusów
 
