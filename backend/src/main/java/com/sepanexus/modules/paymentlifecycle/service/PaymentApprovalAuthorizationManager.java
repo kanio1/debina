@@ -2,7 +2,7 @@ package com.sepanexus.modules.paymentlifecycle.service;
 
 import com.sepanexus.evidenceaudit.DeniedCommandAuditEntry;
 import com.sepanexus.evidenceaudit.DeniedCommandAuditPort;
-import java.time.Instant;
+import com.sepanexus.shared.ClockPort;
 import java.util.UUID;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
@@ -29,14 +29,16 @@ public class PaymentApprovalAuthorizationManager implements AuthorizationManager
     private final PaymentRepository payments;
     private final PaymentApprovalRepository approvals;
     private final DeniedCommandAuditPort deniedAudit;
+    private final ClockPort clock;
 
     public PaymentApprovalAuthorizationManager(TransactionTemplate transactionTemplate, TenantGucConfigurer tenantGuc,
-            PaymentRepository payments, PaymentApprovalRepository approvals, DeniedCommandAuditPort deniedAudit) {
+            PaymentRepository payments, PaymentApprovalRepository approvals, DeniedCommandAuditPort deniedAudit, ClockPort clock) {
         this.transactionTemplate = transactionTemplate;
         this.tenantGuc = tenantGuc;
         this.payments = payments;
         this.approvals = approvals;
         this.deniedAudit = deniedAudit;
+        this.clock = clock;
     }
 
     @Override
@@ -74,7 +76,7 @@ public class PaymentApprovalAuthorizationManager implements AuthorizationManager
             deniedAudit.appendDenied(new DeniedCommandAuditEntry(tenantId, branch == null ? null : UUID.fromString(branch),
                     jwt.getToken().getSubject(), hasApproverRole(jwt) ? "payment_approver" : "no_authorizing_role",
                     jwt.getToken().getClaimAsString("sid"), command.correlationId(), "PAYMENT_APPROVAL_" + command.decision(),
-                    "PAYMENT", command.paymentId(), command.paymentId(), reason, Instant.now()));
+                    "PAYMENT", command.paymentId(), command.paymentId(), reason, clock.now()));
             return new AuthorizationDecision(false);
         } catch (IllegalArgumentException malformedTrustedClaim) {
             return new AuthorizationDecision(false);

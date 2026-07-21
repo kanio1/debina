@@ -13,13 +13,13 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-/** Representative V50-to-V54 PostgreSQL 18 upgrade; Wave 3/4 routing evidence must survive. */
+/** Representative V50-to-current PostgreSQL 18 upgrade; Wave 3/4 routing evidence must survive. */
 @Testcontainers
 class DeferredSettlementCycleMigrationUpgradePathTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");
 
-    @Test void upgradesV50RoutingHistoryToV54WithoutRewritingIt() throws Exception {
+    @Test void upgradesV50RoutingHistoryToCurrentWithoutRewritingIt() throws Exception {
         try (Connection connection = admin(); Statement statement = connection.createStatement()) {
             statement.execute("CREATE ROLE sepa_migration LOGIN SUPERUSER PASSWORD 'dev-only-migration'");
         }
@@ -39,7 +39,7 @@ class DeferredSettlementCycleMigrationUpgradePathTest {
 
         try (Connection connection = admin(); Statement statement = connection.createStatement()) {
             try (ResultSet current = statement.executeQuery("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank DESC LIMIT 1")) {
-                current.next(); assertThat(current.getString(1)).isEqualTo("54");
+                current.next(); assertThat(current.getString(1)).isEqualTo("60");
             }
             try (ResultSet route = statement.executeQuery("SELECT count(*) FROM routing.route_decisions WHERE id = '" + decision + "'")) {
                 route.next(); assertThat(route.getInt(1)).isEqualTo(1);
