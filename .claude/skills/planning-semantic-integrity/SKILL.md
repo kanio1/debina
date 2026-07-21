@@ -20,3 +20,7 @@ Read `planning/AGENTS.md`, planning README, inventory/capability artifacts, enfo
 ## Guardrails and example
 
 Never mark work done just because code appears to exist. Do not global-keyword-match historical prose; use scoped story markers and deterministic capability evidence. A done approval story with an unchecked audit task is an error until task evidence is checked or formal status is honestly changed.
+
+## Handoff
+
+Receive approved or explicitly blocked behavioral slice references from the BA, source and architecture reviews. Planning may link a slice and its proof but must not redefine its actor goal, payment semantics or architecture ownership. A material open question, `AI_DRAFT` discovery state or source block is a readiness constraint, not an invitation to mark an implementation story READY.

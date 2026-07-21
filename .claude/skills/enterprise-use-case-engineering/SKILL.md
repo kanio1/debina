@@ -13,13 +13,25 @@ Act as Debina's Senior Business Analyst and Use-Case 2.0 facilitator. Treat `sou
 
 Read `AGENTS.md`, `docs/requirements/USE-CASE-METHOD.md`, the templates, process catalogue, candidate catalogue, `docs/standards/SOURCE-AUTHORITY-MATRIX.md`, `SOURCE-REGISTRY.yaml`, the concept catalogue, quality scenarios, module catalogue, relevant ADRs, and the affected epic/story. Inspect implementation/tests only as evidence.
 
+## Quick classification
+
+| Evidence | Outcome |
+|---|---|
+| new external actor goal | `CREATE_USE_CASE` |
+| new path to an existing goal | `ADD_FLOW`, then assess `ADD_SLICE` |
+| implementation mechanism only | `NO_USE_CASE_CHANGE` |
+| measurable quality requirement | `QUALITY_SCENARIO_ONLY` |
+| aggregate noun without lifecycle/invariant evidence | `AGGREGATE_REVIEW_REQUIRED` |
+| participant-only rail behavior | `SOURCE_BLOCKED` |
+| AI draft with material question | `HUMAN_REVIEW_REQUIRED` |
+
 ## Workflow
 
-1. Identify the business-process family and locate a use case. Decide `CREATE-USE-CASE`, `UPDATE-USE-CASE`, `ADD-SLICE`, `LINK-EXISTING-SLICE`, `QUALITY-SCENARIO-ONLY`, `SOURCE-BLOCKED`, `DECISION-BLOCKED`, or `NO-USE-CASE-CHANGE`.
+1. Declare system of interest/boundary; identify only external actors and an actor goal. Decide `CREATE_USE_CASE`, `UPDATE_USE_CASE`, `ADD_FLOW`, `ADD_SLICE`, `LINK_EXISTING_SLICE`, `QUALITY_SCENARIO_ONLY`, `ARCHITECTURE_REVIEW_ONLY`, `SOURCE_BLOCKED`, `DECISION_BLOCKED`, `HUMAN_REVIEW_REQUIRED`, or `NO_USE_CASE_CHANGE`.
 2. Identify primary/supporting actors, external systems, goal, scope, trigger, preconditions, minimal/success guarantees, main success scenario, alternatives, and failures.
-3. Perform Example Mapping: rules, concrete examples, questions, and out-of-scope. Record business rules with stable IDs and source registry keys/tags.
+3. Select OUTLINE/ESSENTIAL/FULLY_DRESSED by risk; perform Example Mapping with an honest `AI_DRAFT` review state. Record out-of-scope as Debina extension and rules with source-evidence applicability.
 4. Identify state transitions, messages/events, ownership, security and quality scenarios, observability, transaction boundary, and architecture realization.
-5. Create/update parent use case, its catalogue entry, slices, business-process/rule records, source gaps/open questions, and epic/story traceability.
+5. Create/update parent use case, flow IDs, behavioral slices, test/realization links, source gaps/open questions, and epic/story traceability. Handoff to payment modeling, architecture review, then planning integrity.
 6. Classify readiness. A business story is not `READY` without a slice, goal, actor/external system, main flow, source classification, applicable rules, owner, architecture realization, and executable verify.
 
 ## Guardrails

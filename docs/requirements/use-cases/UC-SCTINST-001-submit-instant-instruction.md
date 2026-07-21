@@ -6,12 +6,21 @@ methodology: {narrative: cockburn_fully_dressed, decomposition: use_case_2_0, ru
 ---
 # Submit an SCT Inst instruction
 **Business process:** BP-01; system level; **primary actor:** payment submitter; supporting: routing/settlement. Interest: an eligible single transaction reaches an explicit outcome. Trigger: instant instruction supplied.
+
+**Methodology assurance correction:** Debina is the system of interest; payment submitter is the external human actor. Routing and settlement are architecture realization. Profile is ESSENTIAL; discovery is `AI_DRAFT`/`NOT_REVIEWED` and rail-timeout remains material.
 ## Preconditions and guarantees
 Applicable SCT Inst profile and route selection exist. Minimal: no financial effect on invalid/failed submission. Success: instruction is accepted for route/settlement or rejected with correlation.
 ## Main success scenario
-1. Submitter provides one instant instruction. 2. Debina identifies tenant/channel. 3. Debina validates source/profile. 4. Debina records lineage and applies approval policy. 5. Debina selects eligible route. 6. Debina reports accepted processing outcome.
+BF-1. The submitter provides one instant instruction.
+BF-2. Debina identifies tenant and channel.
+BF-3. Debina validates the qualified source/profile.
+BF-4. Debina records lineage and applies approval policy.
+BF-5. Debina selects an eligible route.
+BF-6. Debina reports the accepted processing outcome.
 ## Extensions and failure flows
-3a unsupported profile/version rejects. 4a approval gate retains it. 5a no eligible route fails closed. Settlement timing/deadline is rail-specific and not asserted here.
+AF-3A. At BF-3, unsupported profile/version rejects with correlation; terminate.
+AF-4A. At BF-4, approval retains the instruction; rejoin outcome at BF-6.
+CF-5A. At BF-5, no eligible route fails closed; terminate. Rail timing/deadline is explicitly source-blocked.
 ## Rules, sources and rail applicability
 BR-SCTINST-001. `[EPC-SCT-INST]`, `[ISO20022]`; generic SCT Inst APPLICABLE; RT1/TIPS/STET APPLICABLE-WITH-RAIL-EXTENSION, named timing/submission rules SOURCE-BLOCKED; SCT/STEP2 NOT-APPLICABLE.
 ## Special requirements and variations

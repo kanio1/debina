@@ -1,4 +1,6 @@
-# ATAM-lite Review
+# ATAM-inspired Desk Review
+
+**Classification:** `ATAM_INSPIRED_DESK_REVIEW`. This is an agent/team desk analysis, not a stakeholder tradeoff workshop or Full ATAM. It identifies business drivers, quality scenarios, approaches, possible sensitivity/tradeoff points, risk/non-risk hypotheses and experiments; it does not claim stakeholder consensus or utility-tree prioritization.
 
 Business drivers are fidelity without false compliance, safe money semantics, tenant security, recoverability and affordable local verification. This review analyzes existing/frozen approaches; it does not change ADRs.
 

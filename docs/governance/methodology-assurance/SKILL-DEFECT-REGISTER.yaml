@@ -1,0 +1,17 @@
+version: 1
+defects:
+  - {id: F-01, finding: primary skill routing skeleton, disposition: CONFIRMED, remediation: decision-table-and-handoffs}
+  - {id: F-02, finding: shallow method/templates, disposition: CONFIRMED, remediation: adaptive-method-and-templates}
+  - {id: F-03, finding: literal validator, disposition: CONFIRMED, remediation: assurance-level-and-structured-metadata-rules}
+  - {id: F-04, finding: internal actors, disposition: CONFIRMED, remediation: actor-boundary-policy-and-representative-migration}
+  - {id: F-05, finding: compressed C2 flows, disposition: CONFIRMED, remediation: step-per-line-essential-profile}
+  - {id: F-06, finding: approval mixes goals, disposition: CONFIRMED, remediation: pending-approval-precondition}
+  - {id: F-07, finding: unanchored approval alternatives, disposition: CONFIRMED, remediation: BF/AF/CF/FF-flow-IDs}
+  - {id: F-08, finding: non-behavioral approval slices, disposition: CONFIRMED, remediation: slice-migration-map}
+  - {id: F-09, finding: false collaboration implication, disposition: CONFIRMED, remediation: AI_DRAFT-NOT_REVIEWED}
+  - {id: F-10, finding: out-of-scope canonicalized, disposition: CONFIRMED, remediation: Debina-extension-label}
+  - {id: F-11, finding: registry-only sources, disposition: CONFIRMED, remediation: evidence-status-and-limitations}
+  - {id: F-12, finding: ATAM desk review, disposition: CONFIRMED, remediation: ATAM_INSPIRED_DESK_REVIEW}
+  - {id: F-13, finding: C4 fragments, disposition: CONFIRMED, remediation: dynamic-review-metadata}
+  - {id: F-14, finding: uneven measures, disposition: CONFIRMED, remediation: quality-review}
+  - {id: F-15, finding: questionable system actors, disposition: PARTIAL, remediation: actor-type-audit-required-before-ready}

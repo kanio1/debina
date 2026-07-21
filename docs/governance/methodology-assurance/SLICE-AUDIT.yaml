@@ -1,0 +1,13 @@
+version: 1
+valid_types: [BEHAVIORAL, RISK_REDUCTION]
+migrations:
+  - {old_id: UCS-SCT-APPROVAL-001-J, new_owner: architecture-realization, new_type: REALIZATION_NOT_SLICE, replacement_reference: UC-SCT-APPROVAL-001#architecture-realization, reason: UI/BFF path is not distinct actor-visible behavior}
+  - {old_id: UCS-SCT-APPROVAL-001-K, new_owner: test-strategy, new_type: TEST_WORK_NOT_SLICE, replacement_reference: UC-SCT-APPROVAL-001#test-strategy, reason: acceptance automation is verification work}
+  - {old_id: UCS-SCT-APPROVAL-001-L, new_owner: UC-SCT-003, new_type: SEPARATE_USE_CASE_CANDIDATE, replacement_reference: UC-SCT-003, reason: batch/item behavior requires source-backed file-group flow}
+classification_summary: {VALID_BEHAVIORAL_SLICE: 35, REALIZATION_NOT_SLICE: 1, TEST_WORK_NOT_SLICE: 1, SEPARATE_USE_CASE_CANDIDATE: 1}
+records:
+  - {parent: UC-SCT-APPROVAL-001, ids: [UCS-SCT-APPROVAL-001-A, UCS-SCT-APPROVAL-001-B, UCS-SCT-APPROVAL-001-C, UCS-SCT-APPROVAL-001-D, UCS-SCT-APPROVAL-001-E, UCS-SCT-APPROVAL-001-F, UCS-SCT-APPROVAL-001-G, UCS-SCT-APPROVAL-001-H, UCS-SCT-APPROVAL-001-I], classification: VALID_BEHAVIORAL_SLICE}
+  - {parent: UC-SCT-APPROVAL-001, ids: [UCS-SCT-APPROVAL-001-J], classification: REALIZATION_NOT_SLICE}
+  - {parent: UC-SCT-APPROVAL-001, ids: [UCS-SCT-APPROVAL-001-K], classification: TEST_WORK_NOT_SLICE}
+  - {parent: UC-SCT-APPROVAL-001, ids: [UCS-SCT-APPROVAL-001-L], classification: SEPARATE_USE_CASE_CANDIDATE}
+  - {parent: C2-catalogue, ids: [UCS-SCT-001-A, UCS-SCT-001-B, UCS-SCT-002-A, UCS-SCT-002-B, UCS-SCT-003-A, UCS-SCT-003-B, UCS-SCTINST-001-A, UCS-SCTINST-001-B, UCS-ROUTING-001-A, UCS-ROUTING-001-B, UCS-CLEARING-001-A, UCS-SETTLEMENT-001-A, UCS-SETTLEMENT-001-B, UCS-SETTLEMENT-002-A, UCS-STATUS-001-A, UCS-STATUS-001-B, UCS-RTRANS-001-A, UCS-RTRANS-001-B, UCS-RTRANS-002-A, UCS-RTRANS-002-B, UCS-EGRESS-001-A, UCS-EGRESS-001-B, UCS-RECON-001-A, UCS-RECON-001-B, UCS-AUDIT-001-A, UCS-AUDIT-001-B], classification: VALID_BEHAVIORAL_SLICE}

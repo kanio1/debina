@@ -15,11 +15,15 @@ Read `SOURCE-AUTHORITY-MATRIX.md`, `SOURCE-REGISTRY.yaml`, payment concept catal
 
 ## Workflow
 
-1. Identify the concept and authority domain; inspect its registry source and rail applicability.
+1. Identify the concept and authority domain; inspect its registry source, per-claim source-evidence record and rail applicability.
 2. Compare the rail concept matrix with the current Debina representation; identify terminology collisions and common-core rail leakage.
 3. Classify the result as existing representation, new value object, entity, aggregate candidate, technical artifact, rail-specific concept, or unsupported assumption.
 4. Apply aggregate admission criteria before recommending an aggregate.
 5. Return one of `SOURCE-CONFIRMED`, `PROJECT-INTERPRETATION`, `PROJECT-SIMULATION`, `RAIL-SPECIFIC`, `INSUFFICIENT-EVIDENCE`, `CONFLICTING-SOURCES`, or `PARTICIPANT-DOCUMENTATION-REQUIRED` and update traceability/gaps.
+
+## Handoff and evidence
+
+Receive actor goals and candidate rules from `enterprise-use-case-engineering`; return source classification and terminology/aggregate findings to it. Do not treat a Java class, database status or project ADR as authority for EPC, ISO or rail behavior. Record detailed support using [the source-evidence policy](../../../docs/governance/methodology-assurance/SOURCE-EVIDENCE-POLICY.md), then hand architecture realization candidates to `architecture-evolution-review`.
 
 ## Guardrails
 

@@ -1,0 +1,8 @@
+flowchart LR
+  UCF[Use-Case Foundation: actor/goal/flows] --> C[Cockburn: narrative profile] --> UC2[UC2: slices/tests/realization]
+  EM[Example Mapping: discovery] --> UC2
+  ISO[ISO/EPC/rail: external semantics] --> UCF
+  DDD[DDD: ownership/invariants] --> AR[Architecture realization]
+  C4[C4: communication] --> AR
+  ARC[arc42: measurable quality] --> AT[ATAM-inspired desk review]
+  AT --> ADR[ADR candidate if significant]

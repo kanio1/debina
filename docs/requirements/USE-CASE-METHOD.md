@@ -1,7 +1,15 @@
-# Use-Case 2.0 Method
+# Use-Case Engineering Method
 
-Use-Case 2.0 is Debina's delivery model. A Business Process frames outcomes; a Business Use Case describes business intent; a System Use Case defines system responsibility; a Use-Case Slice is the smallest independently valuable, verifiable increment. Business Rules constrain behaviour; Examples illustrate them; Quality Scenarios state measurable non-functional demands; Architecture Realizations map slices to modules/ports; Epics, Stories, Tasks, Tests, and Runtime Evidence implement and prove the slice.
+Debina uses Use-Case Foundation as the universal base: a use case collects all basic, challenged and failure flows by which an **external** primary actor achieves a goal using the declared system of interest. Cockburn supplies readable narrative profiles; Use-Case 2.0 supplies behavioral slices, tests and realization/increment links. See the methodology assurance responsibility map for method boundaries.
 
-Every future story traces to at least one use-case slice or one explicit cross-cutting quality/infrastructure use case. Existing stories are migrated incrementally under Phase F; this policy does not falsely backfill their evidence.
+## Adaptive elaboration
 
-Mandatory system-use-case fields are: goal, scope, actors, trigger, preconditions, minimal guarantee, success guarantee, main scenario, alternatives, failures, business rules, source references, security, data ownership, state transitions, messages/events, quality scenarios, observability, slices, architecture realization, and test strategy.
+Choose `OUTLINE` for discovery/source-blocked work, `ESSENTIAL` for normal delivery preparation, and `FULLY_DRESSED` only for money/finality, security, concurrency/recovery, interoperability/rail uncertainty or significant tradeoffs. A profile states required detail; it does not assert review quality.
+
+## Required structure
+
+Every ENFORCED record declares system of interest/boundary, external actor/type, actor goal/goal level, profile, discovery status, material-question state, methodology, source evidence status and architecture-evaluation classification. Flows use stable `BF-*` and `AF-*`/`CF-*`/`FF-*` IDs. An alternate identifies entry flow, condition, steps, rejoin/termination and guarantee. Internal modules appear only in architecture realization.
+
+Only `BEHAVIORAL` or `RISK_REDUCTION` items are UC2 slices: they select parent flows, have an observable outcome/start/end, link to test cases or an explicit preparation gap, and connect to realization. UI adapters, test automation and future batch candidates are realization/test/candidate records, not slices.
+
+Example Mapping records rules/examples/questions. Collaboration is `AI_DRAFT`/`NOT_REVIEWED` until durable review evidence proves otherwise; `out_of_scope` is a Debina extension. Material open questions block READY. Stories implement/prove slices but never redefine higher-authority behavior.

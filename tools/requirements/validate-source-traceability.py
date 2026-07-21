@@ -24,5 +24,17 @@ def main():
             for item in [x.strip() for x in value.split(',') if x.strip()]:
                 if item not in RAIL_STATUS:
                     errors += 1; diagnostic("ERROR", "SRC-004", path.relative_to(ROOT), item, "rail-applicability", "unsupported value")
+    evidence = ROOT / 'docs/standards/SOURCE-EVIDENCE-CATALOG.yaml'
+    if not evidence.is_file():
+        errors += 1; diagnostic("ERROR", "SRC-005", evidence.relative_to(ROOT), "catalog", "source-evidence", "missing source evidence catalogue")
+    else:
+        content = evidence.read_text()
+        for required in ('id:', 'source_registry_id:', 'document_title:', 'publisher:', 'section:', 'supported_claim:', 'project_interpretation:', 'confidence:'):
+            if required not in content:
+                errors += 1; diagnostic("ERROR", "SRC-006", evidence.relative_to(ROOT), required, "source-evidence", "mandatory evidence field missing")
+        for source in re.findall(r"source_registry_id:\s*([^\s]+)", content):
+            if source not in src:
+                errors += 1; diagnostic("ERROR", "SRC-007", evidence.relative_to(ROOT), source, "source-evidence", "source registry reference missing")
+    print("ASSURANCE [REFERENTIAL] source registry and evidence-catalogue references were checked; semantic truth requires source review.")
     return finish(errors,warnings,validated_sources=len(src))
 if __name__ == '__main__': sys.exit(main())

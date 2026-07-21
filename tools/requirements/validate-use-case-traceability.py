@@ -28,8 +28,8 @@ def main():
             for key, value in required.items():
                 if not re.search(rf"{key}:\s*{value}\b", doc):
                     errors += 1; diagnostic("ERROR", "UCT-008", document, uc, "methodology", f"missing/unsupported {key}")
-            if not re.search(r"^1\.\s", doc, re.M):
-                errors += 1; diagnostic("ERROR", "UCT-009", document, uc, "main-flow", "numbered main success scenario missing")
+            if not re.search(r"^(?:1\.|BF-1\.)\s", doc, re.M):
+                errors += 1; diagnostic("ERROR", "UCT-009", document, uc, "main-flow", "numbered or stable BF main success scenario missing")
     backlog_map = ROOT / "docs/requirements/USE-CASE-TO-BACKLOG-MAP.yaml"
     if backlog_map.exists():
         for value in re.findall(r"\bslices:\s*\[([^]]*)\]", backlog_map.read_text()):

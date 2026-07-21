@@ -1,0 +1,3 @@
+version: 1
+before: {foundation: NOMINAL, cockburn: NOMINAL, use_case_2_0: PARTIAL, example_mapping: NOMINAL, c4: NOMINAL, arc42: PARTIAL, atam: OVERCLAIMED}
+after: {foundation: OPERATIONAL_POLICY, cockburn: ADAPTIVE_POLICY, use_case_2_0: SLICE_AUDITED, example_mapping: HONEST_DISCOVERY, c4: REVIEWED_HUMAN_FOLLOWUP, arc42: REVIEWED, atam: ATAM_INSPIRED_DESK_REVIEW}

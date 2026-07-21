@@ -1,0 +1,62 @@
+version: 1
+purpose: Per-claim evidence references for methodology-assurance representative use cases; registry presence alone is discovery.
+evidence:
+  - id: SE-SCT-001
+    source_registry_id: epc-sct
+    document_title: EPC SEPA Credit Transfer Rulebook
+    publisher: European Payments Council
+    document_version: VERIFY-PER-USE
+    publication_date: UNKNOWN
+    effective_date: UNKNOWN
+    section: SECTION-NOT-AVAILABLE
+    rail: generic-SCT
+    public_or_restricted: public
+    access_date: 2026-07-21
+    supported_claim: SCT-specific admission constraints require the applicable EPC rulebook/profile rather than current Debina code.
+    project_interpretation: Debina records source lineage before its project-specific approval/release decision.
+    confidence: MEDIUM
+  - id: SE-ISO-STATUS-001
+    source_registry_id: iso20022-catalogue
+    document_title: ISO 20022 catalogue and Financial Repository
+    publisher: ISO 20022 Registration Management Group
+    document_version: message-version-specific
+    publication_date: UNKNOWN
+    effective_date: UNKNOWN
+    section: SECTION-NOT-AVAILABLE
+    message_set: payments
+    message_definition: pacs.002
+    message_version: PARTICIPANT-PROFILE-REQUIRED
+    rail: all-applicable
+    public_or_restricted: public
+    access_date: 2026-07-21
+    supported_claim: A status message must be interpreted with its applicable message definition and profile; the catalogue hierarchy alone does not establish a lifecycle transition.
+    project_interpretation: Debina preserves separate message, business, transport, ISO and finality axes during correlation.
+    confidence: MEDIUM
+  - id: SE-PROJECT-APPROVAL-001
+    source_registry_id: project-adr-n10
+    document_title: Debina accepted payment lifecycle and idempotency decision
+    publisher: Debina project
+    document_version: accepted-ADR
+    publication_date: UNKNOWN
+    effective_date: UNKNOWN
+    section: decision
+    rail: project-policy
+    public_or_restricted: project-internal
+    access_date: 2026-07-21
+    supported_claim: Debina's maker-checker, idempotency and atomic-audit behavior is project policy, not EPC or ISO truth.
+    project_interpretation: Approval behavior applies only where Debina's configured policy requires it.
+    confidence: HIGH
+  - id: SE-SCTINST-001
+    source_registry_id: epc-sct-inst
+    document_title: EPC SEPA Instant Credit Transfer scheme material
+    publisher: European Payments Council
+    document_version: VERIFY-PER-USE
+    publication_date: UNKNOWN
+    effective_date: UNKNOWN
+    section: SECTION-NOT-AVAILABLE
+    rail: generic-SCT-Inst
+    public_or_restricted: public
+    access_date: 2026-07-21
+    supported_claim: Generic SCT Inst does not establish participant-specific RT1, TIPS or STET processing behavior.
+    project_interpretation: Rail deadline and liquidity details remain source- or participant-documentation-blocked.
+    confidence: MEDIUM

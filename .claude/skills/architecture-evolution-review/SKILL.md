@@ -20,6 +20,10 @@ Map approved slices/scenarios to the current architecture. Read `ARCHITECTURE-ME
 
 Do not create a module/context without use-case evidence, context-map review, module admission review and consequences. Do not turn GraphQL/BFF into domain ownership. Validate module catalogue and ADR lifecycle; attach a quality scenario and executable proof where applicable.
 
+## Handoff
+
+Receive selected behavioral flows, source classification and candidate concepts; internal modules are never actors for a Debina-system use case. Return only realization/quality/decision outcomes to `enterprise-use-case-engineering`; pass story-facing constraints to `planning-semantic-integrity`. A new aggregate noun without an invariant and lifecycle is an `AGGREGATE-REVIEW-REQUIRED` finding, not a new actor or use case.
+
 ## Example
 
 Maker-checker approval maps command ownership to payment-lifecycle, append-only audit to evidence-audit, approval queue reads through the payment query port and Query-only GraphQL/BFF adapters; it does not create an approval module.

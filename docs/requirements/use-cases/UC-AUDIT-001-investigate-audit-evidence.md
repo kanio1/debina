@@ -6,8 +6,14 @@ methodology: {narrative: cockburn_fully_dressed, decomposition: use_case_2_0, ru
 ---
 # Investigate audit and evidence
 **BP-10; system; primary:** auditor; supporting operations analyst. Trigger: auditor supplies payment/message/audit identifier. Preconditions: authorized scope. Minimal: no data beyond authorized source-owned views. Success: linked audit/evidence is located with correlation.
+
+**Methodology assurance correction:** auditor and operations analyst are human roles external to Debina; GraphQL/BFF/query ports are architecture realization. Profile is ESSENTIAL; discovery is `AI_DRAFT`/`NOT_REVIEWED`.
 ## Main success scenario
-1. Auditor supplies identifier/filter. 2. Debina authorizes scope. 3. Debina queries source-owned payment/ISO/audit reads. 4. Debina correlates available evidence. 5. Debina presents results and gaps.
+BF-1. The auditor supplies an identifier or filter.
+BF-2. Debina authorizes the requested scope.
+BF-3. Debina queries source-owned payment, ISO and audit reads.
+BF-4. Debina correlates available evidence.
+BF-5. Debina presents authorized results and visible gaps.
 ## Extensions/failures
 2a unauthorized: deny/no foreign existence. 3a fragment missing: report gap. 4a correlation inconsistent: preserve evidence, do not repair.
 ## Rules/sources/rails

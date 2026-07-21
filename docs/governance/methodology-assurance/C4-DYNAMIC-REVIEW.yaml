@@ -1,0 +1,9 @@
+version: 1
+review_basis: C4-compatible dynamic view checklist; visual readability is HUMAN_REVIEW_REQUIRED
+diagrams:
+  - {file: UC-SCT-001-submission.mmd, use_case_id: UC-SCT-001, diagram_type: dynamic-sequence, scope: Debina-single-SCT-submission, status: PARTIAL, gaps: [title, scope, legend, element-responsibilities]}
+  - {file: UC-SCT-003-file.mmd, use_case_id: UC-SCT-003, diagram_type: dynamic-sequence, scope: Debina-file-based-SCT-submission, status: PARTIAL, gaps: [title, scope, source-blocked-legend]}
+  - {file: UC-SCT-APPROVAL-001.mmd, use_case_id: UC-SCT-APPROVAL-001, diagram_type: dynamic-sequence, scope: Debina-maker-checker-approval, status: PARTIAL, gaps: [title, scope, relationship-labels]}
+  - {file: UC-SETTLEMENT-001.mmd, use_case_id: UC-SETTLEMENT-001, diagram_type: dynamic-sequence, scope: Debina-project-instant-settlement, status: PARTIAL, gaps: [title, scope, element-responsibilities]}
+  - {file: UC-STATUS-001-correlation.mmd, use_case_id: UC-STATUS-001, diagram_type: dynamic-sequence, scope: Debina-inbound-status-correlation, status: PARTIAL, gaps: [title, scope, lifecycle-boundary]}
+  - {file: UC-AUDIT-001-investigation.mmd, use_case_id: UC-AUDIT-001, diagram_type: dynamic-sequence, scope: Debina-audit-evidence-investigation, status: PARTIAL, gaps: [title, scope, authorization-legend]}

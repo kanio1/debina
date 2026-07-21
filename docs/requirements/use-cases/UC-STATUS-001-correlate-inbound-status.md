@@ -6,8 +6,15 @@ methodology: {narrative: cockburn_fully_dressed, decomposition: use_case_2_0, ru
 ---
 # Correlate an inbound payment status
 **BP-07; system; primary:** external CSM; supporting operations analyst, ISO-adapter. Trigger: recorded pacs.002. Preconditions: source message evidence. Minimal: unknown/ambiguous status does not mutate lifecycle. Success: correlation classification and evidence are durable.
+
+**Methodology assurance correction:** external CSM is an external software-system actor relative to Debina; ISO-adapter is architecture realization. Profile is ESSENTIAL and discovery is `AI_DRAFT`/`NOT_REVIEWED`.
 ## Main success scenario
-1. External system provides status report. 2. Debina preserves/validates message evidence. 3. Debina resolves original identifiers. 4. Debina classifies matched/orphan/ambiguous result. 5. Debina publishes only source-owned classification outcome. 6. Debina makes evidence available.
+BF-1. The external CSM provides a status report.
+BF-2. Debina preserves and validates message evidence.
+BF-3. Debina resolves original identifiers.
+BF-4. Debina classifies matched, orphan or ambiguous correlation.
+BF-5. Debina publishes only the source-owned classification outcome.
+BF-6. Debina makes correlation evidence available.
 ## Extensions/failures
 3a unknown: orphan; 3b conflicting identifiers: ambiguous; 2a duplicate/out-of-order: preserve/classify, do not collapse status axes. Lifecycle handoff is separate capability.
 ## Rules/sources/rails

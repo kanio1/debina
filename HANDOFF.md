@@ -2,21 +2,21 @@
 
 ## Zadanie
 
-Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research platform. Enterprise Rebase Phase C2 has produced the source-backed enterprise use-case catalogue and implementation sequencing without implementing a payment feature.
+Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research platform. The completed methodology-assurance review has remediated the Phase B/C1/C2 use-case operating system without changing production payment behavior.
 
 ## Zrobione
 
-- Added 14 ENFORCED actor-goal use cases across SCT, SCT Inst, routing, clearing, settlement, status, R-transactions, egress, reconciliation and audit; retained the C1 approval pilot.
-- Added C2 concept admission, backlog/dependency/implementation maps and six dynamic diagrams. Methodology validation now checks canonical C2 methodology declarations and numbered main flows.
-- C2 mutation proofs cover missing/invalid methodology, missing backlog slice, duplicate slice and invalid rail applicability; final governance runner passed with 296 LEGACY traceability and 69 LEGACY planning warnings.
+- Audited all 15 use cases and 38 slices in `docs/governance/methodology-assurance/`; deep-corrected approval, single/file SCT, SCT Inst, inbound status and audit investigation use cases.
+- Added adaptive `OUTLINE`/`ESSENTIAL`/`FULLY_DRESSED` templates, honest AI/human discovery states, per-claim source evidence, structured quality scenarios, C4 review metadata and `ATAM_INSPIRED_DESK_REVIEW` classification.
+- Enhanced the four enterprise governance skills and added methodology/C4 structural validators with ten adversarial fixtures. The governance runner and skill discovery pass; legacy warnings remain 296 traceability and 69 planning semantic warnings.
 
 ## Utknęliśmy na
 
-C2 source-blocked records are deliberate: rail file/group, clearing, deferred-cycle and R-transaction participant semantics need qualified source profiles. Legacy migration remains Phase E (296 traceability and 69 planning warnings).
+Nothing is blocked for the completed assurance review. Human review is still required for AI drafts, qualified participant rail profiles, C4 readability and quality measures marked as gaps; legacy migration remains Phase E.
 
 ## Plan na następny krok
 
-Start Phase D only when authorized: turn the recorded local commands into the Dagger verification platform; do not select remote CI or create Dagger code before that phase.
+When separately authorized, begin Phase D by reading `planning/programs/DEBINA-ENTERPRISE-USE-CASE-METHODOLOGY-ASSURANCE.md` and use the existing governance runner as an input to the local Dagger verification platform.
 
 ## Pułapki, których nie wolno powtórzyć
 

@@ -6,12 +6,21 @@ methodology: {narrative: cockburn_fully_dressed, decomposition: use_case_2_0, ru
 ---
 # Submit a file-based SCT instruction
 **Business process:** BP-02; **scope/level:** system; **primary actor:** payment submitter; **supporting:** ingress/ISO-adapter. Stakeholders need preserved file/group/item evidence. Trigger: submitter provides a file.
+
+**Methodology assurance correction:** system of interest is Debina; primary actor is the external human payment submitter. Ingress/ISO-adapter are architecture realization. Profile is OUTLINE because material source questions remain; discovery is `AI_DRAFT`/`NOT_REVIEWED`.
 ## Preconditions and guarantees
 Supported file/profile is selected. Minimal: receipt/evidence is correlated and no invented partial outcome occurs. Success: source-qualified file/group/transaction outcome is recorded.
 ## Main success scenario
-1. Submitter provides a file. 2. Debina identifies tenant/channel. 3. Debina records file evidence and identifies message/profile. 4. Debina validates header/group/transaction structure. 5. Debina records source-qualified outcomes. 6. Debina returns file correlation.
+BF-1. The submitter provides a file.
+BF-2. Debina identifies tenant and channel.
+BF-3. Debina records file evidence and identifies message/profile.
+BF-4. Debina validates header/group/transaction structure.
+BF-5. Debina records only source-qualified outcomes.
+BF-6. Debina returns file correlation.
 ## Extensions and failure flows
-4a. Header count/control sum mismatch: reject at the supported level. 4b. One invalid transaction: outcome policy is SOURCE-BLOCKED; do not infer partial processing. 3a. unsupported version: reject/preserve evidence.
+AF-3A. At BF-3, unsupported version rejects while preserving evidence; terminate with minimal guarantee.
+CF-4A. At BF-4, header count/control-sum mismatch rejects at the supported level; terminate.
+CF-4B. At BF-4, one invalid transaction remains SOURCE-BLOCKED; do not infer partial processing.
 ## Rules, sources and rail applicability
 BR-SCT-004. `[ISO20022]`, `[EPC-SCT]`, `[STEP2]`; generic SCT APPLICABLE-WITH-RAIL-EXTENSION, STEP2 SOURCE-BLOCKED pending profile, SCT Inst/RT1/TIPS NOT-APPLICABLE, STET PARTICIPANT-DOCUMENTATION-REQUIRED. ISO hierarchy: initiation/file/business message/group/transaction/pain.001.
 ## Special requirements and variations

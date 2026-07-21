@@ -1,33 +1,32 @@
 # UC-SCT-APPROVAL-001 — Maker-checker payment approval
 
-**Status:** PILOT / implemented-project-policy evidence; **Business process:** BP-03 approval-and-release; **Level:** system use case.
+**Status:** PILOT / implemented-project-policy evidence; **Business process:** BP-03 approval-and-release; **Level:** user goal; **System of interest:** Debina; **System boundary:** Debina payment-processing system; **Primary actor type:** human_role; **Actor goal:** decide a pending payment approval; **Detail profile:** FULLY_DRESSED; **Discovery:** AI_DRAFT / NOT_REVIEWED; **Material questions open:** true; **Architecture evaluation:** ATAM_INSPIRED_DESK_REVIEW.
 
 ## Goal, scope and actors
 
-**Goal:** make one authorized, durable approval decision for a single submitted payment, releasing only the existing post-receipt path when approved. **Scope:** Debina's synthetic single-payment project policy; it is not an EPC/CSM approval process. **Primary actor:** payment approver. **Supporting actors:** payment submitter (maker), payment-lifecycle, evidence-audit, GraphQL/BFF operational-read adapters. **External systems:** Keycloak supplies the authenticated subject/roles; no payment rail is involved. **Trigger:** a payment's frozen approval-matrix decision requires approval.
+**Goal:** make one authorized, durable approval decision for a pending single payment, releasing only the existing post-receipt path when approved. **Scope:** Debina's synthetic single-payment project policy; it is not an EPC/CSM approval process. **Primary actor:** payment approver. **Supporting external actor:** payment submitter (maker). **External system:** Keycloak supplies identity/roles; no payment rail is involved. Internal payment-lifecycle, evidence-audit, GraphQL and BFF belong to architecture realization, not actors. **Trigger:** the approver selects a pending approval.
 
 ## Preconditions and guarantees
 
-Preconditions: payment/ingress/ISO lineage was persisted; approval matrix result is frozen; caller is authenticated and authorized for tenant/branch. Minimal guarantee: no terminal decision or release occurs on a denied, conflicting, expired, or failed command. Success guarantee: exactly one terminal decision and its required audit evidence persist; approval releases the existing `payment.received` path once, while rejection/expiry do not.
+Preconditions: UC-SCT-001 or an equivalent accepted submission created payment/ingress/ISO lineage; approval is `PENDING_APPROVAL`; matrix result is frozen; caller is authenticated/authorized for tenant/branch. Minimal guarantee: no terminal decision or release occurs on a denied, conflicting, expired, or failed command. Success guarantee: exactly one terminal decision and required audit evidence persist; approval releases `payment.received` once; rejection/expiry do not.
 
 ## Main success scenario
 
-1. Submitter submits a single payment; payment-lifecycle creates the payment, ingress/ISO evidence, and an approval row.
-2. If approval is required, the row is `PENDING_APPROVAL`; no release event is emitted.
-3. Approver views the tenant/branch-scoped pending queue.
-4. Approver sends an approve or reject command with an idempotency key.
-5. payment-lifecycle authorizes the subject, rejects maker self-approval, and conditionally transitions the pending row.
-6. In the required transaction boundary, evidence-audit appends the command audit entry.
-7. Approval emits/reuses the existing received-path release once; rejection does not. The decision response is returned.
+BF-1. The approver opens the pending approval queue.
+BF-2. Debina returns only approvals visible to the approver's tenant and branch.
+BF-3. The approver selects one pending payment and submits an approve or reject decision with an idempotency key.
+BF-4. Debina authorizes the approver, verifies maker/checker separation, and conditionally records the terminal decision.
+BF-5. Debina appends the required command audit evidence in the same project command boundary.
+BF-6. For approval, Debina releases the existing received path once; for rejection it releases nothing.
+BF-7. Debina returns the durable decision and correlation identifiers.
 
 ## Alternatives and failures
 
-- A: matrix says no approval: create the approval representation and release the existing received path; do not enter the pending queue.
-- B: queue/detail read is denied cross tenant/branch, missing role, or empty tenant context; reveal no foreign object information.
-- C: maker equals checker: deny before a decision.
-- D: approval is already terminal, expired, or loses a checker/expiry race: conditional update conflicts; no second terminal state or release.
-- E: same idempotency request replays its stable result; changed payload conflicts.
-- F: audit append fails: decision/release rollback. [PROJECT-SIMULATION] the exact project transaction implementation is authoritative; no rail assertion is made.
+AF-2A — denied visibility. At BF-2, when tenant/branch/role is not authorized: Debina reveals no object existence; terminate with minimal guarantee.
+CF-4A — maker self-approval. At BF-4, when maker equals checker: Debina denies before decision; terminate with minimal guarantee.
+CF-4B — terminal/expired/race. At BF-4, when approval is terminal, expired or loses a race: Debina returns conflict; no second terminal state/release; terminate.
+AF-3A — idempotent replay. At BF-3, equivalent key returns original outcome; changed payload conflicts; rejoin BF-7 or terminate.
+FF-5A — audit append failure. At BF-5, Debina rolls back decision/release; terminate with minimal guarantee. `[PROJECT-SIMULATION]` transaction mechanics are project policy, not rail behavior.
 
 ## Business rules and source references
 
@@ -58,9 +57,9 @@ Quality: QS-INT-01 idempotency, QS-SEC-01 isolation, QS-TRC-01 decision investig
 | UCS-SCT-APPROVAL-001-G | concurrent checker decisions; EPIC-76 76.3–76.4 | BR-002, BR-004, BR-008 | Examples: two checkers race; first terminal decision wins. |
 | UCS-SCT-APPROVAL-001-H | deny maker self-approval; EPIC-76 76.3 | BR-001 | Example: same subject is denied and audited where supported. |
 | UCS-SCT-APPROVAL-001-I | investigate decision through audit/evidence; EPIC-76 76.3, EPIC-77 | BR-005 | Examples: audit append failure rollback; trace payment to audit/lineage. |
-| UCS-SCT-APPROVAL-001-J | existing UI/BFF path; EPIC-76 76.6, EPIC-78 | BR-001, BR-002 | Existing Query-only GraphQL/BFF evidence; full UI acceptance remains gated. |
-| UCS-SCT-APPROVAL-001-K | future full acceptance automation; EPIC-76 76.7 | — | Out-of-scope until ADR-N16 sequencing gate opens. |
-| UCS-SCT-APPROVAL-001-L | future batch/item approval; EPIC-76 76.8 | — | Excluded until a source-backed file/group aggregate exists. |
+| UCS-SCT-APPROVAL-001-J | **Retired as slice:** architecture realization | — | See slice-audit migration; UI/BFF is not a behavioral slice. |
+| UCS-SCT-APPROVAL-001-K | **Retired as slice:** test work | — | See slice-audit migration; acceptance automation is verification, not behavior. |
+| UCS-SCT-APPROVAL-001-L | **Reclassified:** separate-use-case candidate | — | See UC-SCT-003 and slice-audit migration; file/group evidence is required. |
 
 ## Test strategy, gaps and questions
 

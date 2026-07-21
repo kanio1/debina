@@ -1,0 +1,12 @@
+version: 1
+records:
+  - {id: QS-SEC-01, status: COMPLETE, response_measure: binary-non-disclosure, verification: runtime-test}
+  - {id: QS-SEC-02, status: VERIFICATION-MISSING, response_measure: binary-denial, verification: partial}
+  - {id: QS-INT-01, status: COMPLETE, response_measure: exactly-one-or-conflict, verification: integration-test}
+  - {id: QS-INT-02, status: COMPLETE, response_measure: no-partial-effect, verification: Testcontainers}
+  - {id: QS-REL-01, status: PARTIAL, response_measure: durable-relayable, verification: cross-module-gap}
+  - {id: QS-REL-02, status: PARTIAL, response_measure: finality-unchanged, verification: receipt-gap}
+  - {id: QS-TRC-01, status: PARTIAL, response_measure: linked-identifiers-locatable, verification: unified-gap}
+  - {id: QS-MOD-01, status: MEASURE-MISSING, response_measure: PROJECT-TARGET, verification: future}
+  - {id: QS-OPS-01, status: MEASURE-MISSING, response_measure: Phase-D-target, verification: planned}
+  - {id: QS-DEP-01, status: VERIFICATION-MISSING, response_measure: reproducible-command, verification: partial}
