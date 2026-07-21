@@ -136,7 +136,7 @@
     },
     {
       "epic": "EPIC-26",
-      "status": "in-progress",
+      "status": "done",
       "source_file": "planning/epics/EPIC-26-iso-message-lineage-core.md"
     },
     {
@@ -2014,7 +2014,7 @@
         "Story 26.3"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=*PaymentLineageGraphQLTest*"
+        "./mvnw -f backend test -Dtest=PaymentLineageGraphQLTest"
       ],
       "source_file": "planning/epics/EPIC-26-iso-message-lineage-core.md",
       "capability_analysis": "NOT_DEEP_DIVED"

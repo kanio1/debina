@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 depends_on: [EPIC-19-ingress-staging-pipeline]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-ISO-1, line 1268), [MVP]"
 ---
@@ -50,8 +50,8 @@ depends_on: [Story 26.2, Story 26.3]
 
 `[H8, 2026-07-16 — dual-agent governance/backlog-redesign session]`: this story's own deliverable (a read-model/GraphQL/frontend-facing lineage panel) is a different kind of work than its three sibling stories in this epic (26.1–26.3, all DB-migration/lineage-write concerns) — noted, not moved, since renumbering it into another epic file is a bigger structural change than this session's scope covers. Surfaced a real, previously-untracked planning gap while checking this: **`[OPEN-QUESTION]` — no epic in `/planning/` currently owns *building* the GraphQL layer itself.** `EPIC-16` only covers *ownership enforcement* of a GraphQL layer once one exists (grants/RLS on read models), and `EPIC-23` Story 23.1B only covers *codegen* once a GraphQL schema exists. Nothing currently specifies who writes the first `spring-graphql` schema/resolver. Not resolved here — recorded for `HANDOFF.md`/a future planning session, per this repo's own "don't invent architecture, record open questions" rule.
 
-`[READY → IMPLEMENTED-BUT-UNVERIFIED WAVE-11 2026-07-21]`: the GraphQL-missing blocker above was stale after Wave 9 (`EPIC-78` Query-only transport/codegen/BFF) and Wave 10 (Evidence Drawer). Direct dependencies 26.2/26.3 are done. Wave 11 added the ISO-owned typed read port, Query-only field, fixed BFF operation and independent drawer section, with structural RED/GREEN and frontend build proof. It is **not done** until Testcontainers/runtime JSON_DIRECT + signed pain.001, tenant/branch and role evidence, and the required full regressions pass; see `planning/programs/DEBINA-ISO-LINEAGE-IDENTIFIER-EVIDENCE-WAVE-11.md`.
+`[DONE WAVE-11 2026-07-21]`: stale GraphQL blocker resolved by Wave 9/10. Wave 11 delivered the ISO-owned typed read port, Query-only GraphQL field, fixed BFF operation and independent drawer section. PostgreSQL 18 Testcontainers and live Keycloak+BFF+Spring+isolated PostgreSQL proved JSON_DIRECT and signed pain.001, roles, tenant/branch isolation and honest optional identifiers; two full backend runs passed 540/540. Record: `planning/programs/DEBINA-ISO-LINEAGE-IDENTIFIER-EVIDENCE-WAVE-11.md`.
 
 Taski:
-- [ ] **Read model GraphQL: timeline lineage + panel identyfikatorów na szczególe płatności.**
-      `verify: ./mvnw -f backend test -Dtest=*PaymentLineageGraphQLTest*` — `NOT RUN`, `blocked` (patrz wyżej).
+- [x] **Read model GraphQL: timeline lineage + panel identyfikatorów na szczególe płatności.**
+      `verify: ./mvnw -f backend test -Dtest=PaymentLineageGraphQLTest` — PASS; live and full-regression evidence in Wave 11 record.

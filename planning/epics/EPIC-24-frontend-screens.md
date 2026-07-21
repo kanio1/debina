@@ -173,6 +173,8 @@ depends_on: []
 
 `[SOURCE-BLOCKED WAVE-10]`: signature verdict, payload hash, raw/parsed message, evidence records and trace ID mają brak publicznych source-owned typed read ports z field-level exposure rules. Drawer nie może czytać bezpośrednio `signature.*`, `ingress.*` ani `iso.*`; nie jest dozwolone wymyślanie tych danych. Odblokowanie wymaga ownera i read portów dla każdego section.
 
+`[PARTIAL WAVE-11]`: ISO lineage and controlled identifiers are delivered by Story 26.4 through the ISO-owned read port. This does not unblock signature verdict, payload hashes, raw/parsed message or trace-ID evidence; this story remains blocked for those independently source-blocked concerns.
+
 ## Story 24.8D — Evidence drawer Playwright acceptance (S-18)
 
 status: blocked
