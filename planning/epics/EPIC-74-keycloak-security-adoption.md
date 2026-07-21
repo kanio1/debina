@@ -63,20 +63,21 @@ Taski:
 
 ## Story 74.5 — Osobna baza Keycloak w skrypcie backupu
 
-status: not-started
+status: done
 depends_on: [Story 74.1]
 
-`[READY 2026-07-21]`: Story 74.1 now supplies the reproducible realm state.
-The Keycloak blueprint requires a separate Keycloak database and a realm
-export; exact Compose topology, least-privilege backup user, artifact layout
-and restore/readability mechanics are a Class B technical implementation
-choice, to be decided and proven together rather than inferred as business
-semantics. A shell script alone remains insufficient.
+`[DONE 2026-07-21]`: ADR-N14 records the Class B local topology: dedicated
+PostgreSQL 18 `keycloak-postgres`, separate data volume and Keycloak-only
+maintenance window. `backup-keycloak.sh` produces a custom-format database
+dump, supported offline `kc.sh export` output and SHA-256 manifest. Fresh
+Compose proof stopped/restarted only Keycloak, restored the dump into an
+isolated PostgreSQL 18 container (`realm` count `2`), and parsed the exported
+`sepa-nexus` realm with Organizations enabled.
 
 Opis: `[MVP]` Iteracja 0 wg starszego blueprintu §16 — mogło zostać pominięte w konkretnym `iteration-0-foundation-plan.md`, patrz otwarte pytanie.
 
 Taski:
-- [ ] **Osobna baza danych Keycloak + eksport realmu w skrypcie backupu.**
+- [x] **Osobna baza danych Keycloak + eksport realmu w skrypcie backupu.**
       `verify: test -f infra/scripts/backup-keycloak.sh`
 
 ## Otwarte pytania

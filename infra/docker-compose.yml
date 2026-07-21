@@ -16,10 +16,24 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: dev-only-admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: dev-only-keycloak-db
     ports:
       - "8080:8080"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:Z
+
+  keycloak-postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: dev-only-keycloak-db
+    volumes:
+      - keycloak-pgdata:/var/lib/postgresql
 
   kafka:
     image: apache/kafka:latest
@@ -41,3 +55,4 @@ services:
 
 volumes:
   pgdata: {}
+  keycloak-pgdata: {}

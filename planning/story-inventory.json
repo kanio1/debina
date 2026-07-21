@@ -4312,7 +4312,7 @@
       "epic": "EPIC-74",
       "story": "74.5",
       "title": "Osobna baza Keycloak w skrypcie backupu",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 74.1"
       ],
@@ -4320,7 +4320,7 @@
         "test -f infra/scripts/backup-keycloak.sh"
       ],
       "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md",
-      "capability_analysis": "NOT_DEEP_DIVED"
+      "capability_analysis": "DEEP_DIVED: 2026-07-21 EPIC-74 Story 74.5 implementation session"
     },
     {
       "epic": "EPIC-75",

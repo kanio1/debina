@@ -21,6 +21,9 @@ CPC-SP topology · one Spring Modulith deployable · one-writer-per-schema · st
 | [ADR-N9](./ADR-N9-synthetic-credit-transfer-learning-platform-scope.md) | Synthetic Credit Transfer learning-platform scope and non-claims | Product-scope gate |
 | [ADR-N10](./ADR-N10-settlement-finality-and-ledgerport-reservations.md) | Settlement finality authority and LedgerPort reservations | Finality/LedgerPort decision gate |
 | [ADR-N11](./ADR-N11-gross-instant-single-transaction-security-definer.md) | Gross-instant single-transaction SECURITY DEFINER coordination | EPIC-33/36 transaction-boundary decision |
+| [ADR-N12](./ADR-N12-routing-fallback-rule-identity.md) | Routing fallback-rule identity | EPIC-54 fallback evidence |
+| [ADR-N13](./ADR-N13-deferred-cycle-representation-and-finality-trigger.md) | Deferred-cycle representation and finality trigger | EPIC-37/39 deferred settlement |
+| [ADR-N14](./ADR-N14-keycloak-database-backup-and-realm-export.md) | Dedicated Keycloak database and offline realm backup | EPIC-74 Story 74.5 |
 
 ## Status legend
 
