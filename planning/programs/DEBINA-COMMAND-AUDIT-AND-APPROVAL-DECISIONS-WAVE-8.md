@@ -67,3 +67,7 @@ a dedicated `approval_expiry_role` datasource/scheduler. `ApprovalSubmissionInte
 proves one due pending approval becomes EXPIRED with one SYSTEM audit row, no business status or
 outbox, and replay returns zero. Initial missing audit-schema usage was a RED migration/runtime
 failure; V60 is its forward-only grant correction. Log: `expiry-runtime-green.log`.
+
+Authorization checkpoint: `ApprovalSubmissionIntegrationTest` 8/0/0 proves submitter, maker and
+foreign-branch approver denials occur before domain/idempotency mutation and leave a separate
+`DENIED` audit row. Log: `approval-auth-matrix-green.log`.

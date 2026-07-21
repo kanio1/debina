@@ -197,6 +197,29 @@ class ApprovalSubmissionIntegrationTest {
     }
 
     @Test
+    void makerAndForeignBranchApproversAreDeniedBeforeAnyDecisionMutation() throws Exception {
+        UUID tenant = UUID.randomUUID();
+        UUID branch = UUID.randomUUID();
+        UUID rule = addBroadRule(tenant, true, false);
+        UUID payment = paymentForApproval(insertPending(tenant, branch, rule, Instant.now(), Instant.now().plusSeconds(3600)));
+
+        var maker = new ApprovalDecisionCommand(tenant, branch, payment, "maker-queue", "sid-maker", UUID.randomUUID(),
+                "maker-key", null, ApprovalDecisionCommand.Decision.APPROVE);
+        withJwt(tenant, branch, "maker-queue", "payment_approver", () -> assertThatThrownBy(() ->
+                approvalDecisionService.decide(maker)).isInstanceOf(org.springframework.security.authorization.AuthorizationDeniedException.class));
+
+        UUID foreignBranch = UUID.randomUUID();
+        var foreign = new ApprovalDecisionCommand(tenant, foreignBranch, payment, "checker-foreign", "sid-foreign",
+                UUID.randomUUID(), "foreign-key", null, ApprovalDecisionCommand.Decision.APPROVE);
+        withJwt(tenant, foreignBranch, "checker-foreign", "payment_approver", () -> assertThatThrownBy(() ->
+                approvalDecisionService.decide(foreign)).isInstanceOf(org.springframework.security.authorization.AuthorizationDeniedException.class));
+
+        assertThat(count("SELECT count(*) FROM audit.audit_log WHERE payment_id = ? AND outcome = 'DENIED'", payment)).isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment)).isZero();
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys")).isZero();
+    }
+
+    @Test
     void expiryUsesTheNarrowSystemRoleAndIsReplaySafeWithoutStartingTheFsm() throws Exception {
         UUID tenant = UUID.randomUUID();
         UUID branch = UUID.randomUUID();
