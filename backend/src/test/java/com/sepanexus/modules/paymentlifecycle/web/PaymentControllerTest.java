@@ -15,6 +15,8 @@ import com.sepanexus.modules.paymentlifecycle.domain.PaymentStatus;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.IsoIdentifierLookup.IsoIdentifierView;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentNotFoundException;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
+import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionService;
+import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionResult;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentDetail;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentSummary;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentTimelinePage;
@@ -63,6 +65,26 @@ class PaymentControllerTest {
 
     @MockitoBean
     private PaymentService paymentService;
+
+    @MockitoBean
+    private ApprovalDecisionService approvalDecisionService;
+
+    @Test
+    void approveUsesTrustedJwtIdentityAndRequiresIdempotencyKey() throws Exception {
+        UUID tenant = UUID.randomUUID(); UUID branch = UUID.randomUUID(); UUID payment = UUID.randomUUID(); UUID approval = UUID.randomUUID();
+        when(approvalDecisionService.decide(any())).thenReturn(new ApprovalDecisionResult(payment, approval,
+                ApprovalStatus.APPROVED, Instant.parse("2026-07-21T10:00:00Z"), null));
+        mockMvc.perform(post("/api/v1/payments/" + payment + "/approve")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", tenant.toString()).claim("branch_id", branch.toString()).subject("checker"))
+                                .authorities(() -> "ROLE_payment_approver"))
+                        .header("Idempotency-Key", "approve-http-key").contentType("application/json"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.paymentId").value(payment.toString()))
+                .andExpect(jsonPath("$.approvalStatus").value("APPROVED"));
+        mockMvc.perform(post("/api/v1/payments/" + payment + "/approve")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", tenant.toString()).claim("branch_id", branch.toString()).subject("checker"))
+                                .authorities(() -> "ROLE_payment_approver")))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     void createsPaymentAndReturnsLocation() throws Exception {
