@@ -51,6 +51,9 @@ Planning owner and red structural proof are present. The first runtime slice is 
   Subscription roots do not. `GraphQLReadModelOwnershipTest` plus `ModularityTest` prove the
   transport depends on the public `modules.ApprovalQueueQuery`, not repositories or approval commands.
 - Green log: `/tmp/DEBINA-READ-ONLY-GRAPHQL-APPROVAL-WORKSPACE-WAVE-9/graphql-runtime-attempt-2.log`
+- Mutation proof: temporarily adding `type Mutation { forbidden: Boolean }` made
+  `GraphQLReadOnlyStructureTest` fail on the parsed Mutation root; the schema was restored and
+  the test passed. Logs: `mutation-schema-red.log`, `mutation-schema-restored-green.log`.
 
 Remaining in 78.1: bounded depth/complexity, production introspection restriction and their
 non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof before frontend work.
