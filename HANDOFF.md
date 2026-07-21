@@ -31,7 +31,7 @@ SEPA Nexus jest syntetyczną platformą płatności ISO 20022 do nauki testów e
   `backend-regression-2.log`). Governance, inventory, capability graph oraz
   `bash tools/skills/validate-all-skills.sh` są PASS; wygenerowany
   `build/generated-spring-modulith/javadoc.json` przywrócono.
-- Wave 5 (niezacommitowany jeszcze w chwili zapisu): ADR-N13, V51/V52,
+- Wave 5 commit `4c47158 feat(settlement): add deferred cycle finality slice`: ADR-N13, V51/V52,
   `NetDeferredStrategy`, G6 cycle FSM, one-statement netting, item-based
   `ON_CYCLE_SETTLED` authority and `CutoffStateReader`. Done: EPIC-37/37.1--37.4,
   shared EPIC-34/34.1--34.2, EPIC-55/55.1. Focused Testcontainers tests pass;
@@ -50,7 +50,7 @@ reconciliation DDL, case DDL ani file-intake policy.
 
 ## Plan na następny krok
 
-Run governance and skills validators, restore generated Modulith output if Maven changes it, inspect the complete diff, then commit the coherent Wave 5 verified slice and update this handoff with the commit SHA.
+Open `planning/programs/DEBINA-AUTONOMOUS-CAPABILITY-WAVE-5.md` and prepare the exact Class C decision packet for EPIC-55 Story 55.2; do not implement routing outcomes until a source defines cutoff/cycle disagreement precedence.
 
 ## Pułapki, których nie wolno powtórzyć
 

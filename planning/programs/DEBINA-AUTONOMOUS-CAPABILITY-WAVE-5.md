@@ -64,3 +64,10 @@ write or unapproved SECURITY DEFINER surface was added.
 - EPIC-55/55.2 is SOURCE-BLOCKED: no authoritative outcome precedence for cutoff/cycle-state disagreement.
   EPIC-55/55.3 is SOURCE-BLOCKED on its account/amount/result/consistency contract; 55.4 is
   CAPABILITY-BLOCKED by 55.2.
+
+## Commits and next work
+
+- `4c47158 feat(settlement): add deferred cycle finality slice` — ADR-N13, V51/V52,
+  EPIC-37/37.1--37.4, shared EPIC-34/34.1--34.2, EPIC-55/55.1 and all recorded proof.
+- No push occurred. Next highest-value work is a source-backed resolution of EPIC-55/55.2's
+  cutoff/cycle disagreement policy; without it, 55.4 must remain blocked.
