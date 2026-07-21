@@ -55,8 +55,8 @@ Planning owner and red structural proof are present. The first runtime slice is 
   `GraphQLReadOnlyStructureTest` fail on the parsed Mutation root; the schema was restored and
   the test passed. Logs: `mutation-schema-red.log`, `mutation-schema-restored-green.log`.
 
-Remaining in 78.1: bounded depth/complexity, production introspection restriction and their
-non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof before frontend work.
+At this checkpoint the remaining 78.1 hardening and RLS/cursor/detail integration proof were
+explicitly tracked before frontend work; both were completed in the following checkpoints.
 
 ## Hardening checkpoint
 
@@ -127,3 +127,22 @@ non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof bef
   `submitter3.payment.json`, `approver3.queue-before.json`, `approver3.approve.json`,
   `approver3.queue-after.json`, `submitter3.reject-payment.json`, `approver3.reject.json` and
   `approver3.queue-after-reject.json` in the Wave 9 temp directory.
+
+## Final verification checkpoint
+
+- Two consecutive complete backend regressions passed: each reports 526 tests, 0 failures,
+  0 errors and 0 skipped. Logs: `backend-regression-1-final.log` and
+  `backend-regression-2-final.log` in the Wave 9 temp directory.
+- Fresh final checks passed: `pnpm run codegen:graphql:check` regenerated the approved types and
+  found no diff; `bash tools/skills/validate-all-skills.sh`; story inventory; capability graph;
+  and `bash tools/agent-config/validate-governance.sh`. `git diff --check` is clean.
+- Runtime BFF proof used only `http://localhost:3000` endpoints. The resulting browser-equivalent
+  cookie jar contains only the HttpOnly server-session cookie and CSRF cookie, not an access or
+  refresh token. The source BFF uses its fixed configured backend destination and attaches the
+  bearer only server-side.
+- No Wave 9 migration was added. The isolated runtime database used the existing V1--V60 history;
+  the approval-matrix fixture was inserted only into the source-owned reference-data schema for
+  the smoke test.
+- Playwright remains deliberately uninstalled/unactivated: the frozen first-screen sequence is
+  still blocked by Ops Control Room. Batch approval, step-up, and the Evidence Drawer remain
+  outside this Wave 9 scope.
