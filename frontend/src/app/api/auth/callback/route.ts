@@ -35,6 +35,17 @@ function extractRoles(tokenPayload: Record<string, unknown>): string[] {
     : [];
 }
 
+function organizationTenantId(tokenPayload: Record<string, unknown>): string | null {
+  const organization = tokenPayload.organization;
+  if (!organization || typeof organization !== "object" || Array.isArray(organization)) return null;
+  const entries = Object.values(organization as Record<string, unknown>);
+  if (entries.length !== 1 || !entries[0] || typeof entries[0] !== "object" || Array.isArray(entries[0])) return null;
+  const tenantIds = (entries[0] as Record<string, unknown>).tenant_id;
+  if (!Array.isArray(tenantIds)) return null;
+  const tenantId = tenantIds.find((value): value is string => typeof value === "string" && value.length > 0);
+  return tenantId ?? null;
+}
+
 // Roles come from the access token, not the ID token: this realm's "realm roles" client
 // scope mapper is only configured to add `realm_access.roles` to the access token (verified
 // empirically — the ID token carries tenant_id/branch_id/preferred_username but no
@@ -51,7 +62,13 @@ function extractClaims(idTokenPayload: Record<string, unknown>, accessTokenPaylo
       typeof idTokenPayload.preferred_username === "string"
         ? idTokenPayload.preferred_username
         : null,
-    tenantId: typeof idTokenPayload.tenant_id === "string" ? idTokenPayload.tenant_id : null,
+    // The realm's frozen Organization mapper places the stable tenant UUID under
+    // `organization.<alias>.tenant_id`. The backend performs the same one-org
+    // normalization before installing RLS GUCs; the BFF needs it only for its
+    // trusted server-session display metadata.
+    tenantId: typeof idTokenPayload.tenant_id === "string"
+      ? idTokenPayload.tenant_id
+      : organizationTenantId(idTokenPayload),
     branchId: typeof idTokenPayload.branch_id === "string" ? idTokenPayload.branch_id : null,
     roles,
   };

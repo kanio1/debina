@@ -108,3 +108,8 @@ non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof bef
   `approver`; its BFF `ApprovalQueue` call returned an empty server-backed connection. The BFF now
   requests `openid sepa-guc`, the actual realm-published scope, rather than the absent `profile`
   scope that Keycloak rejected with `invalid_scope`.
+- The apparent live `tenantId: null` did not indicate a backend RLS gap: the frozen Organization
+  mapper deliberately emits `organization.<alias>.tenant_id`, which `SecurityConfig` already
+  normalizes before a backend request. The BFF session now performs the identical one-organization
+  derivation for its trusted display metadata. Frontend lint, typecheck and production build stay
+  GREEN (with the existing TanStack warning only).
