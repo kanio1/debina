@@ -4375,13 +4375,13 @@
       "epic": "EPIC-76",
       "story": "76.3",
       "title": "Approve and reject commands with same-transaction audit",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [
         "Story 76.2"
       ],
       "verify": [
         "./mvnw -f backend test -Dtest=ApprovalDecisionAuditIntegrationTest",
-        "./mvnw -f backend test -Dtest=ApprovalDecisionIntegrationTest"
+        "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest,ApprovalDecisionKeycloakRuntimeTest"
       ],
       "source_file": "planning/epics/EPIC-76-payment-approval-maker-checker.md",
       "capability_analysis": "NOT_DEEP_DIVED"
@@ -4390,7 +4390,7 @@
       "epic": "EPIC-76",
       "story": "76.4",
       "title": "Approval expiry",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [
         "Story 76.2",
         "Story 76.3"
@@ -4480,13 +4480,13 @@
       "epic": "EPIC-77",
       "story": "77.2",
       "title": "Same-transaction command audit and denied-command boundary",
-      "status": "not-started",
+      "status": "done",
       "depends_on": [
         "Story 77.1"
       ],
       "verify": [
-        "./mvnw -f backend test -Dtest=CommandAuditTransactionIntegrationTest",
-        "./mvnw -f backend test -Dtest=DeniedCommandAuditIntegrationTest"
+        "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest",
+        "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest"
       ],
       "source_file": "planning/epics/EPIC-77-evidence-audit-command-log.md",
       "capability_analysis": "NOT_DEEP_DIVED"

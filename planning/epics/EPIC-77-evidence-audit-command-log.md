@@ -30,7 +30,7 @@ Tasks:
 
 ## Story 77.2 — Same-transaction command audit and denied-command boundary
 
-status: in-progress
+status: done
 depends_on: [Story 77.1]
 
 Description: Implement the Class B accepted narrow append mechanism so successful commands append

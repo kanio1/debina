@@ -38,7 +38,7 @@ Tasks:
 
 ## Story 76.3 — Approve and reject commands with same-transaction audit
 
-status: in-progress
+status: done
 depends_on: [Story 76.2]
 
 Description: Implement `POST /api/v1/payments/{paymentId}/approve` and `/reject` through payment-lifecycle with role, tenant/branch, maker≠checker, idempotency, conditional-transition and outbox-release guards.
@@ -59,7 +59,7 @@ Tasks:
 
 ## Story 76.4 — Approval expiry
 
-status: in-progress
+status: done
 depends_on: [Story 76.2, Story 76.3]
 
 Description: A narrow service-role expiry capability changes only `PENDING_APPROVAL` rows past the frozen 24-hour limit to `EXPIRED`; it never starts the payment FSM or releases `payment.received`.
