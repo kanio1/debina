@@ -1,0 +1,3 @@
+# C4 Requirements
+
+Maintain a system-landscape diagram (actors and external authority/rail boundaries), system-context diagram (Debina and users/external systems), container diagram (Spring Modulith, Next.js BFF/UI, PostgreSQL, Kafka, Keycloak), deployment diagram (local/CI topology), and selected component diagrams for material ownership/security boundaries. Add dynamic diagrams for major use cases before material cross-context flows. Diagrams identify source version, assumptions, data ownership, trust boundaries, and status/finality axes; they must not imply unsupported rail integration. Detailed components are created demand-first, not as a documentation inventory exercise.

@@ -24,6 +24,9 @@ CPC-SP topology · one Spring Modulith deployable · one-writer-per-schema · st
 | [ADR-N12](./ADR-N12-routing-fallback-rule-identity.md) | Routing fallback-rule identity | EPIC-54 fallback evidence |
 | [ADR-N13](./ADR-N13-deferred-cycle-representation-and-finality-trigger.md) | Deferred-cycle representation and finality trigger | EPIC-37/39 deferred settlement |
 | [ADR-N14](./ADR-N14-keycloak-database-backup-and-realm-export.md) | Dedicated Keycloak database and offline realm backup | EPIC-74 Story 74.5 |
+| [ADR-N15](./ADR-N15-enterprise-payment-processing-research-platform-scope.md) | Enterprise payment-processing research-platform scope | Supersedes ADR-N9 Playwright-first scope only |
+| [ADR-N16](./ADR-N16-playwright-validation-sequencing.md) | Playwright validation sequencing | Minimal smoke early; full acceptance deferred |
+| [ADR-N17](./ADR-N17-demand-driven-graphql-operational-read-models.md) | Demand-driven GraphQL operational reads | Clarifies ADR-W9 |
 
 ## Status legend
 

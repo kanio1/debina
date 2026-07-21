@@ -1,0 +1,25 @@
+version: 1
+scope: "Current Spring Modulith application modules plus planned target contexts; this catalog does not create modules."
+modules:
+  - {name: payment-lifecycle, package: com.sepanexus.modules, status: implemented, classification: domain-bounded-context, subdomain: core, schema: payment}
+  - {name: security, package: com.sepanexus.security, status: implemented, classification: generic-subdomain, subdomain: generic, schema: security}
+  - {name: shared, package: com.sepanexus.shared, status: implemented, classification: platform-module, subdomain: generic, schema: none}
+  - {name: signature, package: com.sepanexus.signature, status: implemented, classification: technical-adapter, subdomain: supporting, schema: signature}
+  - {name: egress, package: com.sepanexus.egress, status: implemented, classification: technical-adapter, subdomain: supporting, schema: egress}
+  - {name: routing, package: com.sepanexus.routing, status: implemented, classification: domain-bounded-context, subdomain: core, schema: routing}
+  - {name: settlement, package: com.sepanexus.settlement, status: implemented, classification: domain-bounded-context, subdomain: core, schema: settlement}
+  - {name: ledger, package: com.sepanexus.ledger, status: implemented, classification: domain-bounded-context, subdomain: core, schema: ledger}
+  - {name: evidence-audit, package: com.sepanexus.evidenceaudit, status: implemented, classification: supporting-domain, subdomain: supporting, schema: [evidence, audit]}
+  - {name: graphql, package: com.sepanexus.graphql, status: implemented, classification: technical-adapter, subdomain: generic, schema: none}
+  - {name: nextjs-bff, package: frontend, status: implemented, classification: technical-adapter, subdomain: generic, schema: none}
+  - {name: ingress, status: planned, classification: technical-adapter, subdomain: supporting, schema: ingress}
+  - {name: batch, status: planned, classification: domain-bounded-context, subdomain: supporting, schema: batch}
+  - {name: iso-adapter, status: planned, classification: technical-adapter, subdomain: supporting, schema: iso}
+  - {name: reconciliation, status: planned, classification: domain-bounded-context, subdomain: supporting, schema: reconciliation}
+  - {name: case, status: planned, classification: domain-bounded-context, subdomain: supporting, schema: case}
+  - {name: reference-data, status: planned, classification: generic-subdomain, subdomain: generic, schema: reference_data}
+  - {name: risk, status: planned, classification: domain-bounded-context, subdomain: supporting, schema: risk}
+  - {name: simulation, status: planned, classification: platform-module, subdomain: supporting, schema: simulation}
+  - {name: reporting, status: planned, classification: supporting-domain, subdomain: supporting, schema: reporting}
+classification_values: [domain-bounded-context, supporting-domain, generic-subdomain, technical-adapter, platform-module]
+subdomain_values: [core, supporting, generic]

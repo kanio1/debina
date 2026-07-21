@@ -1,0 +1,84 @@
+version: 1
+policy: "References and lawful metadata only; no copyrighted scheme or participant document is copied here."
+sources:
+  - id: eu-2012-260
+    tag: EU-LAW
+    authority: EU law/regulation
+    title: Regulation (EU) No 260/2012
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/reg/2012/260/oj
+    version: consolidated-text-to-be-verified-per-use
+    sections: []
+    hash: not-recorded
+  - id: epc-sct
+    tag: EPC-SCT
+    authority: EPC Scheme Rulebook
+    title: SEPA Credit Transfer Scheme Rulebook
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/what-we-do/epc-payment-schemes/sepa-credit-transfer/sepa-credit-transfer-rulebook-and
+    version: 2025-v1.1 (verify applicability per use)
+    sections: []
+    hash: not-recorded
+  - id: epc-sct-inst
+    tag: EPC-SCT-INST
+    authority: EPC Scheme Rulebook and Implementation Guidelines
+    title: SEPA Instant Credit Transfer scheme
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/what-we-do/epc-payment-schemes/sepa-instant-credit-transfer
+    version: 2025-v1.1 (verify applicability per use)
+    sections: []
+    hash: not-recorded
+  - id: iso20022-catalogue
+    tag: ISO20022
+    authority: ISO 20022 Business Model/MDR/MUG/XSD
+    title: ISO 20022 Catalogue of messages
+    publisher: ISO 20022 Registration Management Group
+    url: https://www.iso20022.org/catalogue-messages
+    version: message-version-specific
+    sections: []
+    hash: not-recorded
+  - id: step2-public
+    tag: STEP2
+    authority: rail-specific official CSM specification
+    title: STEP2 public documentation
+    publisher: EBA CLEARING
+    url: https://www.ebaclearing.eu/services/step2-t/
+    version: verify-per-use
+    sections: []
+    hash: not-recorded
+  - id: rt1-public
+    tag: RT1
+    authority: rail-specific official CSM specification
+    title: RT1 public documentation
+    publisher: EBA CLEARING
+    url: https://www.ebaclearing.eu/services/rt1/
+    version: verify-per-use
+    sections: []
+    hash: not-recorded
+  - id: stet-public
+    tag: STET
+    authority: rail-specific official CSM specification
+    title: STET public documentation
+    publisher: STET
+    url: https://www.stet.eu/
+    version: verify-per-use
+    sections: []
+    hash: not-recorded
+  - id: tips-public
+    tag: TIPS
+    authority: rail-specific official CSM specification
+    title: TARGET Instant Payment Settlement documentation
+    publisher: European Central Bank
+    url: https://www.ecb.europa.eu/paym/target/tips/html/index.en.html
+    version: verify-per-use
+    sections: []
+    hash: not-recorded
+  - id: project-adr-n10
+    tag: PROJECT-ADR
+    authority: accepted project ADR
+    title: Settlement Finality Authority and LedgerPort Reservations
+    publisher: Debina
+    url: ../../ADR-N10-settlement-finality-and-ledgerport-reservations.md
+    version: local
+    sections: [Decision]
+    hash: d6503343e3260e1cb9a1be4aa601cf32df2b33c6
