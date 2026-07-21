@@ -14,7 +14,10 @@ export async function GET(_request: NextRequest) {
   const authorizeUrl = new URL(oidcConfig.authorizationEndpoint);
   authorizeUrl.searchParams.set("client_id", oidcConfig.clientId);
   authorizeUrl.searchParams.set("response_type", "code");
-  authorizeUrl.searchParams.set("scope", "openid profile");
+  // The realm intentionally publishes only the source-owned `sepa-guc` scope;
+  // requesting Keycloak's absent `profile` scope turns a valid PKCE login into
+  // an `invalid_scope` redirect before the BFF can establish its server session.
+  authorizeUrl.searchParams.set("scope", "openid sepa-guc");
   authorizeUrl.searchParams.set("redirect_uri", bffConfig.redirectUri);
   authorizeUrl.searchParams.set("state", state);
   authorizeUrl.searchParams.set("nonce", nonce);

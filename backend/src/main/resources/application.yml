@@ -9,6 +9,18 @@ spring:
     url: ${SEPA_MIGRATION_DB_URL:jdbc:postgresql://localhost:5432/sepa_nexus}
     user: ${SEPA_MIGRATION_DB_USER:sepa_migration}
     password: ${SEPA_MIGRATION_DB_PASSWORD:dev-only-migration}
+    locations:
+      - classpath:db/migration
+      - classpath:db/migration/payment
+      - classpath:db/migration/reference_data
+      - classpath:db/migration/ingress
+      - classpath:db/migration/iso
+      - classpath:db/migration/signature
+      - classpath:db/migration/egress
+      - classpath:db/migration/ledger
+      - classpath:db/migration/settlement
+      - classpath:db/migration/routing
+      - classpath:db/migration/audit
   security:
     oauth2:
       resourceserver:

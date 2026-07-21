@@ -98,3 +98,13 @@ non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof bef
   focused runtime test covers the detail contract as well as a submitter-role denial.
 - The GraphQL BFF checks both declared and actual UTF-8 body size before parsing JSON, so a missing
   or false `Content-Length` cannot bypass its 16 KiB request bound.
+
+## Runtime environment checkpoint
+
+- A fresh isolated PostgreSQL 18 container migrated V1 through V60 successfully using the existing
+  Maven Flyway workflow. Runtime configuration now declares every module migration classpath so a
+  packaged application can discover the same source tree rather than only the root V1 migration.
+- Real Keycloak 26.6.4 → Next.js PKCE established an HttpOnly `sepa_session` plus CSRF cookie for
+  `approver`; its BFF `ApprovalQueue` call returned an empty server-backed connection. The BFF now
+  requests `openid sepa-guc`, the actual realm-published scope, rather than the absent `profile`
+  scope that Keycloak rejected with `invalid_scope`.
