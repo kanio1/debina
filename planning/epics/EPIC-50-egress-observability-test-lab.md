@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: blocked
 depends_on: [EPIC-43-egress-rail-outbound-dispatch]
 source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-EGRESS-7, line 1309), [MVP]/[P1]"
 ---
@@ -8,8 +8,13 @@ source: "sepa-nexus-message-flow-and-data-blueprint.md §8 (EPIC-EGRESS-7, line 
 
 ## Story 50.1 — Read modele
 
-status: not-started
+status: blocked
 depends_on: []
+
+`[CAPABILITY-BLOCKED 2026-07-21]`: current egress has outbound messages and
+dispatcher claims, but no retry, DLQ/dead-letter, delivery-attempt or receipt
+persistence. The source story asks for delivery/retry/DLQ read models; a simple
+row listing would not satisfy it.
 
 Taski:
 - [ ] **Read modele egress (dashboard delivery, retry, DLQ).**

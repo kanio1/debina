@@ -32,11 +32,11 @@ Taski:
 - [ ] **Wyniki decyzji `CUTOFF_REACHED`/`CYCLE_CLOSED`.**
       `verify: ./mvnw -f backend test -Dtest=*CutoffCycleOutcomeTest*`
 
-`[SOURCE-BLOCKED 2026-07-21]`: §4.10 names both outcomes but does not define a
-decision precedence or result for a configured passed cutoff whose runtime cycle
-is still `OPEN`/otherwise disagrees. The Wave 5 boundary explicitly forbids
-treating `now > cutoff_at` alone as sufficient. A source or user decision is
-needed before routing behavior is implemented.
+`[DECISION-BLOCKED 2026-07-21]`: §4.10 names both outcomes but does not define
+precedence or the result when configured cutoff and runtime cycle facts disagree.
+The Wave 5 boundary forbids treating `now > cutoff_at` alone as sufficient. D6-01
+asks for the primary business outcome and consequence; routing cannot reject,
+queue, fallback or create/select a cycle by inference.
 
 ## Story 55.3 — `LiquidityModePrecheckPort` (`[P1]`)
 
@@ -49,10 +49,10 @@ Taski:
 - [ ] **`LiquidityModePrecheckPort` — gruby, read-only.**
       `verify: ./mvnw -f backend test -Dtest=*LiquidityPrecheckPortTest*`
 
-`[SOURCE-BLOCKED 2026-07-21]`: no authoritative contract identifies the exact
-participant/account identity, currency/amount input, liquidity-mode result or
-read-consistency boundary. It must not reproduce `LedgerPort` or infer the
-blocked profile-to-liquidity mapping from Story 35.3.
+`[DECISION-BLOCKED 2026-07-21]`: no authoritative contract identifies the
+participant/account, currency/amount, result/freshness or business consequence.
+It must not reproduce `LedgerPort` or infer the blocked profile mapping from
+Story 35.3. See Wave 6 packet D6-02.
 
 ## Story 55.4 — Zachowanie routingu przy zamkniętym cyklu
 

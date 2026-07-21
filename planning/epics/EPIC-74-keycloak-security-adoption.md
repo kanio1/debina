@@ -1,5 +1,5 @@
 ---
-status: not-started
+status: blocked
 depends_on: [EPIC-02-keycloak-realm-iteration-0]
 source: "sepa-nexus-full-blueprint-review-and-task-plan.md §12.1 line 350-351 (EPIC-SEC-KC); sepa-nexus-keycloak-26-security-architecture-blueprint.md (całość); sepa-nexus-keycloak-security-blueprint.md (całość)"
 ---
@@ -10,10 +10,18 @@ Rozszerza EPIC-02 (4 role) do pełnego modelu: 12 ról (`sepa-nexus-keycloak-26-
 
 ## Story 74.1 — Realm design + pełny seed (Organizacje, 12 ról)
 
-status: not-started
+status: blocked
 depends_on: []
 
 Opis: `[MVP]` Iteracja 1. Organization per uczestnik, claim `organization`/`branch_id`→GUC, dwupoziomowy test RLS z tokenem branch.
+
+`[SOURCE-BLOCKED 2026-07-21]`: the later §10 `[CHANGE]` table in the Keycloak
+26.6.4 blueprint authorises twelve roles including `payment_approver`; stale
+eleven-role prose is not used. The import has only four roles and no
+Organizations state. Official Keycloak sources confirm Organizations but the
+repository lacks a reproducible boot-import/export representation and runtime
+proof for its membership/claim seed; do not invent JSON fields or console-only
+state.
 
 Taski:
 - [ ] **Rozszerz realm z EPIC-02 do pełnego modelu 12 ról + Keycloak Organizations, claim mappery `organization_id`/`branch_id`.**
@@ -54,8 +62,12 @@ Taski:
 
 ## Story 74.5 — Osobna baza Keycloak w skrypcie backupu
 
-status: not-started
+status: blocked
 depends_on: [Story 74.1]
+
+`[CAPABILITY-BLOCKED 2026-07-21]`: Compose uses Keycloak development storage;
+no separate Keycloak database, backup convention or restore/readability proof
+exists, and Story 74.1 is source-blocked. A shell script alone is insufficient.
 
 Opis: `[MVP]` Iteracja 0 wg starszego blueprintu §16 — mogło zostać pominięte w konkretnym `iteration-0-foundation-plan.md`, patrz otwarte pytanie.
 

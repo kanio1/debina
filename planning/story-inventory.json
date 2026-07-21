@@ -196,7 +196,7 @@
     },
     {
       "epic": "EPIC-38",
-      "status": "not-started",
+      "status": "blocked",
       "source_file": "planning/epics/EPIC-38-settlement-internal-book-file-batch.md"
     },
     {
@@ -206,7 +206,7 @@
     },
     {
       "epic": "EPIC-40",
-      "status": "in-progress",
+      "status": "blocked",
       "source_file": "planning/epics/EPIC-40-settlement-insufficient-liquidity.md"
     },
     {
@@ -256,7 +256,7 @@
     },
     {
       "epic": "EPIC-50",
-      "status": "not-started",
+      "status": "blocked",
       "source_file": "planning/epics/EPIC-50-egress-observability-test-lab.md"
     },
     {
@@ -376,7 +376,7 @@
     },
     {
       "epic": "EPIC-74",
-      "status": "not-started",
+      "status": "blocked",
       "source_file": "planning/epics/EPIC-74-keycloak-security-adoption.md"
     },
     {
@@ -2591,7 +2591,7 @@
       "epic": "EPIC-38",
       "story": "38.1",
       "title": "`InternalBookStrategy`",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*InternalBookStrategyTest*"
@@ -2603,7 +2603,7 @@
       "epic": "EPIC-38",
       "story": "38.2",
       "title": "`FileBatchStrategy` podstawowa",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*FileBatchStrategyTest*"
@@ -2681,7 +2681,7 @@
       "epic": "EPIC-40",
       "story": "40.2",
       "title": "Wynik zależny od basis+mode+cutoff",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 40.1"
       ],
@@ -2695,7 +2695,7 @@
       "epic": "EPIC-40",
       "story": "40.3",
       "title": "`settlement_queue_items` + next-cycle (`[P1]`)",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 40.2"
       ],
@@ -3102,7 +3102,7 @@
       "epic": "EPIC-50",
       "story": "50.1",
       "title": "Read modele",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*EgressReadModelTest*"
@@ -4257,7 +4257,7 @@
       "epic": "EPIC-74",
       "story": "74.1",
       "title": "Realm design + pełny seed (Organizacje, 12 ról)",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [],
       "verify": [
         "./mvnw -f backend test -Dtest=*FullRoleModelRealmTest*",
@@ -4312,7 +4312,7 @@
       "epic": "EPIC-74",
       "story": "74.5",
       "title": "Osobna baza Keycloak w skrypcie backupu",
-      "status": "not-started",
+      "status": "blocked",
       "depends_on": [
         "Story 74.1"
       ],

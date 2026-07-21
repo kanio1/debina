@@ -89,10 +89,10 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-34 — Rozliczenie odroczone | not-started | EPIC-32, EPIC-37 | [epics/EPIC-34-deferred-settlement.md](epics/EPIC-34-deferred-settlement.md) |
 | EPIC-35 — Settlement: resolver strategii | in-progress (Story 35.1 **done** 2026-07-17 — `SettlementStrategyResolver(settlement_basis, liquidity_mode)`, 17/17 PASS, mutation-proof 3x, fail-closed 4-pair MVP matrix; Story 35.2 **done** 2026-07-17 — `NoProfileNameSwitchTest`, ArchUnit-enforced typed-pair selection boundary, 7/7 PASS, mutation-proof 3x; Story 35.3 `[CAPABILITY-BLOCKED]` — `scheme_profiles` has no `settlement_basis`/`liquidity_mode`/`finality_rule` columns; patrz epic file) | EPIC-12/Story 12.1 | [epics/EPIC-35-settlement-strategy-resolver.md](epics/EPIC-35-settlement-strategy-resolver.md) |
 | EPIC-36 — Settlement: gross instant + LedgerPort | in-progress (ADR-N11 command-port coordination verified; Story 36.2 `settlement_liquidity_checks` is **SOURCE-BLOCKED** — no source-backed table contract) | EPIC-35, EPIC-13 | [epics/EPIC-36-settlement-gross-instant.md](epics/EPIC-36-settlement-gross-instant.md) |
-| EPIC-37 — Settlement: netting odroczony i cykle | not-started | EPIC-35 | [epics/EPIC-37-settlement-deferred-net-cycles.md](epics/EPIC-37-settlement-deferred-net-cycles.md) |
-| EPIC-38 — Settlement: book wewnętrzny i wsad plikowy | not-started | EPIC-35 | [epics/EPIC-38-settlement-internal-book-file-batch.md](epics/EPIC-38-settlement-internal-book-file-batch.md) |
+| EPIC-37 — Settlement: netting odroczony i cykle | done (Stories 37.1–37.4 **done** 2026-07-21: typed deferred strategy, G6 FSM, deterministic netting and item finality; V51/V52) | EPIC-35 | [epics/EPIC-37-settlement-deferred-net-cycles.md](epics/EPIC-37-settlement-deferred-net-cycles.md) |
+| EPIC-38 — Settlement: book wewnętrzny i wsad plikowy | blocked (Stories 38.1–38.2 `DECISION-BLOCKED`; Wave 6 D6-03/D6-04) | EPIC-35 | [epics/EPIC-38-settlement-internal-book-file-batch.md](epics/EPIC-38-settlement-internal-book-file-batch.md) |
 | EPIC-39 — Settlement: model finalności | done (Stories 39.1–39.4 **done** 2026-07-20: versioned catalog, immutable settlement authority record, idempotent payment projection, pre-trigger and transport/receipt negative boundaries; only real `ON_LEDGER_POST` is executable) | EPIC-32/Story 32.2 | [epics/EPIC-39-settlement-finality-model.md](epics/EPIC-39-settlement-finality-model.md) |
-| EPIC-40 — Settlement: niewystarczająca płynność | in-progress (Story 40.1 **done** — gross-instant typed reject is atomic; Stories 40.2–40.3 remain) | EPIC-35 | [epics/EPIC-40-settlement-insufficient-liquidity.md](epics/EPIC-40-settlement-insufficient-liquidity.md) |
+| EPIC-40 — Settlement: niewystarczająca płynność | blocked (Story 40.1 **done**; 40.2 `DECISION-BLOCKED`, 40.3 `CAPABILITY-BLOCKED`; Wave 6 D6-02/D6-05) | EPIC-35 | [epics/EPIC-40-settlement-insufficient-liquidity.md](epics/EPIC-40-settlement-insufficient-liquidity.md) |
 | EPIC-41 — Settlement: CGS i prefunded `[P1]` | not-started | EPIC-35 | [epics/EPIC-41-settlement-cgs-prefunded.md](epics/EPIC-41-settlement-cgs-prefunded.md) |
 | EPIC-42 — Settlement: zwrot vs reversal | blocked (Story 42.1 CAPABILITY-BLOCKED on the missing case/requested-payment intake path) | EPIC-39 | [epics/EPIC-42-settlement-return-vs-reversal.md](epics/EPIC-42-settlement-return-vs-reversal.md) |
 
@@ -107,7 +107,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-47 — Egress: potwierdzenia dostawy, 5-osiowy status | not-started | EPIC-46 | [epics/EPIC-47-egress-delivery-receipts-five-status.md](epics/EPIC-47-egress-delivery-receipts-five-status.md) |
 | EPIC-48 — Egress: dostawa pliku wynikowego | not-started | EPIC-43 | [epics/EPIC-48-egress-batch-result-file-delivery.md](epics/EPIC-48-egress-batch-result-file-delivery.md) |
 | EPIC-49 — Egress: wychodzące case/R-message `[P1]` | not-started | EPIC-65 | [epics/EPIC-49-egress-case-r-message-outbound.md](epics/EPIC-49-egress-case-r-message-outbound.md) |
-| EPIC-50 — Egress: obserwowalność i test lab | not-started | EPIC-43 | [epics/EPIC-50-egress-observability-test-lab.md](epics/EPIC-50-egress-observability-test-lab.md) |
+| EPIC-50 — Egress: obserwowalność i test lab | blocked (Story 50.1 `CAPABILITY-BLOCKED`: retry/DLQ/delivery-attempt facts do not exist) | EPIC-43 | [epics/EPIC-50-egress-observability-test-lab.md](epics/EPIC-50-egress-observability-test-lab.md) |
 
 ## Faza 7 — Routing (Iteracja 5)
 
@@ -117,7 +117,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | EPIC-52 — Routing: kwalifikowalność i osiągalność | in-progress — Stories 52.1–52.3 done; 52.4 `CAPABILITY-BLOCKED` | EPIC-51 | [epics/EPIC-52-routing-eligibility-reachability.md](epics/EPIC-52-routing-eligibility-reachability.md) |
 | EPIC-53 — Routing: decyzja i wyjaśnienie | in-progress — Stories 53.1–53.3 done; 53.4 `CAPABILITY-BLOCKED` | EPIC-52 | [epics/EPIC-53-routing-decision-explanation.md](epics/EPIC-53-routing-decision-explanation.md) |
 | EPIC-54 — Routing: reguły fallback | in-progress — Stories 54.1–54.3 done; 54.4 `SOURCE-BLOCKED` | EPIC-53 | [epics/EPIC-54-routing-fallback-rules.md](epics/EPIC-54-routing-fallback-rules.md) |
-| EPIC-55 — Routing: precheck cutoff/cykl/płynność | not-started | EPIC-53, EPIC-37 | [epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md](epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md) |
+| EPIC-55 — Routing: precheck cutoff/cykl/płynność | in-progress (Story 55.1 **done**; 55.2/55.3 `DECISION-BLOCKED`, 55.4 `CAPABILITY-BLOCKED`; Wave 6 D6-01/D6-02) | EPIC-53, EPIC-37 | [epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md](epics/EPIC-55-routing-cutoff-cycle-liquidity-precheck.md) |
 | EPIC-56 — Routing: test lab | in-progress — Stories 56.1–56.2 done; 56.3 `SOURCE-BLOCKED`; 56.4 `CAPABILITY-BLOCKED` | EPIC-53, EPIC-54 | [epics/EPIC-56-routing-test-lab.md](epics/EPIC-56-routing-test-lab.md) |
 
 ## Faza 8 — Reconciliation (Iteracja 4)
@@ -151,7 +151,7 @@ Katalog epików/stories/tasków wyprowadzony z dokumentacji projektu (`/home/sus
 | Epik | Status | Zależy od | Plik |
 |---|---|---|---|
 | EPIC-73 — Ingress: szyna plikowa | not-started | EPIC-19 | [epics/EPIC-73-ingress-file-rail.md](epics/EPIC-73-ingress-file-rail.md) |
-| EPIC-74 — Adopcja Keycloak (pełny model, poza Iterację 0) | not-started | EPIC-02 | [epics/EPIC-74-keycloak-security-adoption.md](epics/EPIC-74-keycloak-security-adoption.md) |
+| EPIC-74 — Adopcja Keycloak (pełny model, poza Iterację 0) | blocked (Story 74.1 `SOURCE-BLOCKED` on reproducible Organization state; Story 74.5 `CAPABILITY-BLOCKED`) | EPIC-02 | [epics/EPIC-74-keycloak-security-adoption.md](epics/EPIC-74-keycloak-security-adoption.md) |
 | EPIC-75 — Higiena dokumentacji | **done** | — | [epics/EPIC-75-documentation-hygiene.md](epics/EPIC-75-documentation-hygiene.md) |
 
 ---
