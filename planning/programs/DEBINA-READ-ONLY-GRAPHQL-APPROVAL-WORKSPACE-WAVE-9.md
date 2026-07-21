@@ -74,3 +74,19 @@ non-vacuous tests. Then add real RLS/cursor/detail GraphQL integration proof bef
   foreign-tenant `approval(paymentId)` returns null rather than the target. The first run exposed
   and fixed the cursor decoder's over-escaped separator. Green log:
   `/tmp/DEBINA-READ-ONLY-GRAPHQL-APPROVAL-WORKSPACE-WAVE-9/graphql-rls-cursor-attempt-2.log`.
+
+## Frontend delivery checkpoint
+
+- `frontend/codegen.yml` generates query types directly from the versioned backend SDL; its
+  `ApprovalQueue` and `Approval` documents are limited to the approved decision fields. Two
+  consecutive runs produced the same generated-file SHA
+  `2ca0e1390941ee16b5927116836d363b4634423bf89935c32f4e96996ebe3912`.
+- The fixed-destination `/api/graphql` BFF route accepts only the two named read operations,
+  validates a bounded body, attaches the server-session bearer and correlation ID, and never
+  returns a token or accepts a browser-provided backend URL. Approve/reject use separate fixed
+  REST BFF routes with the established CSRF and idempotency conventions.
+- Payments & Files now composes a `payment_approver`-gated approval queue. It presents loading,
+  empty, unauthorized and error states separately; links payment detail; preserves cursor loading;
+  blocks self-approval; confirms approve; requires a rejection comment; and never alters an item
+  until the REST response succeeds and the GraphQL queue is refetched. Frontend lint, typecheck
+  and production build are GREEN (one pre-existing TanStack React Compiler lint warning only).

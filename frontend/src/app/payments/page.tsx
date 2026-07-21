@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PaymentsTable, type PaymentRow, type PaymentsTableStatus } from "@/components/payments/payments-table";
+import { ApprovalQueue } from "@/components/payments/approval-queue";
 import { readCookie } from "@/lib/read-cookie";
 
 interface PaymentSummaryResponse {
@@ -324,6 +325,7 @@ export default function PaymentsPage() {
       </AlertDialog>
 
       <PaymentsTable status={listStatus} payments={payments} errorMessage={listError} />
+      <ApprovalQueue />
     </div>
   );
 }
