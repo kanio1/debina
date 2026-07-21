@@ -1,6 +1,8 @@
 type Query {
   approvalQueue(first: Int!, after: String): ApprovalConnection!
   approval(paymentId: ID!): Approval
+  paymentAuditTrail(paymentId: ID!, first: Int!, after: String): AuditEntryConnection!
+  auditEntries(filter: AuditEntryFilter!, first: Int!, after: String): AuditEntryConnection!
 }
 
 type ApprovalConnection { items: [Approval!]!, nextCursor: String }
@@ -21,3 +23,42 @@ type Approval {
   decisionComment: String
   decidedAt: String
 }
+
+input AuditEntryFilter {
+  tenantId: ID
+  branchId: ID
+  targetType: String
+  targetId: ID
+  paymentId: ID
+  batchId: ID
+  actorId: String
+  commandType: String
+  outcome: String
+  correlationId: ID
+  occurredFrom: String
+  occurredTo: String
+}
+
+type AuditEntryConnection { items: [AuditEntry!]!, nextCursor: String }
+
+type AuditEntry {
+  auditEntryId: ID!
+  tenantId: ID!
+  branchId: ID
+  occurredAt: String!
+  actorType: String!
+  actorId: String!
+  authorizedRole: String!
+  correlationId: ID!
+  commandType: String!
+  targetType: String!
+  targetId: ID!
+  paymentId: ID
+  batchId: ID
+  outcome: String!
+  decisionComment: String
+  beforeState: AuditSnapshot!
+  afterState: AuditSnapshot!
+}
+
+type AuditSnapshot { approvalId: ID, approvalStatus: String }
