@@ -16,12 +16,26 @@ fast:
       commands: [pnpm install --frozen-lockfile, pnpm run codegen:graphql, direct-graphql-output-comparison, pnpm run lint, pnpm run typecheck]
       reason: exact Node 24.18.0 and pnpm 10.33.0 source feedback without a full runtime
 integration:
-  pending:
-    backend: ./mvnw -f backend test
-    frontend: pnpm run build
-    database: [fresh-flyway, upgrade-flyway, rls-grant-environment-probes]
-    kafka: single-broker-readiness-and-contract-probe
-    prerequisite: representative-Testcontainers-in-Dagger-spike
+  implemented:
+    - name: backend-regression-without-testcontainers
+      command: ./mvnw -f backend -Dtest=<explicit-current-socket-free-subset> test
+      result: 128 tests; all existing Testcontainers-backed classes are deliberately excluded
+    - name: frontend-production-build
+      command: pnpm run build
+    - name: postgres-readiness
+      command: pg_isready against ephemeral Dagger PostgreSQL 18 service
+    - name: flyway-fresh-database
+      command: Maven Flyway migrate + validate on a fresh ephemeral PostgreSQL 18 service
+    - name: flyway-upgrade-from-v54
+      command: Maven Flyway migrate + validate at V54, then migrate + validate at V60
+      baseline: docs/ci/FLYWAY-UPGRADE-BASELINE.md
+    - name: postgres-rls-and-grants
+      command: real-role PostgreSQL probes after fresh migration
+    - name: kafka-readiness-and-non-production-probe
+      command: pinned apache/kafka:4.1.1 single-broker create, produce, consume probe
+  blocked:
+    testcontainers-backed-backend-regression:
+      reason: Dagger v0.21.4 execution containers have no supported Host socket accessor; Testcontainers 2.0.5 requires a Docker-compatible Unix API socket and cannot reach the selected rootful Podman API without the prohibited socket bridge.
 smoke:
   pending:
     authority: ADR-N16

@@ -7,5 +7,6 @@ existing_repository_inputs:
   postgres: {image: postgres:18, purpose: Testcontainers-and-local-Compose, exact_digest: NOT_YET_SELECTED}
   keycloak: {image: quay.io/keycloak/keycloak:26.6.4, purpose: local-Keycloak, exact_digest: NOT_YET_SELECTED}
   kafka: {image: apache/kafka:latest, purpose: existing-compose-and-Testcontainers-input, phase_d_assessment: MUST_NOT_BE_COPIED_INTO_DAGGER}
+  dagger_kafka: {image: apache/kafka:4.1.1, purpose: D2A ephemeral non-production readiness/probe service, phase_d_assessment: pinned-separately-from-compose}
 required_future_records: [dagger-engine, go-sdk-runtime, jdk-25, node-24.18.0, pnpm-10.33.0, postgresql-18, keycloak-26.6.4, kafka-pinned, playwright-pinned-if-capability-proven]
 update_trigger: installed-Dagger-compatibility-spike

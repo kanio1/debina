@@ -9,11 +9,12 @@
 - D0 now passes: Dagger CLI/Engine `v0.21.4`, Go `1.26.5`, Podman `5.8.4` rootful, socket access without `sudo`, privileged Engine PID limit `16384`, and a deterministic Alpine Dagger probe. The former environment blocker is superseded without Phase D changing host configuration.
 - One CLI-generated Go SDK module now exists (`dagger.json` → `dagger/`), pins Engine `v0.21.4`, and exposes native `fast`.
 - `dagger check fast` passed. It runs the authoritative governance runner (PASS with the established 296 traceability and 69 planning legacy warnings), non-mutating module self-verification, JDK 25 Maven compilation plus six selected architecture/source-boundary tests, and the pinned Node `24.18.0`/pnpm `10.33.0` codegen-drift, lint and typecheck leaf.
+- D2A completed all socket-free native integration leaves through `dagger check integration`: frontend production build; 128 current non-Testcontainers backend tests; ephemeral PostgreSQL 18 readiness; Flyway fresh migrate/validate; the approved V54 → V60 upgrade/validate; real-role RLS/grant probes; and a pinned `apache/kafka:4.1.1` non-production create/produce/consume probe. No host ports, volumes, runtime socket mounts, Docker, or host configuration changes were used.
+- `ENVIRONMENT-BLOCKED-CHECKPOINT` for the remaining Testcontainers-backed Maven regression: the Dagger v0.21.4 generated SDK has `Container.WithUnixSocket` but no host socket accessor, and Dagger services are isolated TCP services. The Testcontainers 2.0.5 client inside a Dagger execution container reports `/var/run/docker.sock` absent. Presenting the selected rootful Podman socket would require the explicitly prohibited unsupported mount/proxy/compatibility socket. This is not a production defect.
 
 ## Remaining Phase D work
 
-- Classify and add the required backend and frontend fast leaves.
-- Prove Testcontainers compatibility, then add the full integration graph: Maven regression, frontend build, PostgreSQL/Flyway fresh and upgrade checks, RLS/grant probes, and Kafka verification.
+- Resolve the Testcontainers runtime bridge only if a future Dagger-supported minimum-privilege mechanism is available; otherwise D2B cannot run the existing Testcontainers-backed Maven classes.
 - Materialize only the approved ADR-N16 Playwright journeys if the existing capability matrix remains implementable.
 - Add redacted diagnostics, pure Go tests, cache/adversarial evidence, complete command proofs and the final Phase D record/runbook updates.
 

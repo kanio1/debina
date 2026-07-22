@@ -15,7 +15,21 @@ dagger check fast
 
 `fast` currently runs the authoritative governance runner and Go module self-verification (`go test ./...`, compatible `go vet ./...`, and non-mutating `gofmt` drift detection) concurrently. The root command was executed successfully against Dagger CLI/Engine `v0.21.4`.
 
-`integration`, `smoke`, and unfiltered canonical `dagger check` remain incomplete and must not be claimed available. They will compose Go graph functions directly; no module function invokes a nested Dagger CLI command.
+`dagger check integration` is implemented as a socket-free Dagger-native graph. It runs the pinned frontend production build; 128 current backend test cases with all Testcontainers-dependent classes explicitly excluded; PostgreSQL 18 readiness; fresh Flyway migrate/validate; the repository-approved V54 → V60 Flyway upgrade/validate; real-role RLS/grant probes; and a pinned `apache/kafka:4.1.1` single-broker create/produce/consume probe using only the non-production topic `debina.phase-d.non-production-probe`. PostgreSQL and Kafka are ephemeral Dagger services with no host ports, volumes, or runtime socket mounts.
+
+The existing Testcontainers-backed Maven classes are not part of that check. The v0.21.4 generated SDK provides `Container.WithUnixSocket` only as a consumer of a Dagger `Socket`; it provides no host socket accessor. The installed CLI/service model supports isolated TCP service bindings, not importing a host Unix socket. Therefore the selected rootful Podman API cannot be presented to Testcontainers through a supported minimum-privilege Dagger mechanism. No socket proxy, mount, Docker compatibility socket, or host change is used.
+
+## D2A execution evidence (2026-07-22)
+
+| Command | Exit | Observation |
+|---|---:|---|
+| `dagger check integration --progress=plain` | 0 | completed in 17.1s; Maven reported 128 tests, Flyway validated 60 migrations, and Kafka consumed `phase-d-probe` |
+| `dagger check fast --progress=plain` | 0 | completed in 19.1s after the D2A source changes; pure Go composition tests passed |
+| Testcontainers diagnostic inside the Dagger backend execution container | 1, expected | Testcontainers 2.0.5 reported `/var/run/docker.sock` absent; no diagnostic exposes credentials or host socket paths beyond that fixed absent path |
+
+The first D2A integration graph populated only the named Maven/pnpm dependency caches. The final successful integration run reused the already-pulled service images and dependency caches but re-executed source-dependent leaves; no database, Kafka state, credentials, host socket, or test outcome was cached.
+
+`smoke` and unfiltered canonical `dagger check` remain incomplete and must not be claimed available. Graph functions compose values directly; no module function invokes a nested Dagger CLI command.
 
 ## Local safety
 
