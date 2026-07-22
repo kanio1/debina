@@ -6,7 +6,7 @@ source: "sepa-nexus-full-blueprint-review-and-task-plan.md §14 line 410 (EPIC-F
 
 `[AUDYT 2026-07-14]`: `depends_on: EPIC-23` jest formalnie spełnione (23 zamknięty jako `in-progress`, wystarczające stories done), ale rzeczywista zdolność każdego z 9 workspace'ów zweryfikowana indywidualnie poniżej — 8 z 9 pozostaje `blocked` na moduły backendowe, które mają dziś zero kodu (settlement, ledger, egress, reconciliation, case, simulation, evidence-audit, reporting/SSE). Tylko Story 24.2 (Payments & Files) ma dziś realne dane do pokazania.
 
-**Bramka Playwright (linie 11-17 poniżej, `[SEKWENCJONOWANIE — NIE ŁAMAĆ]`) NIE jest otwarta w tej sesji** — wymaga wszystkich pierwszych 3 ekranów (Control Room + Payments & Files + Payment Detail/Timeline) zbudowanych, a Control Room (Story 24.1) pozostaje `blocked` (brak SSE/`reporting`). Zbudowano tylko część Payments & Files — bez Playwrighta, zgodnie z regułą.
+**Bramka Playwright (linie 11-17 poniżej, `[SEKWENCJONOWANIE — NIE ŁAMAĆ]`) pozostaje zamknięta dla EPIC-24 acceptance** — wymaga wszystkich pierwszych 3 ekranów (Control Room + Payments & Files + Payment Detail/Timeline) zbudowanych, a Control Room (Story 24.1) pozostaje `blocked` (brak SSE/`reporting`). Wyjątek programu Phase D / ADR-N16 z 2026-07-22 dopuszcza wyłącznie sześć nazwanych lokalnych smoke journeys; nie zmienia statusu żadnej story, nie odblokowuje Control Room ani ogólnego Playwright acceptance.
 
 # EPIC-24 — Frontend Screens (EPIC-FE-1)
 

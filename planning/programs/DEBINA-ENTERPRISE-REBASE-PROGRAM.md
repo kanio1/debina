@@ -13,3 +13,7 @@ Feature expansion remains paused through Phase F evaluation of Wave 12.
 | G — resume enterprise features | approved UC2 slice + readiness | use-case-slice delivery | broad backlog implementation | executable verify/evidence; per-slice branch |
 
 Remote CI provider selection is `DEFERRED` throughout. Minimal Playwright smoke is Phase D scope only; full acceptance remains deferred.
+
+## Phase D ADR-N16 smoke exception (approved 2026-07-22)
+
+ADR-N16 and Phase D authorize one narrow local exception to EPIC-24's general Playwright sequencing: a minimal Chromium-only Dagger smoke foundation and only the six named ADR-N16 journeys. This exception does not change EPIC-24 story status, does not unblock the Operations Control Room, reporting/SSE, general Playwright acceptance, axe-core, visual/cross-browser testing, remote CI or runtime compose. Phase D must use direct ephemeral Dagger services and may not invent missing product behavior.

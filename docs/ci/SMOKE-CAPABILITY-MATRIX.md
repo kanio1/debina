@@ -13,6 +13,6 @@ Inventory recorded at `676d09e` on `rebase/enterprise-evolution`. This is an imp
 
 ADR-N16 supersedes the older broad Playwright deferral only for this capped smoke. No Control Room, broad acceptance, visual regression or cross-browser work is included.
 
-## D3 audit (2026-07-22)
+## D3 audit and governance resolution (2026-07-22)
 
-All six journeys are `CAPABILITY-BLOCKED`, not failed product behavior. The repository has no approved Playwright package/configuration or Dagger smoke runtime graph, and the current EPIC-24 sequencing record blocks Playwright until the missing Control Room exists. ADR-N16 permits only this capped scope; it does not by itself authorize a new frontend/runtime testing foundation. The implementation inventory above remains historical evidence: login/session, JSON_DIRECT submission, maker-checker approval and payment detail/lineage have routes and stable observables; health still needs a runtime probe. No browser test, product code or runtime-compose graph was created.
+The initial audit found all six journeys capability-blocked on an absent Playwright/Dagger foundation and EPIC-24 sequencing. The approved Phase D ADR-N16 exception now authorizes only the minimum local Chromium foundation, direct ephemeral Dagger graph and six named journeys. EPIC-24's general acceptance sequencing, all story status, Control Room/reporting/SSE scope, axe-core, visual/cross-browser coverage, remote CI and runtime compose remain unchanged. D3A implements only login, BFF session and health; it must not run the other three business journeys.
