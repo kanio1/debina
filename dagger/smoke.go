@@ -147,10 +147,36 @@ func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Serv
 		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
 		WithExec([]string{"pnpm", "install", "--frozen-lockfile"}).
 		WithExec([]string{"pnpm", "run", "build"}).
-		WithExec([]string{"pnpm", "run", "start", "--", "--hostname", "0.0.0.0"}).
 		WithExposedPort(3000).
-		AsService()
+		AsService(dagger.ContainerAsServiceOpts{Args: []string{"pnpm", "exec", "next", "start", "--hostname", "0.0.0.0", "--port", "3000"}})
 }
+
+// SmokeFrontendReadiness builds the pinned production frontend and probes its
+// public shell through the Dagger service alias. It does not start a browser.
+func (m *DebinaVerification) SmokeFrontendReadiness() *dagger.Container {
+	postgres := m.postgresService("smoke-frontend-readiness")
+	keycloak := m.keycloakService()
+	backend := m.smokeBackendService(postgres, m.kafkaService(), keycloak, m.smokeMigrationMarker(postgres))
+	frontend := m.smokeFrontendService(backend, keycloak)
+	return dag.Container().From("curlimages/curl:8.16.0").
+		WithServiceBinding(frontendServiceAlias, frontend).
+		WithExec([]string{"sh", "-ec", frontendReadinessCommand})
+}
+
+const frontendReadinessCommand = `set -eu
+attempts=0
+until [ "$attempts" -ge 60 ]; do
+  attempts=$((attempts + 1))
+  status="$(curl --silent --show-error --max-time 5 --output /tmp/frontend-body --dump-header /tmp/frontend-headers --write-out '%{http_code}' http://frontend:3000/ || true)"
+  location="$(tr -d '\r' < /tmp/frontend-headers 2>/dev/null | awk 'tolower($1) == "location:" { print $2; exit }')"
+  if [ "$status" = 307 ] && [ "$location" = "/payments" ]; then
+    echo "Frontend ready: HTTP 307 Location /payments via frontend:3000/"
+    exit 0
+  fi
+  sleep 1
+done
+echo "Frontend readiness timed out: alias=frontend port=3000 path=/ status=$status location=$location" >&2
+exit 1`
 
 func (m *DebinaVerification) d3aSmokeRunner() *dagger.Container {
 	postgres := m.postgresService("smoke")

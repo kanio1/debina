@@ -15,7 +15,7 @@ Debina is a synthetic enterprise SEPA/ISO 20022 research platform. On `rebase/en
 
 ## Utknęliśmy na
 
-Backend readiness passed: the original missing `sepa_app` error was a Dagger graph-ordering defect. Flyway migrate+validate now creates `/tmp/d3a-flyway-complete`, which is mounted only as a dependency marker before the backend service. The shared PostgreSQL service has roles before startup; Kafka joined; 8081 and alias-bound `/actuator/health` passed in 44.39s (exit 0). Frontend readiness is next; do not start Chromium.
+Backend readiness passed: the original missing `sepa_app` error was a Dagger graph-ordering defect. Flyway migrate+validate now creates `/tmp/d3a-flyway-complete`, which is mounted only as a dependency marker before the backend service. The shared PostgreSQL service has roles before startup; Kafka joined; 8081 and alias-bound `/actuator/health` passed in 44.39s (exit 0). Frontend production readiness also passed in 1m06.85s: `pnpm exec next start --hostname 0.0.0.0 --port 3000`, 3000/tcp healthy, root `307 Location: /payments`. Do not start Chromium yet.
 
 ## Plan na następny krok
 
