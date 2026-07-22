@@ -42,6 +42,12 @@ The first D2A integration graph populated only the named Maven/pnpm dependency c
 
 `smoke` and unfiltered canonical `dagger check` remain incomplete and must not be claimed available. Graph functions compose values directly; no module function invokes a nested Dagger CLI command.
 
+## D3A ephemeral Keycloak realm-overlay assurance (2026-07-22)
+
+The D3A local-only browser-origin exception derives, but never writes, the canonical `infra/keycloak/realm-export.json`. The sole transformer is `dagger/pure/realm_overlay.go`; it accepts only `http://frontend:3000/api/auth/callback` and `http://frontend:3000`, validates parsed JSON structurally in both directions, and rejects client/order/key/property/list changes other than those exact additions. The finite `dagger/cmd/realm-overlay` helper invokes that pure transformer once and creates a shared in-graph directory with `realm-export.json` and a safe `verified.marker`. It creates the marker only after the verified realm file is written.
+
+The D3A Keycloak constructor imports that exact realm file with owner `1000:1000` and mode `0640`. Its bounded readiness client receives only the marker from the same artifact directory, verifies and prints it, then performs realm OpenID discovery through the `keycloak` service alias. It never receives or logs the realm JSON. The final proof completed `dagger call smoke-keycloak-readiness stdout --progress=plain` with `elapsed=0:36.37 exit=0`: helper marker, `sepa-nexus` import, 8080 TCP readiness and OpenID discovery all passed. The final parent progress span displayed Dagger's observed teardown `ERROR` only after `Container.stdout DONE`; the measured shell result and both safe markers remain the functional evidence.
+
 ## D2B execution evidence (2026-07-22)
 
 | Command | Exit | Observation |

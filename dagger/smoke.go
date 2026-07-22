@@ -43,13 +43,15 @@ func (m *DebinaVerification) smokeMigrationMarker(service *dagger.Service) *dagg
 // SmokeKeycloakReadiness is a short-lived client of the imported Keycloak
 // service. Call its stdout from the CLI; the server itself is never awaited.
 func (m *DebinaVerification) SmokeKeycloakReadiness() *dagger.Container {
-	return m.keycloakReadiness(m.keycloakService())
+	overlay := m.d3aRealmOverlayArtifacts()
+	return m.keycloakReadiness(m.keycloakServiceWithOverlay(overlay), overlay.File("verified.marker"))
 }
 
-func (m *DebinaVerification) keycloakReadiness(service *dagger.Service) *dagger.Container {
+func (m *DebinaVerification) keycloakReadiness(service *dagger.Service, marker *dagger.File) *dagger.Container {
 	return dag.Container().From("curlimages/curl:8.16.0").
 		WithServiceBinding(keycloakServiceAlias, service).
-		WithExec([]string{"sh", "-ec", boundedReadinessCommand("http://keycloak:8080/realms/sepa-nexus/.well-known/openid-configuration", "Keycloak")})
+		WithFile("/tmp/verified.marker", marker).
+		WithExec([]string{"sh", "-ec", "test \"$(cat /tmp/verified.marker)\" = \"" + pure.OverlaySuccessMarker + "\"; cat /tmp/verified.marker; " + boundedReadinessCommand("http://keycloak:8080/realms/sepa-nexus/.well-known/openid-configuration", "Keycloak")})
 }
 
 func boundedReadinessCommand(url, name string) string {
@@ -67,6 +69,10 @@ func (m *DebinaVerification) keycloakPostgresService() *dagger.Service {
 }
 
 func (m *DebinaVerification) keycloakService() *dagger.Service {
+	return m.keycloakServiceWithOverlay(m.d3aRealmOverlayArtifacts())
+}
+
+func (m *DebinaVerification) keycloakServiceWithOverlay(overlay *dagger.Directory) *dagger.Service {
 	return dag.Container().
 		From(keycloakImage).
 		// The pinned image inherits 9000/tcp and 8443/tcp. start-dev in this
@@ -75,7 +81,7 @@ func (m *DebinaVerification) keycloakService() *dagger.Service {
 		WithoutExposedPort(9000).
 		WithoutExposedPort(8443).
 		WithServiceBinding(keycloakPostgresServiceAlias, m.keycloakPostgresService()).
-		WithFile("/opt/keycloak/data/import/realm-export.json", m.source().File("infra/keycloak/realm-export.json")).
+		WithFile("/opt/keycloak/data/import/realm-export.json", overlay.File("realm-export.json"), dagger.ContainerWithFileOpts{Owner: "1000:1000", Permissions: 0640}).
 		WithEnvVariable("KC_BOOTSTRAP_ADMIN_USERNAME", "admin").
 		WithSecretVariable("KC_BOOTSTRAP_ADMIN_PASSWORD", dag.SetSecret("d3a-keycloak-admin-password", "dev-only-admin")).
 		WithEnvVariable("KC_DB", "postgres").
@@ -88,6 +94,18 @@ func (m *DebinaVerification) keycloakService() *dagger.Service {
 			Args:          []string{"start-dev", "--import-realm"},
 			UseEntrypoint: true,
 		})
+}
+
+// d3aRealmOverlay derives a local-only import artifact. It never changes the
+// canonical realm source and fails closed if the expected client shape drifts.
+func (m *DebinaVerification) d3aRealmOverlayArtifacts() *dagger.Directory {
+	return dag.Container().
+		From(goImage).
+		WithDirectory("/src", m.source().Directory("dagger")).
+		WithFile("/input/realm-export.json", m.source().File("infra/keycloak/realm-export.json")).
+		WithWorkdir("/src").
+		WithExec([]string{"go", "run", "./cmd/realm-overlay", "--input", "/input/realm-export.json", "--output", "/tmp/d3a-realm-overlay/realm-export.json", "--marker", "/tmp/d3a-realm-overlay/verified.marker", "--callback", pure.D3AFrontendCallback, "--origin", pure.D3AFrontendOrigin}).
+		Directory("/tmp/d3a-realm-overlay")
 }
 
 func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagger.Service, migrationMarker *dagger.File) *dagger.Service {
