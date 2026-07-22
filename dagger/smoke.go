@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 
 	"dagger/debina-verification/internal/dagger"
 	"dagger/debina-verification/pure"
@@ -12,6 +13,8 @@ const (
 	frontendServiceAlias         = "frontend"
 	keycloakServiceAlias         = "keycloak"
 	keycloakPostgresServiceAlias = "keycloak-postgres"
+	flywayCompletionPath         = "/tmp/d3a-flyway-complete"
+	credentialCompletionPath     = "/tmp/d3a-sepa-app-credential-complete"
 )
 
 // Smoke runs only the ADR-N16 D3A vertical slice: runtime health, Keycloak
@@ -31,13 +34,36 @@ func (m *DebinaVerification) SmokePostgresReadiness(ctx context.Context) (string
 
 func (m *DebinaVerification) smokeMigrations(service *dagger.Service) *dagger.Container {
 	args := append(flywayArguments(""), "flyway:migrate", "flyway:validate")
+	// The marker must be written by the same finite process that performs the
+	// migrations. A separate WithNewFile can be evaluated without executing its
+	// predecessor, which would allow a dependent service to start before V1
+	// creates the application roles.
+	command := "set -eu; " + strings.Join(args, " ") + " && printf '%s\\n' flyway-migrate-and-validate-complete > " + flywayCompletionPath
 	return m.flywayClient(service).
-		WithExec(args).
-		WithNewFile("/tmp/d3a-flyway-complete", "flyway-migrate-and-validate-complete\n")
+		WithExec([]string{"sh", "-ec", command})
 }
 
 func (m *DebinaVerification) smokeMigrationMarker(service *dagger.Service) *dagger.File {
-	return m.smokeMigrations(service).File("/tmp/d3a-flyway-complete")
+	return m.smokeMigrations(service).File(flywayCompletionPath)
+}
+
+// d3aSepaAppPassword is the single Dagger authority for the runtime app-role
+// password. Its value matches the immutable V1 role-creation contract without
+// changing that migration or exposing the value in normal environment state.
+func d3aSepaAppPassword() *dagger.Secret {
+	return dag.SetSecret("d3a-sepa-app-db-password", "dev-only-app")
+}
+
+func (m *DebinaVerification) smokeAppCredentialContract(postgres *dagger.Service, migrationMarker *dagger.File, password *dagger.Secret) *dagger.Container {
+	return postgresClient(postgres).
+		WithFile("/tmp/d3a-flyway-complete", migrationMarker).
+		WithEnvVariable("PGUSER", "sepa_app").
+		WithSecretVariable("PGPASSWORD", password).
+		WithExec([]string{"sh", "-ec", "set -eu; identity=$(psql -v ON_ERROR_STOP=1 -Atqc 'SELECT current_user || chr(124) || current_database()'); test \"$identity\" = 'sepa_app|sepa_nexus'; printf '%s\\n' 'D3A sepa_app credential contract verified' | tee " + credentialCompletionPath})
+}
+
+func (m *DebinaVerification) smokeAppCredentialMarker(postgres *dagger.Service, migrationMarker *dagger.File, password *dagger.Secret) *dagger.File {
+	return m.smokeAppCredentialContract(postgres, migrationMarker, password).File(credentialCompletionPath)
 }
 
 // SmokeKeycloakReadiness is a short-lived client of the imported Keycloak
@@ -109,16 +135,21 @@ func (m *DebinaVerification) d3aRealmOverlayArtifacts() *dagger.Directory {
 }
 
 func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagger.Service, migrationMarker *dagger.File) *dagger.Service {
+	sepaAppPassword := d3aSepaAppPassword()
+	credentialMarker := m.smokeAppCredentialMarker(postgres, migrationMarker, sepaAppPassword)
 	return dag.Container().
 		From(javaImage).
 		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
 		WithDirectory("/workspace", m.source()).
 		WithFile("/workspace/.d3a-flyway-complete", migrationMarker).
+		WithFile("/workspace/.d3a-sepa-app-credential-complete", credentialMarker).
 		WithWorkdir("/workspace").
 		WithServiceBinding(postgresServiceAlias, postgres).
 		WithServiceBinding(kafkaServiceAlias, kafka).
 		WithServiceBinding(keycloakServiceAlias, keycloak).
 		WithEnvVariable("SEPA_APP_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
+		WithEnvVariable("SEPA_APP_DB_USER", "sepa_app").
+		WithSecretVariable("SEPA_APP_DB_PASSWORD", sepaAppPassword).
 		WithEnvVariable("SEPA_MIGRATION_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
 		WithEnvVariable("OUTBOX_RELAY_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
 		WithEnvVariable("SEPA_SIGNATURE_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
@@ -140,10 +171,19 @@ func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagg
 func (m *DebinaVerification) SmokeBackendReadiness() *dagger.Container {
 	postgres := m.postgresService("smoke-backend-readiness")
 	keycloak := m.keycloakService()
-	backend := m.smokeBackendService(postgres, m.kafkaService(), keycloak, m.smokeMigrationMarker(postgres))
+	migrationMarker := m.smokeMigrationMarker(postgres)
+	backend := m.smokeBackendService(postgres, m.kafkaService(), keycloak, migrationMarker)
 	return dag.Container().From("curlimages/curl:8.16.0").
 		WithServiceBinding(backendServiceAlias, backend).
 		WithExec([]string{"sh", "-ec", boundedReadinessCommand("http://backend:8081/actuator/health", "Backend")})
+}
+
+// SmokeBackendCredentialReadiness proves the post-Flyway application-role
+// login that the backend will use. It is finite and never starts Spring.
+func (m *DebinaVerification) SmokeBackendCredentialReadiness(ctx context.Context) (string, error) {
+	postgres := m.postgresService("smoke-backend-credential-readiness")
+	password := d3aSepaAppPassword()
+	return m.smokeAppCredentialContract(postgres, m.smokeMigrationMarker(postgres), password).Stdout(ctx)
 }
 
 func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Service) *dagger.Service {
