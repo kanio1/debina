@@ -19,7 +19,7 @@ Backend readiness passed: the original missing `sepa_app` error was a Dagger gra
 
 ## Plan na następny krok
 
-Commit the coherent backend readiness correction, then isolate the pinned production frontend using the same backend and Keycloak instances.
+Use the approved ephemeral Dagger-only realm overlay to add exactly the frontend callback URI and web origin to the derived `sepa-web` client; the tracked canonical realm must remain unchanged. Then run only the D3A browser login/session/health slice.
 
 ## Pułapki, których nie wolno powtórzyć
 
