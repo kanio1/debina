@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
@@ -62,8 +63,7 @@ class SettlementFinalityServiceTest {
         assertThat(replay).isEqualTo(new SettlementFinalityService.FinalityOutcome(first.recordId(), NOW, true));
         assertThat(string("SELECT finality_rule_code FROM settlement.settlement_finality_records WHERE id = '" + first.recordId() + "'"))
                 .isEqualTo("ON_LEDGER_POST");
-        assertThat(string("SELECT finality_at::text FROM settlement.settlement_finality_records WHERE id = '" + first.recordId() + "'"))
-                .contains("12:15:30.123+02");
+        assertThat(finalityAt(first.recordId())).isEqualTo(NOW);
         assertThat(projection.calls).isEqualTo(2);
         assertThatThrownBy(() -> finality.recordLedgerPost(tenant, attempt, payment, post, new byte[] {9}))
                 .isInstanceOf(FinalityConflictException.class);
@@ -145,6 +145,7 @@ class SettlementFinalityServiceTest {
     private static UUID account(long available) throws Exception { UUID id = UUID.randomUUID(); try (Connection c = admin(); PreparedStatement s = c.prepareStatement("INSERT INTO ledger.liquidity_accounts (id, tenant_id, participant_id, currency, available_minor) VALUES (?, gen_random_uuid(), gen_random_uuid(), 'EUR', ?)")) { s.setObject(1,id); s.setLong(2,available); s.executeUpdate(); } return id; }
     private static int count(String sql) throws Exception { try (Connection c=admin(); Statement s=c.createStatement(); ResultSet r=s.executeQuery(sql)) { r.next(); return r.getInt(1); } }
     private static String string(String sql) throws Exception { try (Connection c=admin(); Statement s=c.createStatement(); ResultSet r=s.executeQuery(sql)) { r.next(); return r.getString(1); } }
+    private static Instant finalityAt(UUID recordId) throws Exception { try (Connection c=admin(); PreparedStatement s=c.prepareStatement("SELECT finality_at FROM settlement.settlement_finality_records WHERE id = ?")) { s.setObject(1, recordId); try (ResultSet r=s.executeQuery()) { r.next(); return r.getObject(1, OffsetDateTime.class).toInstant(); } } }
     private static Connection admin() throws Exception { return DriverManager.getConnection(POSTGRES.getJdbcUrl(), "test_admin", "test_admin"); }
     private static final class RecordingProjection implements PaymentFinalityPort { int calls; @Override public ProjectionResult project(UUID tenantId, UUID paymentId, UUID recordId, Instant finalityAt) { calls++; return ProjectionResult.PROJECTED; } }
     private static final class FailsOnceProjection implements PaymentFinalityPort { int calls; @Override public ProjectionResult project(UUID tenantId, UUID paymentId, UUID recordId, Instant finalityAt) { if (++calls == 1) throw new IllegalStateException("projection fault"); return ProjectionResult.PROJECTED; } }
