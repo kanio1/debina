@@ -31,7 +31,13 @@ func (m *DebinaVerification) SmokePostgresReadiness(ctx context.Context) (string
 
 func (m *DebinaVerification) smokeMigrations(service *dagger.Service) *dagger.Container {
 	args := append(flywayArguments(""), "flyway:migrate", "flyway:validate")
-	return m.flywayClient(service).WithExec(args)
+	return m.flywayClient(service).
+		WithExec(args).
+		WithNewFile("/tmp/d3a-flyway-complete", "flyway-migrate-and-validate-complete\n")
+}
+
+func (m *DebinaVerification) smokeMigrationMarker(service *dagger.Service) *dagger.File {
+	return m.smokeMigrations(service).File("/tmp/d3a-flyway-complete")
 }
 
 // SmokeKeycloakReadiness is a short-lived client of the imported Keycloak
@@ -84,11 +90,12 @@ func (m *DebinaVerification) keycloakService() *dagger.Service {
 		})
 }
 
-func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagger.Service) *dagger.Service {
+func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagger.Service, migrationMarker *dagger.File) *dagger.Service {
 	return dag.Container().
 		From(javaImage).
 		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
 		WithDirectory("/workspace", m.source()).
+		WithFile("/workspace/.d3a-flyway-complete", migrationMarker).
 		WithWorkdir("/workspace").
 		WithServiceBinding(postgresServiceAlias, postgres).
 		WithServiceBinding(kafkaServiceAlias, kafka).
@@ -105,9 +112,20 @@ func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagg
 		WithEnvVariable("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092").
 		WithEnvVariable("KEYCLOAK_ISSUER_URI", "http://keycloak:8080/realms/sepa-nexus").
 		WithEnvVariable("SEPA_SCHEDULING_ENABLED", "false").
-		WithExec([]string{"./mvnw", "-f", "backend", "spring-boot:run"}).
 		WithExposedPort(8081).
-		AsService()
+		AsService(dagger.ContainerAsServiceOpts{Args: []string{"./mvnw", "-f", "backend", "spring-boot:run"}})
+}
+
+// SmokeBackendReadiness uses the real application health endpoint from an
+// alias-bound, short-lived client. Kafka is included because Spring Kafka is
+// configured during application startup.
+func (m *DebinaVerification) SmokeBackendReadiness() *dagger.Container {
+	postgres := m.postgresService("smoke-backend-readiness")
+	keycloak := m.keycloakService()
+	backend := m.smokeBackendService(postgres, m.kafkaService(), keycloak, m.smokeMigrationMarker(postgres))
+	return dag.Container().From("curlimages/curl:8.16.0").
+		WithServiceBinding(backendServiceAlias, backend).
+		WithExec([]string{"sh", "-ec", boundedReadinessCommand("http://backend:8081/actuator/health", "Backend")})
 }
 
 func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Service) *dagger.Service {
@@ -138,7 +156,7 @@ func (m *DebinaVerification) d3aSmokeRunner() *dagger.Container {
 	postgres := m.postgresService("smoke")
 	kafka := m.kafkaService()
 	keycloak := m.keycloakService()
-	backend := m.smokeBackendService(postgres, kafka, keycloak)
+	backend := m.smokeBackendService(postgres, kafka, keycloak, m.smokeMigrationMarker(postgres))
 	frontend := m.smokeFrontendService(backend, keycloak)
 	return dag.Container().
 		From(playwrightImage).

@@ -15,11 +15,11 @@ Debina is a synthetic enterprise SEPA/ISO 20022 research platform. On `rebase/en
 
 ## Utknęliśmy na
 
-Backend readiness is next. Do not start frontend or Chromium until a bounded, alias-bound backend readiness leaf passes. The earlier 22-minute full smoke stall and Keycloak-probe stalls are historical orchestration evidence, superseded by the service-command correction.
+Backend readiness passed: the original missing `sepa_app` error was a Dagger graph-ordering defect. Flyway migrate+validate now creates `/tmp/d3a-flyway-complete`, which is mounted only as a dependency marker before the backend service. The shared PostgreSQL service has roles before startup; Kafka joined; 8081 and alias-bound `/actuator/health` passed in 44.39s (exit 0). Frontend readiness is next; do not start Chromium.
 
 ## Plan na następny krok
 
-Commit the coherent D3A Keycloak correction/foundation, then isolate backend readiness using PostgreSQL/Flyway, the same Keycloak service instance, and Kafka only when startup evidence requires it.
+Commit the coherent backend readiness correction, then isolate the pinned production frontend using the same backend and Keycloak instances.
 
 ## Pułapki, których nie wolno powtórzyć
 
