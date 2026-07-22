@@ -2,25 +2,27 @@
 
 ## Zadanie
 
-Debina is a synthetic enterprise SEPA/ISO 20022 research platform. Phase D implements a provider-neutral local Dagger Go SDK verification platform on `rebase/enterprise-evolution`; D2A has completed its independent Dagger-native integration foundation while Testcontainers compatibility is environment-blocked.
+Debina is a synthetic enterprise SEPA/ISO 20022 research platform. On `rebase/enterprise-evolution`, Phase D builds a local Dagger Go SDK verification platform; D2B has proven the supported typed-Socket Testcontainers bridge but awaits a portability decision before its complete Maven regression can pass.
 
 ## Zrobione
 
-- D0 and `fast` remain valid at `9081d938a109afcbcce41743c3f1e19bcc03e6c8`: Dagger CLI/Engine `v0.21.4`, Go `1.26.5`, rootful Podman `5.8.4`, privileged Engine PID limit `16384`, and the user-owned `build/generated-spring-modulith/javadoc.json` SHA-256 `9c484e010bfa0a8719f78dd4ade744fe7e08a3a9fe7eaf0fb35ed1dd2ca0a015`.
-- D2A adds `dagger check integration` in `dagger/`. It proves the pinned frontend production build; 128 explicitly selected current Maven tests with Testcontainers-dependent classes excluded; PostgreSQL 18 readiness; Flyway fresh migrate/validate; `docs/ci/FLYWAY-UPGRADE-BASELINE.md` V54 → V60 migrate/validate; real-role RLS/grant checks; and `apache/kafka:4.1.1` ephemeral create/produce/consume of `debina.phase-d.non-production-probe`.
-- The native graph passed: `dagger check integration --progress=plain` exit 0 in 17.1s. `dagger check fast --progress=plain` exit 0, with the final warm rerun fully cached at 0.0s. Pure Go success/failure-propagation tests live in `dagger/pure/` so they do not require an SDK session.
-- `docs/ci/DAGGER-{IMPLEMENTATION,CHECK-MANIFEST,IMAGE-BASELINE}.yaml` and `planning/programs/DEBINA-ENTERPRISE-REBASE-PHASE-D.md` record D2A evidence and the exact environmental boundary.
+- D0, `dagger check fast` and the socket-free `dagger check integration` remain valid. D2A covers the pinned frontend build, 128 socket-free Maven tests, PostgreSQL/Flyway/RLS/grant leaves and the non-production Kafka probe.
+- D2B adds `dagger/testcontainers.go`: `socket-transport-probe`, `runtime-reachability-probe`, `testcontainers-representative` and `testcontainers-regression`. The Dagger v0.21.4 CLI converted `--runtime-socket=/run/podman/podman.sock` into `Address.socket: Socket!`; `_ping` returned `OK` when mounted only in the disposable diagnostic container.
+- The dedicated Maven container alone receives that typed socket at `/var/run/docker.sock`, with `DOCKER_HOST=unix:///var/run/docker.sock`. A socket-free Dagger probe reached `host.containers.internal` at `10.88.0.1`, so that Maven container also uses the evidence-backed `TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal`.
+- `PaymentsRlsTest` passed through the bridge (PostgreSQL 18, 60 Flyway migrations, 2 tests). The explicit full command ran 540 Maven tests; `docs/ci/DAGGER-IMPLEMENTATION.md`, `docs/ci/DAGGER-CHECK-MANIFEST.yaml`, `docs/ci/DAGGER-PODMAN-TROUBLESHOOTING.md` and `planning/programs/DEBINA-ENTERPRISE-REBASE-PHASE-D.md` record the exact D2B contract and outcomes.
+- The user-owned `build/generated-spring-modulith/javadoc.json` remains unstaged and at SHA-256 `9c484e010bfa0a8719f78dd4ade744fe7e08a3a9fe7eaf0fb35ed1dd2ca0a015`.
 
 ## Utknęliśmy na
 
-`ENVIRONMENT-BLOCKED-CHECKPOINT`: existing Testcontainers-backed Maven classes cannot run inside a Dagger v0.21.4 execution container. Testcontainers 2.0.5 reports `/var/run/docker.sock` absent; the generated v0.21.4 bindings expose `Container.WithUnixSocket` only with a Dagger `Socket` input and expose no host-socket accessor. Official Dagger service bindings are isolated TCP services, not Unix socket import. A rootful Podman bridge would require the prohibited unsupported socket mount/proxy/Docker compatibility socket. This is not a production defect.
+`DECISION-BLOCKED-CHECKPOINT`: the supported bridge worked across the full Testcontainers run, but `SettlementFinalityServiceTest:66` failed because it asserts that `finality_at::text` contains `12:15:30.123+02`. The pinned Dagger Maven container uses UTC and correctly returned `2026-07-20 10:15:30.123+00` for the same `Instant`; 539 other tests passed. Do not add a hidden `TZ` override or modify the backend test/production code without an approved portability decision.
 
 ## Plan na następny krok
 
-Start by reviewing the committed D2A checkpoint and do not attempt D2B unless a Dagger v0.21.4-supported, minimum-privilege mechanism to provide the required Testcontainers API is newly evidenced; otherwise preserve the environment-blocked checkpoint.
+Obtain the Phase D decision whether this existing test must assert a timezone-independent instant or whether a documented Maven execution-timezone contract is approved; then rerun `dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock` cold and warm.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Do not upgrade Dagger, use Docker, create a compatibility socket, copy/mount/proxy `/run/podman/podman.sock`, or alter groups, socket permissions, systemd, SELinux, containers.conf or PID limits.
-- Do not claim Testcontainers-backed Maven regression, smoke, unfiltered `dagger check`, Playwright, remote CI, `act`, deployment, or D2B passed. `integration` deliberately covers only the native socket-free leaves.
-- Do not stage, restore, regenerate, or modify `build/generated-spring-modulith/javadoc.json`; it must remain user-owned and at the recorded hash. Do not touch Wave 12, production payment code, backend tests, migrations, GraphQL schema, runtime compose, Keycloak realm, or workflows.
+- Do not revive the D2A claim that typed Socket transport is unsupported merely because `dag.Host()` lacks a socket accessor: Dagger v0.21.4 CLI arguments construct `Address.socket` for `*dagger.Socket` parameters.
+- Do not give the runtime socket to `dagger check integration`, frontend, Flyway-native, Kafka-native, governance or any other container. Do not copy/proxy it, use Docker, create a compatibility socket, or change host groups, permissions, systemd, SELinux, containers.conf or PID limits.
+- Do not make the runtime socket optional or report Testcontainers PASS while skipping it. Do not hide the observed timezone portability failure with a Dagger environment override.
+- Do not stage, restore, regenerate or modify `build/generated-spring-modulith/javadoc.json`; do not touch Wave 12, Phase E, Playwright, production payment code, backend test sources, migrations, GraphQL, runtime compose, Keycloak, workflows, remote CI or `act`.

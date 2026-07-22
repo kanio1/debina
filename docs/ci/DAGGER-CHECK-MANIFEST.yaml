@@ -33,9 +33,16 @@ integration:
       command: real-role PostgreSQL probes after fresh migration
     - name: kafka-readiness-and-non-production-probe
       command: pinned apache/kafka:4.1.1 single-broker create, produce, consume probe
-  blocked:
+  explicit_runtime_socket:
     testcontainers-backed-backend-regression:
-      reason: Dagger v0.21.4 execution containers have no supported Host socket accessor; Testcontainers 2.0.5 requires a Docker-compatible Unix API socket and cannot reach the selected rootful Podman API without the prohibited socket bridge.
+      command: dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
+      contract: required typed Dagger Socket argument; never part of a no-argument check
+      scope: mounted only into the dedicated Maven/Testcontainers container at /var/run/docker.sock
+      environment: [DOCKER_HOST=unix:///var/run/docker.sock, TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal]
+      transport_proof: socket-transport-probe returned Podman API _ping OK
+      representative: PaymentsRlsTest passed (2 tests; PostgreSQL 18 and 60 Flyway migrations)
+      regression: blocked-by-portability-decision
+      regression_failure: SettlementFinalityServiceTest asserts a +02 text rendering of timestamptz while the pinned execution container correctly renders the same Instant as +00
 smoke:
   pending:
     authority: ADR-N16

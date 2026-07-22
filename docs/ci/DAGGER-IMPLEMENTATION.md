@@ -17,7 +17,17 @@ dagger check fast
 
 `dagger check integration` is implemented as a socket-free Dagger-native graph. It runs the pinned frontend production build; 128 current backend test cases with all Testcontainers-dependent classes explicitly excluded; PostgreSQL 18 readiness; fresh Flyway migrate/validate; the repository-approved V54 → V60 Flyway upgrade/validate; real-role RLS/grant probes; and a pinned `apache/kafka:4.1.1` single-broker create/produce/consume probe using only the non-production topic `debina.phase-d.non-production-probe`. PostgreSQL and Kafka are ephemeral Dagger services with no host ports, volumes, or runtime socket mounts.
 
-The existing Testcontainers-backed Maven classes are not part of that check. The v0.21.4 generated SDK provides `Container.WithUnixSocket` only as a consumer of a Dagger `Socket`; it provides no host socket accessor. The installed CLI/service model supports isolated TCP service bindings, not importing a host Unix socket. Therefore the selected rootful Podman API cannot be presented to Testcontainers through a supported minimum-privilege Dagger mechanism. No socket proxy, mount, Docker compatibility socket, or host change is used.
+The existing Testcontainers-backed Maven classes are not part of that check. The v0.21.4 generated SDK provides `Container.WithUnixSocket` as a consumer of a Dagger `Socket`, while `dag.Host()` has no socket accessor. The D2A conclusion based solely on that missing host accessor is superseded by the supported typed function-argument mechanism below. No socket proxy, Docker compatibility socket, or host change is used.
+
+That D2A limitation is superseded for an explicit argument only: Dagger v0.21.4's CLI turns `--runtime-socket=/run/podman/podman.sock` into an `Address.socket` value for a function argument typed `*dagger.Socket`. `socket-transport-probe` mounts that value only in its disposable diagnostic container and proves `_ping`. `testcontainers-representative` and `testcontainers-regression` mount it only in their dedicated Maven/Testcontainers container at `/var/run/docker.sock`; they set `DOCKER_HOST=unix:///var/run/docker.sock` and, after a reachability probe, `TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal`. No no-argument check receives a runtime socket, and `integration` remains hermetic.
+
+```bash
+dagger call socket-transport-probe --runtime-socket=/run/podman/podman.sock
+dagger call testcontainers-representative --runtime-socket=/run/podman/podman.sock
+dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
+```
+
+The first representative passes. The first complete regression establishes the bridge but currently fails one repository test that assumes PostgreSQL text formatting in Warsaw time (`+02`) despite the pinned Maven container using UTC. Do not add a hidden `TZ` override or call the full regression a pass; resolving whether the portable assertion or a documented execution-timezone contract is intended requires a Phase D portability decision.
 
 ## D2A execution evidence (2026-07-22)
 
@@ -30,6 +40,17 @@ The existing Testcontainers-backed Maven classes are not part of that check. The
 The first D2A integration graph populated only the named Maven/pnpm dependency caches. The final successful integration run reused the already-pulled service images and dependency caches but re-executed source-dependent leaves; no database, Kafka state, credentials, host socket, or test outcome was cached.
 
 `smoke` and unfiltered canonical `dagger check` remain incomplete and must not be claimed available. Graph functions compose values directly; no module function invokes a nested Dagger CLI command.
+
+## D2B execution evidence (2026-07-22)
+
+| Command | Exit | Observation |
+|---|---:|---|
+| `dagger call socket-transport-probe --runtime-socket=/run/podman/podman.sock --progress=plain` | 0 | CLI showed `Address.socket: Socket!`; the sole socket-mounted diagnostic returned `_ping` = `OK`. |
+| `dagger call runtime-reachability-probe --port=43249 --progress=plain` | 0 | a socket-free Alpine container resolved `host.containers.internal` to `10.88.0.1` and connected to the active Ryuk published port. |
+| `dagger call testcontainers-representative --runtime-socket=/run/podman/podman.sock --progress=plain` | 0 | `PaymentsRlsTest`: PostgreSQL 18 started at `host.containers.internal:<redacted-port>`, Flyway applied 60 migrations, 2 tests passed. |
+| `dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock --progress=plain` | 1 | bridge held across 540 tests; one existing `SettlementFinalityServiceTest` assertion expected `12:15:30.123+02` while the correct UTC rendering was `2026-07-20 10:15:30.123+00`. |
+
+The regression's Maven dependency cache was warm after the representative, while the complete suite itself executed (not cached) and created ephemeral labeled Testcontainers resources; those resources were removed after the failed run. No secrets, host configuration, socket copy, TCP proxy, or result cache was introduced.
 
 ## Local safety
 
