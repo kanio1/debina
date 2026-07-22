@@ -2,25 +2,25 @@
 
 ## Zadanie
 
-Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research platform. Phase D is authorized to create one provider-neutral, local Dagger Go SDK verification platform, but it is currently at a tooling checkpoint rather than implementation completion.
+Debina is a synthetic enterprise SEPA/ISO 20022 research platform. Phase D is implementing one provider-neutral, local Dagger Go SDK verification platform on `rebase/enterprise-evolution`; Phase E and Wave 12 remain out of scope.
 
 ## Zrobione
 
-- Verified `rebase/enterprise-evolution` at baseline `676d09e19393830936f5bf419b40f4a5eaa2a4c3`; updated `planning/programs/DEBINA-ENTERPRISE-REBASE-PROGRAM.md` so D/E/F continue on this long-lived branch while preserving historical branch records.
-- Recorded the Dagger/Go/Podman gate in `docs/ci/DAGGER-TOOLCHAIN-BASELINE.{md,yaml}`, the exact ADR-N16 smoke inventory in `docs/ci/SMOKE-CAPABILITY-MATRIX.{md,yaml}`, Phase D status in `planning/programs/DEBINA-ENTERPRISE-REBASE-PHASE-D.md`, and the local-only workflow in `.claude/skills/dagger-go-pipeline/SKILL.md`.
-- Added checkpoint implementation/check-manifest/image/Flyway/runbook/troubleshooting documents under `docs/ci/`; skills validation and the enterprise governance runner pass with the established 296 traceability and 69 planning legacy warnings.
+- D0 was independently reverified and the obsolete environment checkpoint was superseded in `docs/ci/DAGGER-TOOLCHAIN-BASELINE.{md,yaml}`: Dagger CLI/Engine `v0.21.4`, Go `1.26.5`, Podman `5.8.4` rootful, rootful API access without `sudo`, privileged Engine PID limit `16384`, and the deterministic Alpine Dagger probe all pass.
+- Created and committed one CLI-generated module at root `dagger.json` with Go source in `dagger/`: `c417a6a feat(dagger): initialize local Go verification module`.
+- Added and committed native `fast` composition in `06f4109 feat(dagger): add fast backend and frontend checks`. `dagger check -l` lists `fast`; `dagger check fast` passes. It runs the authoritative governance runner (the established 296 traceability and 69 planning legacy warnings), Go module test/vet/format-drift validation, JDK 25 Maven compilation plus six exact architecture/source-boundary tests, and Node `24.18.0`/pnpm `10.33.0` frozen install, direct GraphQL codegen drift comparison, lint and typecheck. A warm rerun was cached and took one second.
+- The rootful Engine remains `privileged=true` with `pids_limit=16384`. The user-owned `build/generated-spring-modulith/javadoc.json` remains at bootstrap SHA-256 `9c484e010bfa0a8719f78dd4ade744fe7e08a3a9fe7eaf0fb35ed1dd2ca0a015`; it is the only current worktree modification and must never be staged.
 
 ## Utknęliśmy na
 
-Dagger CLI/Engine `v0.21.4` and Go `1.26.5` are now installed. The system rootful socket `/run/podman/podman.sock` exists but `podman --remote --url unix:///run/podman/podman.sock ps` fails `connect: permission denied`; Dagger therefore auto-detects rootless Podman and its privileged Engine has PID limit `2048`. No Dagger module, bindings, Testcontainers-in-Dagger spike, Flyway/RLS/Kafka graph, Playwright smoke, cache timing or adversarial proof has run. The pre-existing user-owned `build/generated-spring-modulith/javadoc.json` remains modified but unchanged from bootstrap SHA-256 `9c484e010bfa0a8719f78dd4ade744fe7e08a3a9fe7eaf0fb35ed1dd2ca0a015` and must not be staged or altered.
+The required Testcontainers-in-Dagger compatibility spike is not yet complete. A Dagger execution container was probed with `dagger core container from --address alpine:3.22 ...`; it reports both `/run/podman/podman.sock` and `/var/run/docker.sock` as `not-visible`, and has no `DOCKER_HOST`/`CONTAINER_HOST`. The generated v0.21.4 bindings expose `Container.WithUnixSocket` but no `Host` socket accessor. Do not treat this preliminary finding as the final environment checkpoint yet: Phase D policy requires completing Dagger-native Flyway/database checks and frontend build first. No host setting was changed.
 
 ## Plan na następny krok
 
-After the workstation owner explicitly authorizes this user to access `/run/podman/podman.sock` and sets an approved safe Dagger Engine PID limit, run `podman --remote --url unix:///run/podman/podman.sock ps`, then execute the deterministic no-repository-content Dagger engine probe before generating the module.
+Inspect the v0.21.4 generated Dagger schema and official installed CLI capabilities for a supported, minimum-privilege Testcontainers socket/service bridge; if none exists, implement the independent Dagger-native PostgreSQL/Flyway/RLS/Kafka and frontend-build leaves before recording the exact `ENVIRONMENT-BLOCKED-CHECKPOINT`.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Do not guess a Dagger module/config/binding format or silently install Dagger/Go; use the installed stable CLI to generate it.
-- Do not weaken Podman security, use Docker, add a Docker symlink, use sudo, change PID limits or start a privileged runner without explicit user authorization.
-- Do not resume, switch to, merge, cherry-pick, rebase or modify `wip/wave-12-signature-verdict-evidence` / `5ebebb0` before Phase F.
-- Do not stage, restore, regenerate or include `build/generated-spring-modulith/javadoc.json`; remote CI, `.github/workflows`, `act`, deployment and payment-feature work remain out of scope.
+- Do not upgrade Dagger from `v0.21.4`, use Docker, change groups/socket permissions/systemd/SELinux/containers.conf/PID limits, use `sudo`, or mount a host socket by an unsupported mechanism. The rootful API is intentionally authorized only for this trusted session.
+- Do not claim `integration`, `smoke`, unfiltered `dagger check`, `all`, Testcontainers, Flyway, Kafka or Playwright succeeded: only `fast` is implemented and proven.
+- Do not stage, restore, regenerate or include `build/generated-spring-modulith/javadoc.json`; preserve its bootstrap hash. Do not switch/merge/cherry-pick/rebase or copy from Wave 12 (`wip/wave-12-signature-verdict-evidence` / `5ebebb0`), push, use `act`, select remote CI, or alter production payment code, backend tests, migrations, GraphQL schema, compose or the Keycloak realm.
