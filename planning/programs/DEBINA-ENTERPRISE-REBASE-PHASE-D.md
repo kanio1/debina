@@ -8,7 +8,7 @@
 - Repository inputs and ADR-N16's actual smoke capability inventory were inspected and recorded. The program records D/E/F on this long-lived branch while historical completed-phase branch references remain untouched.
 - D0 now passes: Dagger CLI/Engine `v0.21.4`, Go `1.26.5`, Podman `5.8.4` rootful, socket access without `sudo`, privileged Engine PID limit `16384`, and a deterministic Alpine Dagger probe. The former environment blocker is superseded without Phase D changing host configuration.
 - One CLI-generated Go SDK module now exists (`dagger.json` → `dagger/`), pins Engine `v0.21.4`, and exposes native `fast`.
-- `dagger check fast` passed. It runs the authoritative governance runner (PASS with the established 296 traceability and 69 planning legacy warnings) and concurrent non-mutating module self-verification.
+- `dagger check fast` passed. It runs the authoritative governance runner (PASS with the established 296 traceability and 69 planning legacy warnings), non-mutating module self-verification, JDK 25 Maven compilation plus six selected architecture/source-boundary tests, and the pinned Node `24.18.0`/pnpm `10.33.0` codegen-drift, lint and typecheck leaf.
 
 ## Remaining Phase D work
 

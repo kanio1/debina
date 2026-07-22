@@ -13,6 +13,8 @@ func (m *DebinaVerification) Fast(ctx context.Context) error {
 	checks := []namedCheck{
 		{name: "governance", container: m.governance()},
 		{name: "module", container: m.moduleSelfTest()},
+		{name: "backend-fast", container: m.backendFast()},
+		{name: "frontend-fast", container: m.frontendFast()},
 	}
 	return runChecks(ctx, checks)
 }
