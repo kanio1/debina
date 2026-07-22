@@ -41,8 +41,11 @@ integration:
       environment: [DOCKER_HOST=unix:///var/run/docker.sock, TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal]
       transport_proof: socket-transport-probe returned Podman API _ping OK
       representative: PaymentsRlsTest passed (2 tests; PostgreSQL 18 and 60 Flyway migrations)
-      regression: blocked-by-portability-decision
-      regression_failure: SettlementFinalityServiceTest asserts a +02 text rendering of timestamptz while the pinned execution container correctly renders the same Instant as +00
+      portability_target: dagger call testcontainers-finality-portability --runtime-socket=/run/podman/podman.sock
+      portability_result: SettlementFinalityServiceTest passed 5/0/0 after typed JDBC OffsetDateTime-to-Instant assertion
+      regression: passed
+      cold_result: 540 tests; 0 failures; 0 errors; 0 skipped; Maven 4m29s
+      warm_result: Dagger result cache hit in approximately 1s; no second Maven execution
 smoke:
   pending:
     authority: ADR-N16

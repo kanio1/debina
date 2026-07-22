@@ -38,6 +38,14 @@ func (m *DebinaVerification) TestcontainersRepresentative(ctx context.Context, r
 		Stdout(ctx)
 }
 
+// TestcontainersFinalityPortability runs the timezone-portable finality proof
+// using the same explicit runtime-socket contract as the complete regression.
+func (m *DebinaVerification) TestcontainersFinalityPortability(ctx context.Context, runtimeSocket *dagger.Socket) (string, error) {
+	return m.testcontainersMaven(runtimeSocket).
+		WithExec([]string{"./mvnw", "-f", "backend", "-Dtest=SettlementFinalityServiceTest", "test"}).
+		Stdout(ctx)
+}
+
 // TestcontainersRegression runs the existing complete backend Maven suite.
 // The runtime socket is an explicit, required Dagger argument.
 func (m *DebinaVerification) TestcontainersRegression(ctx context.Context, runtimeSocket *dagger.Socket) (string, error) {

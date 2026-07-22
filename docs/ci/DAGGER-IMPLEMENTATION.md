@@ -24,10 +24,11 @@ That D2A limitation is superseded for an explicit argument only: Dagger v0.21.4'
 ```bash
 dagger call socket-transport-probe --runtime-socket=/run/podman/podman.sock
 dagger call testcontainers-representative --runtime-socket=/run/podman/podman.sock
+dagger call testcontainers-finality-portability --runtime-socket=/run/podman/podman.sock
 dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
 ```
 
-The first representative passes. The first complete regression establishes the bridge but currently fails one repository test that assumes PostgreSQL text formatting in Warsaw time (`+02`) despite the pinned Maven container using UTC. Do not add a hidden `TZ` override or call the full regression a pass; resolving whether the portable assertion or a documented execution-timezone contract is intended requires a Phase D portability decision.
+The approved portability correction reads `settlement_finality_records.finality_at` through typed JDBC as `OffsetDateTime`, converts it to `Instant`, and asserts exact equality with the fixed millisecond-precision authority instant. It does not set a timezone or compare rendered text. The focused finality proof and complete regression pass; do not add a hidden `TZ` override.
 
 ## D2A execution evidence (2026-07-22)
 
@@ -48,9 +49,11 @@ The first D2A integration graph populated only the named Maven/pnpm dependency c
 | `dagger call socket-transport-probe --runtime-socket=/run/podman/podman.sock --progress=plain` | 0 | CLI showed `Address.socket: Socket!`; the sole socket-mounted diagnostic returned `_ping` = `OK`. |
 | `dagger call runtime-reachability-probe --port=43249 --progress=plain` | 0 | a socket-free Alpine container resolved `host.containers.internal` to `10.88.0.1` and connected to the active Ryuk published port. |
 | `dagger call testcontainers-representative --runtime-socket=/run/podman/podman.sock --progress=plain` | 0 | `PaymentsRlsTest`: PostgreSQL 18 started at `host.containers.internal:<redacted-port>`, Flyway applied 60 migrations, 2 tests passed. |
-| `dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock --progress=plain` | 1 | bridge held across 540 tests; one existing `SettlementFinalityServiceTest` assertion expected `12:15:30.123+02` while the correct UTC rendering was `2026-07-20 10:15:30.123+00`. |
+| `dagger call testcontainers-finality-portability --runtime-socket=/run/podman/podman.sock --progress=plain` | 0 | `SettlementFinalityServiceTest`: 5 tests passed; typed JDBC retrieved `timestamptz(3)` as `OffsetDateTime` and asserted its exact `Instant`. |
+| `dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock --progress=plain` | 0 | cold: 540 tests, 0 failures/errors/skips; Maven 4m29s. |
+| same regression command, immediate repeat | 0 | warm Dagger result cache hit in approximately 1s; the explicit `runtime-socket` argument remained required and Maven did not execute again. |
 
-The regression's Maven dependency cache was warm after the representative, while the complete suite itself executed (not cached) and created ephemeral labeled Testcontainers resources; those resources were removed after the failed run. No secrets, host configuration, socket copy, TCP proxy, or result cache was introduced.
+The cold regression's Maven dependency cache was warm after the representative, while its complete suite executed and created ephemeral labeled Testcontainers resources. The immediate warm run was an observable Dagger result-cache hit, not a second test execution; named caches still contain dependency data only. No secrets, host configuration, socket copy or TCP proxy was introduced.
 
 ## Local safety
 
