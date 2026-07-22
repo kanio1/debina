@@ -1,0 +1,7 @@
+status: NOT_RUN
+selected_migration: V54__payment_approvals.sql
+reason: first durable maker-checker approval schema cutpoint before audit-and-expiry follow-on migrations used by ADR-N16 smoke
+baseline_command: migrate-to-V54-in-ephemeral-PostgreSQL-18
+upgrade_command: migrate-to-latest-in-same-ephemeral-service
+post_upgrade_invariants: [flyway-history-consistent, expected-schemas, roles, rls-policies, grants, approval-and-audit-contract-probes]
+limitations: [requires-installed-Dagger, requires-compatible-runtime, no-synthetic-schema-dump]

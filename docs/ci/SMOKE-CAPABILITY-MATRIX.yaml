@@ -1,0 +1,10 @@
+baseline_sha: 676d09e19393830936f5bf419b40f4a5eaa2a4c3
+status: INVENTORIED_NOT_EXECUTED
+authority: ADR-N16
+journeys:
+  - {name: keycloak-login, route: /api/auth/login, role: submitter, bff: frontend/src/app/api/auth/login/route.ts, observable: /api/session-claims-without-token, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
+  - {name: bff-session, route: /api/session, role: submitter, bff: frontend/src/app/api/session/route.ts, observable: claims-json, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
+  - {name: health-runtime, route: runtime-readiness, role: operator, backend: Spring-Boot-Actuator, observable: configured-health-endpoint, status: INVENTORY_NEEDS_RUNTIME_PROBE}
+  - {name: json-direct-submission, route: /payments, role: submitter, bff: frontend/src/app/api/payments/route.ts, use_case: UC-SCT-001, locator: payments.submit.form, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
+  - {name: maker-checker-approval, route: /payments, role: approver, bff: frontend/src/app/api/payments/[id]/approve/route.ts, use_case: UC-SCT-APPROVAL-001, locator: payments.approvals.queue, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
+  - {name: payment-detail-lineage, route: /payments/[id], role: viewer, bff: frontend/src/app/api/payments/[id]/route.ts, use_case: UC-AUDIT-001, locator: payment.detail.iso-identifiers.row, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}

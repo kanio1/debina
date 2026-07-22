@@ -1,0 +1,17 @@
+status: DESIGN_PENDING_INSTALLED_DAGGER
+authority: repository commands remain authoritative; Dagger will orchestrate only
+fast:
+  governance: bash tools/agent-config/validate-enterprise-governance.sh
+  dagger_self_verification: go-test-fmt-vet-and-generated-binding-drift-after-module-initialization
+  backend: SELECT_AFTER_TEST_INVENTORY_CLASSIFICATION
+  frontend: [codegen-direct-comparison, lint, typecheck]
+integration:
+  backend: ./mvnw -f backend test
+  frontend: pnpm run build
+  database: [fresh-flyway, upgrade-flyway, rls-grant-environment-probes]
+  kafka: single-broker-readiness-and-contract-probe
+  prerequisite: representative-Testcontainers-in-Dagger-spike
+smoke:
+  authority: ADR-N16
+  journeys: [keycloak-login, bff-session, health-runtime, json-direct-submission, maker-checker-approval, payment-detail-lineage]
+non_goals: [GitHub-Actions, act, remote-CI, deployment, payment-features]

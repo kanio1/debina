@@ -24,7 +24,7 @@ Debina is a synthetic, enterprise-grade SEPA/ISO 20022 payment-processing resear
 | Architecture, C4, quality, context map | `docs/architecture/` |
 | Security and data ownership | `backend/AGENTS.md`, Keycloak and ownership blueprints |
 | Planning/readiness | `planning/AGENTS.md`, `planning/README.md`, `planning/capabilities.yaml` |
-| CI/Dagger | `docs/ci/DAGGER-PIPELINE-ARCHITECTURE.md` |
+| CI/Dagger | `docs/ci/DAGGER-PIPELINE-ARCHITECTURE.md`; when Phase D is materialized, local Dagger checks are authoritative for composed verification. Apply `dagger-go-pipeline` for Dagger changes. Remote CI and `act` remain out of scope. |
 | Skills | `.claude/skills/`, `docs/governance/SKILL-ROADMAP.md` |
 
 Read local instructions before changing `backend/`, `frontend/`, `infra/`, or `planning/`. Before ending any session, overwrite `HANDOFF.md` using the `session-handoff` skill format.
