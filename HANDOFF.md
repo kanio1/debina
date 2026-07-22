@@ -12,11 +12,11 @@ Debina is a synthetic enterprise SEPA/ISO 20022 payment-processing research plat
 
 ## Utknęliśmy na
 
-`dagger` and `go` are absent. Podman 5.8.4 is installed but rootless; Dagger's official Podman guidance requires rootful execution and a safe Engine PID limit. No Dagger module, bindings, Dagger engine probe, Testcontainers-in-Dagger spike, Flyway/RLS/Kafka graph, Playwright smoke, cache timing or adversarial proof has run. The pre-existing user-owned `build/generated-spring-modulith/javadoc.json` remains modified but unchanged from bootstrap SHA-256 `9c484e010bfa0a8719f78dd4ade744fe7e08a3a9fe7eaf0fb35ed1dd2ca0a015` and must not be staged or altered.
+Dagger CLI/Engine `v0.21.4` and Go `1.26.5` are now installed. The system rootful socket `/run/podman/podman.sock` exists but `podman --remote --url unix:///run/podman/podman.sock ps` fails `connect: permission denied`; Dagger therefore auto-detects rootless Podman and its privileged Engine has PID limit `2048`. No Dagger module, bindings, Testcontainers-in-Dagger spike, Flyway/RLS/Kafka graph, Playwright smoke, cache timing or adversarial proof has run. The pre-existing user-owned `build/generated-spring-modulith/javadoc.json` remains modified but unchanged from bootstrap SHA-256 `9c484e010bfa0a8719f78dd4ade744fe7e08a3a9fe7eaf0fb35ed1dd2ca0a015` and must not be staged or altered.
 
 ## Plan na następny krok
 
-After the workstation owner installs pinned Dagger `v0.21.4`, a compatible Go toolchain and satisfies the official Podman prerequisite, run `dagger version && dagger core version && dagger check --help`, then execute the deterministic no-repository-content Dagger engine probe before generating the module.
+After the workstation owner explicitly authorizes this user to access `/run/podman/podman.sock` and sets an approved safe Dagger Engine PID limit, run `podman --remote --url unix:///run/podman/podman.sock ps`, then execute the deterministic no-repository-content Dagger engine probe before generating the module.
 
 ## Pułapki, których nie wolno powtórzyć
 
