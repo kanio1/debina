@@ -13,9 +13,9 @@ cache assertion and an approval-list mapper NPE.
 
 | ID | Severity | Area | Decision and status |
 |---|---|---|---|
-| DGR-001 | P0 | check topology | ADOPT: one canonical `PhaseD` check; fixed and statically guarded |
+| DGR-001 | P0 | check topology | ADOPT: one canonical `Acceptance` check; fixed and statically guarded |
 | DGR-002 | P0 | workspace correctness | ADOPT: auto-injected constructor Workspace; dirty-source digest proof passed |
-| DGR-003 | P1 | image reproducibility | ADOPT: centralized images, `.dagger/lock`, frozen fail-closed proof |
+| DGR-003 | P1 | image reproducibility | ADOPT: centralized images, `.dagger/lock`, positive frozen runtime plus repository completeness regression |
 | DGR-004 | P1 | `all` semantics | ADAPT Model A: `all-socket-free`, legacy `all`, typed-socket `full-local` |
 | DGR-005 | P1 | cache evidence | ADOPT: external cold/warm/changed trace runner; equal output proves only determinism |
 | DGR-006 | P1 | Engine | DEFER 0.21.7 until CLI+Engine can move atomically; candidate focused proofs passed |
@@ -56,7 +56,7 @@ Community posts were not used as implementation authority.
 | service binding | DNS proof passes | DNS proof passes | open historical issue | keep regression |
 | Workspace | constructor proof passes | focused digest passes | future config migration | dirty-source matrix |
 | checks / `Expect: FAILURE` | used by Phase D | no focused regression observed | semantic drift | full assurance trace |
-| lockfile | live/frozen passes | frozen probe passes | format/lookup drift | missing-entry fail closed |
+| lockfile | live/frozen passes | frozen probe passes | format/lookup drift | positive runtime plus declared-image completeness regression |
 | Go SDK | generated for 0.21.4 | `fast` via x-release passes | host CLI rejects required module version | regenerate with installed CLI |
 | secrets/cache | current proofs pass | release fixes attractive | cache behaviour changes | redaction + cache traces |
 
@@ -70,8 +70,8 @@ top-level `CACHED` span.
 |---|---:|---:|---|
 | `fast` | 31.76s | 1.14s | cold graph span 28.7s; warm top-level cached |
 | `integration` | ~20.9s | 1.22s | fixed graph span 16.0s; first attempt exposed missing AsyncAPI boundary |
-| `smoke` | 67.69s | 1.13s | one D3A Playwright invocation |
-| `phase-d` | 203.04s | 1.13s | three D3B Playwright commands, sequential |
+| pre-tightening `smoke` | 67.69s | 1.13s | one D3A Playwright invocation |
+| pre-tightening `phase-d` | 203.04s | 1.13s | three D3B Playwright commands, sequential |
 
 The redacted failure summary is 573 bytes. Service startup and browser vertex
 durations remain in `/tmp/debina-perf-*.log`; they are not committed because
@@ -85,25 +85,52 @@ fail-closed.
 
 ## Final runtime matrix
 
-The final unfiltered `dagger check --progress=plain` completed successfully on
-Engine 0.21.4 in 250.92 seconds after the last source-boundary fix. Its trace
-contains one logical vertex for D3A and one for each of the three D3B journeys;
-their start/completion order proves sequential browser execution. Repeated
-progress lines reuse those vertex identifiers and are not additional
-executions.
+The durable public contract is:
 
-Each public socket-free function (`fast`, `integration`, `smoke`,
-`smoke-payments`, `phase-d`, and legacy `all`) then returned exit 0. The
-explicit typed-socket Testcontainers regression ran 542 tests with no failures,
-errors, or skips; its immediate repeat was top-level `CACHED`. Frozen image
-lookup, cold/warm/changed-input cache traces, cache-volume reset/stress,
-service-binding DNS, failure redaction, unexpected-failure propagation,
-generator idempotence, and positive/negative log-health proofs also passed.
+```text
+fast
+integration
+smoke-auth
+smoke-payments
+smoke-suite
+acceptance
+pipeline-assurance
+backend-testcontainers
+full-local
+```
 
-The final 250.92-second canonical result is a correctness observation, not a
-performance regression or SLA: it includes work invalidated by the final
-Keycloak fixture boundary correction, whereas the 203.04-second row above was
-captured on the preceding source revision.
+`acceptance` is the sole automatic check. It runs `fast` and `integration` in
+parallel and, only after both succeed, runs `smoke-suite` sequentially.
+`pipeline-assurance` is a separate public gate. `full-local` runs `acceptance`
+then the `backend-testcontainers` classification exactly once. `smoke`,
+`phase-d`, `all-socket-free`, `all` and `testcontainers-regression` remain
+deprecated aliases and never appear in canonical compositors.
+
+Wave 6 ran `tools/ci/verify-dagger-architecture.sh
+/tmp/debina-wave6-architecture` on Dagger CLI/Engine 0.21.4. The canonical
+acceptance completed in 3m10s and the independent assurance in 8.5s. Both
+trace log-health checks passed, together with generator idempotence, canonical
+function and alias discovery, frozen image lookup, repository lock
+completeness, cold/warm/changed-input cache traces, cache-volume concurrency
+and unexpected-failure propagation.
+
+The CLI's frozen mode was positively proven for all declared images. A
+disposable experiment also established that this installed CLI does not, by
+itself, reject a removed lock line. The fail-closed negative guarantee is
+therefore provided honestly by `dagger/pure/image_lock_test.go`, which maps
+every declared image to a root lock entry and fails when one is missing.
+
+The classified Maven results were `fast` 146/0/0/0 and `testcontainers`
+397/0/0/0; the unfiltered oracle was 543/0/0/0. The class sets were 39 and 99,
+their intersection was empty, and their union exactly matched all 138 test
+classes. `full-local` returned exit 0 and its trace contained exactly one
+`-Dgroups=fast` execution and one `-Dgroups=testcontainers` execution.
+
+The protected
+`build/generated-spring-modulith/javadoc.json` remained byte-identical with
+SHA-256
+`47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054`.
+All performance values remain correctness observations, not an SLA.
 
 ## Deferred remote CI proposal boundary
 

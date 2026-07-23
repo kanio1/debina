@@ -2,38 +2,48 @@
 
 ## Decision and public surface
 
-Keep `Smoke` backward compatible as the one proven D3A journey. `SmokeAuth` is
-its explicit alias and `SmokePayments` owns the three independent D3B leaves.
-`PhaseD` is the final socket-free aggregate and the sole automatic `+check`.
-All other gates remain public callable functions. `AllSocketFree` names the same
-contract explicitly; legacy `All` remains an alias. `FullLocal` is the only
-aggregate that adds Testcontainers and therefore requires a typed socket.
+`Acceptance` is the final socket-free aggregate and the sole automatic
+`+check`. It runs `Fast` and `Integration` in parallel, then `SmokeSuite`
+sequentially. `PipelineAssurance` is an independent public gate.
+`SmokeSuite` owns the full capped ADR-N16 browser scope; `SmokeAuth` and
+`SmokePayments` remain narrower diagnostic gates. `PhaseD`, `AllSocketFree`,
+legacy `All` and `Smoke` remain deprecated callable aliases. `FullLocal` adds
+`BackendTestcontainers` exactly once and therefore requires a typed socket.
 
 ```text
 dagger call fast
 dagger call integration
-dagger call smoke                  # compatibility: D3A only
 dagger call smoke-auth
 dagger call smoke-json-direct-submission
 dagger call smoke-maker-checker-approval
 dagger call smoke-payment-detail-lineage
 dagger call smoke-payments
-dagger call phase-d                # Fast + Integration + SmokeAuth + SmokePayments + D4
-dagger check                       # discovers only PhaseD
-dagger call all-socket-free
+dagger call smoke-suite            # complete capped ADR-N16 browser smoke
+dagger call pipeline-assurance
+dagger call acceptance             # parallel Fast + Integration, then SmokeSuite
+dagger check                       # discovers only Acceptance
+dagger call backend-testcontainers --runtime-socket=/run/podman/podman.sock
 dagger call full-local --runtime-socket=/run/podman/podman.sock
-dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
 ```
 
 The prior design note that both `SmokePayments` and `PhaseD` should become
 checks is superseded by the runtime topology review. Nested discovered checks
-repeat child graphs; `dagger/pure/check_topology_test.go` enforces one root.
+repeat child graphs; `dagger/pure/check_topology_test.go` enforces the single
+`Acceptance` root and the compositor rejects duplicate classifications.
+
+| Deprecated callable | Canonical replacement |
+|---|---|
+| `Smoke` | `SmokeSuite` |
+| `PhaseD`, `AllSocketFree`, `All` | `Acceptance` |
+| `TestcontainersRegression` | `BackendRegressionAll` |
+| `CacheReuse` | `CacheOutputDeterminism` |
+| `CacheInvalidation` | `CacheOutputInputSensitivity` |
 
 ## Proposed file tree
 
 ```text
 dagger/
-  checks.go                 # compatibility Smoke, PhaseD composition
+  checks.go                  # final staged Acceptance, assurance and aliases
   credentials.go             # internal typed secret bundle
   smoke_runtime.go           # one graph, readiness, finite runners
   smoke_evidence.go          # PostgreSQL/Kafka finite clients and markers

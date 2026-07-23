@@ -1,6 +1,6 @@
 # AGENTS.md — planning
 
-`/planning/` is the executable epic/story/task catalog derived from the project documentation — 76 epics, organized into phases in `planning/README.md`. Nothing here is invented; every epic has a `source:` field pointing at the doc/section it comes from (skill `artifact-derived-planning`).
+`/planning/` is the executable epic/story/task catalog derived from the project documentation — currently 79 epics according to the generated story inventory, organized into phases in `planning/README.md`. Nothing here is invented; every epic has a `source:` field pointing at the doc/section it comes from (skill `artifact-derived-planning`).
 
 ## Status vocabulary
 

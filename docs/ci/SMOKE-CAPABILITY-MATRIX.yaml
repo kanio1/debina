@@ -1,15 +1,15 @@
 baseline_sha: 676d09e19393830936f5bf419b40f4a5eaa2a4c3
-status: D3A_AUTHORIZED
+status: ADR_N16_CAPPED_SMOKE_RUNTIME_PROVEN
 authority: ADR-N16
 journeys:
-  - {name: keycloak-login, route: /api/auth/login, role: submitter, bff: frontend/src/app/api/auth/login/route.ts, observable: /api/session-claims-without-token, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
-  - {name: bff-session, route: /api/session, role: submitter, bff: frontend/src/app/api/session/route.ts, observable: claims-json, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
-  - {name: health-runtime, route: runtime-readiness, role: operator, backend: Spring-Boot-Actuator, observable: configured-health-endpoint, status: INVENTORY_NEEDS_RUNTIME_PROBE}
-  - {name: json-direct-submission, route: /payments, role: submitter, bff: frontend/src/app/api/payments/route.ts, use_case: UC-SCT-001, locator: payments.submit.form, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
-  - {name: maker-checker-approval, route: /payments, role: approver, bff: frontend/src/app/api/payments/[id]/approve/route.ts, use_case: UC-SCT-APPROVAL-001, locator: payments.approvals.queue, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
-  - {name: payment-detail-lineage, route: /payments/[id], role: viewer, bff: frontend/src/app/api/payments/[id]/route.ts, use_case: UC-AUDIT-001, locator: payment.detail.iso-identifiers.row, status: IMPLEMENTABLE_AFTER_RUNTIME_GATE}
+  - {name: keycloak-login, route: /api/auth/login, role: submitter, bff: frontend/src/app/api/auth/login/route.ts, observable: /api/session-claims-without-token, status: RUNTIME_PROVEN}
+  - {name: bff-session, route: /api/session, role: submitter, bff: frontend/src/app/api/session/route.ts, observable: claims-json, status: RUNTIME_PROVEN}
+  - {name: health-runtime, route: runtime-readiness, role: operator, backend: Spring-Boot-Actuator, observable: bounded-service-readiness, status: RUNTIME_PROVEN}
+  - {name: json-direct-submission, route: /payments, role: submitter, bff: frontend/src/app/api/payments/route.ts, use_case: UC-SCT-001, locator: payments.submit.form, status: RUNTIME_PROVEN}
+  - {name: maker-checker-approval, route: /payments, role: approver, bff: "frontend/src/app/api/payments/[id]/approve/route.ts", use_case: UC-SCT-APPROVAL-001, locator: payments.approvals.queue, status: RUNTIME_PROVEN}
+  - {name: payment-detail-lineage, route: "/payments/[id]", role: viewer, bff: "frontend/src/app/api/payments/[id]/route.ts", use_case: UC-AUDIT-001, locator: payment.detail.iso-identifiers.row, status: RUNTIME_PROVEN}
 d3_audit:
-  classification: D3A-AUTHORIZED-NARROW-EXCEPTION
+  classification: HISTORICAL_PRE_IMPLEMENTATION_AUDIT
   authority: Phase-D-ADR-N16-exception-2026-07-22
   preserves: [EPIC-24-general-sequencing, EPIC-24-story-status, Control-Room-blocker, no-runtime-compose, no-general-acceptance]
   journeys:
@@ -19,3 +19,10 @@ d3_audit:
     json-direct-submission: CAPABILITY-BLOCKED
     maker-checker-approval: CAPABILITY-BLOCKED
     payment-detail-lineage: CAPABILITY-BLOCKED
+runtime_proof:
+  date: 2026-07-23
+  classification: COMPLETE_CAPPED_SMOKE
+  command: dagger call smoke-suite --lock=frozen --progress=plain
+  execution: sequential
+  result: PASS
+  preserves: [EPIC-24-general-sequencing, EPIC-24-story-status, Control-Room-blocker, no-runtime-compose, no-general-product-acceptance]

@@ -16,35 +16,53 @@ fixture.
 ## Implemented command surface
 
 ```bash
-dagger check -l                    # exactly phase-d
-dagger check --progress=plain      # canonical automatic socket-free graph
+dagger check -l                    # exactly acceptance
+dagger check --lock=frozen --progress=plain
 dagger call fast
 dagger call integration
-dagger call smoke
+dagger call smoke-auth
 dagger call smoke-payments
-dagger call all-socket-free
-dagger call all                    # legacy socket-free alias
+dagger call smoke-suite            # complete sequential ADR-N16 cap
+dagger call acceptance
+dagger call pipeline-assurance     # independent platform gate
+dagger call backend-testcontainers --runtime-socket=/run/podman/podman.sock
 dagger call full-local --runtime-socket=/run/podman/podman.sock
 ```
 
-Only `phase-d` carries `// +check`. Public child gates are callable functions,
+Only `acceptance` carries `// +check`. Public child gates are callable functions,
 not automatically discovered roots. This prevents an unfiltered check from
 running nested heavy graphs concurrently. `fast` runs the authoritative
 governance runner and Go module self-verification (root package compile,
 pure/command tests, compatible `go vet ./...`, and non-mutating `gofmt` drift
 detection) concurrently.
 
-`dagger call integration` is implemented as a socket-free Dagger-native graph. It runs the pinned frontend production build; 128 current backend test cases with all Testcontainers-dependent classes explicitly excluded; PostgreSQL 18 readiness; fresh Flyway migrate/validate; the repository-approved V54 → V60 Flyway upgrade/validate; real-role RLS/grant probes; and a pinned `apache/kafka:4.1.1` single-broker create/produce/consume probe using only the non-production topic `debina.phase-d.non-production-probe`. PostgreSQL and Kafka are ephemeral Dagger services with no host ports, volumes, or runtime socket mounts.
+`dagger call integration` is implemented as a socket-free Dagger-native graph.
+It owns exactly `backend-integration`, `frontend-production-build`,
+`database-contract`, `database-upgrade` and `kafka-contract`. The backend leaf
+selects the durable JUnit `fast` tag (146 current cases). `database-contract`
+orders readiness, fresh migrate/validate, application credentials, RLS and
+grants on one PostgreSQL service; `database-upgrade` owns the only separate
+upgrade database. PostgreSQL and Kafka are ephemeral Dagger services with no
+host ports, volumes, or runtime socket mounts.
 
 The existing Testcontainers-backed Maven classes are not part of that check. The v0.21.4 generated SDK provides `Container.WithUnixSocket` as a consumer of a Dagger `Socket`, while `dag.Host()` has no socket accessor. The D2A conclusion based solely on that missing host accessor is superseded by the supported typed function-argument mechanism below. No socket proxy, Docker compatibility socket, or host change is used.
 
-That D2A limitation is superseded for an explicit argument only: Dagger v0.21.4's CLI turns `--runtime-socket=/run/podman/podman.sock` into an `Address.socket` value for a function argument typed `*dagger.Socket`. `socket-transport-probe` mounts that value only in its disposable diagnostic container and proves `_ping`. `testcontainers-representative` and `testcontainers-regression` mount it only in their dedicated Maven/Testcontainers container at `/var/run/docker.sock`; they set `DOCKER_HOST=unix:///var/run/docker.sock` and, after a reachability probe, `TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal`. No no-argument check receives a runtime socket, and `integration` remains hermetic.
+That D2A limitation is superseded for an explicit argument only: Dagger
+v0.21.4's CLI turns `--runtime-socket=/run/podman/podman.sock` into an
+`Address.socket` value for a function argument typed `*dagger.Socket`.
+`backend-testcontainers` selects the durable JUnit `testcontainers` tag and
+mounts the socket only in its dedicated Maven container at
+`/var/run/docker.sock`; `backend-regression-all` is the unfiltered coverage
+oracle. They set `DOCKER_HOST=unix:///var/run/docker.sock` and
+`TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal`. No no-argument check
+receives a runtime socket, and `integration` remains hermetic.
 
 ```bash
 dagger call socket-transport-probe --runtime-socket=/run/podman/podman.sock
 dagger call testcontainers-representative --runtime-socket=/run/podman/podman.sock
 dagger call testcontainers-finality-portability --runtime-socket=/run/podman/podman.sock
-dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
+dagger call backend-testcontainers --runtime-socket=/run/podman/podman.sock
+dagger call backend-regression-all --runtime-socket=/run/podman/podman.sock
 ```
 
 The approved portability correction reads `settlement_finality_records.finality_at` through typed JDBC as `OffsetDateTime`, converts it to `Instant`, and asserts exact equality with the fixed millisecond-precision authority instant. It does not set a timezone or compare rendered text. The focused finality proof and complete regression pass; do not add a hidden `TZ` override.
@@ -53,18 +71,21 @@ The approved portability correction reads `settlement_finality_records.finality_
 
 | Command | Exit | Observation |
 |---|---:|---|
-| `dagger check integration --progress=plain` | 0 | completed in 17.1s; Maven reported 128 tests, Flyway validated 60 migrations, and Kafka consumed `phase-d-probe` |
-| `dagger check fast --progress=plain` | 0 | completed in 19.1s after the D2A source changes; pure Go composition tests passed |
+| `dagger call integration --progress=plain` | 0 | completed in 17.1s; Maven reported 128 tests, Flyway validated 60 migrations, and Kafka consumed `phase-d-probe` |
+| `dagger call fast --progress=plain` | 0 | completed in 19.1s after the D2A source changes; pure Go composition tests passed |
 | Testcontainers diagnostic inside the Dagger backend execution container | 1, expected | Testcontainers 2.0.5 reported `/var/run/docker.sock` absent; no diagnostic exposes credentials or host socket paths beyond that fixed absent path |
 
 The first D2A integration graph populated only the named Maven/pnpm dependency caches. The final successful integration run reused the already-pulled service images and dependency caches but re-executed source-dependent leaves; no database, Kafka state, credentials, host socket, or test outcome was cached.
 
-`dagger call smoke` runs only the proven D3A Chromium login/session/health
-vertical slice. `smoke-payments` runs the three implemented D3B journeys
-sequentially. `phase-d` composes both plus fast, integration and assurance;
-unfiltered `dagger check` is now the complete canonical socket-free graph. Graph
-functions compose values directly; no module function invokes a nested Dagger
-CLI command.
+`dagger call smoke-suite` is the complete capped ADR-N16 browser
+classification: it runs `smoke-auth` and then the three `smoke-payments`
+journeys sequentially. `pipeline-assurance` contains only verification-platform proofs:
+failure propagation, timeouts, dependency-unavailability classification,
+redaction, cache behavior and service binding, and remains independent.
+`acceptance` runs `fast` and `integration` in parallel, then `smoke-suite`
+sequentially. `full-local` runs `acceptance`, then `backend-testcontainers`
+exactly once. Graph functions compose values directly; no module function
+invokes a nested Dagger CLI command.
 
 ## D3A Chromium login/session/health proof (2026-07-23)
 
@@ -72,7 +93,12 @@ CLI command.
 
 The test starts at the application, follows the actual username-first Keycloak authorization-code/PKCE flow, verifies the callback and host-only `sepa_session` metadata, queries `/api/session` in the authenticated browser context, requires the stable non-empty `sub` and `payment_submitter` role, asserts `preferredUsername: null` under the current `sepa-web` scope contract, rejects token/code/secret/cookie-value exposure, and verifies the authenticated shell's existing `unknown user` fallback. `preferred_username` is intentionally optional: `sepa-web` defaults only to `basic` and `sepa-guc`, while the login request intentionally omits absent Keycloak `profile` scope. The BFF projects claims only after cryptographic verification of the ID and access tokens.
 
-The first successful narrow run returned one passing test in `elapsed=1:05.17 exit=0`. `dagger check smoke` then completed `exit=0` in `elapsed=0:04.39`, with the same finite Playwright command recorded as a Dagger result-cache hit. This is a proof of the implemented D3A slice only; it does not prove payment submission, maker-checker approval, Payment Detail/lineage, cross-browser, visual or accessibility coverage.
+The first successful narrow run returned one passing test in
+`elapsed=1:05.17 exit=0`. At that historical checkpoint the then-narrow
+`dagger check smoke` completed `exit=0` in `elapsed=0:04.39`, with the same
+finite Playwright command recorded as a Dagger result-cache hit. That command
+is now a deprecated alias of `smoke-suite`. Neither proof covers cross-browser,
+visual or accessibility testing.
 
 ## D3A ephemeral Keycloak realm-overlay assurance (2026-07-22)
 
@@ -93,6 +119,50 @@ The D3A Keycloak constructor imports that exact realm file with owner `1000:1000
 
 The cold regression's Maven dependency cache was warm after the representative, while its complete suite executed and created ephemeral labeled Testcontainers resources. The immediate warm run was an observable Dagger result-cache hit, not a second test execution; named caches still contain dependency data only. No secrets, host configuration, socket copy or TCP proxy was introduced.
 
+## Final acceptance architecture proof (2026-07-23)
+
+The host runner is the complete repeatable architecture proof:
+
+```bash
+tools/ci/verify-dagger-architecture.sh /tmp/debina-wave6-architecture
+dagger call backend-testcontainers --runtime-socket=/run/podman/podman.sock --lock=frozen --progress=plain
+dagger call full-local --runtime-socket=/run/podman/podman.sock --lock=frozen --progress=plain
+dagger call backend-regression-all --runtime-socket=/run/podman/podman.sock --lock=frozen --progress=plain
+./mvnw -f backend test -Dgroups=fast
+```
+
+| Proof | Exact result |
+|---|---|
+| architecture runner | exit 0; `DAGGER-ARCHITECTURE-VERIFICATION-PROVEN`; acceptance 3m10s; independent assurance 8.5s |
+| JUnit `fast` | 39 classes; 146 tests; 0 failures/errors/skips |
+| JUnit `testcontainers` | 99 classes; 397 tests; 0 failures/errors/skips |
+| unfiltered oracle | 138 classes; 543 tests; 0 failures/errors/skips |
+| coverage equivalence | intersection 0; classified union exactly equals the unfiltered class set |
+| `full-local` | exit 0; exactly one `fast` Maven selector and one `testcontainers` selector |
+| protected file | no diff; SHA-256 `47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054` |
+
+Compatibility migration:
+
+| Deprecated callable | Canonical replacement |
+|---|---|
+| `smoke` | `smoke-suite` |
+| `phase-d` | `acceptance` |
+| `all-socket-free` | `acceptance` |
+| `all` | `acceptance` |
+| `testcontainers-regression` | `backend-regression-all` |
+| `cache-reuse` | `cache-output-determinism` |
+| `cache-invalidation` | `cache-output-input-sensitivity` |
+
+Logical implementation commits are `18818e1`, `159a736`, `b654a10`,
+`233a862`, `c935bf7`, `c69203f` and `c492d55`; Wave 7 documentation is the
+following local commit. At this checkpoint branch
+`rebase/enterprise-evolution` tracks
+`origin/rebase/phase-b-product-domain-architecture` and is seven commits ahead
+before the Wave 7 commit. No push was performed.
+
 ## Local safety
 
-Named Dagger caches may contain only dependency/build data. No host `.env.local`, database/Kafka/Keycloak state, test outcome, credential, or runtime artifact is an input cache. Secrets and diagnostics will be handled only by the subsequent service-graph work.
+Named Dagger caches may contain only dependency/build data. No host `.env.local`,
+database/Kafka/Keycloak state, test outcome, credential, or runtime artifact is
+an input cache. Secrets are mounted as Dagger secrets and diagnostics export
+only bounded redacted artifacts.

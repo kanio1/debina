@@ -94,7 +94,8 @@ images:
   proof_mode: frozen
   update_mode: live
   regressions: dagger/pure/image_lock_test.go
-  frozen_missing_entry: fail-closed-proven
+  frozen_runtime: all-declared-images-proven
+  missing_entry_guarantee: repository-completeness-regression
 
 workspace:
   constructor_input: auto-injected Workspace
