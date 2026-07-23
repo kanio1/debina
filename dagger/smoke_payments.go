@@ -49,13 +49,8 @@ type paymentPlaywrightInput struct {
 }
 
 func (m *DebinaVerification) paymentPlaywright(runtime *paymentSmokeRuntime, command string, inputs ...paymentPlaywrightInput) *dagger.Container {
-	browser := dag.Container().
-		From(playwrightImage).
-		WithMountedCache("/pnpm/store", dag.CacheVolume("debina-pnpm-node24.18.0-pnpm10.33.0")).
-		WithEnvVariable("PNPM_HOME", "/pnpm").
-		WithEnvVariable("PNPM_STORE_DIR", "/pnpm/store").
-		WithDirectory("/workspace", m.source()).
-		WithWorkdir("/workspace/frontend").
+	browser := m.frontendDependencies(dag.Container().From(playwrightImage)).
+		WithDirectory("/workspace", m.frontendWorkspace()).
 		WithServiceBinding(backendServiceAlias, runtime.backend).
 		WithServiceBinding(keycloakServiceAlias, runtime.keycloak).
 		WithServiceBinding(frontendServiceAlias, runtime.frontend).
@@ -64,10 +59,7 @@ func (m *DebinaVerification) paymentPlaywright(runtime *paymentSmokeRuntime, com
 		WithSecretVariable("SMOKE_SUBMITTER_PASSWORD", runtime.credentials.submitterPassword).
 		WithSecretVariable("SMOKE_APPROVER_USERNAME", runtime.credentials.approverUsername).
 		WithSecretVariable("SMOKE_APPROVER_PASSWORD", runtime.credentials.approverPassword).
-		WithEnvVariable("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright").
-		WithExec([]string{"corepack", "enable", "pnpm"}).
-		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
-		WithExec([]string{"pnpm", "install", "--frozen-lockfile"})
+		WithEnvVariable("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright")
 	for _, input := range inputs {
 		browser = browser.WithFile(input.path, input.file)
 	}

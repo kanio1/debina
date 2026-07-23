@@ -9,8 +9,8 @@ const backendTestsWithoutTestcontainers = "com.sepanexus.ClockPortEnforcementTes
 func (m *DebinaVerification) backendFast() *dagger.Container {
 	return dag.Container().
 		From(javaImage).
-		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
-		WithDirectory("/workspace", m.source()).
+		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25"), sharedCache).
+		WithDirectory("/workspace", m.backendWorkspace()).
 		WithWorkdir("/workspace").
 		WithExec([]string{"./mvnw", "-f", "backend", "-DskipTests", "compile"}).
 		WithExec([]string{"./mvnw", "-f", "backend", "test", "-Dtest=" + fastBackendTests})
@@ -22,8 +22,8 @@ func (m *DebinaVerification) backendFast() *dagger.Container {
 func (m *DebinaVerification) backendWithoutTestcontainers() *dagger.Container {
 	return dag.Container().
 		From(javaImage).
-		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
-		WithDirectory("/workspace", m.source()).
+		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25"), sharedCache).
+		WithDirectory("/workspace", m.backendWorkspace()).
 		WithWorkdir("/workspace").
 		WithExec([]string{"./mvnw", "-f", "backend", "-Dtest=" + backendTestsWithoutTestcontainers, "test"})
 }

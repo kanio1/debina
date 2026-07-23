@@ -139,8 +139,8 @@ func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagg
 	credentialMarker := m.smokeAppCredentialMarker(postgres, migrationMarker, credentials.appPassword)
 	return dag.Container().
 		From(javaImage).
-		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
-		WithDirectory("/workspace", m.source()).
+		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25"), sharedCache).
+		WithDirectory("/workspace", m.backendWorkspace()).
 		WithFile("/workspace/.d3a-flyway-complete", migrationMarker).
 		WithFile("/workspace/.d3a-sepa-app-credential-complete", credentialMarker).
 		WithWorkdir("/workspace").
@@ -188,13 +188,8 @@ func (m *DebinaVerification) SmokeBackendCredentialReadiness(ctx context.Context
 }
 
 func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Service, credentials phaseDCredentials) *dagger.Service {
-	return dag.Container().
-		From(nodeImage).
-		WithMountedCache("/pnpm/store", dag.CacheVolume("debina-pnpm-node24.18.0-pnpm10.33.0")).
-		WithEnvVariable("PNPM_HOME", "/pnpm").
-		WithEnvVariable("PNPM_STORE_DIR", "/pnpm/store").
-		WithDirectory("/workspace", m.source()).
-		WithWorkdir("/workspace/frontend").
+	return m.frontendDependencies(dag.Container().From(nodeImage)).
+		WithDirectory("/workspace", m.frontendWorkspace()).
 		WithServiceBinding(backendServiceAlias, backend).
 		WithServiceBinding(keycloakServiceAlias, keycloak).
 		WithEnvVariable("KEYCLOAK_ISSUER", "http://keycloak:8080/realms/sepa-nexus").
@@ -202,9 +197,6 @@ func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Serv
 		WithSecretVariable("KEYCLOAK_CLIENT_SECRET", credentials.webClientSecret).
 		WithEnvVariable("BFF_BASE_URL", "http://frontend:3000").
 		WithEnvVariable("BACKEND_API_BASE_URL", "http://backend:8081").
-		WithExec([]string{"corepack", "enable", "pnpm"}).
-		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
-		WithExec([]string{"pnpm", "install", "--frozen-lockfile"}).
 		WithExec([]string{"pnpm", "run", "build"}).
 		WithExposedPort(3000).
 		AsService(dagger.ContainerAsServiceOpts{Args: []string{"pnpm", "exec", "next", "start", "--hostname", "0.0.0.0", "--port", "3000"}})
@@ -245,13 +237,8 @@ func (m *DebinaVerification) d3aSmokeRunner(browserCommand string) *dagger.Conta
 	keycloak := m.keycloakServiceWithOverlay("smoke-auth", m.d3aRealmOverlayArtifacts(), credentials)
 	backend := m.smokeBackendService(postgres, kafka, keycloak, m.smokeMigrationMarker(postgres, credentials), credentials)
 	frontend := m.smokeFrontendService(backend, keycloak, credentials)
-	return dag.Container().
-		From(playwrightImage).
-		WithMountedCache("/pnpm/store", dag.CacheVolume("debina-pnpm-node24.18.0-pnpm10.33.0")).
-		WithEnvVariable("PNPM_HOME", "/pnpm").
-		WithEnvVariable("PNPM_STORE_DIR", "/pnpm/store").
-		WithDirectory("/workspace", m.source()).
-		WithWorkdir("/workspace/frontend").
+	return m.frontendDependencies(dag.Container().From(playwrightImage)).
+		WithDirectory("/workspace", m.frontendWorkspace()).
 		WithServiceBinding(backendServiceAlias, backend).
 		WithServiceBinding(keycloakServiceAlias, keycloak).
 		WithServiceBinding(frontendServiceAlias, frontend).
@@ -259,9 +246,6 @@ func (m *DebinaVerification) d3aSmokeRunner(browserCommand string) *dagger.Conta
 		WithSecretVariable("SMOKE_SUBMITTER_USERNAME", credentials.submitterUsername).
 		WithSecretVariable("SMOKE_SUBMITTER_PASSWORD", credentials.submitterPassword).
 		WithEnvVariable("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright").
-		WithExec([]string{"corepack", "enable", "pnpm"}).
-		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
-		WithExec([]string{"pnpm", "install", "--frozen-lockfile"}).
 		WithExec([]string{"sh", "-ec", pure.D3AReadinessCommand([]string{
 			"http://keycloak:8080/realms/sepa-nexus/.well-known/openid-configuration",
 			"http://backend:8081/actuator/health",

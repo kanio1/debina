@@ -102,17 +102,9 @@ exit 0`}, dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure})
 // marker only after Playwright exits non-zero and its bounded log contains a
 // navigation-layer error.
 func (m *DebinaVerification) ResilienceBrowserNavigationFailure(ctx context.Context) (string, error) {
-	child := dag.Container().
-		From(playwrightImage).
-		WithMountedCache("/pnpm/store", dag.CacheVolume("debina-pnpm-node24.18.0-pnpm10.33.0")).
-		WithEnvVariable("PNPM_HOME", "/pnpm").
-		WithEnvVariable("PNPM_STORE_DIR", "/pnpm/store").
-		WithDirectory("/workspace/frontend", m.source().Directory("frontend")).
-		WithWorkdir("/workspace/frontend").
+	child := m.frontendDependencies(dag.Container().From(playwrightImage)).
+		WithDirectory("/workspace", m.frontendWorkspace()).
 		WithEnvVariable("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright").
-		WithExec([]string{"corepack", "enable", "pnpm"}).
-		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
-		WithExec([]string{"pnpm", "install", "--frozen-lockfile"}).
 		WithExec([]string{"sh", "-ec", `
 set -eu
 if timeout 30 pnpm exec playwright test e2e/d6-browser-navigation-failure.spec.ts --project=chromium --workers=1 > /tmp/navigation.log 2>&1; then

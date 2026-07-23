@@ -22,8 +22,8 @@ func (m *DebinaVerification) SocketTransportProbe(ctx context.Context, runtimeSo
 func (m *DebinaVerification) testcontainersMaven(runtimeSocket *dagger.Socket) *dagger.Container {
 	return dag.Container().
 		From(javaImage).
-		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
-		WithDirectory("/workspace", m.source()).
+		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25"), sharedCache).
+		WithDirectory("/workspace", m.backendWorkspace()).
 		WithWorkdir("/workspace").
 		WithUnixSocket(testcontainersSocketPath, runtimeSocket).
 		WithEnvVariable("DOCKER_HOST", "unix:///var/run/docker.sock").

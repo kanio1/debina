@@ -29,17 +29,50 @@ var runtimeImages = []string{
 	playwrightImage,
 }
 
+var sharedCache = dagger.ContainerWithMountedCacheOpts{
+	Sharing: dagger.CacheSharingModeShared,
+}
+
 // DebinaVerification owns local check composition. Repository commands remain
 // the authoritative verification leaves.
 type DebinaVerification struct {
+	// +private
+	Source *dagger.Directory
 }
 
-func New() *DebinaVerification { return &DebinaVerification{} }
+// New captures the auto-injected caller workspace in the module object. The
+// resulting Directory ID participates in function cache keys, so dirty source
+// changes cannot reuse a result computed for an older workspace snapshot.
+func New(workspace *dagger.Workspace) *DebinaVerification {
+	return &DebinaVerification{
+		Source: workspace.Directory("/", dagger.WorkspaceDirectoryOpts{
+			Exclude: sourceExcludes,
+		}),
+	}
+}
 
-// source reads the caller workspace on each check. Dagger's check dispatcher
-// invokes annotations directly, so constructor state is intentionally avoided.
-func (m *DebinaVerification) source() *dagger.Directory {
-	return dag.CurrentWorkspace().Directory("/", dagger.WorkspaceDirectoryOpts{
-		Exclude: sourceExcludes,
-	})
+func (m *DebinaVerification) source() *dagger.Directory { return m.Source }
+
+// backendWorkspace contains only the Maven wrapper and backend tree. Changes
+// to frontend, documentation, planning or the Dagger module cannot invalidate
+// backend compilation and test vertices.
+func (m *DebinaVerification) backendWorkspace() *dagger.Directory {
+	source := m.source()
+	return dag.Directory().
+		WithFile("mvnw", source.File("mvnw")).
+		WithDirectory(".mvn", source.Directory(".mvn")).
+		WithDirectory("backend", source.Directory("backend"))
+}
+
+// frontendWorkspace retains the complete frontend tree, including the
+// committed generated GraphQL client, plus the one source-owned backend schema
+// consumed by GraphQL codegen. Other backend inputs remain excluded.
+func (m *DebinaVerification) frontendWorkspace() *dagger.Directory {
+	source := m.source()
+	return dag.Directory().
+		WithDirectory("frontend", source.Directory("frontend")).
+		WithFile(
+			"backend/src/main/resources/graphql/schema.graphqls",
+			source.File("backend/src/main/resources/graphql/schema.graphqls"),
+		)
 }

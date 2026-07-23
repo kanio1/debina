@@ -7,7 +7,7 @@ func (m *DebinaVerification) moduleSelfTest() *dagger.Container {
 	module := m.source().Directory("dagger")
 	return dag.Container().
 		From(goImage).
-		WithMountedCache("/go/pkg/mod", cache).
+		WithMountedCache("/go/pkg/mod", cache, sharedCache).
 		WithMountedDirectory("/src", module).
 		WithWorkdir("/src").
 		// The generated binding requires a live Dagger session at package init

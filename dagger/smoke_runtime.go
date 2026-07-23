@@ -42,8 +42,8 @@ func (m *DebinaVerification) paymentSmokeBackendService(postgres, kafka, keycloa
 	credentialMarker := m.smokeAppCredentialMarker(postgres, migrationMarker, credentials.appPassword)
 	return dag.Container().
 		From(javaImage).
-		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
-		WithDirectory("/workspace", m.source()).
+		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25"), sharedCache).
+		WithDirectory("/workspace", m.backendWorkspace()).
 		WithFile("/workspace/.phase-d-flyway-complete", migrationMarker).
 		WithFile("/workspace/.phase-d-sepa-app-credential-complete", credentialMarker).
 		WithWorkdir("/workspace").

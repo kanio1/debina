@@ -44,8 +44,8 @@ func (m *DebinaVerification) postgresReadiness() *dagger.Container {
 func (m *DebinaVerification) flywayClient(service *dagger.Service) *dagger.Container {
 	return dag.Container().
 		From(javaImage).
-		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25")).
-		WithDirectory("/workspace", m.source()).
+		WithMountedCache("/root/.m2/repository", dag.CacheVolume("debina-maven-jdk25"), sharedCache).
+		WithDirectory("/workspace", m.backendWorkspace()).
 		WithWorkdir("/workspace").
 		WithServiceBinding(postgresServiceAlias, service)
 }
