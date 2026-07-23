@@ -120,6 +120,10 @@ func (m *DebinaVerification) phaseDAssurance(ctx context.Context) error {
 			_, err := m.CacheInvalidation(ctx)
 			return err
 		}},
+		{Name: "service-binding-dns", Timeout: time.Minute, Run: func(ctx context.Context) error {
+			_, err := m.ServiceBindingDNS(ctx)
+			return err
+		}},
 	})
 }
 
@@ -140,7 +144,26 @@ func (m *DebinaVerification) PhaseD(ctx context.Context) error {
 // but deliberately not an automatic check: otherwise an unfiltered
 // `dagger check` would run the complete PhaseD graph twice.
 func (m *DebinaVerification) All(ctx context.Context) error {
+	return m.AllSocketFree(ctx)
+}
+
+// AllSocketFree is the unambiguous callable alias for the complete Phase D
+// graph that never receives or mounts a host runtime socket.
+func (m *DebinaVerification) AllSocketFree(ctx context.Context) error {
 	return m.PhaseD(ctx)
+}
+
+// FullLocal composes the socket-free Phase D graph with the complete backend
+// Testcontainers regression. The host runtime socket remains a required typed
+// argument and is mounted only into the Testcontainers leaf.
+func (m *DebinaVerification) FullLocal(ctx context.Context, runtimeSocket *dagger.Socket) error {
+	return pure.RunChecksSequential(ctx, []namedCheck{
+		{Name: "phase-d", Timeout: 45 * time.Minute, Run: m.PhaseD},
+		{Name: "testcontainers-regression", Timeout: 30 * time.Minute, Run: func(ctx context.Context) error {
+			_, err := m.TestcontainersRegression(ctx, runtimeSocket)
+			return err
+		}},
+	})
 }
 
 // AggregateUnexpectedFailureProbe proves that the same sequential aggregate
