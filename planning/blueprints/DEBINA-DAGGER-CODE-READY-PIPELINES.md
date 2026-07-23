@@ -2,27 +2,32 @@
 
 ## Decision and public surface
 
-Keep `Smoke` backward compatible as the one proven D3A journey. Add `SmokeAuth`
-as its explicit alias and `SmokePayments` for the three independent D3B leaves.
-`PhaseD` is the final socket-free aggregate; it intentionally does not mean
-“all verification” and never includes Testcontainers.
+Keep `Smoke` backward compatible as the one proven D3A journey. `SmokeAuth` is
+its explicit alias and `SmokePayments` owns the three independent D3B leaves.
+`PhaseD` is the final socket-free aggregate and the sole automatic `+check`.
+All other gates remain public callable functions. `AllSocketFree` names the same
+contract explicitly; legacy `All` remains an alias. `FullLocal` is the only
+aggregate that adds Testcontainers and therefore requires a typed socket.
 
 ```text
-dagger check fast
-dagger check integration
-dagger check smoke                 # compatibility: D3A only
+dagger call fast
+dagger call integration
+dagger call smoke                  # compatibility: D3A only
 dagger call smoke-auth
 dagger call smoke-json-direct-submission
 dagger call smoke-maker-checker-approval
 dagger call smoke-payment-detail-lineage
 dagger call smoke-payments
-dagger check phase-d               # Fast + Integration + SmokeAuth + SmokePayments + D4
+dagger call phase-d                # Fast + Integration + SmokeAuth + SmokePayments + D4
+dagger check                       # discovers only PhaseD
+dagger call all-socket-free
+dagger call full-local --runtime-socket=/run/podman/podman.sock
 dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
 ```
 
-`SmokePayments` and `PhaseD` are `+check` functions only after their leaves are
-implemented and individually proven. This avoids silently changing the current
-`dagger check smoke` contract recorded in the manifest.
+The prior design note that both `SmokePayments` and `PhaseD` should become
+checks is superseded by the runtime topology review. Nested discovered checks
+repeat child graphs; `dagger/pure/check_topology_test.go` enforces one root.
 
 ## Proposed file tree
 
@@ -320,3 +325,26 @@ codes, realm JSON, and secret values.
 | frontend build | Dagger result cache only; no mutable named `.next` cache | measure | frontend source/config changes rerun build |
 | Playwright browser | immutable pinned image path `/ms-playwright` | image pull then reuse | image digest change |
 | runtime services, DB/Kafka/Keycloak, sessions/cookies/tokens, test results, generated credentials | never cache | always fresh | absence is inspected in graph code |
+
+## Post-Phase-D architecture hardening (2026-07-23)
+
+The approved local Phase D scope also owns reproducibility and proof quality.
+The hardening review added no business capability and changed no frozen
+architecture decision:
+
+- the auto-injected Workspace is constructor state, preventing stale dirty-source
+  result reuse;
+- `.dagger/lock` controls all ten runtime image lookups and frozen mode fails
+  closed;
+- backend, frontend, Dagger and governance input boundaries are explicit;
+- pnpm dependency installation depends only on its manifests;
+- Maven, pnpm and Go caches are toolchain-versioned, explicit `SHARED`, and
+  covered by an isolated concurrent-writer fixture;
+- cache acceptance uses cold/warm/changed traces, not equal digest or duration;
+- service alias/DNS, binding regeneration and unexpected runtime log failures
+  have focused regressions;
+- Engine 0.21.7 remains a dedicated future CLI+Engine upgrade, not an implicit
+  Phase D dependency.
+
+Evidence and external-source decisions live in
+`docs/ci/DAGGER-ARCHITECTURE-REVIEW-2026-07-23.md`.

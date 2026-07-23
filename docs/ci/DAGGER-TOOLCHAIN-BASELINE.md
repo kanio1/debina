@@ -29,3 +29,18 @@ Output: `dagger-d0-probe`.
 ## Result
 
 `D0-PASSED`. The prior `ENVIRONMENT-BLOCKED-CHECKPOINT` is superseded. The rootful Podman API is security-sensitive and intentionally remains a workstation-owner decision; Phase D made no group, socket, systemd, SELinux, containers.conf or PID-limit change.
+
+## Architecture-review version decision — 2026-07-23
+
+The latest patch in the pinned line is `v0.21.7`. It passed `fast`, frozen image
+lookup and the `WithServiceBinding` DNS regression when invoked through
+`dagger --x-release v0.21.7`. Releases 0.21.5–0.21.7 include relevant cache,
+filtered-directory, garbage-collection and CNI fixes.
+
+Decision: `DEFER`. Applying the official `dagger develop` upgrade changed only
+`engineVersion`, after which the installed v0.21.4 CLI correctly refused every
+ordinary module call. The controlled change was reverted by patch. Do not
+require a newer Engine without atomically installing the matching CLI. A future
+upgrade must regenerate bindings and repeat frozen-lock, workspace invalidation,
+service DNS, cache, assurance and full Phase D proofs. See
+[the review](DAGGER-ARCHITECTURE-REVIEW-2026-07-23.md).

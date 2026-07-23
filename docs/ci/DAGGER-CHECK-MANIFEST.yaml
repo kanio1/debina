@@ -1,100 +1,125 @@
-status: PHASE_D_LOCAL_RUNTIME_PROVEN
+status: DAGGER_ARCHITECTURE_REVIEW_IMPLEMENTED_PENDING_FINAL_MATRIX
 authority: repository commands remain authoritative; Dagger orchestrates them
-fast:
-  implemented:
-    - name: governance
-      command: bash tools/agent-config/validate-enterprise-governance.sh
-      reason: authoritative enterprise governance runner
-    - name: dagger-module-self-verification
-      commands: [go test ./..., go vet ./..., gofmt-drift-check]
-      reason: validates the generated local Go SDK module without host mutation
-    - name: backend-compile-and-architecture-fitness
-      command: ./mvnw -f backend -DskipTests compile, then selected Maven tests
-      tests: [ModularityTest, OwnershipArchRulesTest, PaymentNoGodModuleTest, ClockPortEnforcementTest, RuntimeDatasourceOwnershipTest, SchedulerActivationGuardTest]
-      reason: pure architecture and source-boundary tests; Testcontainers/runtime tests remain integration-only
-    - name: frontend-codegen-lint-typecheck
-      commands: [pnpm install --frozen-lockfile, pnpm run codegen:graphql, direct-graphql-output-comparison, pnpm run lint, pnpm run typecheck]
-      reason: exact Node 24.18.0 and pnpm 10.33.0 source feedback without a full runtime
-integration:
-  implemented:
-    - name: backend-regression-without-testcontainers
-      command: ./mvnw -f backend -Dtest=<explicit-current-socket-free-subset> test
-      result: 128 tests; all existing Testcontainers-backed classes are deliberately excluded
-    - name: frontend-production-build
-      command: pnpm run build
-    - name: postgres-readiness
-      command: pg_isready against ephemeral Dagger PostgreSQL 18 service
-    - name: flyway-fresh-database
-      command: Maven Flyway migrate + validate on a fresh ephemeral PostgreSQL 18 service
-    - name: flyway-upgrade-from-v54
-      command: Maven Flyway migrate + validate at V54, then migrate + validate at V60
-      baseline: docs/ci/FLYWAY-UPGRADE-BASELINE.md
-    - name: postgres-rls-and-grants
-      command: real-role PostgreSQL probes after fresh migration
-    - name: kafka-readiness-and-non-production-probe
-      command: pinned apache/kafka:4.1.1 single-broker create, produce, consume probe
-  explicit_runtime_socket:
-    testcontainers-backed-backend-regression:
-      command: dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
-      contract: required typed Dagger Socket argument; never part of a no-argument check
-      scope: mounted only into the dedicated Maven/Testcontainers container at /var/run/docker.sock
-      environment: [DOCKER_HOST=unix:///var/run/docker.sock, TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal]
-      transport_proof: socket-transport-probe returned Podman API _ping OK
-      representative: PaymentsRlsTest passed (2 tests; PostgreSQL 18 and 60 Flyway migrations)
-      portability_target: dagger call testcontainers-finality-portability --runtime-socket=/run/podman/podman.sock
-      portability_result: SettlementFinalityServiceTest passed 5/0/0 after typed JDBC OffsetDateTime-to-Instant assertion
-      regression: passed
-      cold_result: 540 tests; 0 failures; 0 errors; 0 skipped; Maven 4m29s
-      warm_result: Dagger result cache hit in approximately 1s; no second Maven execution
-smoke:
-  implemented:
-    authority: ADR-N16
-    command: dagger check smoke
-    d3a_vertical_slice:
-      narrow_command: dagger call smoke-login-session-health --progress=plain
-      journeys: [keycloak-login, bff-session, health-runtime]
-      browser: Chromium-only; one Playwright test and one worker; no retries
-      origins: [http://frontend:3000, http://keycloak:8080]
-      contract: application-triggered authorization-code/PKCE flow; callback; HttpOnly host-only sepa_session; safe /api/session claims; authenticated shell
-      session_identity: required stable sub and payment_submitter role; preferredUsername is explicitly nullable under the current sepa-web scopes and shell renders its source-backed "unknown user" fallback
-      token_policy: access, refresh and ID tokens; authorization codes; client secrets; and cookie values must not appear in the browser session projection
-      result: narrow leaf 1 passed, elapsed 1m05.17s, exit 0; public smoke reused the real leaf through Dagger result cache in 4.39s, exit 0
-  payment_aggregate:
-    command: dagger call smoke-payments --progress=plain
-    execution: sequential; one isolated PostgreSQL, Kafka, Keycloak and Keycloak-PostgreSQL service identity per journey
-    journeys:
-      - name: json-direct-submission
-        proof: UI -> BFF -> REST command -> PostgreSQL/ISO/outbox -> exact Kafka payment key
-      - name: maker-checker-approval
-        proof: distinct browser contexts; maker denied; checker approves; approval/audit/outbox -> exact Kafka payment key
-      - name: payment-detail-lineage
-        proof: real detail identifiers/status/timeline/lineage projection -> PostgreSQL/outbox -> exact Kafka payment key
-    result: 3 passed sequentially; elapsed 3m27.06s; exit 0
+engine:
+  current: v0.21.4
+  candidate: v0.21.7
+  decision: DEFER
+  reason: candidate focused proofs pass, but a repo-only engineVersion change breaks ordinary commands with the installed v0.21.4 CLI
+
+automatic_checks:
+  canonical:
+    name: phase-d
+    directive: "+check"
+    command: dagger check --progress=plain
+  forbidden_topology:
+    automatic_children: [fast, integration, smoke, smoke-auth, smoke-payments, all]
+    regression: dagger/pure/check_topology_test.go
+
+callable_gates:
+  fast:
+    membership: [governance, dagger-module-self-verification, backend-fast, frontend-fast]
+  integration:
+    membership:
+      - backend-regression-without-testcontainers
+      - frontend-production-build
+      - postgres-readiness
+      - flyway-fresh-database
+      - flyway-upgrade-from-v54
+      - postgres-rls-and-grants
+      - kafka-readiness-and-non-production-probe
+  smoke:
+    contract: backward-compatible D3A login/session/health alias
+  smoke-payments:
+    execution: sequential
+    journeys: [json-direct-submission, maker-checker-approval, payment-detail-lineage]
+  phase-d:
+    membership: [fast, integration, smoke-auth, smoke-payments, assurance]
+    socket: none
+  all-socket-free:
+    contract: unambiguous alias of phase-d
+  all:
+    contract: legacy alias of all-socket-free; not literal typed-socket verification
+  full-local:
+    membership: [phase-d, testcontainers-regression]
+    socket: required typed Dagger Socket argument
+
+testcontainers:
+  command: dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
+  contract: explicit and mounted only into the dedicated Maven container
+  environment:
+    - DOCKER_HOST=unix:///var/run/docker.sock
+    - TESTCONTAINERS_HOST_OVERRIDE=host.containers.internal
+
+images:
+  declarations: dagger/main.go
+  inventory_count: 10
+  lockfile: .dagger/lock
+  normal_mode: developer default
+  proof_mode: frozen
+  update_mode: live
+  regressions: dagger/pure/image_lock_test.go
+  frozen_missing_entry: fail-closed-proven
+
+workspace:
+  constructor_input: auto-injected Workspace
+  exclusions: [.git, node_modules, .next, target, build, coverage, test-results, playwright-report, runtime-logs]
+  boundaries:
+    backend: [mvnw, .mvn, backend, infra/asyncapi/asyncapi.yaml]
+    frontend: [frontend, backend/src/main/resources/graphql/schema.graphqls]
+    dagger: [dagger]
+    governance: [filtered-repository-root]
+  dependency_precision:
+    pnpm_install: [frontend/package.json, frontend/pnpm-lock.yaml, frontend/pnpm-workspace.yaml]
+  diagnostic: source-boundary-digest
+
+caches:
+  named:
+    - {name: debina-maven-jdk25, content: Maven dependencies, sharing: SHARED}
+    - {name: debina-pnpm-node24.18.0-pnpm10.33.0, content: pnpm content-addressed store, sharing: SHARED}
+    - {name: debina-dagger-go-1.26.5, content: Go modules, sharing: SHARED}
+  trace_runner: tools/ci/verify-dagger-cache.sh
+  statuses:
+    - OUTPUT-DETERMINISM-PROVEN
+    - CACHE-REUSE-TRACE-PROVEN
+    - SELECTIVE-INVALIDATION-TRACE-PROVEN
+  volume_stress:
+    function: cache-volume-stress
+    namespace: hash-isolated
+    reset: fixture-files-only
+
+services:
+  stateful: [postgresql, kafka, keycloak-postgresql, keycloak, backend, frontend]
+  lifecycle: lazy bindings; no host ports; no manual Start/Stop
+  dns_regression: service-binding-dns
+  candidate_proof: passed on v0.21.4 and v0.21.7
+
+secrets:
+  transport: [dag.SetSecret, WithSecretVariable]
+  forbidden: [plaintext-password-env, returned-secret-file, stable-secret-cache-key]
+  redaction_proof: failure-artifact-redaction
+
 assurance:
   expected_failures:
     leaves: [child-non-zero, bounded-timeout, postgres-unavailable, kafka-unavailable, keycloak-unavailable, backend-unavailable, frontend-unavailable, browser-navigation-failure]
-    contract: non-zero child plus exact PHASE-D EXPECTED classification marker; finite per-leaf budget
-    result: runtime-proven
-  failure_artifacts:
-    command: dagger call failure-artifact-redaction --progress=plain
-    export: dagger call failure-artifacts export --path=<local-path>
-    type: redacted JSON summary
-    automated_scan: [Authorization, Bearer, access_token, refresh_token, id_token, client_secret, password, Cookie, Set-Cookie, exact-synthetic-secret-values]
-    result: PHASE-D FAILURE-ARTIFACT REDACTION VERIFIED
-  cache:
-    key_inputs: [pinned-image, dagger/go.mod, source-input, configuration]
-    reuse: identical second call returned DebinaVerification.cacheProbe CACHED with stable digest
-    invalidation: changed source input reran probe with a distinct digest while independent file/container layers remained CACHED
-aggregates:
-  phase-d:
-    command: dagger call phase-d --progress=plain
-    membership: [fast, integration, smoke-auth, smoke-payments, assurance]
-    result: elapsed 1m41.53s; exit 0
-  all:
-    command: dagger call all --progress=plain
-    contract: non-duplicating public alias of phase-d; explicit-socket Testcontainers remains separate
-    result: elapsed 6.50s; exit 0
+    contract: non-zero child plus exact PHASE-D EXPECTED classification marker
   unexpected_child_propagation:
-    command: dagger call aggregate-unexpected-failure-probe --progress=plain
-    result: expected non-zero; PHASE-D UNEXPECTED CHILD FAILURE propagated
-non_goals: [GitHub-Actions, act, remote-CI, deployment, payment-features]
+    function: aggregate-unexpected-failure-probe
+    expected_result: non-zero with PHASE-D UNEXPECTED CHILD FAILURE
+  log_health:
+    runner: tools/ci/verify-dagger-log-health.sh
+    rejects: [NullPointerException, uncaught-exception, JVM-thread-exception, panic, fatal-startup, runtime-ERROR, runtime-FATAL]
+  service_binding_dns: service-binding-dns
+
+generators:
+  bindings: dagger develop -y
+  bindings_hash_idempotence: proven
+  generate_check: dagger check --generate
+  graphql: regenerated and byte-compared inside fast
+
+observability:
+  source: Dagger plain progress/OpenTelemetry spans
+  artifacts: /tmp only
+  timing_policy: observational; no single-run SLA
+  performance_review: docs/ci/DAGGER-ARCHITECTURE-REVIEW-2026-07-23.md
+
+non_goals: [GitHub-Actions, Jenkins, act, Dagger-Cloud, remote-cache, deployment, Phase-E, payment-feature-expansion]
