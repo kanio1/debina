@@ -43,8 +43,8 @@ names, nil runners and duplicate names before executing a graph.
 
 | Function | Contract |
 |---|---|
-| `fast` | governance, module compile/tests/vet/gofmt, backend architecture checks, frontend GraphQL drift/lint/typecheck |
-| `integration` | socket-free backend subset, frontend build, PostgreSQL/Flyway/RLS/grants and Kafka |
+| `fast` | governance, Dagger module compile/tests/vet/gofmt, frontend GraphQL drift/lint/typecheck |
+| `integration` | exactly `backend-integration`, `frontend-production-build`, `database-contract`, `database-upgrade`, `kafka-contract` |
 | `smoke-suite` | all six capped ADR-N16 journeys, sequential and isolated |
 | `smoke` | deprecated callable alias of `smoke-suite` |
 | `smoke-auth` | separately callable D3A login/session/health compatibility gate |
@@ -59,8 +59,9 @@ names, nil runners and duplicate names before executing a graph.
 | `full-local --runtime-socket=...` | `acceptance`, then `backend-testcontainers`; each backend classification exactly once |
 
 The three acceptance classifications are intentionally disjoint: `fast` owns
-static/unit/architecture feedback, `integration` owns non-browser component and
-service interaction, and `smoke-suite` owns browser journeys.
+static governance/Dagger/frontend feedback, `integration` owns the durable
+backend `fast` JUnit classification plus non-browser service contracts, and
+`smoke-suite` owns browser journeys.
 `pipeline-assurance` owns tests of the pipeline itself and is deliberately
 independent of acceptance. Diagnostic sub-gates remain public without becoming
 additional automatic roots.

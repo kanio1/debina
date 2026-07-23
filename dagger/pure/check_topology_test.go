@@ -124,6 +124,103 @@ func TestAcceptanceOwnsExactlyThreeCanonicalClassifications(t *testing.T) {
 	}
 }
 
+func TestIntegrationOwnsExactlyFiveCanonicalLeaves(t *testing.T) {
+	t.Parallel()
+
+	sourcePath := filepath.Join("..", "checks.go")
+	parsed, err := parser.ParseFile(token.NewFileSet(), sourcePath, nil, 0)
+	if err != nil {
+		t.Fatalf("parse %s: %v", sourcePath, err)
+	}
+
+	var actual []string
+	for _, declaration := range parsed.Decls {
+		function, ok := declaration.(*ast.FuncDecl)
+		if !ok || function.Name.Name != "Integration" {
+			continue
+		}
+		ast.Inspect(function.Body, func(node ast.Node) bool {
+			call, ok := node.(*ast.CallExpr)
+			if !ok || len(call.Args) != 2 {
+				return true
+			}
+			callee, ok := call.Fun.(*ast.Ident)
+			if !ok || callee.Name != "containerCheck" {
+				return true
+			}
+			name, ok := call.Args[0].(*ast.BasicLit)
+			if !ok {
+				t.Fatalf("integration leaf name is not a literal: %T", call.Args[0])
+			}
+			vertex, ok := call.Args[1].(*ast.CallExpr)
+			if !ok {
+				t.Fatalf("integration leaf is not a container call: %T", call.Args[1])
+			}
+			selector, ok := vertex.Fun.(*ast.SelectorExpr)
+			if !ok {
+				t.Fatalf("integration leaf runner is not a selector: %T", vertex.Fun)
+			}
+			actual = append(actual, name.Value+":"+selector.Sel.Name)
+			return false
+		})
+	}
+
+	expected := []string{
+		`"backend-integration":backendIntegration`,
+		`"frontend-production-build":frontendBuild`,
+		`"database-contract":databaseContract`,
+		`"database-upgrade":databaseUpgrade`,
+		`"kafka-contract":kafkaContract`,
+	}
+	if !reflect.DeepEqual(actual, expected) {
+		t.Fatalf("integration leaves = %v, want %v", actual, expected)
+	}
+}
+
+func TestDatabaseContractCreatesOneFreshPostgresService(t *testing.T) {
+	t.Parallel()
+
+	sourcePath := filepath.Join("..", "integration.go")
+	parsed, err := parser.ParseFile(token.NewFileSet(), sourcePath, nil, 0)
+	if err != nil {
+		t.Fatalf("parse %s: %v", sourcePath, err)
+	}
+
+	serviceCalls := map[string][]string{}
+	for _, declaration := range parsed.Decls {
+		function, ok := declaration.(*ast.FuncDecl)
+		if !ok || (function.Name.Name != "databaseContract" &&
+			function.Name.Name != "databaseUpgrade") {
+			continue
+		}
+		ast.Inspect(function.Body, func(node ast.Node) bool {
+			call, ok := node.(*ast.CallExpr)
+			if !ok || len(call.Args) == 0 {
+				return true
+			}
+			selector, ok := call.Fun.(*ast.SelectorExpr)
+			if !ok || selector.Sel.Name != "postgresService" {
+				return true
+			}
+			instance, ok := call.Args[0].(*ast.BasicLit)
+			if !ok {
+				t.Fatalf("%s postgres service instance is not literal", function.Name.Name)
+			}
+			serviceCalls[function.Name.Name] =
+				append(serviceCalls[function.Name.Name], instance.Value)
+			return true
+		})
+	}
+
+	expected := map[string][]string{
+		"databaseContract": {`"database-contract"`},
+		"databaseUpgrade":  {`"upgrade"`},
+	}
+	if !reflect.DeepEqual(serviceCalls, expected) {
+		t.Fatalf("database service instances = %v, want %v", serviceCalls, expected)
+	}
+}
+
 func hasCheckDirective(group *ast.CommentGroup) bool {
 	for _, comment := range group.List {
 		for _, line := range strings.Split(comment.Text, "\n") {

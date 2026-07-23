@@ -17,16 +17,20 @@ automatic_checks:
 
 callable_gates:
   fast:
-    membership: [governance, dagger-module-self-verification, backend-fast, frontend-fast]
+    membership: [governance, dagger-module-self-verification, frontend-fast]
   integration:
     membership:
-      - backend-regression-without-testcontainers
+      - backend-integration
       - frontend-production-build
-      - postgres-readiness
-      - flyway-fresh-database
-      - flyway-upgrade-from-v54
-      - postgres-rls-and-grants
-      - kafka-readiness-and-non-production-probe
+      - database-contract
+      - database-upgrade
+      - kafka-contract
+    database_contract:
+      postgres_instances: 1
+      sequence: [readiness, migrate, validate, application-credential, RLS, grants]
+    database_upgrade:
+      postgres_instances: 1
+      contract: independent v54-to-current proof
   smoke-suite:
     membership: [smoke-auth, smoke-payments]
     execution: sequential

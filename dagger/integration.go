@@ -7,8 +7,11 @@ import (
 )
 
 const (
-	postgresServiceAlias = "postgres"
-	kafkaServiceAlias    = "kafka"
+	postgresServiceAlias             = "postgres"
+	kafkaServiceAlias                = "kafka"
+	databaseReadinessCompletionPath  = "/tmp/database-readiness-complete"
+	databaseMigrationCompletionPath  = "/tmp/database-migration-complete"
+	databaseCredentialCompletionPath = "/tmp/database-credential-complete"
 )
 
 // postgresService is intentionally ephemeral and has no host port or volume.
@@ -31,14 +34,6 @@ func postgresClient(service *dagger.Service) *dagger.Container {
 		WithEnvVariable("PGHOST", postgresServiceAlias).
 		WithEnvVariable("PGPORT", "5432").
 		WithEnvVariable("PGDATABASE", "sepa_nexus")
-}
-
-func (m *DebinaVerification) postgresReadiness() *dagger.Container {
-	credentials := newPhaseDCredentials()
-	return postgresClient(m.postgresService("readiness", credentials)).
-		WithEnvVariable("PGUSER", "sepa_migration").
-		WithSecretVariable("PGPASSWORD", credentials.migrationPassword).
-		WithExec([]string{"pg_isready", "-t", "30"})
 }
 
 func (m *DebinaVerification) flywayClient(service *dagger.Service) *dagger.Container {
@@ -64,35 +59,45 @@ func flywayCommand(target string, goals ...string) string {
 	return strings.Join(append(args, goals...), " ")
 }
 
-func (m *DebinaVerification) flywayFresh() *dagger.Container {
-	credentials := newPhaseDCredentials()
-	return m.flywayClient(m.postgresService("fresh", credentials)).
-		WithSecretVariable("FLYWAY_PASSWORD", credentials.migrationPassword).
-		WithExec([]string{"sh", "-ec", flywayCommand("", "flyway:migrate", "flyway:validate")})
-}
-
-func (m *DebinaVerification) flywayUpgrade() *dagger.Container {
+func (m *DebinaVerification) databaseUpgrade() *dagger.Container {
 	credentials := newPhaseDCredentials()
 	return m.flywayClient(m.postgresService("upgrade", credentials)).
 		WithSecretVariable("FLYWAY_PASSWORD", credentials.migrationPassword).
 		WithExec([]string{"sh", "-ec", flywayCommand("54", "flyway:migrate", "flyway:validate")}).
-		WithExec([]string{"sh", "-ec", flywayCommand("", "flyway:migrate", "flyway:validate")})
+		WithExec([]string{"sh", "-ec", flywayCommand("", "flyway:migrate", "flyway:validate") + " && printf '%s\n' 'DATABASE-UPGRADE-CONTRACT-VERIFIED'"})
 }
 
-func (m *DebinaVerification) rlsAndGrantProbes() *dagger.Container {
+func (m *DebinaVerification) databaseContract() *dagger.Container {
 	credentials := newPhaseDCredentials()
-	service := m.postgresService("rls-grants", credentials)
+	service := m.postgresService("database-contract", credentials)
+	readiness := postgresClient(service).
+		WithEnvVariable("PGUSER", "sepa_migration").
+		WithSecretVariable("PGPASSWORD", credentials.migrationPassword).
+		WithExec([]string{"sh", "-ec", "pg_isready -t 30 && printf '%s\n' ready > " + databaseReadinessCompletionPath}).
+		File(databaseReadinessCompletionPath)
 	migrated := m.flywayClient(service).
+		WithFile(databaseReadinessCompletionPath, readiness).
 		WithSecretVariable("FLYWAY_PASSWORD", credentials.migrationPassword).
-		WithExec([]string{"sh", "-ec", flywayCommand("", "flyway:migrate", "flyway:validate")}).
-		File("/workspace/backend/pom.xml")
+		WithExec([]string{"sh", "-ec", "test \"$(cat " + databaseReadinessCompletionPath + ")\" = ready && " + flywayCommand("", "flyway:migrate", "flyway:validate") + " && printf '%s\n' migrated > " + databaseMigrationCompletionPath}).
+		File(databaseMigrationCompletionPath)
+	credential := postgresClient(service).
+		WithFile(databaseMigrationCompletionPath, migrated).
+		WithEnvVariable("PGUSER", "sepa_app").
+		WithSecretVariable("PGPASSWORD", credentials.appPassword).
+		WithExec([]string{"sh", "-ec", "test \"$(cat " + databaseMigrationCompletionPath + ")\" = migrated; test \"$(psql -v ON_ERROR_STOP=1 -Atqc 'SELECT current_user')\" = sepa_app; printf '%s\n' credential > " + databaseCredentialCompletionPath}).
+		File(databaseCredentialCompletionPath)
 	return postgresClient(service).
-		WithFile("/migration-complete", migrated).
+		WithFile(databaseReadinessCompletionPath, readiness).
+		WithFile(databaseMigrationCompletionPath, migrated).
+		WithFile(databaseCredentialCompletionPath, credential).
 		WithEnvVariable("PGUSER", "sepa_migration").
 		WithSecretVariable("PGPASSWORD", credentials.migrationPassword).
 		WithSecretVariable("SEPA_APP_PASSWORD", credentials.appPassword).
 		WithExec([]string{"sh", "-ec", `
 set -eu
+test "$(cat ` + databaseReadinessCompletionPath + `)" = ready
+test "$(cat ` + databaseMigrationCompletionPath + `)" = migrated
+test "$(cat ` + databaseCredentialCompletionPath + `)" = credential
 assert_true() {
   actual="$(psql -v ON_ERROR_STOP=1 -Atqc "$1")"
   test "$actual" = t
@@ -104,6 +109,7 @@ assert_true "SELECT NOT has_table_privilege('sepa_app', 'ledger.journal_entries'
 assert_true "SELECT has_table_privilege('outbox_dispatcher_role', 'payment.outbox_events', 'SELECT,UPDATE')"
 assert_true "SELECT NOT has_table_privilege('outbox_dispatcher_role', 'payment.payments', 'INSERT')"
 PGUSER=sepa_app PGPASSWORD="$SEPA_APP_PASSWORD" psql -v ON_ERROR_STOP=1 -Atqc "SELECT count(*) FROM payment.payments" | grep -x 0
+printf '%s\n' 'DATABASE-CONTRACT-VERIFIED'
 `})
 }
 
@@ -124,8 +130,8 @@ func (m *DebinaVerification) kafkaService(instance string) *dagger.Service {
 		AsService()
 }
 
-func (m *DebinaVerification) kafkaProbe() *dagger.Container {
-	service := m.kafkaService("integration-probe")
+func (m *DebinaVerification) kafkaContract() *dagger.Container {
+	service := m.kafkaService("kafka-contract")
 	return dag.Container().
 		From(kafkaImage).
 		WithServiceBinding(kafkaServiceAlias, service).
@@ -135,5 +141,6 @@ topic=debina.phase-d.non-production-probe
 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic "$topic" --partitions 1 --replication-factor 1
 printf 'phase-d-probe\n' | /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server kafka:9092 --topic "$topic"
 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic "$topic" --from-beginning --max-messages 1 --timeout-ms 30000 | grep -x phase-d-probe
+printf '%s\n' 'KAFKA-CONTRACT-VERIFIED'
 `})
 }

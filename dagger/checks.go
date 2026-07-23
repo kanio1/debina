@@ -14,24 +14,21 @@ func (m *DebinaVerification) Fast(ctx context.Context) error {
 	checks := []namedCheck{
 		containerCheck("governance", m.governance()),
 		containerCheck("module", m.moduleSelfTest()),
-		containerCheck("backend-fast", m.backendFast()),
 		containerCheck("frontend-fast", m.frontendFast()),
 	}
 	return runChecks(ctx, checks)
 }
 
-// Integration proves the Dagger-native integration leaves. Existing
-// Testcontainers tests are intentionally excluded until a supported bridge to
-// the selected Podman runtime is available.
+// Integration proves exactly five disjoint Dagger-native integration leaves.
+// The backend leaf owns the durable fast JUnit classification; typed-socket
+// Testcontainers remain outside this socket-free graph.
 func (m *DebinaVerification) Integration(ctx context.Context) error {
 	checks := []namedCheck{
-		containerCheck("backend-regression-without-testcontainers", m.backendWithoutTestcontainers()),
+		containerCheck("backend-integration", m.backendIntegration()),
 		containerCheck("frontend-production-build", m.frontendBuild()),
-		containerCheck("postgres-readiness", m.postgresReadiness()),
-		containerCheck("flyway-fresh-database", m.flywayFresh()),
-		containerCheck("flyway-upgrade-from-v54", m.flywayUpgrade()),
-		containerCheck("postgres-rls-and-grants", m.rlsAndGrantProbes()),
-		containerCheck("kafka-readiness-and-non-production-probe", m.kafkaProbe()),
+		containerCheck("database-contract", m.databaseContract()),
+		containerCheck("database-upgrade", m.databaseUpgrade()),
+		containerCheck("kafka-contract", m.kafkaContract()),
 	}
 	return runChecks(ctx, checks)
 }
