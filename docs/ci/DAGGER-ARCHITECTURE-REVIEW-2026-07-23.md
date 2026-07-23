@@ -77,6 +77,12 @@ The redacted failure summary is 573 bytes. Service startup and browser vertex
 durations remain in `/tmp/debina-perf-*.log`; they are not committed because
 traces are runtime artifacts and may contain operational detail.
 
+The first log-health pass also found the two expected PostgreSQL missing-table
+probes used by Keycloak before it initializes an empty database. Only the exact
+`migration_model` and `public.databasechangeloglock` relations are classified
+as bootstrap observations; all other runtime `ERROR/FATAL` payloads remain
+fail-closed.
+
 ## Deferred remote CI proposal boundary
 
 No remote CI implementation is authorized. A later Phase E proposal should be a

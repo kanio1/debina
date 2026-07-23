@@ -129,8 +129,11 @@ redacted JSON summary and scan exact fixture secrets and forbidden headers.
 exceptions, JVM thread exceptions, panic, fatal startup and runtime payload
 `ERROR`/`FATAL`. Dagger structural `ERROR` spans are not application logs;
 expected-failure payloads require the exact `PHASE-D EXPECTED <classification>`
-marker. The approval-gated payment mapper NPE was independently reproduced and
-fixed without inventing a business status before the FSM starts.
+marker. Two exact PostgreSQL errors are allowlisted only for Keycloak's empty-DB
+bootstrap probes (`migration_model` and `public.databasechangeloglock` absent);
+the trace must subsequently show Liquibase schema initialization and successful
+Keycloak readiness. The approval-gated payment mapper NPE was independently
+reproduced and fixed without inventing a business status before the FSM starts.
 
 ## Generation and observability
 

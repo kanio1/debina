@@ -7,7 +7,7 @@ import (
 )
 
 func TestScanAcceptsExpectedFailureAndStructuralError(t *testing.T) {
-	path := writeTrace(t, "12 : Container.withExec ERROR [0.1s]\n12 : [0.1s] | PHASE-D EXPECTED CHILD_EXIT_NON_ZERO\nWARN Resolved [MissingRequestHeaderException: expected validation]\n")
+	path := writeTrace(t, "12 : Container.withExec ERROR [0.1s]\n12 : [0.1s] | PHASE-D EXPECTED CHILD_EXIT_NON_ZERO\nWARN Resolved [MissingRequestHeaderException: expected validation]\n13 : [1.0s] | ERROR:  relation \"migration_model\" does not exist at character 25\n14 : [1.1s] | ERROR:  relation \"public.databasechangeloglock\" does not exist at character 22\n")
 	if err := scan(path); err != nil {
 		t.Fatalf("expected allowlisted trace to pass: %v", err)
 	}

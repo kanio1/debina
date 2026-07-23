@@ -108,6 +108,9 @@ assurance:
   log_health:
     runner: tools/ci/verify-dagger-log-health.sh
     rejects: [NullPointerException, uncaught-exception, JVM-thread-exception, panic, fatal-startup, runtime-ERROR, runtime-FATAL]
+    exact_bootstrap_allowlist:
+      - 'Keycloak PostgreSQL: relation "migration_model" does not exist before schema initialization'
+      - 'Keycloak PostgreSQL: relation "public.databasechangeloglock" does not exist before Liquibase initialization'
   service_binding_dns: service-binding-dns
 
 generators:

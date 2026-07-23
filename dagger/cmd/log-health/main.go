@@ -55,11 +55,18 @@ func scan(path string) error {
 		// the surface on which application ERROR/FATAL entries are asserted.
 		if payloadIndex := strings.Index(line, " | "); payloadIndex >= 0 &&
 			errorPattern.MatchString(line[payloadIndex+3:]) {
-			return fmt.Errorf("%s:%d unexpected runtime ERROR/FATAL: %s", path, lineNumber, line)
+			if !expectedKeycloakSchemaBootstrap(line) {
+				return fmt.Errorf("%s:%d unexpected runtime ERROR/FATAL: %s", path, lineNumber, line)
+			}
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("scan %s: %w", path, err)
 	}
 	return nil
+}
+
+func expectedKeycloakSchemaBootstrap(line string) bool {
+	return strings.Contains(line, `ERROR:  relation "migration_model" does not exist`) ||
+		strings.Contains(line, `ERROR:  relation "public.databasechangeloglock" does not exist`)
 }
