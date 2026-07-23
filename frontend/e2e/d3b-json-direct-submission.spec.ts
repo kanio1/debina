@@ -29,7 +29,19 @@ test("D3B JSON_DIRECT submits through the existing UI and BFF", async ({ page })
   await page.getByTestId("payments.submit.debtor-iban-input").fill("DE89370400440532013000");
   await page.getByTestId("payments.submit.creditor-iban-input").fill("FR7630006000011234567890189");
   await page.getByTestId("payments.submit.submit-button").click();
-  await page.getByTestId("payments.submit.confirm-dialog.confirm-button").click();
+  await expect(page.getByTestId("payments.submit.confirm-dialog")).toBeVisible();
+  const confirmButton = page.getByTestId("payments.submit.confirm-dialog.confirm-button");
+  await expect(confirmButton).toBeEnabled();
+  const submissionRequest = page.waitForRequest((request) =>
+    new URL(request.url()).pathname === "/api/payments"
+    && request.method() === "POST",
+  );
+  await confirmButton.click();
+  await expect(confirmButton).toHaveText("Submitting…");
+  const response = await (await submissionRequest).response();
+  expect(response).not.toBeNull();
+  expect(response!.status()).toBe(201);
+  await expect(page.getByTestId("payments.submit.error")).toHaveCount(0);
 
   const payment = page.getByTestId("payments.list.end-to-end-id-link").filter({ hasText: endToEndID });
   await expect(payment).toHaveCount(1);

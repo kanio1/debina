@@ -19,6 +19,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { ApprovalQueueQuery } from "@/generated/graphql";
 import { readCookie } from "@/lib/read-cookie";
+import { browserRandomUUID } from "@/lib/browser-random-uuid";
 
 const PAGE_SIZE = 25;
 
@@ -123,7 +124,7 @@ export function ApprovalQueue() {
         headers: {
           "Content-Type": "application/json",
           "x-csrf-token": readCookie("sepa_csrf") ?? "",
-          "Idempotency-Key": crypto.randomUUID(),
+          "Idempotency-Key": browserRandomUUID(),
         },
         body: JSON.stringify({ decisionComment: comment }),
       });

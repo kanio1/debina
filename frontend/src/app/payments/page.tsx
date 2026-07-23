@@ -18,6 +18,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { PaymentsTable, type PaymentRow, type PaymentsTableStatus } from "@/components/payments/payments-table";
 import { ApprovalQueue } from "@/components/payments/approval-queue";
+import { browserRandomUUID } from "@/lib/browser-random-uuid";
 import { readCookie } from "@/lib/read-cookie";
 
 interface PaymentSummaryResponse {
@@ -129,7 +130,7 @@ export default function PaymentsPage() {
         headers: {
           "Content-Type": "application/json",
           "x-csrf-token": csrfToken,
-          "Idempotency-Key": crypto.randomUUID(),
+          "Idempotency-Key": browserRandomUUID(),
         },
         body: JSON.stringify({
           endToEndId: form.endToEndId,

@@ -1,4 +1,5 @@
 import { writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 const frontendOrigin = "http://frontend:3000";
@@ -30,12 +31,18 @@ async function submitPendingPayment(page: Page): Promise<string> {
   await page.getByTestId("payments.submit.debtor-iban-input").fill("DE89370400440532013000");
   await page.getByTestId("payments.submit.creditor-iban-input").fill("FR7630006000011234567890189");
   await page.getByTestId("payments.submit.submit-button").click();
+  const submissionResponse = page.waitForResponse((response) => {
+    const request = response.request();
+    return new URL(response.url()).pathname === "/api/payments" && request.method() === "POST";
+  });
   await page.getByTestId("payments.submit.confirm-dialog.confirm-button").click();
-  const link = page.getByTestId("payments.list.end-to-end-id-link").filter({ hasText: endToEndID });
-  await expect(link).toHaveCount(1);
-  const href = await link.getAttribute("href");
-  expect(href).toMatch(/^\/payments\/[0-9a-f-]{36}$/);
-  return href!.slice("/payments/".length);
+  const response = await submissionResponse;
+  expect(response.status()).toBe(202);
+  const result = (await response.json()) as { paymentId?: string; approvalStatus?: string };
+  expect(result.approvalStatus).toBe("PENDING_APPROVAL");
+  expect(result.paymentId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+  await expect(page.getByTestId("payments.submit.error")).toHaveCount(0);
+  return result.paymentId!;
 }
 
 test("D3B maker cannot approve and independent checker can approve", async ({ browser }) => {
@@ -46,16 +53,16 @@ test("D3B maker cannot approve and independent checker can approve", async ({ br
     const paymentID = await submitPendingPayment(makerPage);
 
     await expect(makerPage.getByTestId("payments.approvals.queue.unauthorized")).toBeVisible();
-    const denied = await makerPage.evaluate(async ({ id }) => {
+    const denied = await makerPage.evaluate(async ({ id, idempotencyKey }) => {
       const csrf = document.cookie.split("; ").find((entry) => entry.startsWith("sepa_csrf="))?.slice("sepa_csrf=".length) ?? "";
       const response = await fetch(`/api/payments/${id}/approve`, {
         method: "POST",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json", "x-csrf-token": csrf, "Idempotency-Key": crypto.randomUUID() },
+        headers: { "Content-Type": "application/json", "x-csrf-token": csrf, "Idempotency-Key": idempotencyKey },
         body: "{}",
       });
       return response.status;
-    }, { id: paymentID });
+    }, { id: paymentID, idempotencyKey: randomUUID() });
     expect(denied).toBe(403);
 
     const checkerPage = await login(checker, requiredEnv("SMOKE_APPROVER_USERNAME"), requiredEnv("SMOKE_APPROVER_PASSWORD"));
