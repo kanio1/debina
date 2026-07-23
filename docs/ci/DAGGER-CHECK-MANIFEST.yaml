@@ -47,7 +47,19 @@ integration:
       cold_result: 540 tests; 0 failures; 0 errors; 0 skipped; Maven 4m29s
       warm_result: Dagger result cache hit in approximately 1s; no second Maven execution
 smoke:
-  pending:
+  implemented:
     authority: ADR-N16
-    journeys: [keycloak-login, bff-session, health-runtime, json-direct-submission, maker-checker-approval, payment-detail-lineage]
+    command: dagger check smoke
+    d3a_vertical_slice:
+      narrow_command: dagger call smoke-login-session-health --progress=plain
+      journeys: [keycloak-login, bff-session, health-runtime]
+      browser: Chromium-only; one Playwright test and one worker; no retries
+      origins: [http://frontend:3000, http://keycloak:8080]
+      contract: application-triggered authorization-code/PKCE flow; callback; HttpOnly host-only sepa_session; safe /api/session claims; authenticated shell
+      session_identity: required stable sub and payment_submitter role; preferredUsername is explicitly nullable under the current sepa-web scopes and shell renders its source-backed "unknown user" fallback
+      token_policy: access, refresh and ID tokens; authorization codes; client secrets; and cookie values must not appear in the browser session projection
+      result: narrow leaf 1 passed, elapsed 1m05.17s, exit 0; public smoke reused the real leaf through Dagger result cache in 4.39s, exit 0
+  pending:
+    journeys: [json-direct-submission, maker-checker-approval, payment-detail-lineage]
+    contract: D3B only; not part of the D3A public smoke proof
 non_goals: [GitHub-Actions, act, remote-CI, deployment, payment-features]

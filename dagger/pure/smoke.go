@@ -3,9 +3,9 @@ package pure
 import "strings"
 
 // D3AReadinessCommand creates the bounded service-readiness gate used before
-// the browser smoke. A failed dependency is terminal: the Playwright command
-// is not run after the timeout.
-func D3AReadinessCommand(urls []string) string {
+// a finite browser command. A failed dependency is terminal: that command is
+// not run after the timeout.
+func D3AReadinessCommand(urls []string, browserCommand string) string {
 	return `set -eu
 for url in ` + strings.Join(urls, " ") + `; do
   attempts=0
@@ -18,5 +18,5 @@ for url in ` + strings.Join(urls, " ") + `; do
     sleep 1
   done
 done
-pnpm run test:smoke:d3a`
+` + browserCommand
 }

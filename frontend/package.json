@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test:smoke:d3a": "playwright test --project=chromium",
+    "test:callback-redirect": "node --experimental-strip-types scripts/test-post-login-redirect.ts",
+    "test:session-claims": "node --experimental-strip-types scripts/test-session-claims.ts",
+    "test:smoke:d3a": "playwright test e2e/d3a-vertical-smoke.spec.ts --project=chromium",
     "codegen:graphql": "graphql-codegen --config codegen.yml",
     "codegen:graphql:check": "pnpm run codegen:graphql && git diff --exit-code -- src/generated/graphql.ts"
   },

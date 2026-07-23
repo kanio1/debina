@@ -17,12 +17,17 @@ const (
 	credentialCompletionPath     = "/tmp/d3a-sepa-app-credential-complete"
 )
 
-// Smoke runs only the ADR-N16 D3A vertical slice: runtime health, Keycloak
-// authorization-code/PKCE login, and BFF session exposure.
+// Smoke runs the ADR-N16 D3A login/session/health vertical slice.
 // +check
 func (m *DebinaVerification) Smoke(ctx context.Context) error {
-	_, err := m.d3aSmokeRunner().Sync(ctx)
+	_, err := m.SmokeLoginSessionHealth(ctx)
 	return err
+}
+
+// SmokeLoginSessionHealth returns the finite Chromium execution for the
+// D3A Keycloak authorization-code/PKCE, BFF session and authenticated-shell proof.
+func (m *DebinaVerification) SmokeLoginSessionHealth(ctx context.Context) (string, error) {
+	return m.d3aSmokeRunner("pnpm run test:smoke:d3a").Stdout(ctx)
 }
 
 // SmokePostgresReadiness proves the ephemeral database and repository Flyway
@@ -199,7 +204,7 @@ func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Serv
 		WithEnvVariable("KEYCLOAK_ISSUER", "http://keycloak:8080/realms/sepa-nexus").
 		WithEnvVariable("KEYCLOAK_CLIENT_ID", "sepa-web").
 		WithSecretVariable("KEYCLOAK_CLIENT_SECRET", dag.SetSecret("d3a-keycloak-client-secret", "dev-only-sepa-web-secret")).
-		WithEnvVariable("BFF_BASE_URL", "http://localhost:3000").
+		WithEnvVariable("BFF_BASE_URL", "http://frontend:3000").
 		WithEnvVariable("BACKEND_API_BASE_URL", "http://backend:8081").
 		WithExec([]string{"corepack", "enable", "pnpm"}).
 		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
@@ -236,7 +241,7 @@ done
 echo "Frontend readiness timed out: alias=frontend port=3000 path=/ status=$status location=$location" >&2
 exit 1`
 
-func (m *DebinaVerification) d3aSmokeRunner() *dagger.Container {
+func (m *DebinaVerification) d3aSmokeRunner(browserCommand string) *dagger.Container {
 	postgres := m.postgresService("smoke")
 	kafka := m.kafkaService()
 	keycloak := m.keycloakService()
@@ -252,9 +257,10 @@ func (m *DebinaVerification) d3aSmokeRunner() *dagger.Container {
 		WithServiceBinding(backendServiceAlias, backend).
 		WithServiceBinding(keycloakServiceAlias, keycloak).
 		WithServiceBinding(frontendServiceAlias, frontend).
-		WithEnvVariable("SMOKE_BASE_URL", "http://localhost:3000").
-		WithEnvVariable("SMOKE_BACKEND_HEALTH_URL", "http://backend:8081/actuator/health").
+		WithEnvVariable("SMOKE_BASE_URL", "http://frontend:3000").
+		WithSecretVariable("SMOKE_SUBMITTER_USERNAME", dag.SetSecret("d3a-submitter-username", "submitter")).
 		WithSecretVariable("SMOKE_SUBMITTER_PASSWORD", dag.SetSecret("d3a-submitter-password", "dev-only-submitter")).
+		WithEnvVariable("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright").
 		WithExec([]string{"corepack", "enable", "pnpm"}).
 		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
 		WithExec([]string{"pnpm", "install", "--frozen-lockfile"}).
@@ -262,5 +268,5 @@ func (m *DebinaVerification) d3aSmokeRunner() *dagger.Container {
 			"http://keycloak:8080/realms/sepa-nexus/.well-known/openid-configuration",
 			"http://backend:8081/actuator/health",
 			"http://frontend:3000",
-		})})
+		}, browserCommand)})
 }

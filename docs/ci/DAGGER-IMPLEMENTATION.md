@@ -40,7 +40,15 @@ The approved portability correction reads `settlement_finality_records.finality_
 
 The first D2A integration graph populated only the named Maven/pnpm dependency caches. The final successful integration run reused the already-pulled service images and dependency caches but re-executed source-dependent leaves; no database, Kafka state, credentials, host socket, or test outcome was cached.
 
-`smoke` and unfiltered canonical `dagger check` remain incomplete and must not be claimed available. Graph functions compose values directly; no module function invokes a nested Dagger CLI command.
+`dagger check smoke` now runs only the proven D3A Chromium login/session/health vertical slice; it is not a payment-journey aggregate. The separate D3B JSON_DIRECT, approval and Payment Detail/lineage journeys remain unimplemented and are not silently skipped or reported as passing. Unfiltered canonical `dagger check` remains incomplete. Graph functions compose values directly; no module function invokes a nested Dagger CLI command.
+
+## D3A Chromium login/session/health proof (2026-07-23)
+
+`dagger call smoke-login-session-health --progress=plain` composes the existing ephemeral PostgreSQL/Flyway marker, Keycloak overlay/import/discovery, Kafka, backend health and production frontend services once, then runs exactly one Chromium Playwright test with no retries. It uses only the Dagger aliases `http://frontend:3000` and `http://keycloak:8080`; no localhost, host resolver rule, host port or duplicate service is involved.
+
+The test starts at the application, follows the actual username-first Keycloak authorization-code/PKCE flow, verifies the callback and host-only `sepa_session` metadata, queries `/api/session` in the authenticated browser context, requires the stable non-empty `sub` and `payment_submitter` role, asserts `preferredUsername: null` under the current `sepa-web` scope contract, rejects token/code/secret/cookie-value exposure, and verifies the authenticated shell's existing `unknown user` fallback. `preferred_username` is intentionally optional: `sepa-web` defaults only to `basic` and `sepa-guc`, while the login request intentionally omits absent Keycloak `profile` scope. The BFF projects claims only after cryptographic verification of the ID and access tokens.
+
+The first successful narrow run returned one passing test in `elapsed=1:05.17 exit=0`. `dagger check smoke` then completed `exit=0` in `elapsed=0:04.39`, with the same finite Playwright command recorded as a Dagger result-cache hit. This is a proof of the implemented D3A slice only; it does not prove payment submission, maker-checker approval, Payment Detail/lineage, cross-browser, visual or accessibility coverage.
 
 ## D3A ephemeral Keycloak realm-overlay assurance (2026-07-22)
 

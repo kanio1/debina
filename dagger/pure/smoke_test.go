@@ -7,7 +7,7 @@ import (
 
 func TestD3AReadinessCommandGatesBrowserOnEveryService(t *testing.T) {
 	urls := []string{"http://keycloak:8080/ready", "http://backend:8081/actuator/health", "http://frontend:3000"}
-	command := D3AReadinessCommand(urls)
+	command := D3AReadinessCommand(urls, "pnpm run test:smoke:d3a")
 
 	for _, url := range urls {
 		if !strings.Contains(command, url) {
