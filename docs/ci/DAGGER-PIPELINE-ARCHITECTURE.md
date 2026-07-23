@@ -66,6 +66,13 @@ backend `fast` JUnit classification plus non-browser service contracts, and
 independent of acceptance. Diagnostic sub-gates remain public without becoming
 additional automatic roots.
 
+The frontend has one reusable `frontendProductionBuild` vertex. No application
+source uses `NEXT_PUBLIC_*`; the OIDC client, BFF origin and backend endpoint
+are server-only values read lazily from `process.env`. Smoke services therefore
+attach their five runtime bindings only after the build vertex. Integration and
+all smoke graphs consume the same `.next` artifact without baking endpoints or
+secrets into it.
+
 This is Model A. The typed host socket is required only by `full-local` and the
 three explicit Testcontainers functions. It is mounted only at
 `/var/run/docker.sock` inside the dedicated Maven container.

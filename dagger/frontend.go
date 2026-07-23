@@ -29,6 +29,13 @@ func (m *DebinaVerification) frontendFast() *dagger.Container {
 }
 
 func (m *DebinaVerification) frontendBuild() *dagger.Container {
+	return m.frontendProductionBuild()
+}
+
+// frontendProductionBuild creates the single reusable production artifact.
+// OIDC, BFF and backend endpoints are server-only runtime inputs and are
+// deliberately attached by service constructors after this build vertex.
+func (m *DebinaVerification) frontendProductionBuild() *dagger.Container {
 	return m.frontendDependencies(dag.Container().From(nodeImage)).
 		WithDirectory("/workspace", m.frontendWorkspace()).
 		WithExec([]string{"pnpm", "run", "build"})

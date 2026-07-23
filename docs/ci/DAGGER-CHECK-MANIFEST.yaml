@@ -103,6 +103,21 @@ workspace:
     pnpm_install: [frontend/package.json, frontend/pnpm-lock.yaml, frontend/pnpm-workspace.yaml]
   diagnostic: source-boundary-digest
 
+frontend:
+  production_build:
+    reusable_vertex: frontendProductionBuild
+    project_build_time_env: []
+    public_build_time_env_prefix: NEXT_PUBLIC_
+    public_build_time_env_present: false
+  server_runtime_env:
+    - KEYCLOAK_ISSUER
+    - KEYCLOAK_CLIENT_ID
+    - KEYCLOAK_CLIENT_SECRET
+    - BFF_BASE_URL
+    - BACKEND_API_BASE_URL
+  regression: dagger/pure/frontend_env_test.go
+  runtime_proof: smoke-suite
+
 caches:
   named:
     - {name: debina-maven-jdk25, content: Maven dependencies, sharing: SHARED}

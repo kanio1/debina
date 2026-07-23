@@ -182,8 +182,7 @@ func (m *DebinaVerification) SmokeBackendCredentialReadiness(ctx context.Context
 }
 
 func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Service, credentials phaseDCredentials) *dagger.Service {
-	return m.frontendDependencies(dag.Container().From(nodeImage)).
-		WithDirectory("/workspace", m.frontendWorkspace()).
+	return m.frontendProductionBuild().
 		WithServiceBinding(backendServiceAlias, backend).
 		WithServiceBinding(keycloakServiceAlias, keycloak).
 		WithEnvVariable("KEYCLOAK_ISSUER", "http://keycloak:8080/realms/sepa-nexus").
@@ -191,7 +190,6 @@ func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Serv
 		WithSecretVariable("KEYCLOAK_CLIENT_SECRET", credentials.webClientSecret).
 		WithEnvVariable("BFF_BASE_URL", "http://frontend:3000").
 		WithEnvVariable("BACKEND_API_BASE_URL", "http://backend:8081").
-		WithExec([]string{"pnpm", "run", "build"}).
 		WithExposedPort(3000).
 		AsService(dagger.ContainerAsServiceOpts{Args: []string{"pnpm", "exec", "next", "start", "--hostname", "0.0.0.0", "--port", "3000"}})
 }
