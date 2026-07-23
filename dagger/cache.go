@@ -28,8 +28,8 @@ func (m *DebinaVerification) CacheProbe(ctx context.Context, sourceInput, config
 }
 
 // CacheReuse verifies stable output for two identical deterministic vertices.
-// The CLI progress trace is the runtime authority for the second vertex's
-// explicit CACHED state.
+// It deliberately makes no in-module assertion about cache state: the
+// versioned external trace proof is the authority for explicit CACHED state.
 func (m *DebinaVerification) CacheReuse(ctx context.Context) (string, error) {
 	first, err := m.cacheProbeContainer("baseline-source", "baseline-config").Stdout(ctx)
 	if err != nil {
@@ -42,12 +42,12 @@ func (m *DebinaVerification) CacheReuse(ctx context.Context) (string, error) {
 	if strings.TrimSpace(first) != strings.TrimSpace(second) {
 		return "", fmt.Errorf("CACHE_CONTRACT: identical inputs produced different outputs")
 	}
-	return "PHASE-D CACHE-REUSE OUTPUT VERIFIED", nil
+	return "OUTPUT-DETERMINISM-PROVEN", nil
 }
 
-// CacheInvalidation verifies that changing one relevant source/config input
-// changes only the deterministic probe result; the progress trace shows reuse
-// of independent image and source-transfer vertices.
+// CacheInvalidation verifies only that changing a relevant source/config input
+// changes the deterministic result. Selective cache invalidation is proved
+// from CLI traces by tools/ci/verify-dagger-cache.sh.
 func (m *DebinaVerification) CacheInvalidation(ctx context.Context) (string, error) {
 	baseline, err := m.cacheProbeContainer("baseline-source", "baseline-config").Stdout(ctx)
 	if err != nil {
@@ -67,5 +67,5 @@ func (m *DebinaVerification) CacheInvalidation(ctx context.Context) (string, err
 	if baseline == sourceChanged || baseline == configChanged || sourceChanged == configChanged {
 		return "", fmt.Errorf("CACHE_CONTRACT: relevant input change did not produce an independent result")
 	}
-	return "PHASE-D CACHE-SOURCE-INVALIDATED\nPHASE-D CACHE-CONFIG-INVALIDATED", nil
+	return "OUTPUT-SOURCE-CHANGE-PROVEN\nOUTPUT-CONFIG-CHANGE-PROVEN", nil
 }
