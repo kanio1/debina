@@ -55,6 +55,23 @@ func (m *DebinaVerification) SmokeAuth(ctx context.Context) error {
 	return err
 }
 
+// SmokeSuite is the complete ADR-N16 browser-smoke gate. D3A and the three D3B
+// journeys remain separately callable, but this classification owns all six
+// capped journeys and executes their runtime graphs sequentially.
+func (m *DebinaVerification) SmokeSuite(ctx context.Context) error {
+	return pure.RunChecksSequential(ctx, []namedCheck{
+		{Name: "authentication-session-health", Timeout: 6 * time.Minute, Run: m.SmokeAuth},
+		{Name: "payment-journeys", Timeout: 20 * time.Minute, Run: m.SmokePayments},
+	})
+}
+
+// Smoke preserves the pre-contract callable name.
+//
+// Deprecated: use SmokeSuite.
+func (m *DebinaVerification) Smoke(ctx context.Context) error {
+	return m.SmokeSuite(ctx)
+}
+
 // SmokePayments runs the three independent D3B browser journeys sequentially
 // so their PostgreSQL, Kafka, Keycloak and Chromium graphs never overlap.
 func (m *DebinaVerification) SmokePayments(ctx context.Context) error {
@@ -74,7 +91,10 @@ func (m *DebinaVerification) SmokePayments(ctx context.Context) error {
 	})
 }
 
-func (m *DebinaVerification) phaseDAssurance(ctx context.Context) error {
+// PipelineAssurance proves failure propagation, finite timeouts, diagnostic
+// redaction, cache semantics and service-binding behavior. These are tests of
+// the verification platform itself, not product integration or browser smoke.
+func (m *DebinaVerification) PipelineAssurance(ctx context.Context) error {
 	return pure.RunChecksSequential(ctx, []namedCheck{
 		{Name: "child-non-zero", Timeout: time.Minute, Run: func(ctx context.Context) error {
 			_, err := m.ResilienceChildNonZero(ctx)
@@ -112,12 +132,12 @@ func (m *DebinaVerification) phaseDAssurance(ctx context.Context) error {
 			_, err := m.FailureArtifactRedaction(ctx)
 			return err
 		}},
-		{Name: "cache-reuse", Timeout: time.Minute, Run: func(ctx context.Context) error {
-			_, err := m.CacheReuse(ctx)
+		{Name: "cache-output-determinism", Timeout: time.Minute, Run: func(ctx context.Context) error {
+			_, err := m.CacheOutputDeterminism(ctx)
 			return err
 		}},
-		{Name: "cache-invalidation", Timeout: time.Minute, Run: func(ctx context.Context) error {
-			_, err := m.CacheInvalidation(ctx)
+		{Name: "cache-output-input-sensitivity", Timeout: time.Minute, Run: func(ctx context.Context) error {
+			_, err := m.CacheOutputInputSensitivity(ctx)
 			return err
 		}},
 		{Name: "service-binding-dns", Timeout: time.Minute, Run: func(ctx context.Context) error {
@@ -127,38 +147,45 @@ func (m *DebinaVerification) phaseDAssurance(ctx context.Context) error {
 	})
 }
 
-// PhaseD is the complete no-host-socket aggregate. The typed-socket
-// Testcontainers regression remains an explicit separate function.
+// Acceptance is the complete no-host-socket aggregate and the sole automatic
+// check. Its three child gates are disjoint classifications and remain callable.
+// The typed-socket Testcontainers regression remains an explicit separate gate.
 // +check
-func (m *DebinaVerification) PhaseD(ctx context.Context) error {
+func (m *DebinaVerification) Acceptance(ctx context.Context) error {
 	return pure.RunChecksSequential(ctx, []namedCheck{
 		{Name: "fast", Timeout: 10 * time.Minute, Run: m.Fast},
 		{Name: "integration", Timeout: 15 * time.Minute, Run: m.Integration},
-		{Name: "smoke-auth", Timeout: 6 * time.Minute, Run: m.SmokeAuth},
-		{Name: "smoke-payments", Timeout: 20 * time.Minute, Run: m.SmokePayments},
-		{Name: "assurance", Timeout: 10 * time.Minute, Run: m.phaseDAssurance},
+		{Name: "smoke-suite", Timeout: 26 * time.Minute, Run: m.SmokeSuite},
 	})
 }
 
-// All is the backward-compatible socket-free alias of PhaseD. It is callable,
-// but deliberately not an automatic check: otherwise an unfiltered
-// `dagger check` would run the complete PhaseD graph twice.
+// PhaseD preserves the established callable Phase D entry point.
+//
+// Deprecated: use Acceptance.
+func (m *DebinaVerification) PhaseD(ctx context.Context) error {
+	return m.Acceptance(ctx)
+}
+
+// All preserves the legacy socket-free alias.
+//
+// Deprecated: use Acceptance.
 func (m *DebinaVerification) All(ctx context.Context) error {
-	return m.AllSocketFree(ctx)
+	return m.Acceptance(ctx)
 }
 
-// AllSocketFree is the unambiguous callable alias for the complete Phase D
-// graph that never receives or mounts a host runtime socket.
+// AllSocketFree preserves the pre-contract explicit socket-free alias.
+//
+// Deprecated: use Acceptance.
 func (m *DebinaVerification) AllSocketFree(ctx context.Context) error {
-	return m.PhaseD(ctx)
+	return m.Acceptance(ctx)
 }
 
-// FullLocal composes the socket-free Phase D graph with the complete backend
+// FullLocal composes the socket-free acceptance graph with the complete backend
 // Testcontainers regression. The host runtime socket remains a required typed
 // argument and is mounted only into the Testcontainers leaf.
 func (m *DebinaVerification) FullLocal(ctx context.Context, runtimeSocket *dagger.Socket) error {
 	return pure.RunChecksSequential(ctx, []namedCheck{
-		{Name: "phase-d", Timeout: 45 * time.Minute, Run: m.PhaseD},
+		{Name: "acceptance", Timeout: 45 * time.Minute, Run: m.Acceptance},
 		{Name: "testcontainers-regression", Timeout: 30 * time.Minute, Run: func(ctx context.Context) error {
 			_, err := m.TestcontainersRegression(ctx, runtimeSocket)
 			return err
@@ -167,7 +194,7 @@ func (m *DebinaVerification) FullLocal(ctx context.Context, runtimeSocket *dagge
 }
 
 // AggregateUnexpectedFailureProbe proves that the same sequential aggregate
-// compositor used by PhaseD propagates an unrelated child error instead of
+// compositor used by Acceptance propagates an unrelated child error instead of
 // classifying it as an expected assurance failure.
 func (m *DebinaVerification) AggregateUnexpectedFailureProbe(ctx context.Context) error {
 	return pure.RunChecksSequential(ctx, []namedCheck{

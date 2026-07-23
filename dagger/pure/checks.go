@@ -16,6 +16,9 @@ type NamedCheck struct {
 }
 
 func RunChecks(ctx context.Context, checks []NamedCheck) error {
+	if err := validateChecks(checks); err != nil {
+		return err
+	}
 	results := make(chan error, len(checks))
 	for _, check := range checks {
 		check := check
@@ -39,10 +42,30 @@ func RunChecks(ctx context.Context, checks []NamedCheck) error {
 // RunChecksSequential preserves explicit ordering for resource-heavy browser
 // and service graphs while retaining named failure propagation.
 func RunChecksSequential(ctx context.Context, checks []NamedCheck) error {
+	if err := validateChecks(checks); err != nil {
+		return err
+	}
 	for _, check := range checks {
 		if err := runNamedCheck(ctx, check); err != nil {
 			return fmt.Errorf("%s: %w", check.Name, err)
 		}
+	}
+	return nil
+}
+
+func validateChecks(checks []NamedCheck) error {
+	seen := make(map[string]struct{}, len(checks))
+	for _, check := range checks {
+		if check.Name == "" {
+			return errors.New("check name must not be empty")
+		}
+		if check.Run == nil {
+			return fmt.Errorf("%s: check runner must not be nil", check.Name)
+		}
+		if _, duplicate := seen[check.Name]; duplicate {
+			return fmt.Errorf("%s: duplicate check classification", check.Name)
+		}
+		seen[check.Name] = struct{}{}
 	}
 	return nil
 }

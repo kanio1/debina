@@ -16,12 +16,6 @@ const (
 	credentialCompletionPath     = "/tmp/d3a-sepa-app-credential-complete"
 )
 
-// Smoke runs the ADR-N16 D3A login/session/health vertical slice.
-func (m *DebinaVerification) Smoke(ctx context.Context) error {
-	_, err := m.SmokeLoginSessionHealth(ctx)
-	return err
-}
-
 // SmokeLoginSessionHealth returns the finite Chromium execution for the
 // D3A Keycloak authorization-code/PKCE, BFF session and authenticated-shell proof.
 func (m *DebinaVerification) SmokeLoginSessionHealth(ctx context.Context) (string, error) {

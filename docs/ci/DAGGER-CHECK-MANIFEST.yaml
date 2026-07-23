@@ -8,11 +8,11 @@ engine:
 
 automatic_checks:
   canonical:
-    name: phase-d
+    name: acceptance
     directive: "+check"
     command: dagger check --progress=plain
   forbidden_topology:
-    automatic_children: [fast, integration, smoke, smoke-auth, smoke-payments, all]
+    automatic_children: [fast, integration, smoke-suite, smoke, smoke-auth, smoke-payments, pipeline-assurance, phase-d, all-socket-free, all]
     regression: dagger/pure/check_topology_test.go
 
 callable_gates:
@@ -27,20 +27,32 @@ callable_gates:
       - flyway-upgrade-from-v54
       - postgres-rls-and-grants
       - kafka-readiness-and-non-production-probe
+  smoke-suite:
+    membership: [smoke-auth, smoke-payments]
+    execution: sequential
+    contract: complete capped ADR-N16 browser-smoke classification
   smoke:
-    contract: backward-compatible D3A login/session/health alias
+    deprecated_alias_of: smoke-suite
+  smoke-auth:
+    contract: separately callable D3A login/session/health compatibility gate
   smoke-payments:
     execution: sequential
     journeys: [json-direct-submission, maker-checker-approval, payment-detail-lineage]
-  phase-d:
-    membership: [fast, integration, smoke-auth, smoke-payments, assurance]
+  pipeline-assurance:
+    membership: [failure-propagation, bounded-timeouts, dependency-unavailability, failure-artifact-redaction, cache-output-determinism, cache-output-input-sensitivity, service-binding-dns]
+    contract: verification-platform behavior only; no product test membership
+  acceptance:
+    membership: [fast, integration, smoke-suite]
+    contract: pipeline-assurance is independent and must never be an acceptance child
     socket: none
+  phase-d:
+    deprecated_alias_of: acceptance
   all-socket-free:
-    contract: unambiguous alias of phase-d
+    deprecated_alias_of: acceptance
   all:
-    contract: legacy alias of all-socket-free; not literal typed-socket verification
+    deprecated_alias_of: acceptance
   full-local:
-    membership: [phase-d, testcontainers-regression]
+    membership: [acceptance, testcontainers-regression]
     socket: required typed Dagger Socket argument
 
 testcontainers:
@@ -99,6 +111,7 @@ secrets:
   redaction_proof: failure-artifact-redaction
 
 assurance:
+  callable_gate: pipeline-assurance
   expected_failures:
     leaves: [child-non-zero, bounded-timeout, postgres-unavailable, kafka-unavailable, keycloak-unavailable, backend-unavailable, frontend-unavailable, browser-navigation-failure]
     contract: non-zero child plus exact PHASE-D EXPECTED classification marker

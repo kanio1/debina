@@ -71,3 +71,32 @@ func TestRunChecksSequentialAppliesFiniteBudget(t *testing.T) {
 		t.Fatalf("expected finite timeout propagation, got %v", err)
 	}
 }
+
+func TestRunChecksRejectsDuplicateClassification(t *testing.T) {
+	runner := func(context.Context) error { return nil }
+	for name, execute := range map[string]func(context.Context, []NamedCheck) error{
+		"parallel":   RunChecks,
+		"sequential": RunChecksSequential,
+	} {
+		t.Run(name, func(t *testing.T) {
+			err := execute(context.Background(), []NamedCheck{
+				{Name: "same-leaf", Run: runner},
+				{Name: "same-leaf", Run: runner},
+			})
+			if err == nil || !strings.Contains(err.Error(), "duplicate check classification") {
+				t.Fatalf("expected duplicate classification rejection, got %v", err)
+			}
+		})
+	}
+}
+
+func TestRunChecksRejectsIncompleteClassification(t *testing.T) {
+	for _, checks := range [][]NamedCheck{
+		{{Name: "", Run: func(context.Context) error { return nil }}},
+		{{Name: "missing-runner"}},
+	} {
+		if err := RunChecksSequential(context.Background(), checks); err == nil {
+			t.Fatalf("expected invalid classification rejection for %+v", checks)
+		}
+	}
+}

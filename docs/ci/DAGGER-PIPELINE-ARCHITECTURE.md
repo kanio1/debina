@@ -17,15 +17,17 @@ function without that directive remains callable with `dagger call`.
 
 ```text
 dagger check
-└── phase-d                         # the only +check
+└── acceptance                      # the only +check
     ├── fast
     ├── integration
-    ├── smoke-auth                  # D3A
-    ├── smoke-payments              # sequential D3B leaves
-    │   ├── json-direct-submission
-    │   ├── maker-checker-approval
-    │   └── payment-detail-lineage
-    └── assurance                   # sequential failure/cache/DNS proofs
+    └── smoke-suite                 # sequential, complete ADR-N16 cap
+        ├── smoke-auth              # D3A
+        └── smoke-payments          # sequential D3B leaves
+            ├── json-direct-submission
+            ├── maker-checker-approval
+            └── payment-detail-lineage
+
+dagger call pipeline-assurance      # independent failure/cache/DNS proofs
 ```
 
 Before the architecture review, `fast`, `integration`, `smoke`, `smoke-auth`,
@@ -34,7 +36,8 @@ called their children. An unfiltered check therefore described `fast ×3`,
 `integration ×3`, D3A `×4`, each D3B journey `×3`, and assurance `×2`.
 A disposable light compositor reproduced concurrent roots and three executions
 of an analogous leaf. `dagger/pure/check_topology_test.go` now rejects any
-automatic check except `PhaseD`.
+automatic check except `Acceptance`. The pure compositor also rejects empty
+names, nil runners and duplicate names before executing a graph.
 
 ## Public function contracts
 
@@ -42,12 +45,23 @@ automatic check except `PhaseD`.
 |---|---|
 | `fast` | governance, module compile/tests/vet/gofmt, backend architecture checks, frontend GraphQL drift/lint/typecheck |
 | `integration` | socket-free backend subset, frontend build, PostgreSQL/Flyway/RLS/grants and Kafka |
-| `smoke` / `smoke-auth` | backward-compatible D3A login/session/health journey |
+| `smoke-suite` | all six capped ADR-N16 journeys, sequential and isolated |
+| `smoke` | deprecated callable alias of `smoke-suite` |
+| `smoke-auth` | separately callable D3A login/session/health compatibility gate |
 | `smoke-payments` | three isolated D3B journeys, strictly sequential |
-| `phase-d` | complete socket-free graph and the only automatic check |
-| `all-socket-free` | unambiguous callable alias of `phase-d` |
+| `pipeline-assurance` | verification-platform failure, timeout, redaction, cache and DNS proofs; no product tests |
+| `acceptance` | exactly fast + integration + smoke-suite; complete socket-free graph and the only automatic check |
+| `phase-d` | backward-compatible callable alias of `acceptance`; never automatic |
+| `all-socket-free` | unambiguous callable alias of `acceptance` |
 | `all` | legacy callable alias of `all-socket-free`; it is not literal host-socket verification |
-| `full-local --runtime-socket=...` | `phase-d`, then complete Testcontainers regression |
+| `full-local --runtime-socket=...` | `acceptance`, then complete Testcontainers regression |
+
+The three acceptance classifications are intentionally disjoint: `fast` owns
+static/unit/architecture feedback, `integration` owns non-browser component and
+service interaction, and `smoke-suite` owns browser journeys.
+`pipeline-assurance` owns tests of the pipeline itself and is deliberately
+independent of acceptance. Diagnostic sub-gates remain public without becoming
+additional automatic roots.
 
 This is Model A. The typed host socket is required only by `full-local` and the
 three explicit Testcontainers functions. It is mounted only at
