@@ -17,7 +17,6 @@ const (
 )
 
 // Smoke runs the ADR-N16 D3A login/session/health vertical slice.
-// +check
 func (m *DebinaVerification) Smoke(ctx context.Context) error {
 	_, err := m.SmokeLoginSessionHealth(ctx)
 	return err

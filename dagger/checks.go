@@ -10,7 +10,6 @@ import (
 )
 
 // Fast runs high-signal checks that do not provision the full runtime.
-// +check
 func (m *DebinaVerification) Fast(ctx context.Context) error {
 	checks := []namedCheck{
 		containerCheck("governance", m.governance()),
@@ -24,7 +23,6 @@ func (m *DebinaVerification) Fast(ctx context.Context) error {
 // Integration proves the Dagger-native integration leaves. Existing
 // Testcontainers tests are intentionally excluded until a supported bridge to
 // the selected Podman runtime is available.
-// +check
 func (m *DebinaVerification) Integration(ctx context.Context) error {
 	checks := []namedCheck{
 		containerCheck("backend-regression-without-testcontainers", m.backendWithoutTestcontainers()),
@@ -52,7 +50,6 @@ func runChecks(ctx context.Context, checks []namedCheck) error {
 }
 
 // SmokeAuth is the explicit D3A authentication/session/health aggregate.
-// +check
 func (m *DebinaVerification) SmokeAuth(ctx context.Context) error {
 	_, err := m.SmokeLoginSessionHealth(ctx)
 	return err
@@ -60,7 +57,6 @@ func (m *DebinaVerification) SmokeAuth(ctx context.Context) error {
 
 // SmokePayments runs the three independent D3B browser journeys sequentially
 // so their PostgreSQL, Kafka, Keycloak and Chromium graphs never overlap.
-// +check
 func (m *DebinaVerification) SmokePayments(ctx context.Context) error {
 	return pure.RunChecksSequential(ctx, []namedCheck{
 		{Name: "json-direct-submission", Timeout: 6 * time.Minute, Run: func(ctx context.Context) error {
@@ -140,9 +136,9 @@ func (m *DebinaVerification) PhaseD(ctx context.Context) error {
 	})
 }
 
-// All is the public no-argument full supported gate and deliberately reuses
-// PhaseD composition rather than duplicating its leaves.
-// +check
+// All is the backward-compatible socket-free alias of PhaseD. It is callable,
+// but deliberately not an automatic check: otherwise an unfiltered
+// `dagger check` would run the complete PhaseD graph twice.
 func (m *DebinaVerification) All(ctx context.Context) error {
 	return m.PhaseD(ctx)
 }
