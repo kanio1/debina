@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestRunChecksReturnsNamedFailures(t *testing.T) {
@@ -30,5 +31,43 @@ func TestRunChecksSucceedsWhenEveryLeafSucceeds(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestRunChecksSequentialStopsAtFirstFailure(t *testing.T) {
+	var order []string
+	err := RunChecksSequential(context.Background(), []NamedCheck{
+		{Name: "first", Run: func(context.Context) error {
+			order = append(order, "first")
+			return nil
+		}},
+		{Name: "failure", Run: func(context.Context) error {
+			order = append(order, "failure")
+			return errors.New("unexpected child")
+		}},
+		{Name: "must-not-run", Run: func(context.Context) error {
+			order = append(order, "must-not-run")
+			return nil
+		}},
+	})
+	if err == nil || !strings.Contains(err.Error(), "failure: unexpected child") {
+		t.Fatalf("expected named child propagation, got %v", err)
+	}
+	if strings.Join(order, ",") != "first,failure" {
+		t.Fatalf("unexpected execution order: %v", order)
+	}
+}
+
+func TestRunChecksSequentialAppliesFiniteBudget(t *testing.T) {
+	err := RunChecksSequential(context.Background(), []NamedCheck{{
+		Name:    "bounded",
+		Timeout: time.Millisecond,
+		Run: func(ctx context.Context) error {
+			<-ctx.Done()
+			return ctx.Err()
+		},
+	}})
+	if err == nil || !strings.Contains(err.Error(), "context deadline exceeded") {
+		t.Fatalf("expected finite timeout propagation, got %v", err)
 	}
 }

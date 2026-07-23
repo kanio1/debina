@@ -6,11 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type NamedCheck struct {
-	Name string
-	Run  func(context.Context) error
+	Name    string
+	Run     func(context.Context) error
+	Timeout time.Duration
 }
 
 func RunChecks(ctx context.Context, checks []NamedCheck) error {
@@ -18,7 +20,7 @@ func RunChecks(ctx context.Context, checks []NamedCheck) error {
 	for _, check := range checks {
 		check := check
 		go func() {
-			if err := check.Run(ctx); err != nil {
+			if err := runNamedCheck(ctx, check); err != nil {
 				results <- fmt.Errorf("%s: %w", check.Name, err)
 				return
 			}
@@ -32,4 +34,24 @@ func RunChecks(ctx context.Context, checks []NamedCheck) error {
 		}
 	}
 	return errors.Join(failures...)
+}
+
+// RunChecksSequential preserves explicit ordering for resource-heavy browser
+// and service graphs while retaining named failure propagation.
+func RunChecksSequential(ctx context.Context, checks []NamedCheck) error {
+	for _, check := range checks {
+		if err := runNamedCheck(ctx, check); err != nil {
+			return fmt.Errorf("%s: %w", check.Name, err)
+		}
+	}
+	return nil
+}
+
+func runNamedCheck(ctx context.Context, check NamedCheck) error {
+	if check.Timeout <= 0 {
+		return check.Run(ctx)
+	}
+	childCtx, cancel := context.WithTimeout(ctx, check.Timeout)
+	defer cancel()
+	return check.Run(childCtx)
 }
