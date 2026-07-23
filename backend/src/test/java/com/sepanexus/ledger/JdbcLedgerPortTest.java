@@ -19,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** ADR-N10 runtime proof: only the ledger writer creates balanced, single-terminal money effects. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class JdbcLedgerPortTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

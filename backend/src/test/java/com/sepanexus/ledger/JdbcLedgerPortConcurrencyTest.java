@@ -27,6 +27,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Deterministic PostgreSQL lock proofs for ADR-N10's reservation lifecycle. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class JdbcLedgerPortConcurrencyTest {
 
     @Container

@@ -16,6 +16,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@org.junit.jupiter.api.Tag("testcontainers")
 class OutboxDispatcherTest extends KafkaIntegrationSupport {
 
     @Autowired

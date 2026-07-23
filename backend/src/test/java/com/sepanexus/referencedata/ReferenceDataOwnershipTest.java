@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * {@code payment}'s tables either.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class ReferenceDataOwnershipTest {
 
     @Container

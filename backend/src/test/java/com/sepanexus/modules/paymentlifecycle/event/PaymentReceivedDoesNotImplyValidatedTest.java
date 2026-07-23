@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@org.junit.jupiter.api.Tag("testcontainers")
 class PaymentReceivedDoesNotImplyValidatedTest extends KafkaIntegrationSupport {
 
     @Autowired

@@ -30,6 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * adds them.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class OutboxDispatcherNoDomainWriteSweepTest {
 
     @Container

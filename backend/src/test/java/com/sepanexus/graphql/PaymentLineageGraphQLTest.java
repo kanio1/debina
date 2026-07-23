@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
  * evidence field. Runtime/security behaviour belongs to the ISO owner once its public read port
  * exists; this test deliberately does not permit a repository shortcut in the GraphQL adapter.
  */
+@org.junit.jupiter.api.Tag("fast")
 class PaymentLineageGraphQLTest {
 
     @Test

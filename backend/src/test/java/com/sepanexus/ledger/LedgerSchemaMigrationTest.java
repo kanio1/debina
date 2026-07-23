@@ -25,6 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * reversal flow (Story 32.4) — DDL and ownership only.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class LedgerSchemaMigrationTest {
 
     @Container

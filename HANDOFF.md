@@ -11,42 +11,48 @@ i czysty worktree bez `git push`.
 
 - Wave 0 odtworzyła stan, zapisała finalny kontrakt i zakończyła się lokalnym
   commitem `18818e1 docs(ci): record final dagger architecture contract`.
-- Wave 1 ustanowiła `Acceptance` jako jedyny `+check`; AST regression potwierdza
-  dokładnie `fast`, `integration`, `smoke-suite`.
-- Dodano publiczne `SmokeSuite` i niezależne `PipelineAssurance`. `smoke`,
-  `phase-d`, `all-socket-free`, `all`, `cache-reuse` i `cache-invalidation`
-  pozostają bezpośrednimi deprecated aliases.
-- Canonical cache leaves nazywają uczciwie dowód rezultatu:
-  `cache-output-determinism` i `cache-output-input-sensitivity`; trace-based
-  cache proof pozostaje odpowiedzialnością zewnętrznego runnera.
-- Pure compositors odrzucają pustą nazwę, nil runner i zduplikowaną
-  klasyfikację przed uruchomieniem grafu.
-- Focused proof Wave 1: `go test ./...`, `git diff --check`,
-  `dagger develop -y`, `dagger check --generate`, `dagger check -l`,
-  `dagger functions`, `dagger call pipeline-assurance --lock=frozen
-  --progress=plain` oraz `dagger call smoke-suite --lock=frozen
-  --progress=plain` zakończyły się kodem 0. `smoke-suite` wykonało komplet D3A
-  i trzech D3B journey w 3m50s.
+- Wave 1 ustanowiła finalne nazwy/topologię i zakończyła się commitem
+  `159a736 refactor(ci): establish final acceptance topology`.
+- Wave 2 oznaczyła każdą z 138 klas Surefire dokładnie jednym trwałym tagiem:
+  39 klas `fast` i 99 klas `testcontainers`. Audyt zależności obejmuje
+  bezpośrednie importy oraz użycie/dziedziczenie wspólnych supportów
+  PostgreSQL/Kafka/Keycloak.
+- `TestClassificationCompletenessTest` fail-closed wykrywa brak, konflikt i
+  niezgodność tagu z zależnością runtime. Usunięto obie ręczne listy `-Dtest=`
+  z grafu Dagger.
+- Dodano publiczne `BackendTestcontainers` (wyłącznie tag `testcontainers`) i
+  `BackendRegressionAll` (unfiltered equivalence oracle).
+  `TestcontainersRegression` jest deprecated aliasem pełnego oracle;
+  `FullLocal` używa tylko `BackendTestcontainers`.
+- Maven proof: `fast` = 146 testów, `testcontainers` = 397, unfiltered = 543;
+  39+99 klas daje dokładnie 138, przecięcie klas jest puste, unia identyczna
+  ze zbiorem unfiltered.
+- Dagger runtime proof: `backend-testcontainers` = 397/0/0/0 w 4m32s;
+  `backend-regression-all` = 543/0/0/0 w 4m36s. Oba użyły jawnego typed socket
+  `/run/podman/podman.sock` i frozen lock.
+- Chroniony `build/generated-spring-modulith/javadoc.json` został po Maven
+  odtworzony do HEAD i ma oczekiwany SHA-256
+  `47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054`.
 
 ## Utknęliśmy na
 
-Nic nie blokuje. Wave 1 jest gotowa do lokalnego commita. Niecommitowane
-zmiany dokumentacyjne i planning spoza wyznaczonego zakresu commita Wave 1
-pozostają zachowane do późniejszych fal.
+Nic nie blokuje. Wave 2 jest gotowa do lokalnego commita. Zachowane wcześniejsze
+zmiany dokumentacyjne/planning nadal pozostają poza tym selektywnym commitem.
 
 ## Plan na następny krok
 
-Zacommitować wyłącznie implementację, manifest, architecture doc i HANDOFF dla
-Wave 1. Następnie rozpocząć Wave 2: sklasyfikować każdą konkretną klasę JUnit
-dokładnie jednym tagiem `fast` albo `testcontainers`, dodać completeness
-regression i udowodnić liczniki oraz equivalence pełnej regresji.
+Zacommitować Wave 2, następnie przejść do Wave 3. Zastąpić obecne siedem leaves
+integration dokładnie pięcioma: `backend-integration`,
+`frontend-production-build`, `database-contract`, `database-upgrade`,
+`kafka-contract`. Fresh PostgreSQL readiness/migrate/validate/credential/RLS/
+grants ma wykonać się na jednej instancji; upgrade pozostaje oddzielny.
 
 ## Pułapki, których nie wolno powtórzyć
 
-- Nie włączać `pipeline-assurance` do `acceptance`; jest oddzielnym publicznym
-  gate.
-- Nie zmieniać finalnej orkiestracji acceptance przed Wave 5: Wave 1 ustala
-  nazwy i membership, a Wave 5 zmieni pierwsze dwa etapy na równoległe.
-- Nie zastępować tagów JUnit kolejną ręczną listą klas.
+- Nie wracać do 62 klas z samym `@Testcontainers`: 37 dalszych zależności
+  runtime wynika z bezpośrednich kontenerów bez tej adnotacji lub supportów.
+- Nie uruchamiać unfiltered `BackendRegressionAll` jako dziecka `FullLocal`;
+  duplikowałoby 146 testów `fast`.
+- Nie traktować dwóch świeżych baz jako konsolidacji database-contract.
 - Nie dodawać ambient host socketu, nested Dagger CLI, remote CI ani `git push`.
 - Nie zmieniać chronionego `build/generated-spring-modulith/javadoc.json`.

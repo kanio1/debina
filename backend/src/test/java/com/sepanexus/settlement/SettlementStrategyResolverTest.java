@@ -15,6 +15,7 @@ import java.util.stream.Stream;
  * deterministic {@code (settlement_basis, liquidity_mode) -> strategy_kind} function with zero
  * infrastructure dependency.
  */
+@org.junit.jupiter.api.Tag("fast")
 class SettlementStrategyResolverTest {
 
     private final SettlementStrategyResolver resolver = new SettlementStrategyResolver();

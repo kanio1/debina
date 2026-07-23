@@ -30,6 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * {@link SetLocalRoleJpaFlushProofTest} for the JPA-specific hazard this SQL-only proof cannot show.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SetLocalRoleSqlProofTest {
 
     @Container

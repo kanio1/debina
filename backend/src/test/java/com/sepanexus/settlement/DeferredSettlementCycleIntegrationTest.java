@@ -27,6 +27,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 proof for §4.6 G6 locking, P8 netting, grants and replay. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class DeferredSettlementCycleIntegrationTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

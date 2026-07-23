@@ -28,6 +28,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 /** HTTP/runtime proof for the fixed authenticated GraphQL endpoint; data ownership is tested separately. */
 @SpringBootTest(classes = SepaNexusApplication.class)
 @AutoConfigureMockMvc
+@org.junit.jupiter.api.Tag("testcontainers")
 class ApprovalGraphQlRuntimeTest {
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

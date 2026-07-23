@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /** Mutation guards for ADR-N10's non-negotiable row-lock and active-transition predicates. */
+@org.junit.jupiter.api.Tag("fast")
 class LedgerPortReservationProtocolContractTest {
 
     private static final Path WRITER = Path.of("src/main/java/com/sepanexus/ledger/JdbcLedgerPort.java");

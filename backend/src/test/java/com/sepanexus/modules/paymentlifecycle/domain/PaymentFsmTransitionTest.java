@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
+@org.junit.jupiter.api.Tag("fast")
 class PaymentFsmTransitionTest {
 
     @Test

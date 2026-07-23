@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
  * set after a real broker acknowledgement). {@link IsoOutboxDispatcher} is called explicitly in
  * every test, never relying on the {@code @Scheduled} trigger firing on its own.
  */
+@org.junit.jupiter.api.Tag("testcontainers")
 class IsoOutboxTopicRoutingTest extends IsoKafkaIntegrationSupport {
 
     @Autowired

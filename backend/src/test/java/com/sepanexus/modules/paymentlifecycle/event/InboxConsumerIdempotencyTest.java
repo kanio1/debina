@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 
+@org.junit.jupiter.api.Tag("testcontainers")
 class InboxConsumerIdempotencyTest extends KafkaIntegrationSupport {
 
     @Autowired private KafkaTemplate<String, String> kafkaTemplate;

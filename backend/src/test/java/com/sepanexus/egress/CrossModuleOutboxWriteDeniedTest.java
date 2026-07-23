@@ -36,6 +36,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * two, so it is the only side of the matrix that produces real cross-module assertions.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class CrossModuleOutboxWriteDeniedTest {
 
     @Container

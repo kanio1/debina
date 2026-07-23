@@ -19,6 +19,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noFields;
  * planning/epics/EPIC-09-ownership-schema-grants.md rather than inventing that
  * architecture speculatively.
  */
+@org.junit.jupiter.api.Tag("fast")
 class OwnershipArchRulesTest {
 
     private static final JavaClasses CLASSES = new ClassFileImporter().importPackages("com.sepanexus");

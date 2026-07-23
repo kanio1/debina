@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
  * fixture is parsed through the same {@link HardenedXmlFactory} the real pipeline uses, so these
  * tests exercise the exact {@link Document} shape the mapper receives in production.
  */
+@org.junit.jupiter.api.Tag("fast")
 class Pain001CanonicalMapperTest {
 
     private final HardenedXmlFactory hardenedXmlFactory = new HardenedXmlFactory();

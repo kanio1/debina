@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
+@org.junit.jupiter.api.Tag("fast")
 class PaymentOutboxEventTypeTest {
 
     @Test

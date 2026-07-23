@@ -41,6 +41,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * hack) so {@link JdbcTemplate} correctly participates in the externally-controlled transaction.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class DoubleDispatcherTest {
 
     private static final UUID TENANT_ID = UUID.randomUUID();

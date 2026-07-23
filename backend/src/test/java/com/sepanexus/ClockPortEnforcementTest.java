@@ -21,6 +21,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
  * legitimately construct objects with an arbitrary/"now" timestamp for setup and are not part of
  * this rule's source (§14.3 — no false positives in tests).
  */
+@org.junit.jupiter.api.Tag("fast")
 class ClockPortEnforcementTest {
 
     private static final Set<String> SYSTEM_CLOCK_OWNERS = Set.of(

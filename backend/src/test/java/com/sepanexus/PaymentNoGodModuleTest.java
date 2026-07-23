@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
  * a forbidden dependency and an allowed public-port dependency so the exact same {@link ArchRule} is
  * proven to both catch a real violation and not reject a legitimate integration.
  */
+@org.junit.jupiter.api.Tag("fast")
 class PaymentNoGodModuleTest {
 
     private static ArchRule paymentLifecycleNoGodModuleRule() {

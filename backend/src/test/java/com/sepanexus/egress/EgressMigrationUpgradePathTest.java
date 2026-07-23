@@ -19,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * prior data survives untouched.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class EgressMigrationUpgradePathTest {
 
     @Container

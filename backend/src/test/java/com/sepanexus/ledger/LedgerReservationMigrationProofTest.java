@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Fresh and V30-upgrade proof for ADR-N10's reservation DDL and compatibility expansion. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class LedgerReservationMigrationProofTest {
 
     @Container

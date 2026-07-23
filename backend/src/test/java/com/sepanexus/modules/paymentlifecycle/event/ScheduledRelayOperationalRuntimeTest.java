@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
         "sepa.scheduling.enabled=true",
         "sepa.scheduling.relay-fixed-delay-ms=100"
 })
+@org.junit.jupiter.api.Tag("testcontainers")
 class ScheduledRelayOperationalRuntimeTest extends KafkaIntegrationSupport {
 
     @Autowired

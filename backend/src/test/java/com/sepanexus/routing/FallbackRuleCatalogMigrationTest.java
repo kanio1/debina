@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 fresh-migration proof for explicit fallback configuration and writer isolation. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class FallbackRuleCatalogMigrationTest {
 
     @Container

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
+@org.junit.jupiter.api.Tag("fast")
 class XmlHardeningTest {
 
     private final HardenedXmlFactory factory = new HardenedXmlFactory();

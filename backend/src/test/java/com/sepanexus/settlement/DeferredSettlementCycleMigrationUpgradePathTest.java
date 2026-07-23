@@ -15,6 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Representative V50-to-current PostgreSQL 18 upgrade; Wave 3/4 routing evidence must survive. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class DeferredSettlementCycleMigrationUpgradePathTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

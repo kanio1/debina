@@ -25,6 +25,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 /** A Keycloak-issued, issuer-validated token must traverse the decision authorization boundary. */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class ApprovalDecisionKeycloakRuntimeTest {
 
     private static final UUID TENANT = UUID.fromString("00000000-0000-0000-0000-000000000001");

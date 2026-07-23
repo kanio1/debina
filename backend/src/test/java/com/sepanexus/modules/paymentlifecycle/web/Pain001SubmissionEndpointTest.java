@@ -43,6 +43,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
 @AutoConfigureMockMvc
+@org.junit.jupiter.api.Tag("testcontainers")
 class Pain001SubmissionEndpointTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * and nobody may {@code UPDATE}/{@code DELETE} — the table is append-only evidence.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class IsoMessageParseErrorOwnershipTest {
 
     @Container

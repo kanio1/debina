@@ -20,6 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * a pristine empty schema — and that prior rows survive and become immediately claimable.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class OutboxDispatcherGrantsMigrationUpgradePathTest {
 
     @Container

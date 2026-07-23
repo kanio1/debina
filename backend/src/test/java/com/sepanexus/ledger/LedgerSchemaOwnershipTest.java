@@ -25,6 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * real {@code INSERT} against a real PostgreSQL 18 Testcontainer, never a metadata-only assertion.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class LedgerSchemaOwnershipTest {
 
     @Container

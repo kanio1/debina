@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * convention already established by {@code SetLocalRoleSqlProofTest}.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SecurityDefinerPrivilegeProofTest {
 
     @Container

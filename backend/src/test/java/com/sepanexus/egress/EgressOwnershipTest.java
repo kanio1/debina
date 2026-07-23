@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * domain table.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class EgressOwnershipTest {
 
     @Container

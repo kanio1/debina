@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Isolated V28→V29 upgrade proof with representative valid ledger evidence. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class LedgerIntegrityMigrationUpgradePathTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

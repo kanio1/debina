@@ -39,6 +39,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * {@code OrphanDlqTest}/{@code Pacs002CorrelationPersistenceTest}.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SigningRoundTripTest {
 
     @Container

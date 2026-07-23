@@ -41,6 +41,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  * the same transaction).
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class SecurityDefinerJpaFlushProofTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

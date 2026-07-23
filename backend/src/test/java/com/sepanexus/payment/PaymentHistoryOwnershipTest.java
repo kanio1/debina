@@ -30,6 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * row, no fabricated intermediate transitions and no finality inferred from business terminality.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class PaymentHistoryOwnershipTest {
 
     @Container

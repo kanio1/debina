@@ -37,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * project's default "prefer LANGUAGE SQL" guidance, because PL/pgSQL is genuinely needed here).
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SecurityDefinerSearchPathProofTest {
 
     @Container

@@ -34,6 +34,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  * must not call this four-commit sequence "one transaction".
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class GrossInstantTransactionBoundaryProofTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

@@ -17,6 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Structural only: this does not claim a runtime reversal or finality decision. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class ReversalStructuralIntegrityTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

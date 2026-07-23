@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProc
 
 /** A dedicated Testcontainers context is the only test context which enables relay scheduling. */
 @SpringBootTest(properties = "sepa.scheduling.enabled=true")
+@org.junit.jupiter.api.Tag("testcontainers")
 class ScheduledRelayActivationIntegrationTest extends KafkaIntegrationSupport {
 
     @Autowired

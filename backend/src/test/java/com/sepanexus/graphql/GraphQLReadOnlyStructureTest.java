@@ -11,6 +11,7 @@ import org.springframework.core.io.ClassPathResource;
  * Wave 9's first structural boundary: GraphQL must be an explicit, source-controlled schema,
  * never an accidental controller convention.
  */
+@org.junit.jupiter.api.Tag("fast")
 class GraphQLReadOnlyStructureTest {
 
     @Test

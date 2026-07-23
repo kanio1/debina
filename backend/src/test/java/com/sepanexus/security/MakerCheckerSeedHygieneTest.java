@@ -7,6 +7,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+@org.junit.jupiter.api.Tag("testcontainers")
 class MakerCheckerSeedHygieneTest {
 
     @BeforeAll

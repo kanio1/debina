@@ -26,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * proves this — see {@code sepa-nexus-flyway-safe-change} skill's upgrade-verification guidance.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class IsoMessageCorrelationMigrationUpgradeTest {
 
     @Container

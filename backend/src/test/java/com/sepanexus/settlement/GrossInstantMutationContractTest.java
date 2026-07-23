@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
  * Mutation guards for ADR-N11. Each assertion names a concrete weakening that must make this test
  * fail; runtime rollback, RLS and duplicate-effect mutants are exercised by GrossInstantOneTxFlowTest.
  */
+@org.junit.jupiter.api.Tag("fast")
 class GrossInstantMutationContractTest {
 
     private static final Path LEDGER = Path.of("src/main/resources/db/migration/ledger/V37__gross_instant_ordered_account_lock.sql");

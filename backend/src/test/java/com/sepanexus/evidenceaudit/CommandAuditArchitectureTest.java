@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
 
 /** Non-vacuous public-boundary check for the evidence-audit application module. */
+@org.junit.jupiter.api.Tag("fast")
 class CommandAuditArchitectureTest {
 
     @Test

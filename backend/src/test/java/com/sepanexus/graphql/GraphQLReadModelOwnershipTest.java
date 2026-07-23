@@ -12,6 +12,7 @@ import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionService;
 import org.junit.jupiter.api.Test;
 
 /** Keeps the transport adapter unable to obtain data or invoke commands except through its public port. */
+@org.junit.jupiter.api.Tag("fast")
 class GraphQLReadModelOwnershipTest {
 
     @Test

@@ -17,6 +17,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+@org.junit.jupiter.api.Tag("testcontainers")
 class OutboxRelayCrashWindowRedeliveryTest extends KafkaIntegrationSupport {
 
     @Autowired @Qualifier("outboxRelayJdbcTemplate") private JdbcTemplate relayJdbcTemplate;

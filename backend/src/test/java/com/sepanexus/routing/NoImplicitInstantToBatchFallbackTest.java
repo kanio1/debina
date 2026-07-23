@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 /** The labels are test data only; §4.10 permits a fallback only through an explicit rule. */
+@org.junit.jupiter.api.Tag("fast")
 class NoImplicitInstantToBatchFallbackTest {
 
     @Test

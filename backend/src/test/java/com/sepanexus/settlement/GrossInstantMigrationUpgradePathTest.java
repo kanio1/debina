@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 proof that the ADR-N11 migrations upgrade an existing V34 database in place. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class GrossInstantMigrationUpgradePathTest {
 
     @Container

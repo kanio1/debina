@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
+@org.junit.jupiter.api.Tag("fast")
 class RouteCandidatesReadModelTest {
 
     @Test

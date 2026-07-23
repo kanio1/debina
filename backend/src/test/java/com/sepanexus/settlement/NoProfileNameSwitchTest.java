@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
  *       {@code Step2}/{@code Stet}/{@code Kir}/{@code Elixir}{@code *SettlementEngine}).</li>
  * </ol>
  */
+@org.junit.jupiter.api.Tag("fast")
 class NoProfileNameSwitchTest {
 
     private static final JavaClasses PRODUCTION_SETTLEMENT = new ClassFileImporter()

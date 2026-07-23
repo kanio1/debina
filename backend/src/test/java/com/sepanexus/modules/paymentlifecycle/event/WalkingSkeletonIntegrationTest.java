@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
  * Testcontainers supplies PostgreSQL and Kafka; this test does not depend on local Keycloak.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@org.junit.jupiter.api.Tag("testcontainers")
 class WalkingSkeletonIntegrationTest extends KafkaIntegrationSupport {
 
     private static final UUID SUBMITTER_TENANT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");

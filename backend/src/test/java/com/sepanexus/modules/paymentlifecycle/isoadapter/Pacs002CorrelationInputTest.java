@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
  * {@code OrgnlMsgId}/{@code OrgnlEndToEndId} extraction (untouched, still covered by
  * {@link Pacs002IdentifierExtractionTest}). Pure extraction only — no correlation, no DB write.
  */
+@org.junit.jupiter.api.Tag("fast")
 class Pacs002CorrelationInputTest {
 
     private final HardenedXmlFactory hardenedXmlFactory = new HardenedXmlFactory();

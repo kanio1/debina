@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
+@org.junit.jupiter.api.Tag("testcontainers")
 class OutboxRelayRuntimeWiringTest extends KafkaIntegrationSupport {
 
     @Autowired

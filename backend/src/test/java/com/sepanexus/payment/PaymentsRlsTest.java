@@ -19,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class PaymentsRlsTest {
 
     private static final UUID TENANT_A = UUID.fromString("00000000-0000-0000-0000-000000000001");

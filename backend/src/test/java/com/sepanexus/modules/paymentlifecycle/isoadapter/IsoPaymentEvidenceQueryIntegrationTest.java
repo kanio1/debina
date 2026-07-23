@@ -27,6 +27,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 /** PostgreSQL 18 proof for the ISO-owned payment evidence port and its payment-visibility gate. */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class IsoPaymentEvidenceQueryIntegrationTest {
     private static final UUID TENANT_A = UUID.fromString("00000000-0000-0000-0000-0000000000a1");
     private static final UUID TENANT_B = UUID.fromString("00000000-0000-0000-0000-0000000000b1");

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 /** The shared test property disables relay scheduling unless a dedicated test opts in. */
+@org.junit.jupiter.api.Tag("testcontainers")
 class SchedulingDisabledIntegrationTest extends KafkaIntegrationSupport {
 
     @Autowired

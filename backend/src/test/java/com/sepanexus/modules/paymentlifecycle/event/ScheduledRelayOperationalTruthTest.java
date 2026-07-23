@@ -14,6 +14,7 @@ import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.health.contributor.Status;
 
+@org.junit.jupiter.api.Tag("fast")
 class ScheduledRelayOperationalTruthTest {
 
     private final OutboxDispatcher paymentRelay = mock(OutboxDispatcher.class);

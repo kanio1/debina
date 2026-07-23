@@ -48,6 +48,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  * risk not reproducing genuine Hibernate flush timing.
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class SetLocalRoleJpaFlushProofTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

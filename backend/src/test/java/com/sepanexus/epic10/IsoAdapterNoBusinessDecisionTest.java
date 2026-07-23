@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
  * against a non-existent package would be either vacuously true or an invention of architecture that
  * doesn't exist. This test file is the place a future rule belongs once those modules exist.
  */
+@org.junit.jupiter.api.Tag("fast")
 class IsoAdapterNoBusinessDecisionTest {
 
     // Production code only — test fixtures legitimately construct/read PaymentEntity for setup

@@ -18,6 +18,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  * Structural RED proof for EPIC-76 Story 76.1.  The frozen maker–checker prefix gate needs a
  * durable approval axis and a payment row that may exist before the business FSM starts.
  */
+@org.junit.jupiter.api.Tag("testcontainers")
 class ApprovalPersistenceMigrationTest {
 
     @Test

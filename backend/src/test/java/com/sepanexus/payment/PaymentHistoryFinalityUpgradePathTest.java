@@ -17,6 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Forward-only proof for correcting V20's terminal-business-status false positives. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class PaymentHistoryFinalityUpgradePathTest {
 
     @Container

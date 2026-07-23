@@ -19,6 +19,7 @@ import org.springframework.kafka.listener.MessageListenerContainer;
  * (`payment-lifecycle-inbox`), producing a message, and observing lag > 0, then resuming and
  * observing lag drop back to 0 once the message is actually consumed.
  */
+@org.junit.jupiter.api.Tag("testcontainers")
 class KafkaConsumerGroupLagGaugeTest extends KafkaIntegrationSupport {
 
     @Autowired

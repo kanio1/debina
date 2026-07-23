@@ -17,6 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Fresh-install proof: V20 baseline creation followed by the forward correction never marks an FSM state final. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class PaymentHistoryFreshMigrationFinalityTest {
 
     @Container

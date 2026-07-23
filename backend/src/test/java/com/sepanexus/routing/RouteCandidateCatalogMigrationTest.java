@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 fresh-migration and writer-isolation proof for EPIC-51 Story 51.1. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class RouteCandidateCatalogMigrationTest {
 
     @Container

@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@org.junit.jupiter.api.Tag("fast")
 class PaymentServiceTest {
 
     @Mock

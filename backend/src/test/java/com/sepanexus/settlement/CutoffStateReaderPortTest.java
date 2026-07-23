@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class CutoffStateReaderPortTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18").withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");
     private static DeferredSettlementCycleService cycles; private static CutoffStateReader reader;

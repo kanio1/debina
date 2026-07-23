@@ -54,7 +54,9 @@ names, nil runners and duplicate names before executing a graph.
 | `phase-d` | backward-compatible callable alias of `acceptance`; never automatic |
 | `all-socket-free` | unambiguous callable alias of `acceptance` |
 | `all` | legacy callable alias of `all-socket-free`; it is not literal host-socket verification |
-| `full-local --runtime-socket=...` | `acceptance`, then complete Testcontainers regression |
+| `backend-testcontainers --runtime-socket=...` | exactly the durable JUnit `testcontainers` classification |
+| `backend-regression-all --runtime-socket=...` | unfiltered coverage-equivalence oracle; not a compositor child |
+| `full-local --runtime-socket=...` | `acceptance`, then `backend-testcontainers`; each backend classification exactly once |
 
 The three acceptance classifications are intentionally disjoint: `fast` owns
 static/unit/architecture feedback, `integration` owns non-browser component and

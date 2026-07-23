@@ -22,6 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * access to any ledger table, so this fails closed rather than assuming one.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SettlementRoleNoLedgerGrantTest {
 
     @Container

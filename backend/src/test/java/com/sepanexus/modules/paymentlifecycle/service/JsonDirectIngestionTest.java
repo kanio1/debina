@@ -26,6 +26,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  * identifiers/lineage through the seeded JSON_DIRECT pseudo message-version (§2.2a, ADR-N7).
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class JsonDirectIngestionTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

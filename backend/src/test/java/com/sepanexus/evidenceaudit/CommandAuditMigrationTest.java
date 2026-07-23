@@ -20,6 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 proof for immutable, source-owned application command audit. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class CommandAuditMigrationTest {
 
     private static final UUID TENANT_A = UUID.fromString("00000000-0000-0000-0000-0000000000a1");

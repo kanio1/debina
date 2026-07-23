@@ -23,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * multi-statement transactions.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class UnbalancedEntryAtCommitTest {
 
     @Container

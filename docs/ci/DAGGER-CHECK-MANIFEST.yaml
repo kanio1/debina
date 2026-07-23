@@ -52,11 +52,26 @@ callable_gates:
   all:
     deprecated_alias_of: acceptance
   full-local:
-    membership: [acceptance, testcontainers-regression]
+    membership: [acceptance, backend-testcontainers]
     socket: required typed Dagger Socket argument
 
 testcontainers:
-  command: dagger call testcontainers-regression --runtime-socket=/run/podman/podman.sock
+  classification:
+    durable_tags: [fast, testcontainers]
+    class_counts:
+      fast: 39
+      testcontainers: 99
+      total: 138
+    test_counts:
+      fast: 146
+      testcontainers: 397
+      total: 543
+    completeness_regression: backend/src/test/java/com/sepanexus/TestClassificationCompletenessTest.java
+  commands:
+    classified: dagger call backend-testcontainers --runtime-socket=/run/podman/podman.sock
+    coverage_oracle: dagger call backend-regression-all --runtime-socket=/run/podman/podman.sock
+  deprecated_aliases:
+    testcontainers-regression: backend-regression-all
   contract: explicit and mounted only into the dedicated Maven container
   environment:
     - DOCKER_HOST=unix:///var/run/docker.sock

@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * tenants) never see each other's GUC or role state.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SecurityDefinerPoolIsolationProofTest {
 
     @Container

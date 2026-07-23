@@ -28,6 +28,7 @@ import tools.jackson.databind.ObjectMapper;
 
 /** PostgreSQL 18 proof for ADR-N12's immutable, explicit fallback decision boundary. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class FallbackDecisionEvidenceMigrationTest {
 
     private static final Instant DECIDED_AT = Instant.parse("2026-07-20T12:00:00Z");

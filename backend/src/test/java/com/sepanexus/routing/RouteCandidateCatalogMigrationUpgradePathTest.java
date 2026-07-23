@@ -13,6 +13,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Representative V44→V45 forward-only migration proof for the new static route catalog. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class RouteCandidateCatalogMigrationUpgradePathTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

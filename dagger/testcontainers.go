@@ -46,12 +46,27 @@ func (m *DebinaVerification) TestcontainersFinalityPortability(ctx context.Conte
 		Stdout(ctx)
 }
 
-// TestcontainersRegression runs the existing complete backend Maven suite.
-// The runtime socket is an explicit, required Dagger argument.
-func (m *DebinaVerification) TestcontainersRegression(ctx context.Context, runtimeSocket *dagger.Socket) (string, error) {
+// BackendTestcontainers runs exactly the durable JUnit testcontainers
+// classification. The runtime socket is an explicit, required Dagger argument.
+func (m *DebinaVerification) BackendTestcontainers(ctx context.Context, runtimeSocket *dagger.Socket) (string, error) {
+	return m.testcontainersMaven(runtimeSocket).
+		WithExec([]string{"./mvnw", "-f", "backend", "test", "-Dgroups=testcontainers"}).
+		Stdout(ctx)
+}
+
+// BackendRegressionAll runs the unfiltered backend Maven suite as the coverage
+// equivalence oracle for fast plus testcontainers.
+func (m *DebinaVerification) BackendRegressionAll(ctx context.Context, runtimeSocket *dagger.Socket) (string, error) {
 	return m.testcontainersMaven(runtimeSocket).
 		WithExec([]string{"./mvnw", "-f", "backend", "test"}).
 		Stdout(ctx)
+}
+
+// TestcontainersRegression preserves the former complete-regression callable.
+//
+// Deprecated: use BackendRegressionAll.
+func (m *DebinaVerification) TestcontainersRegression(ctx context.Context, runtimeSocket *dagger.Socket) (string, error) {
+	return m.BackendRegressionAll(ctx, runtimeSocket)
 }
 
 // RuntimeReachabilityProbe checks Podman's documented host address from a

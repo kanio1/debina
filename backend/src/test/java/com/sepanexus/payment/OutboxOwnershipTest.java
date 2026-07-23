@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class OutboxOwnershipTest {
 
     @Container

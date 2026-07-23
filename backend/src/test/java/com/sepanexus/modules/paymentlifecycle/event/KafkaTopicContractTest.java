@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
  * name or declared producer-owner drifting from that file is exactly the
  * "[EVENT-RISK] documentation defect" the source blueprint calls out.
  */
+@org.junit.jupiter.api.Tag("fast")
 class KafkaTopicContractTest {
 
     private static final Path ASYNCAPI_FILE = Path.of("../infra/asyncapi/asyncapi.yaml");

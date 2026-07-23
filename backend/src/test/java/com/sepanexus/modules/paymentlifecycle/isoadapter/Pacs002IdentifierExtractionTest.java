@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
  * needed), every fixture is parsed through the same {@link HardenedXmlFactory} the real pipeline
  * uses, matching the {@code Pain001CanonicalMapperTest} convention.
  */
+@org.junit.jupiter.api.Tag("fast")
 class Pacs002IdentifierExtractionTest {
 
     private final HardenedXmlFactory hardenedXmlFactory = new HardenedXmlFactory();

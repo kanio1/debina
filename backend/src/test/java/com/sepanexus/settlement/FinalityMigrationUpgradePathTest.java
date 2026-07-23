@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Representative V30-to-V34 upgrade proof for the additive finality authority migration. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class FinalityMigrationUpgradePathTest {
 
     @Container

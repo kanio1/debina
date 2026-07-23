@@ -39,6 +39,7 @@ import tools.jackson.databind.module.SimpleModule;
  * IsoOutboxTopicRoutingTest}'s concern.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class OrphanDlqTest {
 
     @Container

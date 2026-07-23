@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * every pair of dimension values; they do not invent amount, currency-limit, CSM, or settlement
  * semantics.
  */
+@org.junit.jupiter.api.Tag("fast")
 class RoutingPairwiseProfileTest {
 
     @ParameterizedTest(name = "{0}")

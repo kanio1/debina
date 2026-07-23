@@ -41,6 +41,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 /** PostgreSQL 18 proof for the frozen approval prefix gate (EPIC-76 Story 76.2). */
 @SpringBootTest(classes = SepaNexusApplication.class)
 @AutoConfigureMockMvc
+@org.junit.jupiter.api.Tag("testcontainers")
 class ApprovalSubmissionIntegrationTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

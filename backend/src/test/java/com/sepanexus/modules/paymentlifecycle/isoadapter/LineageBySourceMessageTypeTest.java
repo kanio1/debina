@@ -33,6 +33,7 @@ import com.sepanexus.modules.paymentlifecycle.service.SubmitPaymentCommand;
  * the same payment and confirming both coexist without collision.
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class LineageBySourceMessageTypeTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

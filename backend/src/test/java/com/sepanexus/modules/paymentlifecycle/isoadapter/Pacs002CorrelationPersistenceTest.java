@@ -35,6 +35,7 @@ import tools.jackson.databind.ObjectMapper;
  * IsoOutboxDispatcher}/actual publication is out of this story's scope.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class Pacs002CorrelationPersistenceTest {
 
     @Container

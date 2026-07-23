@@ -13,6 +13,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Representative V47→V48 PostgreSQL 18 upgrade proof for immutable route decision evidence. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class RouteDecisionPersistenceUpgradePathTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

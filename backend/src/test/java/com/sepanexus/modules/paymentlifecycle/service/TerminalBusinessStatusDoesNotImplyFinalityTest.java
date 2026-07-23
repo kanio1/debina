@@ -23,6 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * claim it. See the frozen five-axis rule in the main blueprint §3.11/§4.11.
  */
 @ExtendWith(MockitoExtension.class)
+@org.junit.jupiter.api.Tag("fast")
 class TerminalBusinessStatusDoesNotImplyFinalityTest {
 
     @Mock

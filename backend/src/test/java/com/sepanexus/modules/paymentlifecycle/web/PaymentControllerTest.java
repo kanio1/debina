@@ -46,6 +46,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.junit.jupiter.api.Tag("testcontainers")
 class PaymentControllerTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

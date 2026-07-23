@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
  * {@code Pacs002CorrelationPersistenceTest}, which proves the real JDBC {@link
  * CorrelationCandidateLookup} implementation against Testcontainers).
  */
+@org.junit.jupiter.api.Tag("fast")
 class Pacs002CorrelationPolicyTest {
 
     private static final UUID TENANT_ID = UUID.randomUUID();

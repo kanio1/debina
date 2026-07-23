@@ -16,6 +16,7 @@ import java.sql.ResultSet;
  * {@link com.sepanexus.payment.PaymentsRlsTest#emptyTenantGucReturnsZeroRows()}; not duplicated
  * here.
  */
+@org.junit.jupiter.api.Tag("testcontainers")
 class BackgroundWorkerScopeTest extends KafkaIntegrationSupport {
 
     @org.junit.jupiter.api.Test

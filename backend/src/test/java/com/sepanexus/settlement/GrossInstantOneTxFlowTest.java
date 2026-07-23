@@ -34,6 +34,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18/Testcontainers proof for ADR-N11's actual one-transaction gross-instant path. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class GrossInstantOneTxFlowTest {
 
     private static final UUID TENANT = UUID.fromString("00000000-0000-0000-0000-000000003311");

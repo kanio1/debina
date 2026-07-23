@@ -25,6 +25,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 
 /** Proves a row is marked only after its Kafka future has acknowledged publication. */
+@org.junit.jupiter.api.Tag("fast")
 class OutboxRelayAcknowledgementOrderTest {
 
     @Test

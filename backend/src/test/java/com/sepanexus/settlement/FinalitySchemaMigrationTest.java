@@ -21,6 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Fresh PostgreSQL 18 proof of ADR-N10's finality catalog, authority and writer boundaries. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class FinalitySchemaMigrationTest {
 
     @Container

@@ -20,6 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Failure-injection proof that each LedgerPort command leaves one atomic money effect or none. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class JdbcLedgerPortRollbackTest {
 
     @Container

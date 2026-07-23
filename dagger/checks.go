@@ -180,14 +180,14 @@ func (m *DebinaVerification) AllSocketFree(ctx context.Context) error {
 	return m.Acceptance(ctx)
 }
 
-// FullLocal composes the socket-free acceptance graph with the complete backend
-// Testcontainers regression. The host runtime socket remains a required typed
-// argument and is mounted only into the Testcontainers leaf.
+// FullLocal composes the socket-free acceptance graph with exactly the backend
+// testcontainers classification. The host runtime socket remains a required
+// typed argument and is mounted only into the Testcontainers leaf.
 func (m *DebinaVerification) FullLocal(ctx context.Context, runtimeSocket *dagger.Socket) error {
 	return pure.RunChecksSequential(ctx, []namedCheck{
 		{Name: "acceptance", Timeout: 45 * time.Minute, Run: m.Acceptance},
-		{Name: "testcontainers-regression", Timeout: 30 * time.Minute, Run: func(ctx context.Context) error {
-			_, err := m.TestcontainersRegression(ctx, runtimeSocket)
+		{Name: "backend-testcontainers", Timeout: 30 * time.Minute, Run: func(ctx context.Context) error {
+			_, err := m.BackendTestcontainers(ctx, runtimeSocket)
 			return err
 		}},
 	})

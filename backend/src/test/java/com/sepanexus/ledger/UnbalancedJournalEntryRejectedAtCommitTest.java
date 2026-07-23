@@ -30,6 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * {@code [CAPABILITY-BLOCKED]} scope, not this story's.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class UnbalancedJournalEntryRejectedAtCommitTest {
 
     @Container

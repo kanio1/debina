@@ -26,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * delivery_receipts} only, never {@code payment.payments} directly).
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class EgressCannotWritePaymentStatusTest {
 
     @Container

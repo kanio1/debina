@@ -21,6 +21,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest(classes = SepaNexusApplication.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("prod")
+@org.junit.jupiter.api.Tag("testcontainers")
 class ProductionGraphQlIntrospectionTest {
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

@@ -13,6 +13,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Representative V48→V50 PostgreSQL 18 upgrade proof for fallback-rule integrity. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class FallbackRuleCatalogMigrationUpgradePathTest {
 
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

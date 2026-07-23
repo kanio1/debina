@@ -31,6 +31,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  * {@link com.sepanexus.modules.paymentlifecycle.ingress.SignatureBeforeParseOrderingTest}.
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class SignatureVerificationTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

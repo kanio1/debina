@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 /** Structural RED for EPIC-37 Story 37.1: the resolved typed kind needs a real deferred strategy. */
+@org.junit.jupiter.api.Tag("fast")
 class NetDeferredStrategyTest {
 
     @Test

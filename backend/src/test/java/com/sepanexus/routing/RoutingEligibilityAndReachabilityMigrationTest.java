@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** Fresh PostgreSQL 18 proof for the source-defined EPIC-52 catalog and routing runtime boundary. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class RoutingEligibilityAndReachabilityMigrationTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

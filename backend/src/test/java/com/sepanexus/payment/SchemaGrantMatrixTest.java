@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * prove the grant pattern generalizes.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SchemaGrantMatrixTest {
 
     @Container

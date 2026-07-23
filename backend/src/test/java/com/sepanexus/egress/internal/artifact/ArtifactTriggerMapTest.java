@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
  * existing as a home package), not the still-{@code [CAPABILITY-BLOCKED]} egress-profile catalog
  * (Story 44.1) — this taxonomy needs neither an {@code egress_profile} row nor a database table.
  */
+@org.junit.jupiter.api.Tag("fast")
 class ArtifactTriggerMapTest {
 
     @Test

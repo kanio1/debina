@@ -25,6 +25,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  * (sepa-nexus-signature-module-blueprint.md §8).
  */
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class KeyRegistryLookupTest {
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")

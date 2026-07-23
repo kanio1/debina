@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
 
 /** Wave 10 RED boundary: audit reads must be public typed ports, never repository leakage. */
+@org.junit.jupiter.api.Tag("fast")
 class AuditQueryArchitectureTest {
 
     @Test

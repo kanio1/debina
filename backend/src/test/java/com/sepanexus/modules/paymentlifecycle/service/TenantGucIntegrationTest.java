@@ -20,6 +20,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest(classes = SepaNexusApplication.class)
+@org.junit.jupiter.api.Tag("testcontainers")
 class TenantGucIntegrationTest {
 
     private static final UUID TENANT_A = UUID.fromString("00000000-0000-0000-0000-000000000011");

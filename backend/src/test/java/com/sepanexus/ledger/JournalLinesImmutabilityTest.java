@@ -23,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * Testcontainer, real SQLSTATE checks.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class JournalLinesImmutabilityTest {
 
     @Container

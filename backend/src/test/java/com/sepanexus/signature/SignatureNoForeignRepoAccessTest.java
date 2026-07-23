@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
  * may reference them directly; every caller goes through {@link KeyRegistryPort}/{@link
  * SignatureVerificationPort}/{@link SignatureSigningPort} instead.
  */
+@org.junit.jupiter.api.Tag("fast")
 class SignatureNoForeignRepoAccessTest {
 
     private static final JavaClasses CLASSES = new ClassFileImporter().importPackages("com.sepanexus");

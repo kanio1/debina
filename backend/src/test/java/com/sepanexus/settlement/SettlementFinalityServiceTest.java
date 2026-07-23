@@ -30,6 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL proof that only a real LedgerPort POST establishes synthetic laboratory finality. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SettlementFinalityServiceTest {
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("sepa_nexus").withUsername("test_admin").withPassword("test_admin");

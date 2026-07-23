@@ -22,6 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * tables either (symmetric non-domain-mutation check, blueprint §2 "must not").
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class NonSignatureRoleCannotWriteSignatureTest {
 
     @Container

@@ -31,6 +31,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 proof that the public port executes scoped keyset queries in the database. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class CommandAuditQueryIntegrationTest {
     private static final UUID TENANT_A = UUID.fromString("00000000-0000-0000-0000-0000000000a1");
     private static final UUID TENANT_B = UUID.fromString("00000000-0000-0000-0000-0000000000b1");

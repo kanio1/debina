@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
+@org.junit.jupiter.api.Tag("fast")
 class RuntimeDatasourceOwnershipTest {
 
     private static final Path PAYMENT_RELAY = Path.of(

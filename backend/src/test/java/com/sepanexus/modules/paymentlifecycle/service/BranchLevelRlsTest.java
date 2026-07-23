@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * {@code sepa_app}), extended to the branch dimension.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class BranchLevelRlsTest {
 
     private static final UUID TENANT = UUID.fromString("00000000-0000-0000-0000-000000000001");

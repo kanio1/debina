@@ -21,6 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 security proof for the ADR-N11 function-owner/executor boundary. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class GrossInstantSecurityTest {
 
     @Container

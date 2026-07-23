@@ -25,6 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * end-of-transaction and can leak into whatever code runs next in the same transaction.
  */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class SecurityDefinerTransactionProofTest {
 
     @Container

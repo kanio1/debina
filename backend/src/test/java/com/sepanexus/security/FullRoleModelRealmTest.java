@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+@org.junit.jupiter.api.Tag("testcontainers")
 class FullRoleModelRealmTest {
 
     private static final Set<String> EXPECTED_ROLES = Set.of(

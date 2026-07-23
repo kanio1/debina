@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /** PostgreSQL 18 proof that an egress delivery transition is transport-only, never finality. */
 @Testcontainers
+@org.junit.jupiter.api.Tag("testcontainers")
 class DeliveredNotFinalTest {
 
     @Container static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
