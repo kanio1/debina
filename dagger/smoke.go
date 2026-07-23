@@ -69,7 +69,7 @@ func (m *DebinaVerification) smokeAppCredentialMarker(postgres *dagger.Service, 
 func (m *DebinaVerification) SmokeKeycloakReadiness() *dagger.Container {
 	credentials := newPhaseDCredentials()
 	overlay := m.d3aRealmOverlayArtifacts()
-	return m.keycloakReadiness(m.keycloakServiceWithOverlay(overlay, credentials), overlay.File("verified.marker"))
+	return m.keycloakReadiness(m.keycloakServiceWithOverlay("keycloak-readiness", overlay, credentials), overlay.File("verified.marker"))
 }
 
 func (m *DebinaVerification) keycloakReadiness(service *dagger.Service, marker *dagger.File) *dagger.Container {
@@ -83,9 +83,10 @@ func boundedReadinessCommand(url, name string) string {
 	return "set -eu; attempts=0; until curl --fail --silent --show-error --max-time 5 " + url + " >/dev/null; do attempts=$((attempts + 1)); if [ \"$attempts\" -ge 60 ]; then echo \"" + name + " readiness timed out: " + url + "\" >&2; exit 1; fi; sleep 1; done; echo \"" + name + " ready via " + url + "\""
 }
 
-func (m *DebinaVerification) keycloakPostgresService(credentials phaseDCredentials) *dagger.Service {
+func (m *DebinaVerification) keycloakPostgresService(instance string, credentials phaseDCredentials) *dagger.Service {
 	return dag.Container().
 		From(postgresImage).
+		WithLabel("dev.debina.phase-d.keycloak-database-instance", instance).
 		WithEnvVariable("POSTGRES_DB", "keycloak").
 		WithEnvVariable("POSTGRES_USER", "keycloak").
 		WithSecretVariable("POSTGRES_PASSWORD", credentials.keycloakDBPassword).
@@ -95,18 +96,19 @@ func (m *DebinaVerification) keycloakPostgresService(credentials phaseDCredentia
 
 func (m *DebinaVerification) keycloakService() *dagger.Service {
 	credentials := newPhaseDCredentials()
-	return m.keycloakServiceWithOverlay(m.d3aRealmOverlayArtifacts(), credentials)
+	return m.keycloakServiceWithOverlay("standalone", m.d3aRealmOverlayArtifacts(), credentials)
 }
 
-func (m *DebinaVerification) keycloakServiceWithOverlay(overlay *dagger.Directory, credentials phaseDCredentials) *dagger.Service {
+func (m *DebinaVerification) keycloakServiceWithOverlay(instance string, overlay *dagger.Directory, credentials phaseDCredentials) *dagger.Service {
 	return dag.Container().
 		From(keycloakImage).
+		WithLabel("dev.debina.phase-d.keycloak-instance", instance).
 		// The pinned image inherits 9000/tcp and 8443/tcp. start-dev in this
 		// smoke runtime listens only on HTTP 8080, so those inherited health
 		// checks would prevent a bound diagnostic client from running.
 		WithoutExposedPort(9000).
 		WithoutExposedPort(8443).
-		WithServiceBinding(keycloakPostgresServiceAlias, m.keycloakPostgresService(credentials)).
+		WithServiceBinding(keycloakPostgresServiceAlias, m.keycloakPostgresService(instance, credentials)).
 		WithFile("/opt/keycloak/data/import/realm-export.json", overlay.File("realm-export.json"), dagger.ContainerWithFileOpts{Owner: "1000:1000", Permissions: 0640}).
 		WithEnvVariable("KC_BOOTSTRAP_ADMIN_USERNAME", "admin").
 		WithSecretVariable("KC_BOOTSTRAP_ADMIN_PASSWORD", credentials.keycloakAdminPassword).
@@ -170,9 +172,9 @@ func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagg
 func (m *DebinaVerification) SmokeBackendReadiness() *dagger.Container {
 	credentials := newPhaseDCredentials()
 	postgres := m.postgresService("smoke-backend-readiness", credentials)
-	keycloak := m.keycloakServiceWithOverlay(m.d3aRealmOverlayArtifacts(), credentials)
+	keycloak := m.keycloakServiceWithOverlay("backend-readiness", m.d3aRealmOverlayArtifacts(), credentials)
 	migrationMarker := m.smokeMigrationMarker(postgres, credentials)
-	backend := m.smokeBackendService(postgres, m.kafkaService(), keycloak, migrationMarker, credentials)
+	backend := m.smokeBackendService(postgres, m.kafkaService("backend-readiness"), keycloak, migrationMarker, credentials)
 	return dag.Container().From("curlimages/curl:8.16.0").
 		WithServiceBinding(backendServiceAlias, backend).
 		WithExec([]string{"sh", "-ec", boundedReadinessCommand("http://backend:8081/actuator/health", "Backend")})
@@ -214,8 +216,8 @@ func (m *DebinaVerification) smokeFrontendService(backend, keycloak *dagger.Serv
 func (m *DebinaVerification) SmokeFrontendReadiness() *dagger.Container {
 	credentials := newPhaseDCredentials()
 	postgres := m.postgresService("smoke-frontend-readiness", credentials)
-	keycloak := m.keycloakServiceWithOverlay(m.d3aRealmOverlayArtifacts(), credentials)
-	backend := m.smokeBackendService(postgres, m.kafkaService(), keycloak, m.smokeMigrationMarker(postgres, credentials), credentials)
+	keycloak := m.keycloakServiceWithOverlay("frontend-readiness", m.d3aRealmOverlayArtifacts(), credentials)
+	backend := m.smokeBackendService(postgres, m.kafkaService("frontend-readiness"), keycloak, m.smokeMigrationMarker(postgres, credentials), credentials)
 	frontend := m.smokeFrontendService(backend, keycloak, credentials)
 	return dag.Container().From("curlimages/curl:8.16.0").
 		WithServiceBinding(frontendServiceAlias, frontend).
@@ -240,8 +242,8 @@ exit 1`
 func (m *DebinaVerification) d3aSmokeRunner(browserCommand string) *dagger.Container {
 	credentials := newPhaseDCredentials()
 	postgres := m.postgresService("smoke", credentials)
-	kafka := m.kafkaService()
-	keycloak := m.keycloakServiceWithOverlay(m.d3aRealmOverlayArtifacts(), credentials)
+	kafka := m.kafkaService("smoke-auth")
+	keycloak := m.keycloakServiceWithOverlay("smoke-auth", m.d3aRealmOverlayArtifacts(), credentials)
 	backend := m.smokeBackendService(postgres, kafka, keycloak, m.smokeMigrationMarker(postgres, credentials), credentials)
 	frontend := m.smokeFrontendService(backend, keycloak, credentials)
 	return dag.Container().

@@ -16,7 +16,10 @@ const expectedFailureMarkerPrefix = "PHASE-D EXPECTED "
 func (m *DebinaVerification) ResilienceChildNonZero(ctx context.Context) (string, error) {
 	child := dag.Container().
 		From("alpine:3.23.3").
-		WithExec([]string{"sh", "-ec", "exit 23"})
+		WithExec(
+			[]string{"sh", "-ec", "echo 'PHASE-D EXPECTED CHILD_EXIT_NON_ZERO' >&2; exit 23"},
+			dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure},
+		)
 	return expectedFailure(ctx, "CHILD_EXIT_NON_ZERO", child)
 }
 
@@ -25,7 +28,10 @@ func (m *DebinaVerification) ResilienceChildNonZero(ctx context.Context) (string
 func (m *DebinaVerification) ResilienceBoundedTimeout(ctx context.Context) (string, error) {
 	child := dag.Container().
 		From("curlimages/curl:8.16.0").
-		WithExec([]string{"sh", "-ec", pure.BoundedUnavailableCommand("http://phase-d-missing:8081/actuator/health", "PHASE-D EXPECTED READINESS_TIMEOUT", 3)})
+		WithExec(
+			[]string{"sh", "-ec", pure.BoundedUnavailableCommand("http://phase-d-missing:8081/actuator/health", "PHASE-D EXPECTED READINESS_TIMEOUT", 3)},
+			dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure},
+		)
 	return expectedFailure(ctx, "READINESS_TIMEOUT", child)
 }
 
@@ -65,7 +71,7 @@ until pg_isready -h phase-d-postgres-unavailable -p 5432 -t 1 >/dev/null 2>&1; d
   sleep 1
 done
 echo 'unexpected PostgreSQL readiness success' >&2
-exit 0`})
+exit 0`}, dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure})
 	return expectedFailure(ctx, "POSTGRES_UNAVAILABLE", child)
 }
 
@@ -87,30 +93,71 @@ until timeout 1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server phase-d-kafka-
   sleep 1
 done
 echo 'unexpected Kafka readiness success' >&2
-exit 0`})
+exit 0`}, dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure})
 	return expectedFailure(ctx, "KAFKA_UNAVAILABLE", child)
+}
+
+// ResilienceBrowserNavigationFailure proves a real Playwright page.goto
+// failure against an absent graph-local alias. The wrapper emits the expected
+// marker only after Playwright exits non-zero and its bounded log contains a
+// navigation-layer error.
+func (m *DebinaVerification) ResilienceBrowserNavigationFailure(ctx context.Context) (string, error) {
+	child := dag.Container().
+		From(playwrightImage).
+		WithMountedCache("/pnpm/store", dag.CacheVolume("debina-pnpm-node24.18.0-pnpm10.33.0")).
+		WithEnvVariable("PNPM_HOME", "/pnpm").
+		WithEnvVariable("PNPM_STORE_DIR", "/pnpm/store").
+		WithDirectory("/workspace/frontend", m.source().Directory("frontend")).
+		WithWorkdir("/workspace/frontend").
+		WithEnvVariable("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright").
+		WithExec([]string{"corepack", "enable", "pnpm"}).
+		WithExec([]string{"pnpm", "config", "set", "store-dir", "/pnpm/store"}).
+		WithExec([]string{"pnpm", "install", "--frozen-lockfile"}).
+		WithExec([]string{"sh", "-ec", `
+set -eu
+if timeout 30 pnpm exec playwright test e2e/d6-browser-navigation-failure.spec.ts --project=chromium --workers=1 > /tmp/navigation.log 2>&1; then
+  echo 'browser navigation unexpectedly succeeded' >&2
+  exit 1
+fi
+if ! grep -F 'page.goto:' /tmp/navigation.log >/dev/null; then
+  echo 'controlled Playwright failure was not a navigation failure' >&2
+  exit 1
+fi
+if ! grep -E 'ERR_NAME_NOT_RESOLVED|ERR_CONNECTION_REFUSED|ERR_CONNECTION_CLOSED' /tmp/navigation.log >/dev/null; then
+  echo 'controlled Playwright failure had an unexpected network classification' >&2
+  exit 1
+fi
+echo 'PHASE-D EXPECTED BROWSER_NAVIGATION_FAILED' >&2
+exit 23
+`}, dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure})
+	return expectedFailure(ctx, "BROWSER_NAVIGATION_FAILED", child)
 }
 
 func (m *DebinaVerification) expectedHTTPUnavailable(ctx context.Context, classification, url string) (string, error) {
 	child := dag.Container().
 		From("curlimages/curl:8.16.0").
-		WithExec([]string{"sh", "-ec", pure.BoundedUnavailableCommand(url, expectedFailureMarkerPrefix+classification, 3)})
+		WithExec(
+			[]string{"sh", "-ec", pure.BoundedUnavailableCommand(url, expectedFailureMarkerPrefix+classification, 3)},
+			dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure},
+		)
 	return expectedFailure(ctx, classification, child)
 }
 
 func expectedFailure(ctx context.Context, classification string, child *dagger.Container) (string, error) {
 	exitCode, err := child.ExitCode(ctx)
+	marker := expectedFailureMarkerPrefix + classification
 	if err != nil {
-		// Dagger v0.21.4 surfaces a failed WithExec while resolving ExitCode as
-		// an error containing its explicit child exit status. This is the exact
-		// outcome this finite probe asserts; transport/query errors remain fatal.
-		if strings.Contains(err.Error(), "exit code:") {
-			return expectedFailureMarkerPrefix + classification, nil
-		}
 		return "", fmt.Errorf("%s evaluation failed: %w", classification, err)
 	}
 	if exitCode == 0 {
 		return "", fmt.Errorf("%s false success: controlled child exited 0", classification)
 	}
-	return expectedFailureMarkerPrefix + classification, nil
+	stderr, err := child.Stderr(ctx)
+	if err != nil {
+		return "", fmt.Errorf("%s stderr evaluation failed: %w", classification, err)
+	}
+	if !strings.Contains(stderr, marker) {
+		return "", fmt.Errorf("%s wrong failure classification: expected marker %q", classification, marker)
+	}
+	return marker, nil
 }

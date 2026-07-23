@@ -18,9 +18,9 @@ type paymentSmokeRuntime struct {
 func (m *DebinaVerification) paymentSmokeRuntime(instance string) *paymentSmokeRuntime {
 	credentials := newPhaseDCredentials()
 	postgres := m.postgresService("payment-"+instance, credentials)
-	kafka := m.kafkaService()
+	kafka := m.kafkaService("payment-" + instance)
 	overlay := m.d3aRealmOverlayArtifacts()
-	keycloak := m.keycloakServiceWithOverlay(overlay, credentials)
+	keycloak := m.keycloakServiceWithOverlay("payment-"+instance, overlay, credentials)
 	migrationMarker := m.smokeMigrationMarker(postgres, credentials)
 	backend := m.paymentSmokeBackendService(postgres, kafka, keycloak, migrationMarker, credentials)
 	frontend := m.smokeFrontendService(backend, keycloak, credentials)

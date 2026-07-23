@@ -108,9 +108,10 @@ PGUSER=sepa_app PGPASSWORD="$SEPA_APP_PASSWORD" psql -v ON_ERROR_STOP=1 -Atqc "S
 `})
 }
 
-func (m *DebinaVerification) kafkaService() *dagger.Service {
+func (m *DebinaVerification) kafkaService(instance string) *dagger.Service {
 	return dag.Container().
 		From(kafkaImage).
+		WithLabel("dev.debina.phase-d.kafka-instance", instance).
 		WithEnvVariable("KAFKA_PROCESS_ROLES", "broker,controller").
 		WithEnvVariable("KAFKA_NODE_ID", "1").
 		WithEnvVariable("KAFKA_LISTENERS", "PLAINTEXT://:9092,CONTROLLER://:9093").
@@ -125,7 +126,7 @@ func (m *DebinaVerification) kafkaService() *dagger.Service {
 }
 
 func (m *DebinaVerification) kafkaProbe() *dagger.Container {
-	service := m.kafkaService()
+	service := m.kafkaService("integration-probe")
 	return dag.Container().
 		From(kafkaImage).
 		WithServiceBinding(kafkaServiceAlias, service).

@@ -70,8 +70,8 @@ set -eu
 test "$(cat /tmp/phase-d-maker-checker-evidence)" = 'PHASE-D maker-checker PostgreSQL evidence verified'
 payment_id="$(cat /tmp/phase-d-payment-id)"
 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic payment.received --from-beginning --max-messages 1 --timeout-ms 30000 \
-  --property print.key=true --property key.separator=: \
-  | grep -F "$payment_id:" >/dev/null
+  --property print.key=true --property print.value=false \
+  | grep -Fx "$payment_id" >/dev/null
 printf '%s\n' 'PHASE-D MAKER-CHECKER EVIDENCE VERIFIED'
 `})
 }
@@ -122,8 +122,8 @@ set -eu
 test "$(cat /tmp/phase-d-detail-lineage-evidence)" = 'PHASE-D detail lineage PostgreSQL evidence verified'
 payment_id="$(cat /tmp/phase-d-payment-id)"
 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic payment.received --from-beginning --max-messages 1 --timeout-ms 30000 \
-  --property print.key=true --property key.separator=: \
-  | grep -F "$payment_id:" >/dev/null
+  --property print.key=true --property print.value=false \
+  | grep -Fx "$payment_id" >/dev/null
 printf '%s\n' 'PHASE-D DETAIL-LINEAGE EVIDENCE VERIFIED'
 `})
 }
@@ -182,8 +182,8 @@ test "$(cat /tmp/phase-d-json-direct-evidence)" = 'PHASE-D JSON_DIRECT PostgreSQ
 payment_id="$(cat /tmp/phase-d-payment-id)"
 printf '%s' "$payment_id" | grep -Ex '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' >/dev/null
 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic payment.received --from-beginning --max-messages 1 --timeout-ms 30000 \
-  --property print.key=true --property key.separator=: \
-  | grep -F "$payment_id:" >/dev/null
+  --property print.key=true --property print.value=false \
+  | grep -Fx "$payment_id" >/dev/null
 printf '%s\n' 'PHASE-D JSON_DIRECT EVIDENCE VERIFIED'
 `})
 }
