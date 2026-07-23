@@ -20,6 +20,10 @@ type phaseDCredentials struct {
 	submitterPassword      *dagger.Secret
 	approverUsername       *dagger.Secret
 	approverPassword       *dagger.Secret
+	signaturePassword      *dagger.Secret
+	ledgerPassword         *dagger.Secret
+	settlementPassword     *dagger.Secret
+	grossInstantPassword   *dagger.Secret
 	auditAuditorPassword   *dagger.Secret
 	approvalExpiryPassword *dagger.Secret
 }
@@ -37,6 +41,10 @@ func newPhaseDCredentials() phaseDCredentials {
 		submitterPassword:      dag.SetSecret("phase-d-submitter-password", "dev-only-submitter"),
 		approverUsername:       dag.SetSecret("phase-d-approver-username", "approver"),
 		approverPassword:       dag.SetSecret("phase-d-approver-password", "dev-only-approver"),
+		signaturePassword:      dag.SetSecret("phase-d-signature-password", "dev-only-signature"),
+		ledgerPassword:         dag.SetSecret("phase-d-ledger-password", "dev-only-ledger"),
+		settlementPassword:     dag.SetSecret("phase-d-settlement-password", "dev-only-settlement"),
+		grossInstantPassword:   dag.SetSecret("phase-d-gross-instant-password", "dev-only-gross-instant-executor"),
 		auditAuditorPassword:   dag.SetSecret("phase-d-audit-auditor-password", "dev-only-audit-auditor"),
 		approvalExpiryPassword: dag.SetSecret("phase-d-approval-expiry-password", "dev-only-approval-expiry"),
 	}
