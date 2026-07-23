@@ -24,7 +24,9 @@ i czysty worktree bez `git push`.
 - Wave 5 ustawiła finalne stage: `fast` + `integration` równolegle, po ich
   sukcesie sekwencyjny `smoke-suite`. AST regression blokuje zmianę kolejności
   lub membership. `pipeline-assurance` pozostaje oddzielne, a `full-local`
-  pozostaje sekwencyjnym `acceptance + backend-testcontainers`.
+  pozostaje sekwencyjnym `acceptance + backend-testcontainers`. Zmiany
+  zakończyły się commitem
+  `c69203f feat(ci): finalize acceptance orchestration`.
 - Dodano wykonywalny hostowy `tools/ci/verify-dagger-architecture.sh`; w kodzie
   funkcji Dagger nadal nie ma nested Dagger CLI.
 - Runner wykonuje static topology, generator hash idempotence,
@@ -37,27 +39,36 @@ i czysty worktree bez `git push`.
   disposable missing-entry copy jest teraz negatywnym proofem. Drugi run
   ujawnił brak frontend/root-lock inputs wewnątrz `moduleSelfTest`; inputs są
   teraz jawnie montowane w `/workspace`.
-- Finalny runner zakończył się kodem 0 z markerem
-  `DAGGER-ARCHITECTURE-VERIFICATION-PROVEN`; rerun na finalnym snapshotcie
-  implementacji Wave 5 wykonał canonical acceptance w 3m09s. Artefakty:
-  `/tmp/debina-wave5-architecture-final/`.
-- Chroniony `build/generated-spring-modulith/javadoc.json` został po Maven
-  odtworzony do HEAD i ma oczekiwany SHA-256
+- Wave 6 ponownie wykonała kompletny runner na aktualnym HEAD. Wszystkie
+  markery static/generator/lock/check/assurance/log/cache/cache-volume/
+  unexpected-failure są zielone; artefakty:
+  `/tmp/debina-wave6-architecture/`.
+- Osobne runtime proofy Wave 6 zakończyły się kodem 0:
+  `backend-testcontainers` 397/0/0/0,
+  `backend-regression-all` 543/0/0/0 oraz `full-local`. Trace `full-local`
+  zawiera dokładnie jedno wykonanie selektora `fast`, jedno
+  `testcontainers` i jeden zakończony compositor.
+- Bezpośredni Maven `fast` potwierdził 146/0/0/0. Zbiory raportowanych klas:
+  39 `fast`, 99 `testcontainers`, przecięcie 0, suma 138 i dokładna zgodność
+  z 138 klasami pełnego oracle. Logi i zbiory są pod
+  `/tmp/debina-wave6-*.log` oraz `/tmp/debina-wave6-*-classes.txt`.
+- Chroniony `build/generated-spring-modulith/javadoc.json` nie zmienił się
+  podczas proofów i ma oczekiwany SHA-256
   `47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054`.
 
 ## Utknęliśmy na
 
-Nic nie blokuje. Wave 5 jest gotowa do lokalnego commita. Zachowane wcześniejsze
-zmiany dokumentacyjne/planning nadal pozostają poza tym selektywnym commitem.
+Nic nie blokuje. Wave 6 jest runtime-proven i gotowa do lokalnego commita.
+Zachowane wcześniejsze zmiany dokumentacyjne/planning nadal pozostają poza tym
+selektywnym commitem.
 
 ## Plan na następny krok
 
-Zacommitować Wave 5, następnie przejść do Wave 6 i uruchomić pełną macierz:
-static, counts, functions/aliases, `dagger check`, `pipeline-assurance`,
-architecture runner, `backend-testcontainers`, `full-local`, equivalence,
-cache/log/generator/lock/cache-volume/unexpected oraz protected audit. Nie
-powtarzać proofów tylko wtedy, gdy dokładnie ten sam source/result nadal jest
-ważny; po zmianach naprawczych ponowić zależne bramy.
+Zacommitować stan Wave 6, następnie wykonać Wave 7: ujednolicić manifest,
+blueprint, implementation record, runbook, smoke matrix, planning i HANDOFF z
+finalnym kontraktem; zapisać alias migration table, dokładne komendy/wyniki,
+counts, commity, upstream i protected audit. Potem wykonać końcowy audyt bez
+nowego refaktoru, doprowadzić worktree do czystości i nie wykonywać `git push`.
 
 ## Pułapki, których nie wolno powtórzyć
 
