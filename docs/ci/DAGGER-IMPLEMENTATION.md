@@ -10,7 +10,8 @@ cache keys. Backend, frontend, Dagger and governance graphs use separate source
 boundaries; the frontend dependency layer sees only the three pnpm manifests.
 Workspace input excludes repository metadata, build outputs, runtime logs and
 the user-owned `build/` subtree while retaining authoritative generated GraphQL
-source and the backend test's AsyncAPI catalog.
+source, the backend test's AsyncAPI catalog and its canonical Keycloak realm
+fixture.
 
 ## Implemented command surface
 

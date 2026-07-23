@@ -20,7 +20,7 @@ cache assertion and an approval-list mapper NPE.
 | DGR-005 | P1 | cache evidence | ADOPT: external cold/warm/changed trace runner; equal output proves only determinism |
 | DGR-006 | P1 | Engine | DEFER 0.21.7 until CLI+Engine can move atomically; candidate focused proofs passed |
 | DGR-007 | P1 | runtime log health | ADOPT: exact scanner plus reproduced/fixed pre-FSM mapper NPE |
-| DGR-008 | P2 | source precision | ADOPT: backend/frontend/Dagger/governance boundaries and manifest-only pnpm layer |
+| DGR-008 | P2 | source precision | ADOPT: backend/frontend/Dagger/governance boundaries and manifest-only pnpm layer; focused/full proofs restored exact AsyncAPI and realm fixtures |
 | DGR-009 | P2 | cache volumes | ADAPT: explicit SHARED with isolated concurrent writer/reset proof |
 | DGR-010 | P2 | services | ADOPT: alias/DNS regression on current and candidate Engines |
 | DGR-011 | P2 | generators | ADAPT: ignored bindings regenerated idempotently; frontend output compared in graph |

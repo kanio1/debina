@@ -63,7 +63,7 @@ digest proof reproduced that failure and proved the constructor correction.
 
 | Boundary | Included inputs |
 |---|---|
-| backend | Maven wrapper, `.mvn`, `backend/`, and the one test-owned `infra/asyncapi/asyncapi.yaml` contract |
+| backend | Maven wrapper, `.mvn`, `backend/`, test-owned AsyncAPI catalog and canonical Keycloak realm export |
 | frontend | `frontend/` plus the source-owned backend GraphQL schema |
 | Dagger | `dagger/` |
 | governance | filtered repository root |

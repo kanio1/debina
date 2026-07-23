@@ -62,7 +62,8 @@ func (m *DebinaVerification) backendWorkspace() *dagger.Directory {
 		WithFile("mvnw", source.File("mvnw")).
 		WithDirectory(".mvn", source.Directory(".mvn")).
 		WithDirectory("backend", source.Directory("backend")).
-		WithFile("infra/asyncapi/asyncapi.yaml", source.File("infra/asyncapi/asyncapi.yaml"))
+		WithFile("infra/asyncapi/asyncapi.yaml", source.File("infra/asyncapi/asyncapi.yaml")).
+		WithFile("infra/keycloak/realm-export.json", source.File("infra/keycloak/realm-export.json"))
 }
 
 // frontendWorkspace retains the complete frontend tree, including the

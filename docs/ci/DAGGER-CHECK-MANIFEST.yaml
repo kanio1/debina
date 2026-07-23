@@ -64,7 +64,7 @@ workspace:
   constructor_input: auto-injected Workspace
   exclusions: [.git, node_modules, .next, target, build, coverage, test-results, playwright-report, runtime-logs]
   boundaries:
-    backend: [mvnw, .mvn, backend, infra/asyncapi/asyncapi.yaml]
+    backend: [mvnw, .mvn, backend, infra/asyncapi/asyncapi.yaml, infra/keycloak/realm-export.json]
     frontend: [frontend, backend/src/main/resources/graphql/schema.graphqls]
     dagger: [dagger]
     governance: [filtered-repository-root]
