@@ -47,6 +47,9 @@ callable_gates:
     contract: verification-platform behavior only; no product test membership
   acceptance:
     membership: [fast, integration, smoke-suite]
+    execution:
+      stage_1: {parallel: [fast, integration]}
+      stage_2: {sequential_after_stage_1: [smoke-suite]}
     contract: pipeline-assurance is independent and must never be an acceptance child
     socket: none
   phase-d:
@@ -57,6 +60,8 @@ callable_gates:
     deprecated_alias_of: acceptance
   full-local:
     membership: [acceptance, backend-testcontainers]
+    execution: sequential
+    backend_coverage: fast via backend-integration; testcontainers exactly once
     socket: required typed Dagger Socket argument
 
 testcontainers:
@@ -98,6 +103,7 @@ workspace:
     backend: [mvnw, .mvn, backend, infra/asyncapi/asyncapi.yaml, infra/keycloak/realm-export.json]
     frontend: [frontend, backend/src/main/resources/graphql/schema.graphqls]
     dagger: [dagger]
+    dagger_self_test: [dagger, frontend, .dagger/lock]
     governance: [filtered-repository-root]
   dependency_precision:
     pnpm_install: [frontend/package.json, frontend/pnpm-lock.yaml, frontend/pnpm-workspace.yaml]
@@ -165,6 +171,21 @@ generators:
   bindings_hash_idempotence: proven
   generate_check: dagger check --generate
   graphql: regenerated and byte-compared inside fast
+
+architecture_runner:
+  command: tools/ci/verify-dagger-architecture.sh
+  invokes_dagger_from_host_only: true
+  proofs:
+    - static-topology
+    - generator-idempotence
+    - frozen-lock-runtime
+    - missing-lock-completeness-regression
+    - acceptance
+    - pipeline-assurance
+    - both-trace-log-health
+    - cache-trace
+    - cache-volume-concurrency
+    - unexpected-failure-propagation
 
 observability:
   source: Dagger plain progress/OpenTelemetry spans

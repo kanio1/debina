@@ -18,14 +18,16 @@ function without that directive remains callable with `dagger call`.
 ```text
 dagger check
 └── acceptance                      # the only +check
-    ├── fast
-    ├── integration
-    └── smoke-suite                 # sequential, complete ADR-N16 cap
-        ├── smoke-auth              # D3A
-        └── smoke-payments          # sequential D3B leaves
-            ├── json-direct-submission
-            ├── maker-checker-approval
-            └── payment-detail-lineage
+    ├── stage 1 (parallel)
+    │   ├── fast
+    │   └── integration
+    └── stage 2 (after stage 1)
+        └── smoke-suite             # sequential, complete ADR-N16 cap
+            ├── smoke-auth          # D3A
+            └── smoke-payments      # sequential D3B leaves
+                ├── json-direct-submission
+                ├── maker-checker-approval
+                └── payment-detail-lineage
 
 dagger call pipeline-assurance      # independent failure/cache/DNS proofs
 ```
@@ -90,6 +92,7 @@ digest proof reproduced that failure and proved the constructor correction.
 | backend | Maven wrapper, `.mvn`, `backend/`, test-owned AsyncAPI catalog and canonical Keycloak realm export |
 | frontend | `frontend/` plus the source-owned backend GraphQL schema |
 | Dagger | `dagger/` |
+| Dagger self-test | `dagger/`, filtered `frontend/`, root `.dagger/lock` |
 | governance | filtered repository root |
 | Keycloak | canonical realm file plus the Dagger overlay helper |
 
@@ -108,8 +111,12 @@ covered by an AST regression. Root `.dagger/lock` is the reviewed digest record.
 - Reproducibility and acceptance proofs use `--lock=frozen`.
 - Maintainers run a deliberate `--lock=live` image probe to create/update entries,
   review address and digest changes, then commit only `.dagger/lock`.
-- A missing frozen entry must fail closed; this was proved by removing and
-  restoring one entry with controlled patches.
+- `--lock=frozen` is exercised by the positive runtime image probe. On CLI
+  0.21.4 an isolated copy with one removed image entry still resolved that
+  lookup, so CLI behavior alone is not treated as a missing-entry guard.
+  `image_lock_test.go` therefore fails closed by mapping every declared runtime
+  image to a reviewed root lock entry; the architecture runner proves the
+  negative path against a disposable copy with one entry removed.
 - Reverting the lockfile commit restores the previous image digests.
 - Engine/CLI updates and base-image lock updates are separate changes and proofs.
 

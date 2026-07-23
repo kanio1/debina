@@ -73,6 +73,18 @@ func TestEveryContainerImageLookupIsDeclaredAndLockProbed(t *testing.T) {
 		t.Fatalf("runtimeImages = %v, declared image constants = %v", probed, declaredNames)
 	}
 
+	lockPath := filepath.Join("..", "..", ".dagger", "lock")
+	lockBytes, err := os.ReadFile(lockPath)
+	if err != nil {
+		t.Fatalf("read %s: %v", lockPath, err)
+	}
+	lock := string(lockBytes)
+	for name, image := range declared {
+		if !strings.Contains(lock, image+`"`) {
+			t.Errorf("%s image %q has no frozen lock entry", name, image)
+		}
+	}
+
 	entries, err := os.ReadDir("..")
 	if err != nil {
 		t.Fatalf("read Dagger module source: %v", err)

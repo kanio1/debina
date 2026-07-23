@@ -124,6 +124,45 @@ func TestAcceptanceOwnsExactlyThreeCanonicalClassifications(t *testing.T) {
 	}
 }
 
+func TestAcceptanceRunsFastAndIntegrationBeforeSequentialSmoke(t *testing.T) {
+	t.Parallel()
+
+	sourcePath := filepath.Join("..", "checks.go")
+	source, err := os.ReadFile(sourcePath)
+	if err != nil {
+		t.Fatalf("read %s: %v", sourcePath, err)
+	}
+	text := string(source)
+	acceptanceStart := strings.Index(text, "func (m *DebinaVerification) Acceptance")
+	if acceptanceStart < 0 {
+		t.Fatal("Acceptance function not found")
+	}
+	acceptanceSource := text[acceptanceStart:]
+	parallelStart := strings.Index(acceptanceSource, "pure.RunChecks(ctx")
+	sequentialStart := strings.Index(acceptanceSource, "pure.RunChecksSequential(ctx")
+	if parallelStart < 0 || sequentialStart < 0 ||
+		parallelStart >= sequentialStart {
+		t.Fatalf("acceptance does not have parallel stage before sequential stage")
+	}
+
+	parallelStage := text[acceptanceStart+parallelStart : acceptanceStart+sequentialStart]
+	if !strings.Contains(parallelStage, `Name: "fast"`) ||
+		!strings.Contains(parallelStage, `Name: "integration"`) ||
+		strings.Contains(parallelStage, `Name: "smoke-suite"`) {
+		t.Fatalf("acceptance parallel stage is not exactly fast + integration")
+	}
+	sequentialStage := text[acceptanceStart+sequentialStart:]
+	nextFunction := strings.Index(sequentialStage, "\nfunc ")
+	if nextFunction >= 0 {
+		sequentialStage = sequentialStage[:nextFunction]
+	}
+	if !strings.Contains(sequentialStage, `Name: "smoke-suite"`) ||
+		strings.Contains(sequentialStage, `Name: "fast"`) ||
+		strings.Contains(sequentialStage, `Name: "integration"`) {
+		t.Fatalf("acceptance sequential stage is not exactly smoke-suite")
+	}
+}
+
 func TestIntegrationOwnsExactlyFiveCanonicalLeaves(t *testing.T) {
 	t.Parallel()
 

@@ -18,37 +18,46 @@ i czysty worktree bez `git push`.
   `b654a10 test(ci): classify backend suites by durable tags`.
 - Wave 3 skonsolidowała pięć finalnych integration leaves i zakończyła się
   commitem `233a862 refactor(ci): consolidate integration contracts`.
-- Wave 4 potwierdziła, że frontend nie ma żadnego `NEXT_PUBLIC_*` ani
-  projektowego build-time env. Pięć wartości OIDC/BFF/backend jest
-  server-only i odczytywane leniwie: `KEYCLOAK_ISSUER`,
-  `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`, `BFF_BASE_URL`,
-  `BACKEND_API_BASE_URL`.
-- Wyodrębniono jeden `frontendProductionBuild`. Integration i wszystkie runtime
-  smoke services używają tego samego `.next`; bindings i secret są dokładane
-  dopiero po vertex `pnpm run build`. `frontend_env_test.go` blokuje
-  przypadkowe wprowadzenie build-time public env albo przesunięcie bindings
-  przed build.
-- Focused integration po refaktorze przeszedł w 8.5s; `pnpm run build` miał
-  jawny status `CACHED`, a database/Kafka contracts pozostały zielone.
-- Pełny `smoke-suite` przeszedł w 3m01s z env ustawionymi wyłącznie runtime:
-  D3A oraz wszystkie D3B evidence zakończyły się kodem 0. Trace zawiera jeden
-  współdzielony production build vertex dla wszystkich czterech runtime graphs
-  i ten vertex jest `CACHED`.
+- Wave 4 wyodrębniła jeden runtime-neutral frontend production build,
+  udowodniła integration/smoke/cache i zakończyła się commitem
+  `c935bf7 refactor(ci): reuse frontend production build`.
+- Wave 5 ustawiła finalne stage: `fast` + `integration` równolegle, po ich
+  sukcesie sekwencyjny `smoke-suite`. AST regression blokuje zmianę kolejności
+  lub membership. `pipeline-assurance` pozostaje oddzielne, a `full-local`
+  pozostaje sekwencyjnym `acceptance + backend-testcontainers`.
+- Dodano wykonywalny hostowy `tools/ci/verify-dagger-architecture.sh`; w kodzie
+  funkcji Dagger nadal nie ma nested Dagger CLI.
+- Runner wykonuje static topology, generator hash idempotence,
+  `dagger check --generate`, canonical functions/aliases, positive frozen image
+  runtime, missing-lock negative regression, canonical `dagger check`,
+  oddzielne `pipeline-assurance`, log-health obu trace’ów, cache trace,
+  cache-volume concurrency i expected non-zero unexpected-child propagation.
+- Pierwszy run ujawnił, że CLI 0.21.4 samo nie failuje po usunięciu lock entry.
+  Dodano więc fail-closed mapowanie wszystkich image constants do root lock;
+  disposable missing-entry copy jest teraz negatywnym proofem. Drugi run
+  ujawnił brak frontend/root-lock inputs wewnątrz `moduleSelfTest`; inputs są
+  teraz jawnie montowane w `/workspace`.
+- Finalny runner zakończył się kodem 0 z markerem
+  `DAGGER-ARCHITECTURE-VERIFICATION-PROVEN`; rerun na finalnym snapshotcie
+  implementacji Wave 5 wykonał canonical acceptance w 3m09s. Artefakty:
+  `/tmp/debina-wave5-architecture-final/`.
 - Chroniony `build/generated-spring-modulith/javadoc.json` został po Maven
   odtworzony do HEAD i ma oczekiwany SHA-256
   `47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054`.
 
 ## Utknęliśmy na
 
-Nic nie blokuje. Wave 4 jest gotowa do lokalnego commita. Zachowane wcześniejsze
+Nic nie blokuje. Wave 5 jest gotowa do lokalnego commita. Zachowane wcześniejsze
 zmiany dokumentacyjne/planning nadal pozostają poza tym selektywnym commitem.
 
 ## Plan na następny krok
 
-Zacommitować Wave 4, następnie przejść do Wave 5. Ustawić acceptance jako
-równoległe `fast` + `integration`, a po ich sukcesie sekwencyjny `smoke-suite`.
-Zachować oddzielne `pipeline-assurance` oraz `full-local = acceptance +
-backend-testcontainers`. Rozbudować kompletny zewnętrzny architecture runner.
+Zacommitować Wave 5, następnie przejść do Wave 6 i uruchomić pełną macierz:
+static, counts, functions/aliases, `dagger check`, `pipeline-assurance`,
+architecture runner, `backend-testcontainers`, `full-local`, equivalence,
+cache/log/generator/lock/cache-volume/unexpected oraz protected audit. Nie
+powtarzać proofów tylko wtedy, gdy dokładnie ten sam source/result nadal jest
+ważny; po zmianach naprawczych ponowić zależne bramy.
 
 ## Pułapki, których nie wolno powtórzyć
 
@@ -61,5 +70,9 @@ backend-testcontainers`. Rozbudować kompletny zewnętrzny architecture runner.
 - Nie dodawać OIDC/BFF endpointów ani secretu przed
   `frontendProductionBuild`; zmieniłoby to cache key i mogłoby bake'ować runtime
   configuration.
+- Nie usuwać jawnych frontend/root-lock inputs z `moduleSelfTest`; pure
+  regressions muszą działać identycznie lokalnie i wewnątrz Dagger.
+- Nie przypisywać CLI 0.21.4 nieudowodnionego missing-lock fail-closed;
+  odpowiedzialność za kompletność ma repozytoryjny regression.
 - Nie dodawać ambient host socketu, nested Dagger CLI, remote CI ani `git push`.
 - Nie zmieniać chronionego `build/generated-spring-modulith/javadoc.json`.

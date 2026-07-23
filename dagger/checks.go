@@ -149,9 +149,13 @@ func (m *DebinaVerification) PipelineAssurance(ctx context.Context) error {
 // The typed-socket Testcontainers regression remains an explicit separate gate.
 // +check
 func (m *DebinaVerification) Acceptance(ctx context.Context) error {
-	return pure.RunChecksSequential(ctx, []namedCheck{
+	if err := pure.RunChecks(ctx, []namedCheck{
 		{Name: "fast", Timeout: 10 * time.Minute, Run: m.Fast},
 		{Name: "integration", Timeout: 15 * time.Minute, Run: m.Integration},
+	}); err != nil {
+		return err
+	}
+	return pure.RunChecksSequential(ctx, []namedCheck{
 		{Name: "smoke-suite", Timeout: 26 * time.Minute, Run: m.SmokeSuite},
 	})
 }
