@@ -4,13 +4,30 @@ package main
 import "dagger/debina-verification/internal/dagger"
 
 const (
-	goImage         = "golang:1.26.5-bookworm"
-	javaImage       = "eclipse-temurin:25-jdk"
-	nodeImage       = "node:24.18.0-bookworm"
-	postgresImage   = "postgres:18"
-	keycloakImage   = "quay.io/keycloak/keycloak:26.6.4"
-	playwrightImage = "mcr.microsoft.com/playwright:v1.60.0-noble"
+	alpineImage              = "alpine:3.23.3"
+	alpineCompatibilityImage = "alpine:3.22"
+	curlImage                = "curlimages/curl:8.16.0"
+	goImage                  = "golang:1.26.5-bookworm"
+	javaImage                = "eclipse-temurin:25-jdk"
+	kafkaImage               = "apache/kafka:4.1.1"
+	nodeImage                = "node:24.18.0-bookworm"
+	postgresImage            = "postgres:18"
+	keycloakImage            = "quay.io/keycloak/keycloak:26.6.4"
+	playwrightImage          = "mcr.microsoft.com/playwright:v1.60.0-noble"
 )
+
+var runtimeImages = []string{
+	alpineImage,
+	alpineCompatibilityImage,
+	curlImage,
+	goImage,
+	javaImage,
+	kafkaImage,
+	nodeImage,
+	postgresImage,
+	keycloakImage,
+	playwrightImage,
+}
 
 // DebinaVerification owns local check composition. Repository commands remain
 // the authoritative verification leaves.

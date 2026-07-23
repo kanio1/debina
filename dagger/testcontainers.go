@@ -13,7 +13,7 @@ const testcontainersSocketPath = "/var/run/docker.sock"
 // disposable diagnostic container. It is not a no-argument check.
 func (m *DebinaVerification) SocketTransportProbe(ctx context.Context, runtimeSocket *dagger.Socket) (string, error) {
 	return dag.Container().
-		From("alpine:3.22").
+		From(alpineCompatibilityImage).
 		WithUnixSocket(testcontainersSocketPath, runtimeSocket).
 		WithExec([]string{"sh", "-ec", "apk add --no-cache curl >/dev/null && curl --fail --silent --show-error --unix-socket /var/run/docker.sock http://localhost/_ping"}).
 		Stdout(ctx)
@@ -59,7 +59,7 @@ func (m *DebinaVerification) TestcontainersRegression(ctx context.Context, runti
 func (m *DebinaVerification) RuntimeReachabilityProbe(ctx context.Context, port int) (string, error) {
 	command := fmt.Sprintf("apk add --no-cache netcat-openbsd >/dev/null && getent hosts host.containers.internal && nc -z -v -w 3 host.containers.internal %d", port)
 	return dag.Container().
-		From("alpine:3.22").
+		From(alpineCompatibilityImage).
 		WithExec([]string{"sh", "-ec", command}).
 		Stdout(ctx)
 }

@@ -54,7 +54,7 @@ func (m *DebinaVerification) FailureArtifactRedaction(ctx context.Context) (stri
 	refreshToken := dag.SetSecret("phase-d-artifact-scan-refresh-token", syntheticRefreshToken)
 	password := dag.SetSecret("phase-d-artifact-scan-password", syntheticPassword)
 	return dag.Container().
-		From("alpine:3.23.3").
+		From(alpineImage).
 		WithDirectory("/artifacts", m.FailureArtifacts()).
 		WithSecretVariable("PHASE_D_SYNTHETIC_ACCESS_TOKEN", accessToken).
 		WithSecretVariable("PHASE_D_SYNTHETIC_REFRESH_TOKEN", refreshToken).

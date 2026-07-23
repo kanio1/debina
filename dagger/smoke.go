@@ -72,7 +72,7 @@ func (m *DebinaVerification) SmokeKeycloakReadiness() *dagger.Container {
 }
 
 func (m *DebinaVerification) keycloakReadiness(service *dagger.Service, marker *dagger.File) *dagger.Container {
-	return dag.Container().From("curlimages/curl:8.16.0").
+	return dag.Container().From(curlImage).
 		WithServiceBinding(keycloakServiceAlias, service).
 		WithFile("/tmp/verified.marker", marker).
 		WithExec([]string{"sh", "-ec", "test \"$(cat /tmp/verified.marker)\" = \"" + pure.OverlaySuccessMarker + "\"; cat /tmp/verified.marker; " + boundedReadinessCommand("http://keycloak:8080/realms/sepa-nexus/.well-known/openid-configuration", "Keycloak")})
@@ -174,7 +174,7 @@ func (m *DebinaVerification) SmokeBackendReadiness() *dagger.Container {
 	keycloak := m.keycloakServiceWithOverlay("backend-readiness", m.d3aRealmOverlayArtifacts(), credentials)
 	migrationMarker := m.smokeMigrationMarker(postgres, credentials)
 	backend := m.smokeBackendService(postgres, m.kafkaService("backend-readiness"), keycloak, migrationMarker, credentials)
-	return dag.Container().From("curlimages/curl:8.16.0").
+	return dag.Container().From(curlImage).
 		WithServiceBinding(backendServiceAlias, backend).
 		WithExec([]string{"sh", "-ec", boundedReadinessCommand("http://backend:8081/actuator/health", "Backend")})
 }
@@ -218,7 +218,7 @@ func (m *DebinaVerification) SmokeFrontendReadiness() *dagger.Container {
 	keycloak := m.keycloakServiceWithOverlay("frontend-readiness", m.d3aRealmOverlayArtifacts(), credentials)
 	backend := m.smokeBackendService(postgres, m.kafkaService("frontend-readiness"), keycloak, m.smokeMigrationMarker(postgres, credentials), credentials)
 	frontend := m.smokeFrontendService(backend, keycloak, credentials)
-	return dag.Container().From("curlimages/curl:8.16.0").
+	return dag.Container().From(curlImage).
 		WithServiceBinding(frontendServiceAlias, frontend).
 		WithExec([]string{"sh", "-ec", frontendReadinessCommand})
 }

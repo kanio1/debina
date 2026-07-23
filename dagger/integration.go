@@ -9,7 +9,6 @@ import (
 const (
 	postgresServiceAlias = "postgres"
 	kafkaServiceAlias    = "kafka"
-	kafkaImage           = "apache/kafka:4.1.1"
 )
 
 // postgresService is intentionally ephemeral and has no host port or volume.

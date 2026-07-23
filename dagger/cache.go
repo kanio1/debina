@@ -10,7 +10,7 @@ import (
 
 func (m *DebinaVerification) cacheProbeContainer(sourceInput, configuration string) *dagger.Container {
 	return dag.Container().
-		From("alpine:3.23.3").
+		From(alpineImage).
 		WithFile("/probe/go.mod", m.source().File("dagger/go.mod")).
 		WithNewFile("/probe/source-input", sourceInput).
 		WithNewFile("/probe/configuration", configuration).

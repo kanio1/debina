@@ -15,7 +15,7 @@ const expectedFailureMarkerPrefix = "PHASE-D EXPECTED "
 // the Dagger SDK and is never converted into a false success.
 func (m *DebinaVerification) ResilienceChildNonZero(ctx context.Context) (string, error) {
 	child := dag.Container().
-		From("alpine:3.23.3").
+		From(alpineImage).
 		WithExec(
 			[]string{"sh", "-ec", "echo 'PHASE-D EXPECTED CHILD_EXIT_NON_ZERO' >&2; exit 23"},
 			dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure},
@@ -27,7 +27,7 @@ func (m *DebinaVerification) ResilienceChildNonZero(ctx context.Context) (string
 // fixed finite budget and is surfaced as an expected readiness failure.
 func (m *DebinaVerification) ResilienceBoundedTimeout(ctx context.Context) (string, error) {
 	child := dag.Container().
-		From("curlimages/curl:8.16.0").
+		From(curlImage).
 		WithExec(
 			[]string{"sh", "-ec", pure.BoundedUnavailableCommand("http://phase-d-missing:8081/actuator/health", "PHASE-D EXPECTED READINESS_TIMEOUT", 3)},
 			dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure},
@@ -135,7 +135,7 @@ exit 23
 
 func (m *DebinaVerification) expectedHTTPUnavailable(ctx context.Context, classification, url string) (string, error) {
 	child := dag.Container().
-		From("curlimages/curl:8.16.0").
+		From(curlImage).
 		WithExec(
 			[]string{"sh", "-ec", pure.BoundedUnavailableCommand(url, expectedFailureMarkerPrefix+classification, 3)},
 			dagger.ContainerWithExecOpts{Expect: dagger.ReturnTypeFailure},
