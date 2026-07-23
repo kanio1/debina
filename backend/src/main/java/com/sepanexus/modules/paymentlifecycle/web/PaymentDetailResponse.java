@@ -22,7 +22,7 @@ public record PaymentDetailResponse(
                 detail.endToEndId(),
                 detail.payment().getAmount(),
                 detail.payment().getCurrency(),
-                detail.payment().getStatus().name(),
+                detail.payment().getStatus() == null ? null : detail.payment().getStatus().name(),
                 detail.payment().getDebtorIban(),
                 detail.payment().getCreditorIban(),
                 detail.isoIdentifiers().stream().map(IsoIdentifierResponse::from).toList());

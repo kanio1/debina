@@ -26,7 +26,7 @@ interface PaymentSummaryResponse {
   endToEndId: string;
   amount: number;
   currency: string;
-  status: string;
+  status: string | null;
 }
 
 interface ProblemDetail {

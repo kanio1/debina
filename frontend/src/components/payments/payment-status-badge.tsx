@@ -13,13 +13,15 @@ const STATUS_META: Record<string, { variant: BadgeVariant; icon: LucideIcon }> =
   REJECTED: { variant: "destructive", icon: XCircle },
 };
 
-export function PaymentStatusBadge({ status }: { status: string }) {
-  const meta = STATUS_META[status] ?? { variant: "outline" as const, icon: Clock };
+export function PaymentStatusBadge({ status }: { status: string | null }) {
+  const displayStatus = status ?? "Business lifecycle not started";
+  const fallback = { variant: "outline" as const, icon: Clock };
+  const meta = status ? (STATUS_META[status] ?? fallback) : fallback;
   const Icon = meta.icon;
   return (
     <Badge variant={meta.variant}>
       <Icon aria-hidden="true" />
-      {status}
+      {displayStatus}
     </Badge>
   );
 }

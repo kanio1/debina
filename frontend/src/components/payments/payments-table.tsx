@@ -18,7 +18,7 @@ export interface PaymentRow {
   endToEndId: string;
   amount: number;
   currency: string;
-  status: string;
+  status: string | null;
 }
 
 const columns: ColumnDef<PaymentRow>[] = [

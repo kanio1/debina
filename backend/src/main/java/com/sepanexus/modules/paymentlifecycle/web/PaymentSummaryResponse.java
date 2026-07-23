@@ -13,6 +13,6 @@ public record PaymentSummaryResponse(
                 summary.endToEndId(),
                 summary.payment().getAmount(),
                 summary.payment().getCurrency(),
-                summary.payment().getStatus().name());
+                summary.payment().getStatus() == null ? null : summary.payment().getStatus().name());
     }
 }
