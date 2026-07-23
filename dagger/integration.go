@@ -1,6 +1,10 @@
 package main
 
-import "dagger/debina-verification/internal/dagger"
+import (
+	"strings"
+
+	"dagger/debina-verification/internal/dagger"
+)
 
 const (
 	postgresServiceAlias = "postgres"
@@ -9,12 +13,12 @@ const (
 )
 
 // postgresService is intentionally ephemeral and has no host port or volume.
-func (m *DebinaVerification) postgresService(instance string) *dagger.Service {
+func (m *DebinaVerification) postgresService(instance string, credentials phaseDCredentials) *dagger.Service {
 	return dag.Container().
 		From(postgresImage).
 		WithEnvVariable("POSTGRES_DB", "sepa_nexus").
 		WithEnvVariable("POSTGRES_USER", "sepa_migration").
-		WithEnvVariable("POSTGRES_PASSWORD", "dev-only-migration").
+		WithSecretVariable("POSTGRES_PASSWORD", credentials.migrationPassword).
 		// Distinguish independently-created service instances in one Dagger session.
 		WithLabel("dev.debina.phase-d.database-instance", instance).
 		WithExposedPort(5432).
@@ -31,9 +35,10 @@ func postgresClient(service *dagger.Service) *dagger.Container {
 }
 
 func (m *DebinaVerification) postgresReadiness() *dagger.Container {
-	return postgresClient(m.postgresService("readiness")).
+	credentials := newPhaseDCredentials()
+	return postgresClient(m.postgresService("readiness", credentials)).
 		WithEnvVariable("PGUSER", "sepa_migration").
-		WithEnvVariable("PGPASSWORD", "dev-only-migration").
+		WithSecretVariable("PGPASSWORD", credentials.migrationPassword).
 		WithExec([]string{"pg_isready", "-t", "30"})
 }
 
@@ -46,42 +51,47 @@ func (m *DebinaVerification) flywayClient(service *dagger.Service) *dagger.Conta
 		WithServiceBinding(postgresServiceAlias, service)
 }
 
-func flywayArguments(target string) []string {
+func flywayCommand(target string, goals ...string) string {
 	args := []string{
 		"./mvnw", "-f", "backend",
 		"-Dflyway.url=jdbc:postgresql://postgres:5432/sepa_nexus",
 		"-Dflyway.user=sepa_migration",
-		"-Dflyway.password=dev-only-migration",
+		`-Dflyway.password="$FLYWAY_PASSWORD"`,
 		"-Dflyway.locations=filesystem:backend/src/main/resources/db/migration",
 	}
 	if target != "" {
 		args = append(args, "-Dflyway.target="+target)
 	}
-	return args
+	return strings.Join(append(args, goals...), " ")
 }
 
 func (m *DebinaVerification) flywayFresh() *dagger.Container {
-	args := append(flywayArguments(""), "flyway:migrate", "flyway:validate")
-	return m.flywayClient(m.postgresService("fresh")).WithExec(args)
+	credentials := newPhaseDCredentials()
+	return m.flywayClient(m.postgresService("fresh", credentials)).
+		WithSecretVariable("FLYWAY_PASSWORD", credentials.migrationPassword).
+		WithExec([]string{"sh", "-ec", flywayCommand("", "flyway:migrate", "flyway:validate")})
 }
 
 func (m *DebinaVerification) flywayUpgrade() *dagger.Container {
-	toBaseline := append(flywayArguments("54"), "flyway:migrate", "flyway:validate")
-	toLatest := append(flywayArguments(""), "flyway:migrate", "flyway:validate")
-	return m.flywayClient(m.postgresService("upgrade")).
-		WithExec(toBaseline).
-		WithExec(toLatest)
+	credentials := newPhaseDCredentials()
+	return m.flywayClient(m.postgresService("upgrade", credentials)).
+		WithSecretVariable("FLYWAY_PASSWORD", credentials.migrationPassword).
+		WithExec([]string{"sh", "-ec", flywayCommand("54", "flyway:migrate", "flyway:validate")}).
+		WithExec([]string{"sh", "-ec", flywayCommand("", "flyway:migrate", "flyway:validate")})
 }
 
 func (m *DebinaVerification) rlsAndGrantProbes() *dagger.Container {
-	service := m.postgresService("rls-grants")
+	credentials := newPhaseDCredentials()
+	service := m.postgresService("rls-grants", credentials)
 	migrated := m.flywayClient(service).
-		WithExec(append(flywayArguments(""), "flyway:migrate", "flyway:validate")).
+		WithSecretVariable("FLYWAY_PASSWORD", credentials.migrationPassword).
+		WithExec([]string{"sh", "-ec", flywayCommand("", "flyway:migrate", "flyway:validate")}).
 		File("/workspace/backend/pom.xml")
 	return postgresClient(service).
 		WithFile("/migration-complete", migrated).
 		WithEnvVariable("PGUSER", "sepa_migration").
-		WithEnvVariable("PGPASSWORD", "dev-only-migration").
+		WithSecretVariable("PGPASSWORD", credentials.migrationPassword).
+		WithSecretVariable("SEPA_APP_PASSWORD", credentials.appPassword).
 		WithExec([]string{"sh", "-ec", `
 set -eu
 assert_true() {
@@ -94,7 +104,7 @@ assert_true "SELECT has_table_privilege('sepa_app', 'payment.payments', 'SELECT,
 assert_true "SELECT NOT has_table_privilege('sepa_app', 'ledger.journal_entries', 'INSERT')"
 assert_true "SELECT has_table_privilege('outbox_dispatcher_role', 'payment.outbox_events', 'SELECT,UPDATE')"
 assert_true "SELECT NOT has_table_privilege('outbox_dispatcher_role', 'payment.payments', 'INSERT')"
-PGUSER=sepa_app PGPASSWORD=dev-only-app psql -v ON_ERROR_STOP=1 -Atqc "SELECT count(*) FROM payment.payments" | grep -x 0
+PGUSER=sepa_app PGPASSWORD="$SEPA_APP_PASSWORD" psql -v ON_ERROR_STOP=1 -Atqc "SELECT count(*) FROM payment.payments" | grep -x 0
 `})
 }
 
