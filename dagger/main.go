@@ -61,7 +61,8 @@ func (m *DebinaVerification) backendWorkspace() *dagger.Directory {
 	return dag.Directory().
 		WithFile("mvnw", source.File("mvnw")).
 		WithDirectory(".mvn", source.Directory(".mvn")).
-		WithDirectory("backend", source.Directory("backend"))
+		WithDirectory("backend", source.Directory("backend")).
+		WithFile("infra/asyncapi/asyncapi.yaml", source.File("infra/asyncapi/asyncapi.yaml"))
 }
 
 // frontendWorkspace retains the complete frontend tree, including the
