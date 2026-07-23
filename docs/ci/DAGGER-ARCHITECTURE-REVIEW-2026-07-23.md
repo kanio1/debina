@@ -83,6 +83,28 @@ probes used by Keycloak before it initializes an empty database. Only the exact
 as bootstrap observations; all other runtime `ERROR/FATAL` payloads remain
 fail-closed.
 
+## Final runtime matrix
+
+The final unfiltered `dagger check --progress=plain` completed successfully on
+Engine 0.21.4 in 250.92 seconds after the last source-boundary fix. Its trace
+contains one logical vertex for D3A and one for each of the three D3B journeys;
+their start/completion order proves sequential browser execution. Repeated
+progress lines reuse those vertex identifiers and are not additional
+executions.
+
+Each public socket-free function (`fast`, `integration`, `smoke`,
+`smoke-payments`, `phase-d`, and legacy `all`) then returned exit 0. The
+explicit typed-socket Testcontainers regression ran 542 tests with no failures,
+errors, or skips; its immediate repeat was top-level `CACHED`. Frozen image
+lookup, cold/warm/changed-input cache traces, cache-volume reset/stress,
+service-binding DNS, failure redaction, unexpected-failure propagation,
+generator idempotence, and positive/negative log-health proofs also passed.
+
+The final 250.92-second canonical result is a correctness observation, not a
+performance regression or SLA: it includes work invalidated by the final
+Keycloak fixture boundary correction, whereas the 203.04-second row above was
+captured on the preceding source revision.
+
 ## Deferred remote CI proposal boundary
 
 No remote CI implementation is authorized. A later Phase E proposal should be a

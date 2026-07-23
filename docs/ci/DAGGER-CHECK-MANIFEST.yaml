@@ -1,4 +1,4 @@
-status: DAGGER_ARCHITECTURE_REVIEW_IMPLEMENTED_PENDING_FINAL_MATRIX
+status: DAGGER_ARCHITECTURE_REVIEW_RUNTIME_PROVEN
 authority: repository commands remain authoritative; Dagger orchestrates them
 engine:
   current: v0.21.4
