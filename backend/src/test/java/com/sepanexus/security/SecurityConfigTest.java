@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity;
+import com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentSubmissionResult;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -65,7 +67,8 @@ class SecurityConfigTest {
 
         PaymentEntity payment = org.mockito.Mockito.mock(PaymentEntity.class);
         when(payment.getId()).thenReturn(UUID.randomUUID());
-        when(paymentService.submitPayment(any())).thenReturn(payment);
+        when(paymentService.submitPayment(any())).thenReturn(
+                PaymentSubmissionResult.fromSubmission(payment, ApprovalStatus.NOT_REQUIRED));
         mockMvc.perform(post("/api/v1/payments")
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
                                 .authorities(() -> "ROLE_payment_submitter"))

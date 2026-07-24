@@ -90,7 +90,11 @@ class Pain001CanonicalMapperTest {
 
     @Test
     void rejectsGrpHdrNbOfTxsNotOne() {
-        CanonicalMappingResult result = map(minimal().replace("<NbOfTxs>1</NbOfTxs>", "<NbOfTxs>2</NbOfTxs>"));
+        String xml = minimal();
+        int grpHdrNbOfTxs = xml.indexOf("<NbOfTxs>1</NbOfTxs>");
+        String modified = xml.substring(0, grpHdrNbOfTxs) + "<NbOfTxs>2</NbOfTxs>"
+                + xml.substring(grpHdrNbOfTxs + "<NbOfTxs>1</NbOfTxs>".length());
+        CanonicalMappingResult result = map(modified);
 
         assertThat(result.success()).isFalse();
         assertThat(result.error().fieldPath()).isEqualTo("GrpHdr/NbOfTxs");
@@ -110,6 +114,38 @@ class Pain001CanonicalMapperTest {
 
         assertThat(result.success()).isFalse();
         assertThat(result.error().fieldPath()).isEqualTo("PmtInf/CtrlSum");
+    }
+
+    @Test
+    void rejectsPmtInfNbOfTxsNotOne() {
+        String xml = minimal();
+        int first = xml.indexOf("<NbOfTxs>1</NbOfTxs>");
+        int second = xml.indexOf("<NbOfTxs>1</NbOfTxs>", first + 1);
+        String modified = xml.substring(0, second) + "<NbOfTxs>2</NbOfTxs>"
+                + xml.substring(second + "<NbOfTxs>1</NbOfTxs>".length());
+        CanonicalMappingResult result = map(modified);
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/NbOfTxs");
+    }
+
+    @Test
+    void rejectsMissingCtrlSum() {
+        CanonicalMappingResult result = map(withoutElement("<CtrlSum>100.00</CtrlSum>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/CtrlSum");
+    }
+
+    @Test
+    void doesNotPromoteDeferredPartyFieldsIntoCanonicalCommand() {
+        CanonicalMappingResult result = map(realistic());
+
+        assertThat(result.success()).isTrue();
+        CanonicalPaymentCommand command = result.command();
+        assertThat(command.getClass().getRecordComponents()).hasSize(10);
+        assertThat(command.msgId()).isEqualTo("MSG-REAL-0001");
+        assertThat(command.endToEndId()).isEqualTo("E2E-REAL-0001");
     }
 
     @Test

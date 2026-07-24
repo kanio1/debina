@@ -69,14 +69,13 @@ mappings:
     aggregate_or_entity: ISO message lineage entity
     database_schema: iso
     table: iso_messages
-    column: cre_dt_tm
+    column: source_message_created_at
     postgresql_type: timestamptz(3)
     nullable: true
-    constraint: Source value must remain distinct from receive/record timestamps
+    constraint: Source value must remain distinct from receive/record timestamps; legacy cre_dt_tm is not written on new rows
     index: NOT_APPLICABLE
     test_owner: ISO mapper unit plus lineage integration
-    mapping_status: IMPLEMENTATION_GAP
-    current_behavior: Pain001LineageRecorder writes clockPort receive time; Pain001CanonicalMapper does not read GrpHdr/CreDtTm.
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
   - <<: *defaults
     mapping_id: E1-MAP-003
     xml_path: Document/CstmrCdtTrfInitn/GrpHdr/NbOfTxs
@@ -94,7 +93,7 @@ mappings:
     constraint: Must reconcile with actual transaction count after exact profile review
     index: NOT_APPLICABLE
     test_owner: Source/schema plus mapper integration
-    mapping_status: IMPLEMENTATION_GAP
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
   - <<: *defaults
     mapping_id: E1-MAP-004
     xml_path: Document/CstmrCdtTrfInitn/GrpHdr/CtrlSum
@@ -149,7 +148,7 @@ mappings:
     constraint: Value TRF after TVS/profile validation
     index: NOT_APPLICABLE
     test_owner: Source/schema and mapper unit
-    mapping_status: IMPLEMENTATION_GAP
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
   - <<: *defaults
     mapping_id: E1-MAP-007
     xml_path: Document/CstmrCdtTrfInitn/PmtInf/NbOfTxs
@@ -167,7 +166,7 @@ mappings:
     constraint: Must equal actual CdtTrfTxInf count; E1 reviewed profile must equal one
     index: NOT_APPLICABLE
     test_owner: Source/schema plus mapper integration
-    mapping_status: IMPLEMENTATION_GAP
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
   - <<: *defaults
     mapping_id: E1-MAP-008
     xml_path: Document/CstmrCdtTrfInitn/PmtInf/CtrlSum
@@ -185,7 +184,7 @@ mappings:
     constraint: Must equal sum of instructed amounts; pre-agreed C2PSP validation conditions require review
     index: NOT_APPLICABLE
     test_owner: Source/schema plus decimal property test
-    mapping_status: IMPLEMENTATION_GAP
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
   - <<: *defaults
     mapping_id: E1-MAP-009
     xml_path: Document/CstmrCdtTrfInitn/PmtInf/ReqdExctnDt/Dt|DtTm
@@ -578,17 +577,15 @@ review_summary:
   total_entries: 28
   field_scope_artifact: planning/reviews/phase-e/e1/E1-FIELD-SCOPE-DECISION.yaml
   council_date: 2026-07-24
-  currently_mapped_review_required: 9
+  currently_mapped_review_required: 15
   currently_stored_security_review_required: 1
-  implementation_gap: 13
+  implementation_gap: 7
   review_required: 2
   source_blocked: 1
   decision_blocked: 1
   not_applicable: 1
   semantic_mismatch: 1
   blocking_findings:
-    - GrpHdr/CreDtTm is not parsed; the current lineage writer stores receive time in the source-named cre_dt_tm column.
-    - NbOfTxs, CtrlSum, PmtMtd and requested execution date are not validated/mapped by the current mapper.
-    - Parties, agents, remittance, purpose/category-purpose and addresses are not in the current canonical command.
+    - ReqdExctnDt and deferred party/agent/remittance/purpose fields remain outside E1 mapper scope by design.
     - Raw archive, signature evidence visibility, RLS and retention require security/database/legal review.
 review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]

@@ -19,7 +19,7 @@ import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionService;
 import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionResult;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentDetail;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentSummary;
-import com.sepanexus.modules.paymentlifecycle.service.PaymentService.PaymentTimelinePage;
+import com.sepanexus.modules.paymentlifecycle.service.PaymentSubmissionResult;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentTimelineLookup.TimelineEntry;
 import com.sepanexus.security.SecurityConfig;
 import java.math.BigDecimal;
@@ -92,7 +92,8 @@ class PaymentControllerTest {
         PaymentEntity payment = org.mockito.Mockito.mock(PaymentEntity.class);
         UUID paymentId = UUID.randomUUID();
         when(payment.getId()).thenReturn(paymentId);
-        when(paymentService.submitPayment(any())).thenReturn(payment);
+        when(paymentService.submitPayment(any())).thenReturn(
+                PaymentSubmissionResult.fromSubmission(payment, ApprovalStatus.NOT_REQUIRED));
 
         mockMvc.perform(post("/api/v1/payments")
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", UUID.randomUUID().toString()))
@@ -110,9 +111,8 @@ class PaymentControllerTest {
         UUID paymentId = UUID.randomUUID();
         UUID tenantId = UUID.randomUUID();
         when(payment.getId()).thenReturn(paymentId);
-        when(paymentService.submitPayment(any())).thenReturn(payment);
-        when(paymentService.approvalStatus(org.mockito.ArgumentMatchers.eq(tenantId), any(),
-                org.mockito.ArgumentMatchers.eq(paymentId))).thenReturn(ApprovalStatus.PENDING_APPROVAL);
+        when(paymentService.submitPayment(any())).thenReturn(
+                PaymentSubmissionResult.fromSubmission(payment, ApprovalStatus.PENDING_APPROVAL));
 
         mockMvc.perform(post("/api/v1/payments")
                         .with(jwt().jwt(jwt -> jwt.claim("tenant_id", tenantId.toString()).subject("maker-subject"))

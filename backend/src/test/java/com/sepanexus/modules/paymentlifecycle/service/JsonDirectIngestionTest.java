@@ -205,8 +205,8 @@ class JsonDirectIngestionTest {
     private record PaymentEntitySnapshot(UUID id) {
     }
 
-    private static PaymentEntitySnapshot snapshot(com.sepanexus.modules.paymentlifecycle.domain.PaymentEntity entity) {
-        return new PaymentEntitySnapshot(entity.getId());
+    private static PaymentEntitySnapshot snapshot(PaymentSubmissionResult result) {
+        return new PaymentEntitySnapshot(result.payment().getId());
     }
 
     static synchronized void initializeDatabase() {

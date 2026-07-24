@@ -164,6 +164,7 @@ class SignatureVerificationTest {
 
         assertThat(verdict.result()).isEqualTo(Verdict.Result.FAILED);
         assertThat(verdict.reasonCode()).isEqualTo(Verdict.REASON_KEY_NOT_FOUND_OR_INACTIVE);
+        assertThat(verdict.profileOutcome()).isEqualTo(DetachedEd25519ProfileV1.ProfileOutcome.UNKNOWN_SIGNER);
     }
 
     @Test

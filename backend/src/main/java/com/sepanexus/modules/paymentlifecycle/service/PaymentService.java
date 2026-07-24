@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PaymentService {
 
-    private static final int SUBMIT_RESPONSE_CODE = 201;
-
     private final PaymentRepository paymentRepository;
     private final TenantGucConfigurer tenantGucConfigurer;
     private final IdempotencyStore idempotencyStore;
@@ -57,7 +55,7 @@ public class PaymentService {
      */
     @Transactional
     @PreAuthorize("hasRole('payment_submitter')")
-    public PaymentEntity submitPayment(SubmitPaymentCommand command) {
+    public PaymentSubmissionResult submitPayment(SubmitPaymentCommand command) {
         UUID tenantId = command.tenantId();
         tenantGucConfigurer.apply(tenantId, command.branchId());
 
@@ -73,16 +71,16 @@ public class PaymentService {
             PaymentEntity payment = paymentRepository.findById(claim.existingPaymentId())
                     .orElseThrow(() -> new IllegalStateException(
                             "Idempotency replay points at a payment that no longer exists: " + claim.existingPaymentId()));
-            return payment;
+            return PaymentSubmissionResult.frozenReplay(payment, claim.existingResponseCode());
         }
 
         PaymentSubmissionResult result = approvalSubmissionGate.create(tenantId, command.branchId(), command.amount(),
                 command.currency(), command.debtorIban(), command.creditorIban(), command.makerUserId(),
                 paymentId -> jsonDirectLineageRecorder.record(paymentId, tenantId, rawMessageId, command.endToEndId()));
         idempotencyStore.complete(tenantId, command.idempotencyKey(), result.payment().getId(),
-                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE, rawMessageId);
+                result.submissionResponseCode(), rawMessageId);
 
-        return result.payment();
+        return result;
     }
 
     @Transactional(readOnly = true)

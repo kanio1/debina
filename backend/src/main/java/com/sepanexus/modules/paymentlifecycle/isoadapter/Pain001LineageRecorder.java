@@ -27,11 +27,10 @@ public class Pain001LineageRecorder {
         jdbcTemplate.update("""
                 INSERT INTO iso.iso_messages
                     (id, direction, message_type, parse_status, raw_message_id, msg_id,
-                     source_message_created_at, recorded_at, cre_dt_tm, tenant_id)
-                VALUES (?, 'INBOUND', ?, 'PARSED', ?, ?, ?, ?, ?, ?)
+                     source_message_created_at, recorded_at, tenant_id)
+                VALUES (?, 'INBOUND', ?, 'PARSED', ?, ?, ?, ?, ?)
                 """, isoMessageId, MESSAGE_TYPE, rawMessageId, command.msgId(),
-                Timestamp.from(command.sourceMessageCreatedAt()), Timestamp.from(recordedAt),
-                Timestamp.from(recordedAt), tenantId);
+                Timestamp.from(command.sourceMessageCreatedAt()), Timestamp.from(recordedAt), tenantId);
 
         jdbcTemplate.update("""
                 INSERT INTO iso.payment_iso_identifiers

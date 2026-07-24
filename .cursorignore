@@ -1,0 +1,4 @@
+# Claude Code compatibility instructions.
+# Cursor uses AGENTS.md and .cursor/rules instead.
+CLAUDE.md
+**/CLAUDE.md

@@ -48,12 +48,13 @@ class ApprovalSubmissionGate {
         if (!evaluation.requiresApproval()) {
             paymentCreationWriter.releaseReceived(payment, tenantId);
         }
-        return new PaymentSubmissionResult(payment, status);
+        return PaymentSubmissionResult.fromSubmission(payment, status);
     }
 
+    /** Live approval-axis read — not the idempotent submission HTTP outcome. */
     PaymentSubmissionResult replay(PaymentEntity payment) {
         PaymentApprovalEntity approval = approvalRepository.findByPaymentId(payment.getId())
                 .orElseThrow(() -> new IllegalStateException("Idempotency replay has no approval record: " + payment.getId()));
-        return new PaymentSubmissionResult(payment, approval.getStatus());
+        return PaymentSubmissionResult.fromSubmission(payment, approval.getStatus());
     }
 }

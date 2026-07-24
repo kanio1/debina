@@ -67,18 +67,18 @@ class PaymentServiceTest {
                     @SuppressWarnings("unchecked")
                     java.util.function.Consumer<UUID> lineage = invocation.getArgument(7);
                     lineage.accept(created.getId());
-                    return new PaymentSubmissionResult(created,
+                    return PaymentSubmissionResult.fromSubmission(created,
                             com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus.NOT_REQUIRED);
                 });
 
-        PaymentEntity saved = service.submitPayment(command);
+        PaymentSubmissionResult saved = service.submitPayment(command);
 
         verify(approvalSubmissionGate).create(org.mockito.ArgumentMatchers.eq(tenantId), org.mockito.ArgumentMatchers.isNull(),
                 any(), any(), any(), any(), any(), any());
         ArgumentCaptor<String> endToEndId = ArgumentCaptor.forClass(String.class);
         verify(jsonDirectLineageRecorder).record(any(), any(), any(), endToEndId.capture());
-        assertThat(saved.getStatus()).isEqualTo(PaymentStatus.RECEIVED);
-        assertThat(saved.getTenantId()).isEqualTo(tenantId);
+        assertThat(saved.payment().getStatus()).isEqualTo(PaymentStatus.RECEIVED);
+        assertThat(saved.payment().getTenantId()).isEqualTo(tenantId);
         assertThat(endToEndId.getValue()).isEqualTo("E2E-1");
     }
 }

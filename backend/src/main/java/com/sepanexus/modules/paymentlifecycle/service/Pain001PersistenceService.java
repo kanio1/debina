@@ -22,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class Pain001PersistenceService {
 
-    private static final int SUBMIT_RESPONSE_CODE = 201;
-
     private final PaymentRepository paymentRepository;
     private final IdempotencyStore idempotencyStore;
     private final Pain001LineageRecorder pain001LineageRecorder;
@@ -52,17 +50,18 @@ public class Pain001PersistenceService {
             throw new IdempotencyConflictException(idempotencyKey);
         }
         if (claim.outcome() == IdempotencyClaim.Outcome.REPLAY) {
-            return approvalSubmissionGate.replay(paymentRepository.findById(claim.existingPaymentId())
+            return PaymentSubmissionResult.frozenReplay(paymentRepository.findById(claim.existingPaymentId())
                     .orElseThrow(() -> new IllegalStateException(
-                            "Idempotency replay points at a payment that no longer exists: " + claim.existingPaymentId())));
+                            "Idempotency replay points at a payment that no longer exists: " + claim.existingPaymentId())),
+                    claim.existingResponseCode());
         }
 
         PaymentSubmissionResult result = approvalSubmissionGate.create(tenantId, branchId, canonical.amount(),
                 canonical.currency(), canonical.debtorIban(), canonical.creditorIban(), makerUserId,
                 paymentId -> pain001LineageRecorder.record(paymentId, tenantId, rawMessageId, canonical,
                         clockPort.now()));
-        idempotencyStore.complete(tenantId, idempotencyKey, result.payment().getId(),
-                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE, rawMessageId);
+        idempotencyStore.complete(tenantId, idempotencyKey, result.payment().getId(), result.submissionResponseCode(),
+                rawMessageId);
 
         return result;
     }

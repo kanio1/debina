@@ -1,6 +1,5 @@
 package com.sepanexus.modules.paymentlifecycle.web;
 
-import com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus;
 import com.sepanexus.modules.paymentlifecycle.service.Pain001IngestionService;
 import com.sepanexus.modules.paymentlifecycle.service.Pain001SubmissionCommand;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentService;
@@ -49,13 +48,12 @@ public class PaymentController {
     public ResponseEntity<?> submit(@Valid @RequestBody SubmitPaymentRequest request,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal Jwt jwt) {
-        var payment = paymentService.submitPayment(new SubmitPaymentCommand(
+        PaymentSubmissionResult result = paymentService.submitPayment(new SubmitPaymentCommand(
                 UUID.fromString(jwt.getClaimAsString("tenant_id")),
                 branchIdClaim(jwt),
                 request.endToEndId(), request.amount(), request.currency(), request.debtorIban(),
                 request.creditorIban(), jwt.getSubject(), idempotencyKey));
-        return submissionResponse(payment.getId(), paymentService.approvalStatus(
-                UUID.fromString(jwt.getClaimAsString("tenant_id")), branchIdClaim(jwt), payment.getId()));
+        return submissionResponse(result);
     }
 
     /**
@@ -77,7 +75,7 @@ public class PaymentController {
         PaymentSubmissionResult result = pain001IngestionService.submit(new Pain001SubmissionCommand(
                 UUID.fromString(jwt.getClaimAsString("tenant_id")), branchIdClaim(jwt), xmlBytes, signatureBytes,
                 declaredSignerId, algo, jwt.getSubject(), idempotencyKey));
-        return submissionResponse(result.payment().getId(), result.approvalStatus());
+        return submissionResponse(result);
     }
 
     private static UUID branchIdClaim(Jwt jwt) {
@@ -85,11 +83,11 @@ public class PaymentController {
         return branchId == null ? null : UUID.fromString(branchId);
     }
 
-    private static ResponseEntity<?> submissionResponse(UUID paymentId, ApprovalStatus approvalStatus) {
-        URI location = URI.create("/api/v1/payments/" + paymentId);
-        if (approvalStatus == ApprovalStatus.PENDING_APPROVAL) {
+    private static ResponseEntity<?> submissionResponse(PaymentSubmissionResult result) {
+        URI location = URI.create("/api/v1/payments/" + result.payment().getId());
+        if (result.submissionResponseCode() == PaymentSubmissionResult.ACCEPTED_RESPONSE_CODE) {
             return ResponseEntity.accepted().location(location)
-                    .body(new PaymentSubmissionResponse(paymentId, approvalStatus));
+                    .body(new PaymentSubmissionResponse(result.payment().getId(), result.approvalStatus()));
         }
         return ResponseEntity.created(location).build();
     }

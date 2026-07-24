@@ -110,18 +110,18 @@ class ApprovalSubmissionIntegrationTest {
         var first = paymentService.submitPayment(command);
         var replay = paymentService.submitPayment(command);
 
-        assertThat(replay.getId()).isEqualTo(first.getId());
-        assertThat(paymentService.approvalStatus(tenantId, branchId, first.getId()).name()).isEqualTo("PENDING_APPROVAL");
-        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", first.getId())).isZero();
-        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", first.getId())).isZero();
-        assertThat(count("SELECT count(*) FROM iso.message_lineage WHERE payment_id = ?", first.getId())).isEqualTo(1);
+        assertThat(replay.payment().getId()).isEqualTo(first.payment().getId());
+        assertThat(paymentService.approvalStatus(tenantId, branchId, first.payment().getId()).name()).isEqualTo("PENDING_APPROVAL");
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", first.payment().getId())).isZero();
+        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", first.payment().getId())).isZero();
+        assertThat(count("SELECT count(*) FROM iso.message_lineage WHERE payment_id = ?", first.payment().getId())).isEqualTo(1);
         try (Connection connection = admin(); PreparedStatement statement = connection.prepareStatement("""
                 SELECT p.status, a.status, a.maker_user_id, a.matrix_rule_id,
                        a.expires_at - a.submitted_for_approval_at AS expiry
                 FROM payment.payments p JOIN payment.payment_approvals a ON a.payment_id = p.id
                 WHERE p.id = ?
                 """)) {
-            statement.setObject(1, first.getId());
+            statement.setObject(1, first.payment().getId());
             try (ResultSet result = statement.executeQuery()) {
                 assertThat(result.next()).isTrue();
                 assertThat(result.getString("status")).isNull();
@@ -139,10 +139,10 @@ class ApprovalSubmissionIntegrationTest {
         UUID branchId = UUID.randomUUID();
         var payment = paymentService.submitPayment(command(tenantId, branchId, "maker-subject", UUID.randomUUID().toString()));
 
-        assertThat(payment.getStatus().name()).isEqualTo("RECEIVED");
-        assertThat(paymentService.approvalStatus(tenantId, branchId, payment.getId()).name()).isEqualTo("NOT_REQUIRED");
-        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment.getId())).isEqualTo(1);
-        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", payment.getId())).isEqualTo(1);
+        assertThat(payment.payment().getStatus().name()).isEqualTo("RECEIVED");
+        assertThat(paymentService.approvalStatus(tenantId, branchId, payment.payment().getId()).name()).isEqualTo("NOT_REQUIRED");
+        assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", payment.payment().getId())).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", payment.payment().getId())).isEqualTo(1);
     }
 
     @Test

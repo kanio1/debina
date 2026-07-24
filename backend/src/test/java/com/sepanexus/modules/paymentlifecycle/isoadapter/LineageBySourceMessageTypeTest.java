@@ -72,7 +72,7 @@ class LineageBySourceMessageTypeTest {
         SubmitPaymentCommand command = new SubmitPaymentCommand(tenantId, null, "e2e-lineage-multi-1",
                 new BigDecimal("10.00"), "EUR", "DE89370400440532013000", "FR7630006000011234567890189",
                 UUID.randomUUID().toString());
-        UUID paymentId = paymentService.submitPayment(command).getId();
+        UUID paymentId = paymentService.submitPayment(command).payment().getId();
 
         // Simulate a later R-message (e.g. camt.056 recall) referencing the same payment under a
         // different source_message_type — this is exactly the composite-PK scenario G4 exists for.

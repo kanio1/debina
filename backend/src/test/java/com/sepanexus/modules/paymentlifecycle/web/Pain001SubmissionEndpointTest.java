@@ -17,12 +17,18 @@ import java.security.KeyPairGenerator;
 import java.security.Signature;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +93,7 @@ class Pain001SubmissionEndpointTest {
                     + "payment.payment_status_history, payment.payment_events, "
                     + "ingress.idempotency_keys, ingress.raw_inbound_messages, "
                     + "iso.payment_iso_identifiers, iso.message_lineage, iso.iso_messages, "
-                    + "iso.iso_message_parse_errors, "
+                    + "iso.iso_message_parse_errors, reference_data.approval_matrix_rules, "
                     + "signature.signature_keys, signature.message_signatures, signature.signature_verification_events "
                     + "CASCADE");
         }
@@ -123,7 +129,17 @@ class Pain001SubmissionEndpointTest {
                 + "WHERE pii.end_to_end_id = 'E2E-HAPPY' "
                 + "AND im.source_message_created_at = '2026-07-15 10:00:00+00' "
                 + "AND im.recorded_at IS NOT NULL "
-                + "AND im.recorded_at = im.cre_dt_tm")).isEqualTo(1);
+                + "AND im.cre_dt_tm IS NULL "
+                + "AND im.recorded_at <> im.source_message_created_at")).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM payment.payments p "
+                + "JOIN iso.payment_iso_identifiers pii ON pii.payment_id = p.id "
+                + "WHERE pii.end_to_end_id = 'E2E-HAPPY' AND p.amount = 100.00 AND p.currency = 'EUR' "
+                + "AND p.debtor_iban = 'DE89370400440532013000' AND p.creditor_iban = 'FR7630006000011234567890189'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM information_schema.columns "
+                + "WHERE table_schema IN ('payment','iso') AND column_name IN ('pmt_mtd','ctrl_sum','nb_of_txs')"))
+                .as("VALIDATE_ONLY fields must not be persisted as domain columns")
+                .isZero();
         assertThat(count("SELECT count(*) FROM payment.payment_status_history h "
                 + "JOIN iso.payment_iso_identifiers pii ON pii.payment_id = h.payment_id "
                 + "WHERE pii.end_to_end_id = 'E2E-HAPPY' AND h.seq = 1 AND h.from_status IS NULL "
@@ -132,6 +148,38 @@ class Pain001SubmissionEndpointTest {
                 + "JOIN payment.payment_status_history h ON h.event_ref = e.id "
                 + "JOIN iso.payment_iso_identifiers pii ON pii.payment_id = h.payment_id "
                 + "WHERE pii.end_to_end_id = 'E2E-HAPPY'")).isEqualTo(1);
+    }
+
+    @Test
+    void malformedSignatureRejectsWithoutCreatingPayment() throws Exception {
+        byte[] xml = pain001("MSG-MALFORMED", "PMTINF-MALFORMED", "E2E-MALFORMED", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+
+        mockMvc.perform(pain001Request(UUID.randomUUID(), xml, new byte[] {1, 2, 3}, UUID.randomUUID().toString()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorCode").value("SIGNATURE_FAILED"))
+                .andExpect(jsonPath("$.profileOutcome").value("MALFORMED_SIGNATURE"));
+
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-MALFORMED'")).isZero();
+        assertThat(count("SELECT count(*) FROM iso.iso_message_parse_errors")).isZero();
+        assertThat(count("SELECT count(*) FROM signature.signature_verification_events WHERE verdict = 'FAILED'"))
+                .isEqualTo(1);
+    }
+
+    @Test
+    void unknownSignerRejectsWithoutCreatingPayment() throws Exception {
+        byte[] xml = pain001("MSG-UNKNOWN", "PMTINF-UNKNOWN", "E2E-UNKNOWN", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+        UUID unregisteredSigner = UUID.randomUUID();
+
+        mockMvc.perform(pain001Request(UUID.randomUUID(), xml, sign(xml), UUID.randomUUID().toString(),
+                        unregisteredSigner))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorCode").value("SIGNATURE_FAILED"))
+                .andExpect(jsonPath("$.profileOutcome").value("UNKNOWN_SIGNER"));
+
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-UNKNOWN'")).isZero();
+        assertThat(count("SELECT count(*) FROM iso.iso_message_parse_errors")).isZero();
     }
 
     @Test
@@ -311,6 +359,134 @@ class Pain001SubmissionEndpointTest {
     }
 
     @Test
+    void sameIdempotencyKeyDifferentTenantsRemainIsolated() throws Exception {
+        String idempotencyKey = "shared-key-" + UUID.randomUUID();
+        UUID tenantOne = UUID.randomUUID();
+        UUID tenantTwo = UUID.randomUUID();
+        byte[] first = pain001("MSG-TENANT-1", "PMTINF-TENANT-1", "E2E-TENANT-1", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] second = pain001("MSG-TENANT-2", "PMTINF-TENANT-2", "E2E-TENANT-2", "20.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+
+        String firstLocation = mockMvc.perform(pain001Request(tenantOne, first, sign(first), idempotencyKey))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+        String secondLocation = mockMvc.perform(pain001Request(tenantTwo, second, sign(second), idempotencyKey))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+
+        assertThat(secondLocation).isNotEqualTo(firstLocation);
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-TENANT-1'"))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-TENANT-2'"))
+                .isEqualTo(1);
+    }
+
+    @Test
+    void concurrentSameIdempotencyKeySubmissionsCreateOnePayment() throws Exception {
+        byte[] xml = pain001("MSG-CONCURRENT", "PMTINF-CONCURRENT", "E2E-CONCURRENT", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+        String idempotencyKey = UUID.randomUUID().toString();
+        UUID tenantId = UUID.randomUUID();
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        CountDownLatch start = new CountDownLatch(1);
+        Callable<String> submit = () -> {
+            start.await();
+            return mockMvc.perform(pain001Request(tenantId, xml, sign(xml), idempotencyKey))
+                    .andExpect(status().isCreated())
+                    .andReturn().getResponse().getHeader("Location");
+        };
+        try {
+            Future<String> first = executor.submit(submit);
+            Future<String> second = executor.submit(submit);
+            start.countDown();
+            assertThat(first.get()).isEqualTo(second.get());
+            assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-CONCURRENT'"))
+                    .isEqualTo(1);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void failedSignatureDoesNotConsumeIdempotencyKey() throws Exception {
+        byte[] xml = pain001("MSG-RETRY", "PMTINF-RETRY", "E2E-RETRY", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+        String idempotencyKey = UUID.randomUUID().toString();
+        UUID tenantId = UUID.randomUUID();
+
+        mockMvc.perform(pain001Request(tenantId, xml, null, idempotencyKey))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorCode").value("SIGNATURE_FAILED"));
+
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys WHERE idem_key = '" + idempotencyKey + "'"))
+                .isZero();
+
+        mockMvc.perform(pain001Request(tenantId, xml, sign(xml), idempotencyKey))
+                .andExpect(status().isCreated());
+
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-RETRY'")).isEqualTo(1);
+    }
+
+    @Test
+    void mappingFailureDoesNotConsumeIdempotencyKey() throws Exception {
+        String idempotencyKey = UUID.randomUUID().toString();
+        UUID tenantId = UUID.randomUUID();
+        byte[] invalid = pain001("MSG-MAP-FAIL", "PMTINF-MAP-FAIL", "E2E-MAP-FAIL", "10.00", "EUR")
+                .replace("<CtrlSum>10.00</CtrlSum>", "<CtrlSum>9.00</CtrlSum>")
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] valid = pain001("MSG-MAP-OK", "PMTINF-MAP-OK", "E2E-MAP-OK", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+
+        mockMvc.perform(pain001Request(tenantId, invalid, sign(invalid), idempotencyKey))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorCode").value("INVALID_FIELD_FORMAT"));
+
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys WHERE source_id = '" + tenantId + "' "
+                + "AND idem_key = '" + idempotencyKey + "'")).isZero();
+        assertThat(count("SELECT count(*) FROM payment.payments")).isZero();
+
+        mockMvc.perform(pain001Request(tenantId, valid, sign(valid), idempotencyKey))
+                .andExpect(status().isCreated());
+
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-MAP-OK'")).isEqualTo(1);
+    }
+
+    @Test
+    void replayAfterApprovalKeepsOriginalAcceptedOutcome() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        addBroadApprovalRule(tenantId);
+        byte[] xml = pain001("MSG-REPLAY-202", "PMTINF-REPLAY-202", "E2E-REPLAY-202", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+        String idempotencyKey = UUID.randomUUID().toString();
+
+        var firstResponse = mockMvc.perform(pain001Request(tenantId, xml, sign(xml), idempotencyKey))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.paymentId").exists())
+                .andExpect(jsonPath("$.approvalStatus").value("PENDING_APPROVAL"))
+                .andReturn();
+        String firstLocation = firstResponse.getResponse().getHeader("Location");
+        String paymentId = firstLocation.substring(firstLocation.lastIndexOf('/') + 1);
+
+        mockMvc.perform(post("/api/v1/payments/" + paymentId + "/approve")
+                        .with(jwt().jwt(jwt -> jwt.claim("tenant_id", tenantId.toString()).subject("checker-subject"))
+                                .authorities(() -> "ROLE_payment_approver"))
+                        .header("Idempotency-Key", UUID.randomUUID().toString())
+                        .contentType("application/json"))
+                .andExpect(status().isOk());
+
+        var replayResponse = mockMvc.perform(pain001Request(tenantId, xml, sign(xml), idempotencyKey))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.paymentId").value(paymentId))
+                .andExpect(jsonPath("$.approvalStatus").value("PENDING_APPROVAL"))
+                .andReturn();
+
+        assertThat(replayResponse.getResponse().getHeader("Location")).isEqualTo(firstLocation);
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-REPLAY-202'"))
+                .isEqualTo(1);
+    }
+
+    @Test
     void unauthorizedRoleIsRejected() throws Exception {
         byte[] xml = pain001("MSG-ROLE", "PMTINF-ROLE", "E2E-ROLE", "10.00", "EUR").getBytes(StandardCharsets.UTF_8);
         UUID tenantId = UUID.randomUUID();
@@ -330,11 +506,16 @@ class Pain001SubmissionEndpointTest {
 
     private org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder pain001Request(UUID tenantId,
             byte[] xml, byte[] signature, String idempotencyKey) {
+        return pain001Request(tenantId, xml, signature, idempotencyKey, participantId);
+    }
+
+    private org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder pain001Request(UUID tenantId,
+            byte[] xml, byte[] signature, String idempotencyKey, UUID signerId) {
         var request = post("/api/v1/iso/pain001")
                 .with(jwt().jwt(jwt -> jwt.claim("tenant_id", tenantId.toString()))
                         .authorities(() -> "ROLE_payment_submitter"))
                 .header("Idempotency-Key", idempotencyKey)
-                .header("X-Signer-Id", participantId.toString())
+                .header("X-Signer-Id", signerId.toString())
                 .contentType("application/xml")
                 .content(xml);
         return signature == null ? request : request.header("X-Signature", Base64.getEncoder().encodeToString(signature));
@@ -372,6 +553,22 @@ class Pain001SubmissionEndpointTest {
                   </CstmrCdtTrfInitn>
                 </Document>
                 """.formatted(msgId, pmtInfId, amount, endToEndId, currency, amount);
+    }
+
+    private static void addBroadApprovalRule(UUID tenantId) throws Exception {
+        try (Connection connection = DriverManager.getConnection(POSTGRES.getJdbcUrl(), "reference_data_role",
+                "dev-only-reference-data");
+                PreparedStatement guc = connection.prepareStatement("SELECT set_config('app.tenant_id', ?, false)");
+                PreparedStatement insert = connection.prepareStatement("""
+                        INSERT INTO reference_data.approval_matrix_rules
+                            (tenant_id, requires_approval, requires_step_up, valid_from)
+                        VALUES (?, true, false, CURRENT_DATE)
+                        """)) {
+            guc.setString(1, tenantId.toString());
+            guc.execute();
+            insert.setObject(1, tenantId);
+            insert.executeUpdate();
+        }
     }
 
     private static int count(String sql) throws Exception {

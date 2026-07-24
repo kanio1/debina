@@ -5,6 +5,11 @@ package com.sepanexus.signature;
  * HTTP request body bytes before parsing or normalization; verification runs before parse (BR-SCT-003).
  * HTTP header names and signer-identifier transport are implementation evidence only — not a frozen
  * public contract (E1-DEVELOPMENT-ADMISSION).
+ * <p>
+ * Educational limitation: inactive, expired or revoked/unavailable keys currently collapse to
+ * {@link ProfileOutcome#UNKNOWN_SIGNER}; {@link ProfileOutcome#EXPIRED_KEY} and
+ * {@link ProfileOutcome#REVOKED_KEY} are reserved and not independently emitted yet. Production
+ * differentiation remains {@code BLOCKED_FOR_PRODUCTION}.
  */
 public final class DetachedEd25519ProfileV1 {
 
@@ -29,9 +34,6 @@ public final class DetachedEd25519ProfileV1 {
     public static ProfileOutcome toProfileOutcome(Verdict verdict) {
         if (verdict.result() == Verdict.Result.VERIFIED) {
             return ProfileOutcome.VERIFIED;
-        }
-        if (verdict.result() == Verdict.Result.NOT_APPLICABLE) {
-            return ProfileOutcome.MISSING_SIGNATURE;
         }
         if (verdict.result() == Verdict.Result.NOT_APPLICABLE) {
             return ProfileOutcome.MISSING_SIGNATURE;

@@ -1,0 +1,25 @@
+---
+description: Cross-cutting risk-based test allocation and runtime-proof rules.
+globs:
+  - "backend/src/test/**"
+  - "frontend/**/*.test.*"
+  - "frontend/**/*.spec.*"
+  - "frontend/e2e/**"
+  - "dagger/**"
+  - "tools/**/tests/**"
+  - "**/*Test.java"
+  - "**/playwright.config.*"
+  - "docs/testing/**"
+alwaysApply: false
+---
+
+# Test allocation
+
+- Read `docs/testing/SEPA-PAYMENT-TEST-ALLOCATION-MATRIX.md`.
+- One behavior has one primary test layer.
+- Add a secondary layer only when it proves a different risk.
+- Use Testcontainers for backend integration dependencies.
+- Use Dagger for composed runtime proof.
+- Use Playwright only for browser, session, and admitted actor-journey wiring.
+- Do not duplicate backend validation cases in browser tests.
+- Never claim a test passed unless the exact command ran successfully.
