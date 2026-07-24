@@ -11,7 +11,7 @@ Debina is a synthetic, enterprise-grade SEPA/ISO 20022 payment-processing resear
 - Evolve the modular monolith through [the architecture method](docs/architecture/ARCHITECTURE-METHOD.md); modules/adapters, aggregates, and ADRs require their respective admission/lifecycle records.
 - GraphQL is a thin, source-owned, Query-only operational-read adapter; REST/gRPC own commands. Playwright is one validation layer; follow ADR-N16 sequencing.
 - Feature expansion is paused by [the rebase program](planning/programs/DEBINA-ENTERPRISE-REBASE-PROGRAM.md) until its governance phases complete.
-- Business work is use-case-first: apply `enterprise-use-case-engineering` before new/material business planning, `source-backed-payments-modeling` for external payment semantics, `architecture-evolution-review` for boundary changes, and `planning-semantic-integrity` before marking planning complete. New/materially changed stories use explicit `ENFORCED` metadata; legacy stories migrate gradually.
+- Business work is use-case-first: apply `enterprise-use-case-engineering` before new/material business planning, beginning with its source-discovery gate; apply `source-backed-payments-modeling` for external payment semantics, `architecture-evolution-review` for boundary changes, and `planning-semantic-integrity` before marking planning complete. New/materially changed stories use explicit `ENFORCED` metadata and are not READY without a behavioral slice and executable verify; legacy stories migrate gradually.
 
 ## Map
 
