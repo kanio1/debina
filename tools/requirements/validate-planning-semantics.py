@@ -7,6 +7,8 @@ import re
 import sys
 from pathlib import Path
 
+import yaml
+
 from validation_common import ROOT, diagnostic, finish, ids_from_catalog, list_value, story_blocks
 
 BLOCKING_SOURCE = {
@@ -39,25 +41,42 @@ def catalog_records(path: Path, prefix: str) -> dict[str, str]:
     return records
 
 
-def evidence_records(root: Path) -> dict[str, dict[str, object]]:
+def evidence_records(
+    root: Path, overrides: list[dict[str, object]] | None = None
+) -> dict[str, dict[str, object]]:
     path = root / "docs/standards/SOURCE-EVIDENCE-CATALOG.yaml"
-    text = path.read_text(encoding="utf-8")
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    registry_data = yaml.safe_load(
+        (root / "docs/standards/SOURCE-REGISTRY.yaml").read_text(encoding="utf-8")
+    )
+    registry = {
+        item["id"]: item for item in registry_data.get("sources", [])
+    }
     records: dict[str, dict[str, object]] = {}
-    blocks = re.split(r"(?=^\s*- id:\s*SE-)", text, flags=re.M)
-    for block in blocks:
-        identifier = re.search(r"^\s*- id:\s*(SE-[A-Z0-9-]+)", block, re.M)
-        if not identifier:
-            continue
-        version = re.search(r"^\s*document_version:\s*(.+)$", block, re.M)
-        rules = re.search(r"^\s*applicable_rules:\s*\[([^]]*)\]", block, re.M)
-        records[identifier.group(1)] = {
-            "version": version.group(1).strip() if version else "",
-            "rules": set(list_value(rules.group(1) if rules else "")),
+    entries = list(data.get("evidence", []))
+    for override in overrides or []:
+        entries = [item for item in entries if item.get("id") != override.get("id")]
+        entries.append(override)
+    for item in entries:
+        source_id = str(item.get("source_registry_id", ""))
+        authority = registry.get(source_id, {})
+        records[str(item["id"])] = {
+            "version": str(item.get("document_version", "")),
+            "rules": set(item.get("applicable_rules", []) or []),
+            "status": str(item.get("evidence_status", "")),
+            "superseded_by": str(item.get("superseded_by", "")),
+            "method": str(item.get("verification_method", "")),
+            "source_registry_id": source_id,
+            "source_tag": str(authority.get("tag", "")),
+            "source_authority": str(authority.get("authority", "")),
+            "restriction": str(item.get("public_or_restricted", "")),
         }
     return records
 
 
-def reference_data(root: Path) -> dict[str, object]:
+def reference_data(
+    root: Path, evidence_overrides: list[dict[str, object]] | None = None
+) -> dict[str, object]:
     use_cases = catalog_records(root / "docs/requirements/USE-CASE-CATALOG.yaml", "UC")
     processes = ids_from_catalog(root / "docs/requirements/BUSINESS-PROCESS-CATALOG.yaml", "BP")
     rules = ids_from_catalog(root / "docs/requirements/BUSINESS-RULE-CATALOG.yaml", "BR")
@@ -82,7 +101,7 @@ def reference_data(root: Path) -> dict[str, object]:
         "rules": rules,
         "quality": quality,
         "modules": modules,
-        "evidence": evidence_records(root),
+        "evidence": evidence_records(root, evidence_overrides),
     }
 
 
@@ -173,13 +192,69 @@ def enforced_readiness_errors(
             errors.append(("ESR-015", f"READY conflicts with {source_classification}"))
         if refs["use_case_status"].get(use_case) == "SOURCE_BLOCKED":
             errors.append(("ESR-015", f"READY references source-blocked use case {use_case}"))
-        if source_classification == "SOURCE_CONFIRMED":
-            unresolved = [
-                item for item in evidence_ids
-                if "VERIFY_PER_USE" in str(evidence.get(item, {}).get("version", ""))
+        for evidence_id in evidence_ids:
+            record = evidence.get(evidence_id, {})
+            evidence_status = str(record.get("status", ""))
+            superseded_by = str(record.get("superseded_by", ""))
+            project_authority = (
+                record.get("source_tag") == "PROJECT-ADR"
+                and record.get("method") == "PROJECT_ADR"
+                and "project ADR" in str(record.get("source_authority", ""))
+            )
+            if evidence_status == "STALE" or superseded_by not in {
+                "", "NONE", "UNKNOWN"
+            }:
+                errors.append((
+                    "ESR-019",
+                    f"evidence {evidence_id} is stale or superseded by {superseded_by}",
+                ))
+            elif evidence_status in {
+                "VERIFY_PER_USE", "INCOMPLETE", "CONFLICTING", "RESTRICTED"
+            } and source_classification != "SOURCE_CONFIRMED" and not (
+                source_classification == "PROJECT_INTERPRETATION"
+                and evidence_status == "INCOMPLETE"
+                and project_authority
+            ):
+                errors.append((
+                    "ESR-018",
+                    f"evidence {evidence_id} is not VERIFIED ({evidence_status})",
+                ))
+            if source_classification == "SOURCE_CONFIRMED":
+                if evidence_status not in {"VERIFIED", "STALE"}:
+                    errors.append((
+                        "ESR-018",
+                        f"SOURCE_CONFIRMED requires VERIFIED evidence {evidence_id}",
+                    ))
+                if project_authority:
+                    errors.append((
+                        "ESR-020",
+                        f"SOURCE_CONFIRMED conflicts with project authority {evidence_id}",
+                    ))
+        if source_classification == "PROJECT_INTERPRETATION":
+            project_authorities = [
+                evidence_id
+                for evidence_id in evidence_ids
+                if (
+                    evidence.get(evidence_id, {}).get("source_tag") == "PROJECT-ADR"
+                    and evidence.get(evidence_id, {}).get("method") == "PROJECT_ADR"
+                    and "project ADR"
+                    in str(evidence.get(evidence_id, {}).get("source_authority", ""))
+                )
             ]
-            if unresolved:
-                errors.append(("ESR-015", "READY/SOURCE_CONFIRMED uses VERIFY_PER_USE evidence"))
+            if not project_authorities:
+                errors.append((
+                    "ESR-021",
+                    "PROJECT_INTERPRETATION evidence "
+                    f"{','.join(evidence_ids)} lacks accepted/frozen project authority",
+                ))
+        if source_classification == "PROJECT_SIMULATION":
+            boundary = meta.get("synthetic_boundary", "").strip()
+            if not boundary or PLACEHOLDER.search(boundary):
+                errors.append((
+                    "ESR-022",
+                    "PROJECT_SIMULATION evidence "
+                    f"{','.join(evidence_ids)} lacks explicit synthetic_boundary",
+                ))
 
     status = meta.get("status", "").strip().strip("*")
     if status == "done" and re.search(r"\bNOT RUN\b", block, re.I):
@@ -193,7 +268,8 @@ def enforced_readiness_errors(
 def validate_fixture(path: Path) -> int:
     fixture = json.loads(path.read_text(encoding="utf-8"))
     meta = {key: str(value) for key, value in fixture["meta"].items()}
-    errors = enforced_readiness_errors(meta, fixture.get("body", ""), reference_data(ROOT))
+    refs = reference_data(ROOT, fixture.get("evidence_overrides", []))
+    errors = enforced_readiness_errors(meta, fixture.get("body", ""), refs)
     for code, message in errors:
         diagnostic("ERROR", code, path, fixture.get("id", "fixture"), "ENFORCED", message)
     return finish(len(errors), 0, validated_fixtures=1)

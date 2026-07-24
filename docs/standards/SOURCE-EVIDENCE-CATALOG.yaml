@@ -16,6 +16,14 @@ evidence:
     project_interpretation: Debina records source lineage before its project-specific approval/release decision.
     applicable_rules: [BR-SCT-001]
     confidence: MEDIUM
+    evidence_status: VERIFY_PER_USE
+    last_verified_date: UNKNOWN
+    next_review_date: NOT_SCHEDULED
+    effective_from: UNKNOWN
+    effective_until: UNKNOWN
+    superseded_by: NONE
+    verification_method: OTHER
+    reviewer: NOT_RECORDED
   - id: SE-ISO-STATUS-001
     source_registry_id: iso20022-catalogue
     document_title: ISO 20022 catalogue and Financial Repository
@@ -34,6 +42,14 @@ evidence:
     project_interpretation: Debina preserves separate message, business, transport, ISO and finality axes during correlation.
     applicable_rules: [BR-STATUS-001, BR-STATUS-002]
     confidence: MEDIUM
+    evidence_status: INCOMPLETE
+    last_verified_date: UNKNOWN
+    next_review_date: NOT_SCHEDULED
+    effective_from: UNKNOWN
+    effective_until: UNKNOWN
+    superseded_by: NONE
+    verification_method: OTHER
+    reviewer: NOT_RECORDED
   - id: SE-PROJECT-APPROVAL-001
     source_registry_id: project-adr-n10
     document_title: Debina accepted payment lifecycle and idempotency decision
@@ -49,6 +65,14 @@ evidence:
     project_interpretation: Approval behavior applies only where Debina's configured policy requires it.
     applicable_rules: [BR-SCT-002, BR-APPROVAL-001, BR-APPROVAL-002, BR-APPROVAL-003, BR-APPROVAL-004, BR-APPROVAL-005, BR-APPROVAL-006, BR-APPROVAL-007, BR-APPROVAL-008]
     confidence: HIGH
+    evidence_status: INCOMPLETE
+    last_verified_date: UNKNOWN
+    next_review_date: NOT_SCHEDULED
+    effective_from: UNKNOWN
+    effective_until: OPEN
+    superseded_by: NONE
+    verification_method: PROJECT_ADR
+    reviewer: NOT_RECORDED
   - id: SE-SCTINST-001
     source_registry_id: epc-sct-inst
     document_title: EPC SEPA Instant Credit Transfer scheme material
@@ -64,3 +88,11 @@ evidence:
     project_interpretation: Rail deadline and liquidity details remain source- or participant-documentation-blocked.
     applicable_rules: [BR-SCTINST-001]
     confidence: MEDIUM
+    evidence_status: VERIFY_PER_USE
+    last_verified_date: UNKNOWN
+    next_review_date: NOT_SCHEDULED
+    effective_from: UNKNOWN
+    effective_until: UNKNOWN
+    superseded_by: NONE
+    verification_method: OTHER
+    reviewer: NOT_RECORDED
