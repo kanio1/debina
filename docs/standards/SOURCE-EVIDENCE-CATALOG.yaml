@@ -14,6 +14,7 @@ evidence:
     access_date: 2026-07-21
     supported_claim: SCT-specific admission constraints require the applicable EPC rulebook/profile rather than current Debina code.
     project_interpretation: Debina records source lineage before its project-specific approval/release decision.
+    applicable_rules: [BR-SCT-001]
     confidence: MEDIUM
   - id: SE-ISO-STATUS-001
     source_registry_id: iso20022-catalogue
@@ -31,6 +32,7 @@ evidence:
     access_date: 2026-07-21
     supported_claim: A status message must be interpreted with its applicable message definition and profile; the catalogue hierarchy alone does not establish a lifecycle transition.
     project_interpretation: Debina preserves separate message, business, transport, ISO and finality axes during correlation.
+    applicable_rules: [BR-STATUS-001, BR-STATUS-002]
     confidence: MEDIUM
   - id: SE-PROJECT-APPROVAL-001
     source_registry_id: project-adr-n10
@@ -45,6 +47,7 @@ evidence:
     access_date: 2026-07-21
     supported_claim: Debina's maker-checker, idempotency and atomic-audit behavior is project policy, not EPC or ISO truth.
     project_interpretation: Approval behavior applies only where Debina's configured policy requires it.
+    applicable_rules: [BR-SCT-002, BR-APPROVAL-001, BR-APPROVAL-002, BR-APPROVAL-003, BR-APPROVAL-004, BR-APPROVAL-005, BR-APPROVAL-006, BR-APPROVAL-007, BR-APPROVAL-008]
     confidence: HIGH
   - id: SE-SCTINST-001
     source_registry_id: epc-sct-inst
@@ -59,4 +62,5 @@ evidence:
     access_date: 2026-07-21
     supported_claim: Generic SCT Inst does not establish participant-specific RT1, TIPS or STET processing behavior.
     project_interpretation: Rail deadline and liquidity details remain source- or participant-documentation-blocked.
+    applicable_rules: [BR-SCTINST-001]
     confidence: MEDIUM

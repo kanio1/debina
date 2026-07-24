@@ -16,8 +16,18 @@ The next governance goal implements deterministic checks with a stable diagnosti
 | SV-10 | source-backed rule lacks source reference | tag/registry-key check; error |
 | SV-11 | stale “capability does not exist” claim | compare tagged claims against implementation/capability evidence; warning requiring review |
 | SV-12 | duplicate capability ownership | graph/catalog owner uniqueness; error |
+| ESR-001–006 | ENFORCED story lacks a real use case, slice, process, actor goal or stable flow | resolve exact identifiers against the current catalogues; error |
+| ESR-007–009 | ENFORCED story lacks source classification, per-claim evidence or evidence-backed rules | registry presence alone is insufficient; error |
+| ESR-010–013 | ENFORCED story lacks module ownership, architecture, security or quality realization | resolve module and quality IDs; error |
+| ESR-014–016 | verify is a placeholder, READY has an unresolved source gap, or done retains `NOT RUN` | fail closed with the exact diagnostic; error |
+| ESR-017 | technical-only work invents a business use case/slice | route to a quality, architecture, infrastructure or governance scenario; error |
 
 Start with SV-01–SV-05 as deterministic extensions of existing validators, retain exemptions only with reason/expiry, and never infer domain truth from a grep hit alone.
+
+The `ESR-*` rules are active only for the explicit
+`semantic_enforcement: ENFORCED` marker. Focused fixtures exercise both a valid
+record and every fail-closed class. This is gradual enforcement: it does not
+silently rewrite or upgrade legacy stories.
 
 ## Baseline audit — 2026-07-21
 

@@ -1,0 +1,23 @@
+{
+  "id": "stale-reference",
+  "meta": {
+    "semantic_enforcement": "ENFORCED",
+    "status": "not-started",
+    "readiness": "READY",
+    "use_case_id": "UC-SCT-APPROVAL-001",
+    "slice_id": "[UCS-SCT-APPROVAL-001-Z]",
+    "business_process_id": "BP-03",
+    "actor_or_external_system": "payment-approver",
+    "actor_goal": "decide a pending approval",
+    "main_flow": "BF-3",
+    "source_classification": "PROJECT_INTERPRETATION",
+    "source_evidence": "[SE-PROJECT-APPROVAL-001]",
+    "applicable_rules": "[BR-APPROVAL-002]",
+    "module_owner": "payment-lifecycle",
+    "architecture_realization": "payment-lifecycle approval command port",
+    "security_context": "payment_approver tenant and branch scope",
+    "quality_scenarios": "[QS-SEC-01]",
+    "executable_verify": "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest"
+  },
+  "body": ""
+}

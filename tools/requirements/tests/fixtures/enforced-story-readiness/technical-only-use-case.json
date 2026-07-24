@@ -1,0 +1,24 @@
+{
+  "id": "technical-only-use-case",
+  "meta": {
+    "semantic_enforcement": "ENFORCED",
+    "status": "not-started",
+    "readiness": "READY",
+    "work_type": "TECHNICAL_ONLY",
+    "use_case_id": "UC-SCT-APPROVAL-001",
+    "slice_id": "[UCS-SCT-APPROVAL-001-D]",
+    "business_process_id": "BP-03",
+    "actor_or_external_system": "developer",
+    "actor_goal": "rename a repository",
+    "main_flow": "BF-3",
+    "source_classification": "PROJECT_INTERPRETATION",
+    "source_evidence": "[SE-PROJECT-APPROVAL-001]",
+    "applicable_rules": "[BR-APPROVAL-002]",
+    "module_owner": "payment-lifecycle",
+    "architecture_realization": "rename a private repository",
+    "security_context": "no security behavior change",
+    "quality_scenarios": "[QS-SEC-01]",
+    "executable_verify": "./mvnw -f backend test"
+  },
+  "body": ""
+}
