@@ -10,9 +10,9 @@ The model keeps business lifecycle, ISO/message, settlement finality, transport/
 |---|---|---|
 | PaymentOrder | CURRENT-REPRESENTATION-SUFFICIENT | independent identity/lifecycle/commands/invariants exist in `payment.payments`; do not split absent a use-case and source-backed invariant |
 | PaymentInstruction | DEFER | external/business instruction has identity but no demonstrated separate command, consistency or recovery boundary |
-| PaymentGroup | INSUFFICIENT-EVIDENCE | ISO group semantics exist, but no file/group invariant or persistence requirement is implemented; define in file-use-case first |
-| PaymentBatch | RAIL-SPECIFIC | do not normalize file, CSM submission and settlement batch; admit only with rail-specific invariant evidence |
-| ClearingSubmission | RAIL-SPECIFIC | independent lifecycle likely only where applicable CSM evidence and submission recovery contract exist |
+| PaymentGroup | INSUFFICIENT_EVIDENCE | ISO group semantics exist, but no file/group invariant or persistence requirement is implemented; define in file-use-case first |
+| PaymentBatch | RAIL_SPECIFIC | do not normalize file, CSM submission and settlement batch; admit only with rail-specific invariant evidence |
+| ClearingSubmission | RAIL_SPECIFIC | independent lifecycle likely only where applicable CSM evidence and submission recovery contract exist |
 | TransportFile | DO-NOT-ADMIT | technical artifact; egress can own transport state without a business aggregate unless file recovery invariant is proven |
 | Case | DEFER | likely independent lifecycle/commands, but its business rule/source profile and owner are not built |
 | SettlementCycle | ADMIT | independent identity, cycle commands, positions, recovery and persistence exist in `settlement.settlement_cycles` [PROJECT-ADR: ADR-N13] |

@@ -11,8 +11,8 @@ Validated payment and configured candidate data exist. Minimal: no route is sele
 ## Main success scenario
 1. Debina receives a route request. 2. It reads applicable scheme/profile candidates. 3. It evaluates reachability, cutoff, settlement basis and liquidity mode. 4. It records outcome/reason. 5. It returns selected route or fail-closed result.
 ## Extensions and failures
-3a no candidate eligible: fail closed with reason. 3b fallback applies only by configured rule identity. 2a participant policy absent: SOURCE-BLOCKED.
+3a no candidate eligible: fail closed with reason. 3b fallback applies only by configured rule identity. 2a participant policy absent: SOURCE_BLOCKED.
 ## Rules/sources/rails
-BR-ROUTING-001/002; `[EPC-SCT]`, `[EPC-SCT-INST]`, `[PROJECT-ADR] project-adr-n10`. SCT/SCT Inst APPLICABLE-WITH-RAIL-EXTENSION; STEP2/RT1/TIPS/STET PARTICIPANT-DOCUMENTATION-REQUIRED. ISO hierarchy: payment transaction → route decision; no message definition is the goal.
+BR-ROUTING-001/002; `[EPC-SCT]`, `[EPC-SCT-INST]`, `[PROJECT-ADR] project-adr-n10`. SCT/SCT Inst APPLICABLE-WITH-RAIL-EXTENSION; STEP2/RT1/TIPS/STET PARTICIPANT_DOCUMENTATION_REQUIRED. ISO hierarchy: payment transaction → route decision; no message definition is the goal.
 ## Quality/data/architecture
-QS-MOD-01/QS-SEC-01; routing schema owns decision, reference-data owns profile, no cross-owner writes. Command FallbackDecisionCommand; query candidates; route evidence event. `CURRENT-ARCHITECTURE-SUFFICIENT`; ATAM sensitivity is strategy identity, risk participant policy. Slices A select eligible route (CAPABILITY-BLOCKED), B fail closed (READY-CANDIDATE). Example Mapping: eligible/no eligible/fallback; question participant reachability; out rail invention. EPIC-51–55; coverage partial; no volume target.
+QS-MOD-01/QS-SEC-01; routing schema owns decision, reference-data owns profile, no cross-owner writes. Command FallbackDecisionCommand; query candidates; route evidence event. `CURRENT_ARCHITECTURE_SUFFICIENT`; ATAM sensitivity is strategy identity, risk participant policy. Slices A select eligible route (CAPABILITY-BLOCKED), B fail closed (READY-CANDIDATE). Example Mapping: eligible/no eligible/fallback; question participant reachability; out rail invention. EPIC-51–55; coverage partial; no volume target.

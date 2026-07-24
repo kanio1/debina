@@ -25,7 +25,7 @@ executable_verify
 The semantic validator resolves those identifiers against the current use-case,
 process, rule, evidence, module and quality-scenario catalogues. `READY` is
 rejected when a source result is blocking, a referenced use case is
-`SOURCE-BLOCKED`, or `SOURCE_CONFIRMED` relies on evidence whose version remains
+`SOURCE_BLOCKED`, or `SOURCE_CONFIRMED` relies on evidence whose version remains
 `VERIFY-PER-USE`. A registry entry is discovery metadata, not per-claim
 evidence. Placeholder verification and `done` with current `NOT RUN` evidence
 are errors.

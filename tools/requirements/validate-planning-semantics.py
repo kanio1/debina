@@ -14,7 +14,7 @@ BLOCKING_SOURCE = {
     "INSUFFICIENT_EVIDENCE",
     "CONFLICTING_SOURCES",
     "PARTICIPANT_DOCUMENTATION_REQUIRED",
-    "VERIFY-PER-USE",
+    "VERIFY_PER_USE",
 }
 SOURCE_CLASSIFICATIONS = {
     "SOURCE_CONFIRMED",
@@ -171,15 +171,15 @@ def enforced_readiness_errors(
     if readiness == "READY":
         if source_classification in BLOCKING_SOURCE:
             errors.append(("ESR-015", f"READY conflicts with {source_classification}"))
-        if refs["use_case_status"].get(use_case) == "SOURCE-BLOCKED":
+        if refs["use_case_status"].get(use_case) == "SOURCE_BLOCKED":
             errors.append(("ESR-015", f"READY references source-blocked use case {use_case}"))
         if source_classification == "SOURCE_CONFIRMED":
             unresolved = [
                 item for item in evidence_ids
-                if "VERIFY-PER-USE" in str(evidence.get(item, {}).get("version", ""))
+                if "VERIFY_PER_USE" in str(evidence.get(item, {}).get("version", ""))
             ]
             if unresolved:
-                errors.append(("ESR-015", "READY/SOURCE_CONFIRMED uses VERIFY-PER-USE evidence"))
+                errors.append(("ESR-015", "READY/SOURCE_CONFIRMED uses VERIFY_PER_USE evidence"))
 
     status = meta.get("status", "").strip().strip("*")
     if status == "done" and re.search(r"\bNOT RUN\b", block, re.I):

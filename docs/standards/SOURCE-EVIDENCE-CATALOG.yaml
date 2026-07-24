@@ -5,7 +5,7 @@ evidence:
     source_registry_id: epc-sct
     document_title: EPC SEPA Credit Transfer Rulebook
     publisher: European Payments Council
-    document_version: VERIFY-PER-USE
+    document_version: VERIFY_PER_USE
     publication_date: UNKNOWN
     effective_date: UNKNOWN
     section: SECTION-NOT-AVAILABLE
@@ -53,7 +53,7 @@ evidence:
     source_registry_id: epc-sct-inst
     document_title: EPC SEPA Instant Credit Transfer scheme material
     publisher: European Payments Council
-    document_version: VERIFY-PER-USE
+    document_version: VERIFY_PER_USE
     publication_date: UNKNOWN
     effective_date: UNKNOWN
     section: SECTION-NOT-AVAILABLE

@@ -45,7 +45,7 @@ Before drafting or materially changing behavior:
    registry entry is discovery, not proof.
 3. Check publisher, version, publication/effective date, section,
    applicability/rail, access restriction and confidence. Treat
-   `VERIFY-PER-USE`, unknown dates/sections and restricted sources explicitly.
+   `VERIFY_PER_USE`, unknown dates/sections and restricted sources explicitly.
 4. Detect conflicts and never copy restricted participant content.
 5. Apply `source-backed-payments-modeling` to material payment semantics and
    consume one of `SOURCE_CONFIRMED`, `PROJECT_INTERPRETATION`,
@@ -108,7 +108,7 @@ A new/material business story uses `semantic_enforcement: ENFORCED`. It is not
 `source_classification`, `source_evidence`, `applicable_rules`, `module_owner`,
 `architecture_realization`, `security_context`, `quality_scenarios`, and
 `executable_verify`. A source-blocked use case, unresolved material source gap,
-`VERIFY-PER-USE` without claim evidence, placeholder verify, or unreviewed
+`VERIFY_PER_USE` without claim evidence, placeholder verify, or unreviewed
 material question blocks readiness. Legacy stories migrate gradually.
 
 ## Outputs and validation
@@ -136,3 +136,11 @@ Example: rename `PaymentRepository` → `PaymentStore` returns
 `NO_USE_CASE_CHANGE`. A 500 ms/1000 TPS target returns
 `QUALITY_SCENARIO_ONLY`. A new rejection path normally returns `ADD_FLOW`,
 then assesses whether an observable slice is needed.
+
+## Classification contract
+
+```yaml
+vocabulary: docs/governance/methodology-assurance/CLASSIFICATION-VOCABULARY.yaml
+consumes: [SOURCE_CONFIRMED, PROJECT_INTERPRETATION, PROJECT_SIMULATION, RAIL_SPECIFIC, INSUFFICIENT_EVIDENCE, CONFLICTING_SOURCES, PARTICIPANT_DOCUMENTATION_REQUIRED, VERIFY_PER_USE, CURRENT_ARCHITECTURE_SUFFICIENT, NEW_PUBLIC_PORT, NEW_READ_MODEL, NEW_INTEGRATION_CONTRACT, NEW_ADR_REQUIRED, BOUNDARY_REVIEW_REQUIRED, AGGREGATE_REVIEW_REQUIRED, QUALITY_EXPERIMENT_REQUIRED, NO_ARCHITECTURE_CHANGE, READY, BLOCKED, SOURCE_BLOCKED, DECISION_BLOCKED, CAPABILITY_BLOCKED, HUMAN_REVIEW_REQUIRED, NO_PLANNING_CHANGE]
+produces: [CREATE_USE_CASE, UPDATE_USE_CASE, ADD_FLOW, ADD_SLICE, LINK_EXISTING_SLICE, QUALITY_SCENARIO_ONLY, ARCHITECTURE_REVIEW_ONLY, SOURCE_BLOCKED, DECISION_BLOCKED, HUMAN_REVIEW_REQUIRED, NO_USE_CASE_CHANGE]
+```

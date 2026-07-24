@@ -11,6 +11,6 @@ methodology: {narrative: cockburn_fully_dressed, decomposition: use_case_2_0, ru
 ## Extensions/failures
 3a insufficient liquidity: release/no post. 4a failure: rollback partial effect. 5a duplicate/concurrent attempt: idempotent conflict handling. Rail timing is not inferred.
 ## Rules/sources/rails
-BR-SETTLEMENT-001/002; `[PROJECT-ADR] project-adr-n10`, `[EPC-SCT-INST]`; SCT Inst APPLICABLE-WITH-RAIL-EXTENSION; TIPS/RT1/STET SOURCE-BLOCKED; SCT/STEP2 NOT-APPLICABLE.
+BR-SETTLEMENT-001/002; `[PROJECT-ADR] project-adr-n10`, `[EPC-SCT-INST]`; SCT Inst APPLICABLE-WITH-RAIL-EXTENSION; TIPS/RT1/STET SOURCE_BLOCKED; SCT/STEP2 NOT-APPLICABLE.
 ## Quality/data/architecture
-QS-INT-02/QS-REL-01; settlement/ledger/payment owned schemas, LedgerPort-only money path, same transaction coordinator. `CURRENT-ARCHITECTURE-SUFFICIENT`; ATAM sensitivity transaction/role boundary, risk rail trigger evidence. A sufficient liquidity, CAPABILITY-BLOCKED; B insufficient liquidity, READY-CANDIDATE. Examples success/duplicate/race; out return reversal. EPIC-33/36; coverage project strategy.
+QS-INT-02/QS-REL-01; settlement/ledger/payment owned schemas, LedgerPort-only money path, same transaction coordinator. `CURRENT_ARCHITECTURE_SUFFICIENT`; ATAM sensitivity transaction/role boundary, risk rail trigger evidence. A sufficient liquidity, CAPABILITY-BLOCKED; B insufficient liquidity, READY-CANDIDATE. Examples success/duplicate/race; out return reversal. EPIC-33/36; coverage project strategy.

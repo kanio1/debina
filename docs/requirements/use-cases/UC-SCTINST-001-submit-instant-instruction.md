@@ -22,10 +22,10 @@ AF-3A. At BF-3, unsupported profile/version rejects with correlation; terminate.
 AF-4A. At BF-4, approval retains the instruction; rejoin outcome at BF-6.
 CF-5A. At BF-5, no eligible route fails closed; terminate. Rail timing/deadline is explicitly source-blocked.
 ## Rules, sources and rail applicability
-BR-SCTINST-001. `[EPC-SCT-INST]`, `[ISO20022]`; generic SCT Inst APPLICABLE; RT1/TIPS/STET APPLICABLE-WITH-RAIL-EXTENSION, named timing/submission rules SOURCE-BLOCKED; SCT/STEP2 NOT-APPLICABLE.
+BR-SCTINST-001. `[EPC-SCT-INST]`, `[ISO20022]`; generic SCT Inst APPLICABLE; RT1/TIPS/STET APPLICABLE-WITH-RAIL-EXTENSION, named timing/submission rules SOURCE_BLOCKED; SCT/STEP2 NOT-APPLICABLE.
 ## Special requirements and variations
 QS-INT-01/QS-SEC-01/QS-REL-01. Single transaction intent is not a TIPS/RT1 contract claim. Commands submit/route; sources payment/iso; no authoritative volume target.
 ## Architecture, ATAM and slices
-payment/routing/settlement participation; `CURRENT-ARCHITECTURE-SUFFICIENT` for project strategy, `QUALITY-EXPERIMENT-REQUIRED` for rail deadline. **A** accept eligible instant input, CAPABILITY-BLOCKED. **B** fail closed no route, READY-CANDIDATE. Examples valid, invalid amount/currency, duplicate key; question rail timeout; out batch/file.
+payment/routing/settlement participation; `CURRENT_ARCHITECTURE_SUFFICIENT` for project strategy, `QUALITY-EXPERIMENT-REQUIRED` for rail deadline. **A** accept eligible instant input, CAPABILITY-BLOCKED. **B** fail closed no route, READY-CANDIDATE. Examples valid, invalid amount/currency, duplicate key; question rail timeout; out batch/file.
 ## Traceability and open scope
 EPIC-19/33/35; runtime proof requires route plus finality evidence. Open rail profile semantics.

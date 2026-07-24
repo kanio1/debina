@@ -11,6 +11,6 @@ methodology: {narrative: cockburn_fully_dressed, decomposition: use_case_2_0, ru
 ## Extensions/failures
 2a profile absent: fail closed. 3a signing fails: no dispatch. 4a timeout: retry per profile; no finality update. 5a receipt semantics are rail-specific.
 ## Rules/sources/rails
-BR-EGRESS-001; ISO/project ADR; all clearing rails APPLICABLE-WITH-RAIL-EXTENSION or SOURCE-BLOCKED. TransportFile is not a clearing submission.
+BR-EGRESS-001; ISO/project ADR; all clearing rails APPLICABLE-WITH-RAIL-EXTENSION or SOURCE_BLOCKED. TransportFile is not a clearing submission.
 ## Quality/data/architecture
-QS-REL-02/QS-TRC-01; egress owns transport schema, signature key material; outbox boundary. `CURRENT-ARCHITECTURE-SUFFICIENT` for transport-only, render/receipt `SOURCE-BLOCKED`. A render/sign, CAPABILITY-BLOCKED; B delivery receipt, SOURCE-BLOCKED. Examples sign failure/timeout; out finality. EPIC-43–50.
+QS-REL-02/QS-TRC-01; egress owns transport schema, signature key material; outbox boundary. `CURRENT_ARCHITECTURE_SUFFICIENT` for transport-only, render/receipt `SOURCE_BLOCKED`. A render/sign, CAPABILITY-BLOCKED; B delivery receipt, SOURCE_BLOCKED. Examples sign failure/timeout; out finality. EPIC-43–50.

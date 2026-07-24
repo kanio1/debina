@@ -13,10 +13,10 @@ Tenant/profile and verification material are available. Minimal: raw source and 
 ## Extensions and failure flows
 3a. Signature fails: record verdict/evidence and reject; no mapping. 4a. Version/structure is unsupported: reject with preserved source correlation. 5a. Replay follows the idempotency model.
 ## Rules, sources and rail applicability
-BR-SCT-003. `[ISO20022] iso20022-catalogue`, `[EPC-SCT] epc-sct`; generic SCT APPLICABLE, SCT Inst APPLICABLE-WITH-RAIL-EXTENSION, named rail profiles PARTICIPANT-DOCUMENTATION-REQUIRED. ISO hierarchy: initiation/message/business envelope/pain.001; signature policy is project interpretation, not ISO scheme timing.
+BR-SCT-003. `[ISO20022] iso20022-catalogue`, `[EPC-SCT] epc-sct`; generic SCT APPLICABLE, SCT Inst APPLICABLE-WITH-RAIL-EXTENSION, named rail profiles PARTICIPANT_DOCUMENTATION_REQUIRED. ISO hierarchy: initiation/message/business envelope/pain.001; signature policy is project interpretation, not ISO scheme timing.
 ## Special requirements and variations
 QS-SEC-02, QS-TRC-01, QS-INT-01. Privacy: raw evidence access is source-owned. Data/commands: signature verification, ingress evidence, mapping; transaction boundary source-evidence-and-payment. Variations: unsigned JSON_DIRECT is out. No volume target.
 ## Architecture, ATAM and slices
-signature technical adapter, ingress/ISO/payment-lifecycle; `CURRENT-ARCHITECTURE-SUFFICIENT`, but profile rules are `SOURCE-BLOCKED`. ATAM sensitivity: verify-before-map; risk is false provenance. **A** verified signed input, CAPABILITY-BLOCKED; **B** failed signature, READY-CANDIDATE. Example Mapping: rule signature precedes mapping; examples valid/failed signature; question channel certificate profile; out: participant signature policy.
+signature technical adapter, ingress/ISO/payment-lifecycle; `CURRENT_ARCHITECTURE_SUFFICIENT`, but profile rules are `SOURCE_BLOCKED`. ATAM sensitivity: verify-before-map; risk is false provenance. **A** verified signed input, CAPABILITY-BLOCKED; **B** failed signature, READY-CANDIDATE. Example Mapping: rule signature precedes mapping; examples valid/failed signature; question channel certificate profile; out: participant signature policy.
 ## Traceability and open scope
 EPIC-26, EPIC-31 and Wave 12 checkpoint are evidence only (not completion proof). Test strategy signature/lineage proof. Open: exact scheme/profile applicability; out: Wave 12 implementation.

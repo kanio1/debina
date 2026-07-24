@@ -1,0 +1,63 @@
+version: 1
+canonical_style: UPPER_SNAKE_CASE
+model_behavior:
+  status: NOT_EXECUTED
+  reason: no approved safe model evaluator exposes reliable skill-selection evidence
+classifications:
+  - {value: SOURCE_CONFIRMED, domains: [source], meaning: current complete per-claim evidence supports the external claim, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [SOURCE-CONFIRMED]}
+  - {value: PROJECT_INTERPRETATION, domains: [source], meaning: accepted Debina authority establishes project behavior without external-authority claim, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [PROJECT-INTERPRETATION]}
+  - {value: PROJECT_SIMULATION, domains: [source], meaning: explicitly synthetic laboratory behavior with no participant claim, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [PROJECT-SIMULATION]}
+  - {value: RAIL_SPECIFIC, domains: [source], meaning: qualified rail or profile behavior that must not leak into common core, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [RAIL-SPECIFIC]}
+  - {value: INSUFFICIENT_EVIDENCE, domains: [source], meaning: available evidence does not support the material claim, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [INSUFFICIENT-EVIDENCE]}
+  - {value: CONFLICTING_SOURCES, domains: [source], meaning: applicable authorities conflict without accepted resolution, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [CONFLICTING-SOURCES]}
+  - {value: PARTICIPANT_DOCUMENTATION_REQUIRED, domains: [source], meaning: qualified participant documentation is required, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [PARTICIPANT-DOCUMENTATION-REQUIRED]}
+  - {value: VERIFY_PER_USE, domains: [source], meaning: applicability version or claim support must be reverified for this use, produced_by: [source-backed-payments-modeling], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [VERIFY-PER-USE]}
+  - {value: SOURCE_BLOCKED, domains: [use_case, planning], meaning: a material source gate is unresolved, produced_by: [enterprise-use-case-engineering, planning-semantic-integrity], consumed_by: [enterprise-use-case-engineering, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [SOURCE-BLOCKED]}
+  - {value: CREATE_USE_CASE, domains: [use_case], meaning: a new external actor goal requires a use case, produced_by: [enterprise-use-case-engineering], consumed_by: [source-backed-payments-modeling, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: UPDATE_USE_CASE, domains: [use_case], meaning: existing actor-goal behavior changes materially, produced_by: [enterprise-use-case-engineering], consumed_by: [source-backed-payments-modeling, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: ADD_FLOW, domains: [use_case], meaning: add observable flow to an existing use case, produced_by: [enterprise-use-case-engineering], consumed_by: [source-backed-payments-modeling, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: ADD_SLICE, domains: [use_case], meaning: admit an observable behavioral slice, produced_by: [enterprise-use-case-engineering], consumed_by: [architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: LINK_EXISTING_SLICE, domains: [use_case], meaning: realization traces to an admitted slice, produced_by: [enterprise-use-case-engineering], consumed_by: [architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: QUALITY_SCENARIO_ONLY, domains: [use_case], meaning: non-functional change without a new external actor goal, produced_by: [enterprise-use-case-engineering], consumed_by: [architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: ARCHITECTURE_REVIEW_ONLY, domains: [use_case], meaning: realization changes without business behavior change, produced_by: [enterprise-use-case-engineering], consumed_by: [architecture-evolution-review, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: DECISION_BLOCKED, domains: [use_case, planning], meaning: an accepted decision is required, produced_by: [enterprise-use-case-engineering, planning-semantic-integrity], consumed_by: [enterprise-use-case-engineering, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [DECISION-BLOCKED]}
+  - {value: HUMAN_REVIEW_REQUIRED, domains: [use_case, planning], meaning: durable human review evidence is required, produced_by: [enterprise-use-case-engineering, planning-semantic-integrity], consumed_by: [enterprise-use-case-engineering, architecture-evolution-review, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [HUMAN-REVIEW-REQUIRED]}
+  - {value: NO_USE_CASE_CHANGE, domains: [use_case], meaning: no external actor-goal behavior changes, produced_by: [enterprise-use-case-engineering], consumed_by: [planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: []}
+  - {value: CURRENT_ARCHITECTURE_SUFFICIENT, domains: [architecture], meaning: current boundaries realize the approved behavior, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [CURRENT-ARCHITECTURE-SUFFICIENT]}
+  - {value: NEW_PUBLIC_PORT, domains: [architecture], meaning: realization requires an admitted public port, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [NEW-PUBLIC-PORT]}
+  - {value: NEW_READ_MODEL, domains: [architecture], meaning: journey requires a source-owned operational read model, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [NEW-READ-MODEL]}
+  - {value: NEW_INTEGRATION_CONTRACT, domains: [architecture], meaning: realization requires an integration contract, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [NEW-INTEGRATION-CONTRACT]}
+  - {value: NEW_ADR_REQUIRED, domains: [architecture], meaning: a new or superseding ADR is required, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [NEW-ADR-REQUIRED]}
+  - {value: BOUNDARY_REVIEW_REQUIRED, domains: [architecture], meaning: boundary evidence is insufficient, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [BOUNDARY-REVIEW-REQUIRED]}
+  - {value: AGGREGATE_REVIEW_REQUIRED, domains: [architecture], meaning: aggregate lifecycle and invariant evidence is incomplete, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [AGGREGATE-REVIEW-REQUIRED]}
+  - {value: QUALITY_EXPERIMENT_REQUIRED, domains: [architecture], meaning: quality claim requires a bounded measurable experiment, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: true, deprecated_aliases: [QUALITY-EXPERIMENT-REQUIRED]}
+  - {value: NO_ARCHITECTURE_CHANGE, domains: [architecture], meaning: no realization change is required, produced_by: [architecture-evolution-review], consumed_by: [enterprise-use-case-engineering, planning-semantic-integrity], blocking_readiness: false, deprecated_aliases: [NO-ARCHITECTURE-CHANGE]}
+  - {value: READY, domains: [planning], meaning: readiness gates pass without implying completion, produced_by: [planning-semantic-integrity], consumed_by: [enterprise-use-case-engineering], blocking_readiness: false, deprecated_aliases: []}
+  - {value: BLOCKED, domains: [planning], meaning: planning is blocked by a classified cause, produced_by: [planning-semantic-integrity], consumed_by: [enterprise-use-case-engineering], blocking_readiness: true, deprecated_aliases: []}
+  - {value: CAPABILITY_BLOCKED, domains: [planning], meaning: prerequisite capability is absent or unverified, produced_by: [planning-semantic-integrity], consumed_by: [enterprise-use-case-engineering], blocking_readiness: true, deprecated_aliases: [CAPABILITY-BLOCKED]}
+  - {value: NO_PLANNING_CHANGE, domains: [planning], meaning: no planning mutation is required, produced_by: [planning-semantic-integrity], consumed_by: [enterprise-use-case-engineering], blocking_readiness: false, deprecated_aliases: []}
+skill_contract_files:
+  enterprise-use-case-engineering: .claude/skills/enterprise-use-case-engineering/SKILL.md
+  source-backed-payments-modeling: .claude/skills/source-backed-payments-modeling/SKILL.md
+  architecture-evolution-review: .claude/skills/architecture-evolution-review/SKILL.md
+  planning-semantic-integrity: .claude/skills/planning-semantic-integrity/SKILL.md
+active_machine_token_files:
+  - .claude/skills/enterprise-use-case-engineering/SKILL.md
+  - .claude/skills/source-backed-payments-modeling/SKILL.md
+  - .claude/skills/architecture-evolution-review/SKILL.md
+  - .claude/skills/planning-semantic-integrity/SKILL.md
+  - tools/skills/evals/routing/enterprise-use-case-engineering.yaml
+  - tools/skills/evals/regression/enterprise-use-case-engineering.json
+  - tools/skills/evals/adversarial/enterprise-use-case-engineering.json
+  - tools/skills/evals/e2e/enterprise-use-case-engineering.json
+  - tools/requirements/validate-planning-semantics.py
+deprecated_alias_allowed_paths:
+  - docs/domain/
+  - docs/requirements/use-cases/
+  - docs/standards/SOURCE-AUTHORITY-MATRIX.md
+  - docs/standards/TERMINOLOGY-POLICY.md
+  - planning/epics/
+  - planning/programs/
+  - planning/decisions/
+  - planning/AGENTS.md
+  - planning/capabilities.yaml

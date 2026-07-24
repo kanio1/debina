@@ -26,7 +26,7 @@ AF-2A — denied visibility. At BF-2, when tenant/branch/role is not authorized:
 CF-4A — maker self-approval. At BF-4, when maker equals checker: Debina denies before decision; terminate with minimal guarantee.
 CF-4B — terminal/expired/race. At BF-4, when approval is terminal, expired or loses a race: Debina returns conflict; no second terminal state/release; terminate.
 AF-3A — idempotent replay. At BF-3, equivalent key returns original outcome; changed payload conflicts; rejoin BF-7 or terminate.
-FF-5A — audit append failure. At BF-5, Debina rolls back decision/release; terminate with minimal guarantee. `[PROJECT-SIMULATION]` transaction mechanics are project policy, not rail behavior.
+FF-5A — audit append failure. At BF-5, Debina rolls back decision/release; terminate with minimal guarantee. `[PROJECT_SIMULATION]` transaction mechanics are project policy, not rail behavior.
 
 ## Business rules and source references
 
@@ -42,7 +42,7 @@ Security scenarios: QS-SEC-01 tenant/branch non-disclosure; role/maker-checker a
 
 ## Quality, observability and architecture realization
 
-Quality: QS-INT-01 idempotency, QS-SEC-01 isolation, QS-TRC-01 decision investigation, QS-REL-01 durable release/outbox recovery. Observe payment/approval IDs, command audit, immutable ingress/ISO lineage and source-owned audit/read queries. Architecture: payment-lifecycle domain module and payment schema own commands/approval state; evidence-audit supporting module owns append-only audit; source-owned query port feeds Query-only GraphQL; BFF is an authenticated technical adapter. Outcome: `CURRENT-ARCHITECTURE-SUFFICIENT`; no new module, aggregate, context or ADR is introduced.
+Quality: QS-INT-01 idempotency, QS-SEC-01 isolation, QS-TRC-01 decision investigation, QS-REL-01 durable release/outbox recovery. Observe payment/approval IDs, command audit, immutable ingress/ISO lineage and source-owned audit/read queries. Architecture: payment-lifecycle domain module and payment schema own commands/approval state; evidence-audit supporting module owns append-only audit; source-owned query port feeds Query-only GraphQL; BFF is an authenticated technical adapter. Outcome: `CURRENT_ARCHITECTURE_SUFFICIENT`; no new module, aggregate, context or ADR is introduced.
 
 ## Slices and Example Mapping
 
@@ -63,4 +63,4 @@ Quality: QS-INT-01 idempotency, QS-SEC-01 isolation, QS-TRC-01 decision investig
 
 ## Test strategy, gaps and questions
 
-Use focused PostgreSQL/Testcontainers approvals, expiry, audit, Keycloak and GraphQL runtime tests named in EPIC-76; operational acceptance automation is deliberately future. [OPEN-QUESTION] approval matrix policy beyond the supported single broad-rule subset. [PARTICIPANT-DOCUMENTATION-REQUIRED] no participant/rail approval policy is modeled. Known gap: batch/item approval needs a file/group aggregate and is excluded.
+Use focused PostgreSQL/Testcontainers approvals, expiry, audit, Keycloak and GraphQL runtime tests named in EPIC-76; operational acceptance automation is deliberately future. [OPEN-QUESTION] approval matrix policy beyond the supported single broad-rule subset. [PARTICIPANT_DOCUMENTATION_REQUIRED] no participant/rail approval policy is modeled. Known gap: batch/item approval needs a file/group aggregate and is excluded.

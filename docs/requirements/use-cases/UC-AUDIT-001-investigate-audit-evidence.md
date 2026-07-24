@@ -19,4 +19,4 @@ BF-5. Debina presents authorized results and visible gaps.
 ## Rules/sources/rails
 BR-AUDIT-001; project ADR and ISO identifier source. All rails APPLICABLE as operational read, not as rail behavior.
 ## Quality/data/architecture
-QS-SEC-01/QS-TRC-01; evidence-audit/payment/ISO query ports, Query-only GraphQL, BFF adapter; `CURRENT-ARCHITECTURE-SUFFICIENT`. A find payment lineage, READY-CANDIDATE; B audit trail, READY-CANDIDATE. Examples business/ISO ID, tenant restriction, missing fragment; out export. EPIC-77/78; partial coverage.
+QS-SEC-01/QS-TRC-01; evidence-audit/payment/ISO query ports, Query-only GraphQL, BFF adapter; `CURRENT_ARCHITECTURE_SUFFICIENT`. A find payment lineage, READY-CANDIDATE; B audit trail, READY-CANDIDATE. Examples business/ISO ID, tenant restriction, missing fragment; out export. EPIC-77/78; partial coverage.

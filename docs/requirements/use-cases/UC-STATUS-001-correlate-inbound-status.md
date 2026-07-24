@@ -20,4 +20,4 @@ BF-6. Debina makes correlation evidence available.
 ## Rules/sources/rails
 BR-STATUS-001/002; `[ISO20022]`, `[EPC-SCT]`, `[EPC-SCT-INST]`; SCT/SCT Inst APPLICABLE, STEP2/RT1/TIPS/STET APPLICABLE-WITH-RAIL-EXTENSION. ISO hierarchy: status report/pacs.002 is a message, correlation is actor goal.
 ## Quality/data/architecture
-QS-TRC-01/QS-REL-01/QS-MOD-01; ISO owns messages/correlation/outbox, payment owns lifecycle. `CURRENT-ARCHITECTURE-SUFFICIENT`; ATAM sensitivity identifier quality/order. Slices A matched, READY-CANDIDATE; B orphan/ambiguous, READY-CANDIDATE. Examples known/unknown/duplicate/conflict; out status-to-finality inference. EPIC-26–28; coverage correlation-only.
+QS-TRC-01/QS-REL-01/QS-MOD-01; ISO owns messages/correlation/outbox, payment owns lifecycle. `CURRENT_ARCHITECTURE_SUFFICIENT`; ATAM sensitivity identifier quality/order. Slices A matched, READY-CANDIDATE; B orphan/ambiguous, READY-CANDIDATE. Examples known/unknown/duplicate/conflict; out status-to-finality inference. EPIC-26–28; coverage correlation-only.

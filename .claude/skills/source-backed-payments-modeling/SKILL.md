@@ -19,7 +19,10 @@ Read `SOURCE-AUTHORITY-MATRIX.md`, `SOURCE-REGISTRY.yaml`, payment concept catal
 2. Compare the rail concept matrix with the current Debina representation; identify terminology collisions and common-core rail leakage.
 3. Classify the result as existing representation, new value object, entity, aggregate candidate, technical artifact, rail-specific concept, or unsupported assumption.
 4. Apply aggregate admission criteria before recommending an aggregate.
-5. Return one of `SOURCE-CONFIRMED`, `PROJECT-INTERPRETATION`, `PROJECT-SIMULATION`, `RAIL-SPECIFIC`, `INSUFFICIENT-EVIDENCE`, `CONFLICTING-SOURCES`, or `PARTICIPANT-DOCUMENTATION-REQUIRED` and update traceability/gaps.
+5. Return one of `SOURCE_CONFIRMED`, `PROJECT_INTERPRETATION`,
+   `PROJECT_SIMULATION`, `RAIL_SPECIFIC`, `INSUFFICIENT_EVIDENCE`,
+   `CONFLICTING_SOURCES`, `PARTICIPANT_DOCUMENTATION_REQUIRED`, or
+   `VERIFY_PER_USE` and update traceability/gaps.
 
 ## Handoff and evidence
 
@@ -32,3 +35,11 @@ Keep business order, payment instruction, transaction, group, batch, bulk, file,
 ## Validation and example
 
 Run source and use-case validators. Example: `ApprovalDecision` is a project-policy business record under BP-03, not an SCT rail concept; its supporting audit entry is a technical-and-audit artifact owned by evidence-audit.
+
+## Classification contract
+
+```yaml
+vocabulary: docs/governance/methodology-assurance/CLASSIFICATION-VOCABULARY.yaml
+consumes: [CREATE_USE_CASE, UPDATE_USE_CASE, ADD_FLOW]
+produces: [SOURCE_CONFIRMED, PROJECT_INTERPRETATION, PROJECT_SIMULATION, RAIL_SPECIFIC, INSUFFICIENT_EVIDENCE, CONFLICTING_SOURCES, PARTICIPANT_DOCUMENTATION_REQUIRED, VERIFY_PER_USE]
+```
