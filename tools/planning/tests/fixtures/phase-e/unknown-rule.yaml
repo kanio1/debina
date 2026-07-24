@@ -1,0 +1,2 @@
+base: valid-e1-proposal.yaml
+record_patch: {applicable_rules: [BR-NOT-REAL-001]}

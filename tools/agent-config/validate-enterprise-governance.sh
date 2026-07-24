@@ -12,6 +12,7 @@ python3 tools/requirements/validate-use-case-traceability.py
 python3 tools/requirements/validate-planning-semantics.py
 python3 tools/requirements/validate-source-traceability.py
 python3 tools/requirements/validate-methodology-assurance.py
+python3 tools/planning/validate-phase-e-artifacts.py
 python3 tools/architecture/validate-module-catalog.py
 python3 tools/architecture/validate-adr-lifecycle.py
 python3 tools/architecture/validate-dynamic-view-metadata.py

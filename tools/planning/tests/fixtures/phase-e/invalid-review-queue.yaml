@@ -1,0 +1,2 @@
+base: valid-e1-proposal.yaml
+record_patch: {review_queues: [AI_SELF_APPROVAL]}

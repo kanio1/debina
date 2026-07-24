@@ -1,0 +1,18 @@
+records:
+  - record_type: STORY_PROPOSAL
+    proposal_id: PHASE-E1-STORY-PROPOSAL-001
+    future_canonical_id: EPIC-24/24.10
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-B]
+    business_process_id: BP-01
+    source_classification: HUMAN_REVIEW_REQUIRED
+    source_tags: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
+    source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [nextjs-bff, payment-lifecycle]
+    quality_scenarios: [QS-SEC-01, QS-SEC-02, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [channel, signature, TVS, limits, evidence-visibility]

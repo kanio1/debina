@@ -1,0 +1,4 @@
+base: valid-e1-proposal.yaml
+record_patch:
+  record_type: CANONICAL_STORY
+  epic_story_id: PROPOSED-E1-06

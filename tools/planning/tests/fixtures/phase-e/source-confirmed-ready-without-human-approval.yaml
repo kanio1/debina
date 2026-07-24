@@ -1,0 +1,5 @@
+base: valid-e1-proposal.yaml
+record_patch:
+  source_classification: SOURCE_CONFIRMED
+  current_readiness: READY
+  blocking_decisions: []

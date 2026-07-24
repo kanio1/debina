@@ -1,0 +1,2 @@
+base: valid-e1-proposal.yaml
+record_patch: {module_owners: [not-a-module]}

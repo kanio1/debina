@@ -1,0 +1,2 @@
+base: valid-e1-proposal.yaml
+record_patch: {source_classification: EPC-SCT}
