@@ -1,0 +1,8 @@
+{
+  "purpose": "TEST_ONLY",
+  "authority": "NON_PRODUCTION",
+  "scope": "E1 disposable smoke tenant/profile only",
+  "publicMaterialBase64": "MCowBQYDK2VwAyEAJfwyxHilpPhORVegNC4IJ4yINkG2FJvbC0qYarbCy3g=",
+  "v62KeyId": "00000000-0000-0000-0000-00000000e102",
+  "participantId": "00000000-0000-0000-0000-00000000e101"
+}

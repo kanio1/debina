@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09">
+  <CstmrCdtTrfInitn>
+    <GrpHdr>
+      <MsgId>MSG-E1-SMOKE-0001</MsgId>
+      <CreDtTm>2026-07-15T10:00:00</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>PMTINF-E1-SMOKE-0001</PmtInfId>
+      <PmtMtd>TRF</PmtMtd>
+      <NbOfTxs>1</NbOfTxs>
+      <CtrlSum>10.00</CtrlSum>
+      <DbtrAcct><Id><IBAN>DE89370400440532013000</IBAN></Id></DbtrAcct>
+      <CdtTrfTxInf>
+        <PmtId><EndToEndId>E1-SMOKE-ACCEPTED-0001</EndToEndId></PmtId>
+        <Amt><InstdAmt Ccy="EUR">10.00</InstdAmt></Amt>
+        <CdtrAcct><Id><IBAN>FR7630006000011234567890189</IBAN></Id></CdtrAcct>
+      </CdtTrfTxInf>
+    </PmtInf>
+  </CstmrCdtTrfInitn>
+</Document>

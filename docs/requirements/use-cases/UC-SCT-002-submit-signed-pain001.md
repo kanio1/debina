@@ -9,7 +9,7 @@ methodology: {narrative: cockburn_fully_dressed, decomposition: use_case_2_0, ru
 ## Preconditions and guarantees
 Tenant/profile and verification material are available. Minimal: raw source and verdict evidence survive failure where permitted. Success: verified source is mapped as one instruction and proceeds through UC-SCT-001.
 ## Main success scenario
-1. Submitter supplies signed pain.001. 2. Debina identifies channel/tenant. 3. Debina preserves source evidence and verifies signature. 4. Debina validates/maps the applicable message. 5. Debina delegates accepted instruction handling to UC-SCT-001. 6. Debina returns correlation and outcome.
+1. Submitter supplies signed pain.001. 2. Debina identifies channel/tenant. 3. Debina preserves source evidence and verifies signature. 4. Debina validates/maps the applicable message. 5. Debina delegates accepted instruction handling to UC-SCT-001. 6. Debina returns correlation and outcome. When the submitter uses the Debina web interface, they select the signed pain.001 artifact, submit it once, receive a deterministic accepted or created outcome, and can open the resulting payment detail view.
 ## Extensions and failure flows
 3a. Signature fails: record verdict/evidence and reject with a stable outcome; no mapping or payment. 4a. Version/structure is unsupported: reject with preserved source correlation. 4b. E1 profile validation fails (transaction count, payment method, control sum): reject without persisting validated-only fields as domain data. 5a. Replay with the same tenant, idempotency key and payload returns the original outcome; same key with a different payload returns conflict.
 ## Rules, sources and rail applicability

@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Prepare the E1 backend tranche for one coherent commit after final review fixes.
+Close the E1 BFF + Playwright tranche after a narrow Ask review of the composed-stack correction, then one coherent commit.
 
 ## Current use case
 
@@ -10,54 +10,38 @@ Prepare the E1 backend tranche for one coherent commit after final review fixes.
 
 ## Current state
 
-- E1 backend tranche corrections applied in working tree (not committed).
-- Focused E1 regression green (93 tests).
-- Use-case traceability validator: 0 errors (legacy warnings only).
-- `git diff --check`: clean on changed paths.
-- Nothing staged.
+- E1 backend tranche complete (committed).
+- E1 BFF + Playwright tranche + composed-stack wiring implemented (not committed).
+- Focused verification green: `test:pain001-upload-route`, `test:pain001-upload-card`, `generate:e1-signed-fixture`, `typecheck`, lint (changed files), `build`, Dagger pure/cmd tests.
+- `git diff --check`: clean. Nothing staged.
+- **Playwright composed smoke PASS (2/2):**
+  1. `dagger call smoke-signed-pain-001 --lock=frozen --progress=plain` → `1 passed`
+  2. `dagger call smoke-signed-pain-001 --proof-nonce=reliability-<ts> --lock=frozen --progress=plain` → `1 passed` (fresh isolated stack)
+- Host-only `pnpm run test:smoke:e1-pain001` still cannot resolve `frontend`/`keycloak` aliases; that is expected. Canonical composed command is the Dagger function (also `pnpm run test:smoke:e1-pain001:composed`).
 
 ## Completed
 
-- CreDtTm persistence closure (`source_message_created_at`, `recorded_at`, V61).
-- Minimal E1 field mapping: MAP_AND_PERSIST + VALIDATE_ONLY per
-  E1-FIELD-SCOPE-DECISION; deferred fields not promoted.
-- Detached Ed25519 verification boundary (`DEBINA-E1-DETACHED-ED25519-V1`;
-  archive → verify → parse ordering).
-- Tenant-scoped idempotency with frozen submission HTTP outcome on replay
-  (`response_code` from `ingress.idempotency_keys`; 202 body frozen as
-  `PENDING_APPROVAL`).
-- Review-correction tranche: mapping summary arithmetic, post-approval replay
-  proof, JSON-direct frozen replay assertions.
-- **HIGH fix:** unsupported stored idempotency `response_code` values fail with
-  `IdempotencyDataCorruptionException` → HTTP 500 idempotency data integrity
-  error; corruption integration test added.
+- BFF upload adapter, UI card, focused route/card tests, deterministic TEST_ONLY lab key + V62, one accepted Playwright smoke.
+- Dagger `smoke-signed-pain-001` wires the existing payment smoke runtime to `pnpm run test:smoke:e1-pain001`.
+- Backend smoke services remigrate on the live bound Postgres before `spring-boot:run` so ephemeral DB restarts cannot drop `sepa_app` between marker Flyway and consumer start.
 
 ## Decisions
 
-Educational directions for E1 (local/non-production; not production closure):
+Educational E1 directions unchanged.
 
-- Channel direction: `REST_PLUS_BFF_UPLOAD` (backend owns XML command; BFF is
-  session-aware upload adapter).
-- Signature direction: versioned project profile `DEBINA-E1-DETACHED-ED25519-V1`.
-  Inactive/expired/revoked keys currently collapse to `UNKNOWN_SIGNER`;
-  `EXPIRED_KEY`/`REVOKED_KEY` not independently emitted yet.
-- Field scope: minimal single `PmtInf` / single `CdtTrfTxInf`; `NbOfTxs=1`,
-  `PmtMtd=TRF`, `CtrlSum` consistency as VALIDATE_ONLY.
-- CreDtTm: `GrpHdr/CreDtTm` → `source_message_created_at`; Debina record time →
-  `recorded_at`; offset-less `CreDtTm` interpreted as UTC (project interpretation).
-- Idempotency: PostgreSQL `(source_id, idem_key)` with payload SHA-256; claim
-  only after successful verify+map; replay uses stored `response_code` (201/202
-  only; corrupt values are server-side integrity failures).
-- Architecture: current modular monolith sufficient for E1.
+Composed-runtime corrections:
+
+- Playwright runs inside the Dagger service network (`http://frontend:3000`, `http://keycloak:8080`); host execution is not the composed proof.
+- Callable name is `smoke-signed-pain-001` (Dagger kebab of `SmokeSignedPain001`).
+- Optional `--proof-nonce` isolates a fresh ephemeral stack for reliability reruns.
+- Outside ADR-N16 `smoke-suite` (E1 is separately callable).
 
 ## Blocked for production
 
 - Dated specialist approvals / review councils / canonical migration admission
 - EPC TVS lawful acquisition, checksums and production validation claim
 - Normative detached-signature transport contract and signer-identity authority
-- Signer registry is participant/global, not tenant-scoped; a valid participant
-  key may be recognised across authenticated tenants (signature possession still
-  required); tenant-bound signer authority unresolved
+- Signer registry is participant/global, not tenant-scoped; tenant-bound signer authority unresolved
 - IBAN check-digit, SCT EUR-only and UETR UUIDv4 syntax enforcement deferred
 - XML encoding/charset acceptance profile
 - Evidence retention, encryption-at-rest and legal hold
@@ -68,16 +52,24 @@ Educational directions for E1 (local/non-production; not production closure):
 - Contract-phase drop/rename of legacy `cre_dt_tm` column
 - Idempotency TTL/retention/archival policy
 - Distinct `EXPIRED_KEY` / `REVOKED_KEY` profile outcomes
+- Production BFF upload limits and normative signer transport contract
 
-These are `BLOCKED_FOR_PRODUCTION` and must not block safe local educational
-implementation.
+These are `BLOCKED_FOR_PRODUCTION` and must not block safe local educational implementation.
 
 ## Next tasks
 
-1. Narrow verification pass and one coherent E1 commit (exclude CLAUDE files,
-   `.cursor/**`, generated javadoc).
-2. Plan the BFF and accepted-path Playwright tranche (out of current scope).
+1. Independent narrow Ask review of the Playwright/runtime correction.
+2. Fix any BLOCKER/HIGH finding from that review.
+3. Run final focused regression (route/card + composed smoke).
+4. Create one coherent BFF + Playwright tranche commit (exclude CLAUDE files, `.cursor/**`, generated javadoc).
+5. Select the next educational slice.
 
 ## Resume from here
 
-Stage E1 backend + docs only; commit when ready.
+Start task 1: independent narrow Ask review of `smoke-signed-pain-001` wiring and the live-Postgres remigrate fix.
+## Follow-up improvements
+
+- Remove unused `E1_SMOKE_PROOF_NONCE` environment variable or consume it
+  explicitly; runtime isolation currently comes from the Dagger instance suffix.
+- Reliability reruns must use `--proof-nonce` to avoid Dagger cache reuse.
+- Add a pure topology assertion for `smoke-signed-pain-001`.

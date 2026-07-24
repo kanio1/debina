@@ -23,6 +23,7 @@ dagger call integration
 dagger call smoke-auth
 dagger call smoke-payments
 dagger call smoke-suite            # complete sequential ADR-N16 cap
+dagger call smoke-signed-pain-001  # E1 accepted-path Playwright (outside ADR-N16 smoke-suite)
 dagger call acceptance
 dagger call pipeline-assurance     # independent platform gate
 dagger call backend-testcontainers --runtime-socket=/run/podman/podman.sock

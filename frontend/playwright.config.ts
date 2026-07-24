@@ -13,5 +13,17 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "off",
   },
-  projects: [{ name: "chromium", use: { browserName: "chromium" } }],
+  projects: [
+    {
+      name: "chromium",
+      use: { browserName: "chromium" },
+      testIgnore: ["**/e1-signed-pain001.spec.ts"],
+    },
+    {
+      name: "e1-pain001",
+      testMatch: ["**/e1-signed-pain001.spec.ts"],
+      workers: 1,
+      use: { browserName: "chromium" },
+    },
+  ],
 });

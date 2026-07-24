@@ -11,7 +11,12 @@
     "typecheck": "tsc --noEmit",
     "test:callback-redirect": "node --experimental-strip-types scripts/test-post-login-redirect.ts",
     "test:session-claims": "node --experimental-strip-types scripts/test-session-claims.ts",
+    "test:pain001-upload-route": "node --experimental-strip-types scripts/test-pain001-upload-route.ts",
+    "test:pain001-upload-card": "node --experimental-strip-types scripts/test-pain001-upload-card.ts",
+    "generate:e1-signed-fixture": "node --experimental-strip-types scripts/generate-e1-signed-fixture.ts",
     "test:smoke:d3a": "playwright test e2e/d3a-vertical-smoke.spec.ts --project=chromium",
+    "test:smoke:e1-pain001": "playwright test e2e/e1-signed-pain001.spec.ts --project=e1-pain001",
+    "test:smoke:e1-pain001:composed": "cd .. && dagger call smoke-signed-pain-001 --lock=frozen --progress=plain",
     "codegen:graphql": "graphql-codegen --config codegen.yml",
     "codegen:graphql:check": "pnpm run codegen:graphql && git diff --exit-code -- src/generated/graphql.ts"
   },

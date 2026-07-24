@@ -145,6 +145,8 @@ func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagg
 		WithEnvVariable("SEPA_APP_DB_USER", "sepa_app").
 		WithSecretVariable("SEPA_APP_DB_PASSWORD", credentials.appPassword).
 		WithEnvVariable("SEPA_MIGRATION_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
+		WithEnvVariable("SEPA_MIGRATION_DB_USER", "sepa_migration").
+		WithSecretVariable("SEPA_MIGRATION_DB_PASSWORD", credentials.migrationPassword).
 		WithEnvVariable("OUTBOX_RELAY_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
 		WithEnvVariable("SEPA_SIGNATURE_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
 		WithEnvVariable("SEPA_LEDGER_DB_URL", "jdbc:postgresql://postgres:5432/sepa_nexus").
@@ -156,7 +158,16 @@ func (m *DebinaVerification) smokeBackendService(postgres, kafka, keycloak *dagg
 		WithEnvVariable("KEYCLOAK_ISSUER_URI", "http://keycloak:8080/realms/sepa-nexus").
 		WithEnvVariable("SEPA_SCHEDULING_ENABLED", "false").
 		WithExposedPort(8081).
-		AsService(dagger.ContainerAsServiceOpts{Args: []string{"./mvnw", "-f", "backend", "spring-boot:run"}})
+		AsService(dagger.ContainerAsServiceOpts{Args: []string{"sh", "-ec", `
+set -eu
+./mvnw -f backend \
+  -Dflyway.url=jdbc:postgresql://postgres:5432/sepa_nexus \
+  -Dflyway.user=sepa_migration \
+  -Dflyway.password="$SEPA_MIGRATION_DB_PASSWORD" \
+  -Dflyway.locations=filesystem:backend/src/main/resources/db/migration \
+  flyway:migrate
+exec ./mvnw -f backend spring-boot:run
+`}})
 }
 
 // SmokeBackendReadiness uses the real application health endpoint from an

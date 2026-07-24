@@ -1,0 +1,15 @@
+{
+  "participantId": "00000000-0000-0000-0000-00000000e101",
+  "keyId": "00000000-0000-0000-0000-00000000e102",
+  "signatureBase64": "PiqY2EgrXI6n9Gs/h0J8Avqk12QZG+dwIxsA+A6/DkzB4gmb1hkHvbH/6nMiLBq6rxiCyngKTnEK4OmYoWDhDQ==",
+  "signatureAlgo": "Ed25519",
+  "endToEndId": "E1-SMOKE-ACCEPTED-0001",
+  "msgId": "MSG-E1-SMOKE-0001",
+  "amount": "10.00",
+  "currency": "EUR",
+  "debtorIban": "DE89370400440532013000",
+  "creditorIban": "FR7630006000011234567890189",
+  "publicMaterialBase64": "MCowBQYDK2VwAyEAJfwyxHilpPhORVegNC4IJ4yINkG2FJvbC0qYarbCy3g=",
+  "labKeyPurpose": "TEST_ONLY",
+  "labKeyAuthority": "NON_PRODUCTION"
+}

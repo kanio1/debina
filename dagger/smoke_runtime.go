@@ -82,5 +82,17 @@ func (m *DebinaVerification) paymentSmokeBackendService(postgres, kafka, keycloa
 		WithEnvVariable("SEPA_SCHEDULING_ENABLED", "true").
 		WithEnvVariable("SEPA_SCHEDULING_RELAY_FIXED_DELAY_MS", "250").
 		WithExposedPort(8081).
-		AsService(dagger.ContainerAsServiceOpts{Args: []string{"./mvnw", "-f", "backend", "spring-boot:run"}})
+		// Ephemeral Postgres loses roles when the service restarts between the
+		// marker Flyway run and this consumer. Re-apply migrations against the
+		// live bound instance before Spring Boot starts.
+		AsService(dagger.ContainerAsServiceOpts{Args: []string{"sh", "-ec", `
+set -eu
+./mvnw -f backend \
+  -Dflyway.url=jdbc:postgresql://postgres:5432/sepa_nexus \
+  -Dflyway.user=sepa_migration \
+  -Dflyway.password="$SEPA_MIGRATION_DB_PASSWORD" \
+  -Dflyway.locations=filesystem:backend/src/main/resources/db/migration \
+  flyway:migrate
+exec ./mvnw -f backend spring-boot:run
+`}})
 }

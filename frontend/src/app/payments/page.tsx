@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PaymentsTable, type PaymentRow, type PaymentsTableStatus } from "@/components/payments/payments-table";
+import { Pain001UploadCard } from "@/components/payments/pain001-upload-card";
 import { ApprovalQueue } from "@/components/payments/approval-queue";
 import { browserRandomUUID } from "@/lib/browser-random-uuid";
 import { readCookie } from "@/lib/read-cookie";
@@ -300,6 +301,8 @@ export default function PaymentsPage() {
           </form>
         </CardContent>
       </Card>
+
+      <Pain001UploadCard />
 
       <AlertDialog open={confirmOpen} onOpenChange={(open) => !submitting && setConfirmOpen(open)}>
         <AlertDialogContent data-testid="payments.submit.confirm-dialog">

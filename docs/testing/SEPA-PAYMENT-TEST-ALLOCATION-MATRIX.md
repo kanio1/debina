@@ -59,9 +59,10 @@ Planned executable verifies become binding only after review and implementation:
 | Mapper boundaries/properties | `./mvnw -f backend test -Dtest=Pain001CanonicalMapperTest,Pain001MappingPropertyTest` |
 | PostgreSQL RLS/lineage/idempotency | `./mvnw -f backend test -Dtest=Pain001EvidenceDatabaseTest,Pain001SubmissionEndpointTest` |
 | Composed intake integration | `./mvnw -f backend test -Dtest=Pain001E1IntakeIntegrationTest` |
-| BFF route/session/CSRF/body contract | `cd frontend && pnpm run test:pain001-upload-route` |
-| Dagger composed E1 acceptance | `dagger call smoke-signed-pain001 --lock=frozen --progress=plain` |
-| One browser smoke | `cd frontend && pnpm exec playwright test e2e/e1-signed-pain001.spec.ts --project=chromium` |
+| BFF route/session/CSRF/body contract | `cd frontend && pnpm run test:pain001-upload-route` — route-level authorization gates, empty-body rejection, fixed backend destination, session-token forwarding, and exact-byte relay via mocked forwarder (not a live browser session) |
+| BFF upload card idempotency and result parsing | `cd frontend && pnpm run test:pain001-upload-card` |
+| Dagger composed E1 acceptance | `dagger call smoke-signed-pain-001 --lock=frozen --progress=plain` (or `cd frontend && pnpm run test:smoke:e1-pain001:composed`; optional `--proof-nonce=<id>` for an isolated reliability stack) |
+| One browser smoke (inside composed stack only) | `cd frontend && pnpm run test:smoke:e1-pain001` — Chromium command executed by the Dagger runner; host execution cannot resolve `frontend`/`keycloak` service aliases |
 
 These names are an implementation contract, not claims that the commands or tests
 exist or passed in this planning run.
