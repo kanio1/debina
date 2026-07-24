@@ -17,6 +17,7 @@
     "applicable_rules": ["BR-SCT-001"],
     "confidence": "HIGH",
     "evidence_status": "VERIFIED",
+    "semantic_review_state": "NOT_REVIEWED",
     "last_verified_date": "2026-07-24",
     "next_review_date": "2027-01-01",
     "effective_from": "2026-02-01",

@@ -26,6 +26,10 @@ EVIDENCE_STATUS = {
     "VERIFIED", "VERIFY_PER_USE", "INCOMPLETE", "STALE", "CONFLICTING",
     "RESTRICTED",
 }
+SEMANTIC_REVIEW_STATE = {
+    "NOT_REVIEWED", "REVIEW_IN_PROGRESS", "HUMAN_APPROVED",
+    "HUMAN_REJECTED", "CHANGES_REQUESTED",
+}
 VERIFICATION_METHOD = {
     "HUMAN_REVIEW", "OFFICIAL_DOCUMENT_REVIEW", "PROJECT_ADR", "OTHER",
 }
@@ -34,7 +38,7 @@ REQUIRED_EVIDENCE_FIELDS = (
     "document_version", "publication_date", "effective_date", "section", "rail",
     "public_or_restricted", "access_date", "supported_claim",
     "project_interpretation", "applicable_rules", "confidence",
-    "evidence_status", "last_verified_date", "next_review_date",
+    "evidence_status", "semantic_review_state", "last_verified_date", "next_review_date",
     "effective_from", "effective_until", "superseded_by",
     "verification_method", "reviewer",
 )
@@ -84,6 +88,9 @@ def validate_evidence_entries(
         status = scalar(item.get("evidence_status"))
         if status and status not in EVIDENCE_STATUS:
             fail("SRC-010", evidence_id, f"unsupported evidence_status {status}")
+        semantic_state = scalar(item.get("semantic_review_state"))
+        if semantic_state and semantic_state not in SEMANTIC_REVIEW_STATE:
+            fail("SRC-015", evidence_id, f"unsupported semantic_review_state {semantic_state}")
         method = scalar(item.get("verification_method"))
         if method and method not in VERIFICATION_METHOD:
             fail("SRC-010", evidence_id, f"unsupported verification_method {method}")

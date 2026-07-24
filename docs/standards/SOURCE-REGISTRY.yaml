@@ -114,10 +114,10 @@ sources:
     authority: EPC Customer-to-PSP Implementation Guidelines
     title: 2025 SEPA Credit Transfer Customer-to-PSP Implementation Guidelines
     publisher: European Payments Council
-    url: https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/2025-sepa-credit-transfer-customer-psp-implementation
+    url: https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/sepa-credit-transfer-customer-psp-implementation-1
     version: EPC132-08 2025 v1.0
-    sections: [1, 2, 3, Annexes]
-    hash: not-recorded
+    sections: [document information, 1.1-1.7, 2.1, 2.1.1, 3, address-date banner, TVS/XSD download notice]
+    hash: VERIFY_ON_LAWFUL_ACQUISITION
   - id: epc-sct-interpsp-2025
     tag: EPC-SCT
     authority: EPC Inter-PSP Implementation Guidelines

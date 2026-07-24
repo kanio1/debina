@@ -64,6 +64,7 @@ def evidence_records(
             "version": str(item.get("document_version", "")),
             "rules": set(item.get("applicable_rules", []) or []),
             "status": str(item.get("evidence_status", "")),
+            "semantic_review_state": str(item.get("semantic_review_state", "")),
             "superseded_by": str(item.get("superseded_by", "")),
             "method": str(item.get("verification_method", "")),
             "source_registry_id": source_id,
@@ -229,6 +230,12 @@ def enforced_readiness_errors(
                     errors.append((
                         "ESR-020",
                         f"SOURCE_CONFIRMED conflicts with project authority {evidence_id}",
+                    ))
+                if record.get("semantic_review_state") != "HUMAN_APPROVED":
+                    errors.append((
+                        "ESR-023",
+                        "SOURCE_CONFIRMED + READY requires HUMAN_APPROVED "
+                        f"semantic review for {evidence_id}",
                     ))
         if source_classification == "PROJECT_INTERPRETATION":
             project_authorities = [

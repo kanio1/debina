@@ -1,4 +1,4 @@
-version: 2
+version: 3
 purpose: Per-claim evidence references for methodology-assurance representative use cases; registry presence alone is discovery.
 evidence:
   - id: SE-SCT-001
@@ -17,6 +17,7 @@ evidence:
     applicable_rules: [BR-SCT-001]
     confidence: MEDIUM
     evidence_status: VERIFY_PER_USE
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: UNKNOWN
     next_review_date: NOT_SCHEDULED
     effective_from: UNKNOWN
@@ -43,6 +44,7 @@ evidence:
     applicable_rules: [BR-STATUS-001, BR-STATUS-002]
     confidence: MEDIUM
     evidence_status: INCOMPLETE
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: UNKNOWN
     next_review_date: NOT_SCHEDULED
     effective_from: UNKNOWN
@@ -66,6 +68,7 @@ evidence:
     applicable_rules: [BR-SCT-002, BR-APPROVAL-001, BR-APPROVAL-002, BR-APPROVAL-003, BR-APPROVAL-004, BR-APPROVAL-005, BR-APPROVAL-006, BR-APPROVAL-007, BR-APPROVAL-008]
     confidence: HIGH
     evidence_status: INCOMPLETE
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: UNKNOWN
     next_review_date: NOT_SCHEDULED
     effective_from: UNKNOWN
@@ -89,6 +92,7 @@ evidence:
     applicable_rules: [BR-SCTINST-001]
     confidence: MEDIUM
     evidence_status: VERIFY_PER_USE
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: UNKNOWN
     next_review_date: NOT_SCHEDULED
     effective_from: UNKNOWN
@@ -103,7 +107,7 @@ evidence:
     document_version: EPC132-08 2025 v1.0
     publication_date: 2024-11-28
     effective_date: 2025-10-05
-    section: Sections 1-3 and message-profile annexes
+    section: "Document information; 1.1-1.7; 2.1 and 2.1.1; 3; message element rows 1.1-2.19 and relevant transaction rows"
     message_set: customer-to-PSP SCT
     message_definition: pain.001.001.09 and pain.002.001.10
     message_version: ISO 20022 2019
@@ -115,6 +119,7 @@ evidence:
     applicable_rules: [BR-SCT-003]
     confidence: HIGH
     evidence_status: VERIFIED
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: 2026-07-24
     next_review_date: 2026-10-24
     effective_from: 2025-10-05
@@ -129,15 +134,16 @@ evidence:
     document_version: EPC132-08 2025 v1.0
     publication_date: 2024-11-28
     effective_date: 2025-10-05
-    section: Section 1.3 and Technical Validation Subset references
+    section: "EPC publication page TVS/XSD download and disclaimer; IG 1.3 notation, 1.6 XML rules, 2.1 message profile"
     rail: generic-SCT
     public_or_restricted: public
     access_date: 2026-07-24
-    supported_claim: ISO XSD validation alone does not establish compliance with the EPC message usage profile; applicable EPC Technical Validation Subset constraints must be evaluated separately.
-    project_interpretation: E1 separates well-formedness, ISO schema validation, EPC profile validation and project business validation in evidence and error reporting.
+    supported_claim: The EPC publishes a C2PSP XSD ZIP as a Technical Validation Subset formalising IG restrictions and explicitly says production instances use the default ISO namespace; ISO schema validation alone therefore does not establish the EPC usage profile.
+    project_interpretation: E1 separates well-formedness, ISO schema validation, EPC TVS/profile validation and project business validation; lawful acquisition, checksum pinning and repository distribution policy remain review gates.
     applicable_rules: [BR-SCT-003]
     confidence: HIGH
     evidence_status: VERIFIED
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: 2026-07-24
     next_review_date: 2026-10-24
     effective_from: 2025-10-05
@@ -152,7 +158,7 @@ evidence:
     document_version: EPC153-22 v2.1
     publication_date: 2025-10-06
     effective_date: 2025-10-05
-    section: Address-format transition timeline and examples
+    section: "Document information and change history; sections 2-7.5, especially 6 and 7.2-7.4"
     rail: generic-SCT
     public_or_restricted: public
     access_date: 2026-07-24
@@ -161,6 +167,7 @@ evidence:
     applicable_rules: [BR-SCT-003]
     confidence: HIGH
     evidence_status: VERIFIED
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: 2026-07-24
     next_review_date: 2026-10-24
     effective_from: 2025-10-05

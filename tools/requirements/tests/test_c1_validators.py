@@ -78,6 +78,7 @@ class C1ValidatorRepositoryTests(unittest.TestCase):
             "verified-with-unknown-version.json": "SRC-013",
             "verified-with-unknown-effective-date.json": "SRC-013",
             "verified-with-missing-section.json": "SRC-013",
+            "invalid-semantic-review-state.json": "SRC-015",
         }
         for fixture, code in cases.items():
             with self.subTest(fixture=fixture):
@@ -89,6 +90,18 @@ class C1ValidatorRepositoryTests(unittest.TestCase):
                 self.assertNotEqual(0, result.returncode, result.stdout)
                 self.assertIn(code, result.stdout)
                 self.assertIn("SE-FIXTURE-", result.stdout)
+
+    def test_source_confirmed_ready_requires_human_semantic_approval(self):
+        fixture = (
+            ROOT
+            / "tools/requirements/tests/fixtures/enforced-story-readiness"
+            / "source-confirmed-without-human-approval.json"
+        )
+        result = self.run_validator(
+            "tools/requirements/validate-planning-semantics.py", "--fixture", fixture
+        )
+        self.assertNotEqual(0, result.returncode, result.stdout)
+        self.assertIn("ESR-023", result.stdout)
 
     def test_readiness_freshness_fixtures_are_fail_closed(self):
         fixture_dir = (

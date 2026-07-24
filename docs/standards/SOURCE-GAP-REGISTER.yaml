@@ -9,12 +9,13 @@ gaps:
     missing: "approved customer/channel profile for signed pain.001, including signature and certificate semantics"
     safe_next_step: "Payments, security and product review of the synthetic channel contract."
   - id: GAP-E1-TVS
-    status: SOURCE_READY_IMPLEMENTATION_PENDING
+    status: HUMAN_REVIEW_REQUIRED
     affects: [UC-SCT-002, EPIC-28, "28.2"]
-    missing: "checked-in, provenance-recorded ISO XSD and EPC 2025 SCT C2PSP TVS validation set"
-    safe_next_step: "Lawfully retrieve official EPC ZIP, record checksum/license metadata, and approve fixture policy."
+    missing: "approved acquisition/distribution policy and recorded checksums for the official ISO pain.001.001.09 XSD and public EPC 2025 SCT C2PSP TVS ZIP"
+    known_state: "The EPC page publicly offers the ZIP and states that TVSs formalise IG restrictions but are not production XSDs; repository licensing and checksum pinning were not approved."
+    safe_next_step: "ISO/legal reviewers approve lawful acquisition and repository policy, then an authorised implementation run records artifact checksums."
   - id: GAP-E1-SIGNATURE
-    status: PROJECT_POLICY_REVIEW_REQUIRED
+    status: DECISION_BLOCKED
     affects: [UC-SCT-002, EPIC-31, "31.2"]
     missing: "evidence that the synthetic Ed25519 detached-header convention represents any selected customer channel"
     safe_next_step: "Keep it PROJECT_SIMULATION or replace only through an admitted channel profile; do not call it EPC."

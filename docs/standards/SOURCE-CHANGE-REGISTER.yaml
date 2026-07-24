@@ -3,6 +3,11 @@ as_of: 2026-07-24
 review_state: AI_DRAFT
 human_review_state: NOT_REVIEWED
 changes:
+  - id: CHANGE-E1-REFRESH-NO-VERSION-DRIFT
+    detected: 2026-07-24
+    change: "Focused E1 refresh found no newer SCT C2PSP IG or address-guidance version."
+    material_effect: "EPC132-08 2025 v1.0 remains effective with the 2025-10-06 banner; EPC153-22 v2.1 remains the address authority."
+    action: "Keep evidence metadata VERIFIED but semantic_review_state NOT_REVIEWED; TVS/ISO artifact checksums and distribution policy remain gated."
   - id: CHANGE-EPC-2025-V11
     detected: 2026-07-24
     change: "All five 2025 EPC payment scheme rulebooks moved from v1.0 to v1.1."
@@ -34,12 +39,13 @@ source_manifests:
     related_scheme: [SCT]
     related_rail: [CUSTOMER_TO_PSP]
     related_messages: [pain.001.001.09, pain.002.001.10]
-    sections_reviewed: ["document information", "1.1-1.7", "2.1", "2.2", "change banner"]
-    supported_claims: ["2019 ISO baseline", "pain message versions", "TVS role", "single and bulk initiation"]
+    sections_reviewed: ["document information", "1.1-1.7", "2.1 and 2.1.1", "message rows 1.1-2.19 and relevant transaction rows", "3", "change banner", "public TVS/XSD download and disclaimer"]
+    supported_claims: ["2019 ISO baseline", "pain.001.001.09 and default namespace", "TVS role distinct from production XSD", "single and bulk initiation"]
     addenda: ["2025-10-06 address-date banner", "EPC153-22 v2.1", "EPC131-17 v4.0"]
     supersedes: "2023 SCT C2PSP IG"
     superseded_by: NONE
     evidence_status: VERIFIED
+    semantic_review_state: NOT_REVIEWED
     last_verified_date: 2026-07-24
     next_review_date: 2026-10-01
     reviewer: CODEX
