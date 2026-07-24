@@ -1,0 +1,209 @@
+version: 1
+status: AI_DRAFT
+human_review_state: NOT_REVIEWED
+baseline:
+  commit: d5be545
+  date: 2026-07-24
+  use_case_warnings: 296
+  planning_semantic_warnings: 69
+classifications:
+  - IMPLEMENTED_AND_PROVEN
+  - IMPLEMENTED_NOT_PLANNING_RECONCILED
+  - PARTIALLY_IMPLEMENTED
+  - PLANNED
+  - READY_CANDIDATE
+  - SOURCE_BLOCKED
+  - DECISION_BLOCKED
+  - CAPABILITY_BLOCKED
+  - STALE
+  - DUPLICATE
+  - OUT_OF_SCOPE
+selected_cohort:
+  id: E1
+  use_case: UC-SCT-002
+  slice: UCS-SCT-002-A
+  records: [EPIC-31/31.2, EPIC-19/19.2, EPIC-19/19.4, EPIC-26/26.3, EPIC-26/26.4, PROPOSED-E1-06]
+  migration_rule: Every selected record must leave the cohort with semantic_enforcement ENFORCED and zero record-local legacy warnings.
+proposals:
+  - epic_story_id: EPIC-31/31.2
+    cohort: E1
+    current_status: done
+    current_code_state: Ed25519 verification, key lookup, append-only verdict evidence and signature-before-parse integration exist.
+    implementation_evidence: [SignatureVerificationTest, SignatureBeforeParseOrderingTest, KeyRegistryLookupTest]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-A
+    source_status: Project algorithm and detached-signature transport profile remain OPEN-QUESTION; no EPC signature requirement is claimed.
+    architecture: Existing signature module and SignatureVerificationPort are sufficient; channel profile review is required.
+    tests: Retain crypto and ordering integration proofs; add channel-profile contract tests only after the decision.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: Runtime evidence is strong, but the story contract must distinguish project Ed25519 policy from scheme authority.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-19/19.2
+    cohort: E1
+    current_status: done
+    current_code_state: Raw archive precedes signature verification and failed verification prevents parsing.
+    implementation_evidence: [SignatureBeforeParseOrderingTest]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-A
+    source_status: Ordering is a security/project decision; exact signed-channel profile is unresolved.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    tests: Preserve the mutation-proven archive-verify-parse ordering integration test.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: Implemented behavior needs ENFORCED actor, source classification, security context and executable verify metadata.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-19/19.4
+    cohort: E1
+    current_status: done
+    current_code_state: Signed pain.001.001.09 endpoint maps one transaction and persists lineage/outbox, but lacks ISO XSD/EPC TVS validation, reviewed limits and complete profile rules.
+    implementation_evidence: [Pain001IngestionIntegrationTest, Pain001CanonicalMapperTest]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-A
+    source_status: EPC132-08 2025 v1.0 verified; channel/signature and TVS artifact applicability require review.
+    architecture: Existing ingress/payment/ISO ownership is sufficient for the pilot; BOUNDARY_REVIEW_REQUIRED if a file aggregate is proposed.
+    tests: Add XSD/TVS fixtures, deterministic validation errors, database lineage proof and composed E1 acceptance.
+    proposed_status: PARTIALLY_IMPLEMENTED
+    rationale: A done label currently overstates source-profile and validation completeness.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-26/26.3
+    cohort: E1
+    current_status: done
+    current_code_state: Message, instruction, end-to-end and transaction identifiers are persisted in the ISO-owned schema.
+    implementation_evidence: [Pain001IngestionIntegrationTest, IsoIdentifierRepositoryTest]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-A
+    source_status: EPC/ISO message paths are known for pain.001.001.09; normalization and uniqueness semantics need field-level mapping review.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    tests: Allocate identifier mapping to unit/integration and constraints/RLS to database tests.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: The implementation exists but its legacy story lacks the Phase E mapping and source-evidence contract.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-26/26.4
+    cohort: E1
+    current_status: in-progress
+    current_code_state: Query-only GraphQL ISO lineage and the BFF/detail panel exist despite stale story prose claiming GraphQL is absent.
+    implementation_evidence: [GraphqlSmokeIntegrationTest, Dagger_D3B_frontend_graphql_smoke]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-B
+    source_status: Source-owned operational read; no scheme behavior is inferred.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT under ADR-N17.
+    tests: Keep GraphQL contract and one composed read smoke; do not repeat mapping cases in UI.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: Code and runtime proof invalidate the old blocker, but human review is required before changing status.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: PROPOSED-E1-06
+    cohort: E1
+    current_status: absent
+    current_code_state: Backend command exists; signed upload BFF route, UI journey and smoke do not.
+    implementation_evidence: []
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-B
+    source_status: Channel profile, accepted signature representation and upload byte limit are DECISION_BLOCKED.
+    architecture: One Next.js BFF command route and Payments workspace journey; REST command ownership remains backend, GraphQL remains query-only.
+    tests: BFF contract/component tests plus exactly one Playwright signed-upload smoke and composed Dagger acceptance.
+    proposed_status: READY_CANDIDATE
+    rationale: This closes the actor journey without creating frontend-owned payment semantics or broad browser duplication.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-19/19.3
+    cohort: E1-supporting
+    current_status: done
+    current_code_state: DTD, external entities, XInclude and entity expansion are hardened.
+    implementation_evidence: [XmlHardeningTest]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-A
+    source_status: Security/project requirement; size, depth and text limits remain QUALITY_EXPERIMENT_REQUIRED.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    tests: Keep focused parser security tests; exercise endpoint propagation once in E1.
+    proposed_status: IMPLEMENTED_AND_PROVEN
+    rationale: Proven dependency; not one of the six records selected for material migration.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-24/24.2A
+    cohort: E2
+    current_status: done
+    current_code_state: Payment list/detail, ISO panel and timeline exist.
+    implementation_evidence: [Dagger_D3A_frontend_rest_smoke, Dagger_D3B_frontend_graphql_smoke]
+    use_case: UC-SCT-001
+    slice: UCS-SCT-001-A
+    source_status: Project operational read.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    tests: Reuse existing component/build and composed smoke evidence.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: Migrate metadata in E2; do not reopen the screen implementation.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-24/24.2B
+    cohort: deferred
+    current_status: blocked
+    current_code_state: Broad historical Playwright acceptance is absent.
+    implementation_evidence: []
+    use_case: UC-SCT-001
+    slice: UCS-SCT-001-A
+    source_status: Project test policy superseded in scope by ADR-N16.
+    architecture: No architecture change.
+    tests: Replace broad screen gate with named risk-focused smoke only through a reviewed backlog change.
+    proposed_status: STALE
+    rationale: Its broad sequencing conflicts with the current minimal-smoke policy and must not block E1.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-76/76.1-76.6
+    cohort: E2
+    current_status: mixed done and in-progress
+    current_code_state: Approval persistence, policy, commands, queue/read model and UI are substantially implemented.
+    implementation_evidence: [ApprovalServiceTest, ApprovalGraphqlIntegrationTest, Dagger_D3B_frontend_graphql_smoke]
+    use_case: UC-APPROVAL-001
+    slice: UCS-APPROVAL-001-A
+    source_status: Maker-checker is project policy, not an EPC requirement.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT; transaction proof remains binding.
+    tests: Reconcile per command, database/RLS and one approval journey; no broad browser matrix.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: Status/prose lag implementation; E2 should reconcile rather than rebuild.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-77/77.1-77.3
+    cohort: E2
+    current_status: done
+    current_code_state: Append-only command audit, same-transaction writes and integrity reads exist.
+    implementation_evidence: [AuditCommandIntegrationTest, AuditImmutabilityDatabaseTest]
+    use_case: UC-AUDIT-001
+    slice: UCS-AUDIT-001-A
+    source_status: Project evidence policy; legal retention remains LEGAL_REVIEW_REQUIRED.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    tests: Retain database immutability/RLS and command transaction proofs.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: Runtime capability exists; retention and access policy need Phase E review metadata.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-78/78.1-78.4
+    cohort: E2
+    current_status: done
+    current_code_state: Secured query-only GraphQL, source-owned data fetchers and fixed BFF proxy exist.
+    implementation_evidence: [GraphqlSmokeIntegrationTest, Dagger_D3B_frontend_graphql_smoke]
+    use_case: UC-OPS-001
+    slice: UCS-OPS-001-A
+    source_status: Accepted ADR-N17 and project read contract.
+    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    tests: Reconcile unchecked task prose with executed contract/runtime evidence.
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    rationale: Done frontmatter conflicts with unchecked task markers and legacy warnings.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-73/73.1-73.4
+    cohort: E3
+    current_status: not-started
+    current_code_state: No admitted File/Group/Batch aggregate or file-result flow.
+    implementation_evidence: []
+    use_case: UC-SCT-003
+    slice: UCS-SCT-003-A
+    source_status: Participant documentation and partial-processing policy are unresolved.
+    architecture: BOUNDARY_REVIEW_REQUIRED and AGGREGATE_REVIEW_REQUIRED; Spring Batch is not preselected.
+    tests: Decide file/group/count/control-sum and restart risks before allocating tests.
+    proposed_status: DECISION_BLOCKED
+    rationale: Existing stories assume MsgId idempotency, Spring Batch and partial acceptance without sufficient authority.
+    human_review_state: NOT_REVIEWED
+  - epic_story_id: EPIC-28/28.2-28.4
+    cohort: E4-E6
+    current_status: blocked
+    current_code_state: Message catalogue placeholders exist; no participant-qualified rail contracts.
+    implementation_evidence: []
+    use_case: UC-CLEARING-001
+    slice: UCS-CLEARING-001-A
+    source_status: Public EPC message set is known; detailed CSM participant profile is restricted.
+    architecture: NEW_INTEGRATION_CONTRACT and BOUNDARY_REVIEW_REQUIRED per rail.
+    tests: Contract fixtures require lawful participant artifacts or an explicitly synthetic profile.
+    proposed_status: SOURCE_BLOCKED
+    rationale: Do not infer STEP2, RT1, TIPS or STET participant rules from public summaries.
+    human_review_state: NOT_REVIEWED
