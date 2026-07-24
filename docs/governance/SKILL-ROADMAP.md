@@ -1,12 +1,28 @@
 # Skill Roadmap
 
-| Skill | Trigger / inputs | Workflow and mandatory artifacts | Boundaries, validation, anti-patterns |
-|---|---|---|---|
-| source-backed-payments-modeling | payment concept, rule, rail, ISO message | inspect registry/authority; produce concept/rule/admission record | no participant invention; validate tags, versions, assumptions |
-| enterprise-use-case-engineering | capability/use case/story | derive UC2 use case, slices, rules, quality scenarios, trace | no story without slice/quality UC; validate trace links |
-| architecture-evolution-review | module/ADR/boundary change | C4/context/ATAM-lite and admission evidence | no frozen-boundary change; validate catalog/dependency/security effects |
-| planning-semantic-integrity | planning status/capability update | reconcile inventory, code evidence and readiness | no cosmetic status change; run semantic validators |
-| dagger-go-pipeline | CI/pipeline work | define Go Dagger check, thin trigger mapping, evidence | no duplicated Actions logic; validate target parity |
-| demand-driven-graphql-read-model | proposed operational read | prove journey→source port→schema→resolver→codegen→BFF | no CRUD/federation/table schema; structural/security/perf validation |
+The registry is authoritative for installed packages. This roadmap distinguishes
+installed `ACTIVE` skills from `PLANNED` designs and any retired `DEPRECATED`
+entry. “Eval-proven” is recorded only where its named proof was executed.
 
-These are designs, not installed skills. Implement only when the follow-up governance goal accepts conventions and validator integration.
+## ACTIVE
+
+| Skill | Assurance state | Workflow and boundary |
+|---|---|---|
+| `enterprise-use-case-engineering` | installed; deterministic routing/regression/adversarial/E2E contract evals passed 2026-07-24; cross-skill integrated; gradual ENFORCED planning gate active | source discovery → payment-source classification → UC/flow/slice drafting → architecture review → planning readiness; no fictional use case for technical work |
+| `source-backed-payments-modeling` | installed; no new eval claim in this checkpoint | classify payment authority and per-claim evidence; no participant invention |
+| `architecture-evolution-review` | installed; no new eval claim in this checkpoint | review module/port/schema/event/aggregate realization; no silent frozen-boundary redesign |
+| `planning-semantic-integrity` | installed; repository validators and focused ENFORCED fixtures passed 2026-07-24 | reconcile catalogue references, readiness and executable proof; legacy migration remains gradual |
+| `dagger-go-pipeline` | installed; runtime-proven by the Phase D final acceptance record | local Dagger verification only; no remote CI or deployment claim |
+
+Other registry entries with `status: ACTIVE` remain installed at their recorded
+assurance level; this checkpoint does not promote them to eval-proven.
+
+## PLANNED
+
+`debina-dependency-version-gate`, `debina-next16-keycloak-bff`,
+`debina-playwright-payment-lab`, and `demand-driven-graphql-read-model` remain
+design or backlog candidates until their registry/admission work is accepted.
+
+## DEPRECATED
+
+None recorded.

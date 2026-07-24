@@ -23,3 +23,17 @@ Human review remains required for all AI drafts, qualified participant rail prof
 ## Commit record
 
 - `c011c9b feat(governance): assure enterprise use-case methodology` — assurance policies, skill/template remediation, audits, representative use-case corrections, validators and adversarial proofs.
+
+## Hardening checkpoint — 2026-07-24
+
+The installed `enterprise-use-case-engineering` skill now has mandatory source
+discovery, explicit technical/quality-only exits, complete cross-skill handoff,
+behavioral use-case/slice admission, and deterministic routing, regression,
+adversarial and E2E contract evals. Forward-only `ENFORCED` story validation
+requires exact slice, per-claim evidence, module ownership and executable
+verification references. See
+`docs/governance/methodology-assurance/ENTERPRISE-USE-CASE-SKILL-HARDENING.md`.
+
+This hardening closes skill assurance defects F-16–F-19. It does not mark
+Phase E complete: controlled backlog migration and human review of AI-drafted
+artifacts remain outstanding.

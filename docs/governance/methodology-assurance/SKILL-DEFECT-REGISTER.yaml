@@ -15,3 +15,7 @@ defects:
   - {id: F-13, finding: C4 fragments, disposition: CONFIRMED, remediation: dynamic-review-metadata}
   - {id: F-14, finding: uneven measures, disposition: CONFIRMED, remediation: quality-review}
   - {id: F-15, finding: questionable system actors, disposition: PARTIAL, remediation: actor-type-audit-required-before-ready}
+  - {id: F-16, finding: enterprise use-case skill lacked routing and regression proof, disposition: REMEDIATED, remediation: deterministic-routing-regression-adversarial-and-e2e-contract-evals}
+  - {id: F-17, finding: source registry could be mistaken for per-claim evidence, disposition: REMEDIATED, remediation: mandatory-source-discovery-gate-and-evidence-to-rule-links}
+  - {id: F-18, finding: ENFORCED story readiness did not mechanically require an existing slice, disposition: REMEDIATED, remediation: ESR-001-through-017-validator-and-focused-fixtures}
+  - {id: F-19, finding: cross-skill handoff was implicit, disposition: REMEDIATED, remediation: classified-source-modeling-architecture-and-planning-orchestration-contract}
