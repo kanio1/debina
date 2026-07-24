@@ -20,8 +20,12 @@ Before drafting material payment behavior, classify the rule authority and
 inspect both `SOURCE-REGISTRY.yaml` and per-claim
 `SOURCE-EVIDENCE-CATALOG.yaml`. Registry presence or a link is discovery, not
 evidence. Record publisher, applicable version/date/section, rail/profile,
-access restriction, supported claim, interpretation and confidence; unresolved
-`VERIFY-PER-USE`, conflicting or participant-only evidence is source-blocked.
+access restriction, supported claim, interpretation, confidence, freshness,
+effective interval and supersession. `SOURCE_CONFIRMED + READY` requires
+`VERIFIED` per-claim evidence. `VERIFY_PER_USE`, `INCOMPLETE`, `STALE`,
+`CONFLICTING` or `RESTRICTED` evidence blocks that path; accepted/frozen project
+authority and explicit simulation boundaries retain their narrower project-only
+semantics.
 
 Use the handoff
 `enterprise-use-case-engineering → source-backed-payments-modeling →

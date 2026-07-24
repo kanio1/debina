@@ -29,7 +29,7 @@ Human review remains required for all AI drafts, qualified participant rail prof
 The installed `enterprise-use-case-engineering` skill now has mandatory source
 discovery, explicit technical/quality-only exits, complete cross-skill handoff,
 behavioral use-case/slice admission, and deterministic routing, regression,
-adversarial and E2E contract evals. Forward-only `ENFORCED` story validation
+adversarial and cross-skill-chain fixture-contract evals. Forward-only `ENFORCED` story validation
 requires exact slice, per-claim evidence, module ownership and executable
 verification references. See
 `docs/governance/methodology-assurance/ENTERPRISE-USE-CASE-SKILL-HARDENING.md`.
@@ -37,3 +37,8 @@ verification references. See
 This hardening closes skill assurance defects F-16–F-19. It does not mark
 Phase E complete: controlled backlog migration and human review of AI-drafted
 artifacts remain outstanding.
+
+The earlier Phase D recommendation in this historical assurance record is
+superseded by the completed, runtime-proven Phase D records. Remote CI, `act`
+and deployment/release remain out of scope; completed Phase D does not block
+Phase E.

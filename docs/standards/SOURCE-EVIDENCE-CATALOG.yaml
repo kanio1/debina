@@ -1,4 +1,4 @@
-version: 1
+version: 2
 purpose: Per-claim evidence references for methodology-assurance representative use cases; registry presence alone is discovery.
 evidence:
   - id: SE-SCT-001

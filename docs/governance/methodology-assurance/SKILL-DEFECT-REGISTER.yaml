@@ -19,3 +19,6 @@ defects:
   - {id: F-17, finding: source registry could be mistaken for per-claim evidence, disposition: REMEDIATED, remediation: mandatory-source-discovery-gate-and-evidence-to-rule-links}
   - {id: F-18, finding: ENFORCED story readiness did not mechanically require an existing slice, disposition: REMEDIATED, remediation: ESR-001-through-017-validator-and-focused-fixtures}
   - {id: F-19, finding: cross-skill handoff was implicit, disposition: REMEDIATED, remediation: classified-source-modeling-architecture-and-planning-orchestration-contract}
+  - {id: F-20, finding: classification tokens drifted between underscore and hyphen forms, disposition: REMEDIATED, remediation: canonical-vocabulary-deprecated-aliases-and-cross-skill-validator}
+  - {id: F-21, finding: source evidence lacked durable freshness and supersession state, disposition: REMEDIATED, remediation: evidence-status-review-window-and-readiness-gates}
+  - {id: F-22, finding: fixture markers could be mistaken for model behavior, disposition: REMEDIATED, remediation: fixture-contract-markers-and-model-behavior-not-executed}

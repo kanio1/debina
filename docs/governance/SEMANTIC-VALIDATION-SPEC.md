@@ -21,6 +21,11 @@ The next governance goal implements deterministic checks with a stable diagnosti
 | ESR-010–013 | ENFORCED story lacks module ownership, architecture, security or quality realization | resolve module and quality IDs; error |
 | ESR-014–016 | verify is a placeholder, READY has an unresolved source gap, or done retains `NOT RUN` | fail closed with the exact diagnostic; error |
 | ESR-017 | technical-only work invents a business use case/slice | route to a quality, architecture, infrastructure or governance scenario; error |
+| ESR-018 | READY uses evidence that is not `VERIFIED` | name the evidence ID and freshness state; error |
+| ESR-019 | READY uses stale or superseded evidence | name the evidence ID and successor; error |
+| ESR-020 | source classification conflicts with evidence authority | project authority cannot prove an external `SOURCE_CONFIRMED` claim; error |
+| ESR-021 | `PROJECT_INTERPRETATION` lacks accepted/frozen project authority | require project-ADR evidence; error |
+| ESR-022 | `PROJECT_SIMULATION` lacks an explicit synthetic boundary | record the laboratory boundary; error |
 
 Start with SV-01–SV-05 as deterministic extensions of existing validators, retain exemptions only with reason/expiry, and never infer domain truth from a grep hit alone.
 
