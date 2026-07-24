@@ -26,15 +26,28 @@ decisions:
     recommendation: REST_PLUS_BFF_UPLOAD
     proposed_profile:
       backend_content_type: application/xml
-      encoding: XML declaration plus supported UTF policy requires ISO_MESSAGE_REVIEW
+      encoding: >-
+        Preserve exact received bytes; never decode archived evidence with a
+        platform-default charset; reject unsupported or contradictory encoding
+        declarations; determine accepted encoding profile from qualified XML/ISO/EPC
+        evidence; do not require an XML declaration unless the selected authoritative
+        profile explicitly requires it; final declaration/charset policy OPEN or
+        DECISION_BLOCKED where source evidence is insufficient. Open questions:
+        ISO-MESSAGE-REVIEW.md § XML encoding and charset open questions (AI_DRAFT).
+      encoding_acceptance: DECISION_BLOCKED
       authentication: Keycloak bearer token at backend; server-side session at BFF
       authorization: payment_submitter
       tenant_resolution: signed tenant_id token claim; no body/header override
       bff_security: same-origin, CSRF token, fixed backend destination, no browser token exposure
-      idempotency: caller/BFF supplied opaque Idempotency-Key; retry contract requires review
+      idempotency: >-
+        One opaque Idempotency-Key identifies one logical tenant-scoped submission;
+        transport retries of the same logical operation reuse the same key; same key
+        plus same payload identity/hash returns the original deterministic outcome;
+        same key plus materially different payload returns a deterministic conflict;
+        key ownership, TTL and retention remain SECURITY/DATABASE decisions
       replay_and_rate_limits: QUALITY_EXPERIMENT_REQUIRED
     rejected_alternatives: [GraphQL mutation, frontend direct bearer-token storage, SFTP in E1]
-    blocking_questions: [accepted encoding, CSRF/origin contract, retry key lifecycle, measured limits]
+    blocking_questions: [XML encoding and charset open questions in ISO-MESSAGE-REVIEW.md, CSRF/origin contract, Idempotency-Key lifecycle and retention, measured HTTP limits after owner experiment approval]
     affected_slices: [UCS-SCT-002-A, UCS-SCT-002-B]
     affected_stories: [EPIC-19/19.4, EPIC-24/24.10]
     reviewer_roles: [security architect, frontend/BFF architect, product owner, payments domain specialist]
@@ -43,31 +56,47 @@ decisions:
   - id: DEC-E1-SIGNATURE
     title: E1 detached signature project profile
     source_classification: DECISION_BLOCKED
-    source_tags: [PROJECT-ADR, OPEN-QUESTION]
-    authority_boundary: Detached headers and Ed25519 are Debina project security policy, not EPC requirements.
+    source_tags: [OPEN-QUESTION]
+    authority_boundary: >-
+      Detached-signature processing and Ed25519 are a candidate Debina project
+      security policy; they are not EPC requirements. Normative acceptance remains
+      DECISION_BLOCKED. Closure requires a dated human SECURITY_REVIEW and an
+      accepted dedicated project security/evidence decision or ADR.
+    normative_acceptance: DECISION_BLOCKED
     options:
-      - id: VERSIONED_ED25519_HEADERS
-        description: Version the current X-Signer-Id, base64 X-Signature and X-Signature-Algo Ed25519 convention as an explicitly synthetic E1 profile.
-        consequence: Preserves current implementation while making its non-EPC boundary explicit.
+      - id: VERSIONED_DETACHED_ED25519_PROFILE
+        description: >-
+          Define a versioned detached Ed25519 cryptographic and evidence profile
+          for E1. The profile defines covered bytes, algorithm, signature encoding,
+          verification outcomes, immutable evidence and safe telemetry. The profile
+          does not freeze HTTP header names, signer-identifier transport, UUID
+          representation or the public channel contract. Those remain DECISION_BLOCKED
+          pending SECURITY_REVIEW.
+        consequence: >-
+          Separates cryptographic/evidence profile from transport contract; preserves
+          current implementation as evidence without accepting it as normative public API.
       - id: CERTIFICATE_PROFILE
         description: Replace signer UUID/key lookup with a reviewed X.509/certificate profile.
         consequence: Requires trust-store, chain, revocation and likely architecture work before E1.
       - id: NO_BROWSER_SIGNATURE
         description: Limit browser journey to already signed bytes and metadata obtained outside Debina.
         consequence: Avoids browser cryptography but still requires a trusted signer identity representation.
-    recommendation: VERSIONED_ED25519_HEADERS
+    recommendation: VERSIONED_DETACHED_ED25519_PROFILE
     proposed_profile:
       profile_id: DEBINA-E1-DETACHED-ED25519-V1
       covered_bytes: exact archived HTTP request body before parsing or normalization
-      signature_encoding: standard base64; malformed encoding needs a stable problem code
-      signer_identity: X-Signer-Id maps to an approved verification key; semantics require SECURITY_REVIEW
-      algorithm: Ed25519 allowlist entry, explicit rather than trusted client default
+      signature_encoding: standard base64
+      algorithm: Ed25519 allowlist entry
+      transport_contract: DECISION_BLOCKED
+      signer_identifier_transport: DECISION_BLOCKED
+      signer_identifier_representation: DECISION_BLOCKED
+      current_headers_status: IMPLEMENTATION_EVIDENCE_ONLY
       rotation_expiry_revocation: required decisions; current active/expired/revoked key model is implementation evidence only
       immutable_evidence: raw_message_id, covered_sha256, key_id, algorithm, verdict, safe reason and verification time
       telemetry: no XML, signature bytes, public/private material, party/account/address data
     outcomes: [MISSING_SIGNATURE, MALFORMED_SIGNATURE, INVALID_SIGNATURE, UNKNOWN_SIGNER, UNTRUSTED_KEY, EXPIRED_KEY, REVOKED_KEY, VERIFIED]
     rejected_alternatives: [custom cryptography, EPC-signature claim, private key upload]
-    blocking_questions: [signer identity authority, trust model, rotation overlap, revocation source, browser responsibility]
+    blocking_questions: [normative signature profile acceptance, signer identity authority, trust model, rotation overlap, revocation source, browser responsibility, dated SECURITY_REVIEW and accepted security/evidence decision or ADR]
     affected_slices: [UCS-SCT-002-A, UCS-SCT-002-B]
     affected_stories: [EPIC-31/31.2, EPIC-19/19.2, EPIC-19/19.4, EPIC-24/24.10]
     reviewer_roles: [security architect, payments domain specialist, architecture reviewer]
@@ -111,14 +140,14 @@ decisions:
     source_tags: [PROJECT-ADR, OPEN-QUESTION]
     recommendation: Run bounded experiments before accepting production-like thresholds.
     experiments:
-      - {measure: HTTP_BODY_BYTES, state: QUALITY_EXPERIMENT_REQUIRED}
-      - {measure: DECOMPRESSED_BYTES, state: QUALITY_EXPERIMENT_REQUIRED}
-      - {measure: XML_DEPTH, state: QUALITY_EXPERIMENT_REQUIRED}
-      - {measure: MAX_TEXT_LENGTH, state: QUALITY_EXPERIMENT_REQUIRED}
-      - {measure: TRANSACTION_COUNT, state: QUALITY_EXPERIMENT_REQUIRED}
-      - {measure: PARSER_PEAK_MEMORY, state: QUALITY_EXPERIMENT_REQUIRED}
-      - {measure: END_TO_END_TIMEOUT, state: QUALITY_EXPERIMENT_REQUIRED}
-      - {measure: UPLOAD_DURATION, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: HTTP_BODY_BYTES, state: MEASURED_NOT_ACCEPTED, classification: SAFE_LIGHTWEIGHT_EXECUTE, note: see E1-EXPERIMENT-RESULTS.yaml}
+      - {measure: DECOMPRESSED_BYTES, state: MEASURED_NOT_ACCEPTED, classification: SAFE_LIGHTWEIGHT_EXECUTE}
+      - {measure: XML_DEPTH, state: MEASURED_NOT_ACCEPTED, classification: SAFE_LIGHTWEIGHT_EXECUTE}
+      - {measure: MAX_TEXT_LENGTH, state: MEASURED_NOT_ACCEPTED, classification: SAFE_LIGHTWEIGHT_EXECUTE}
+      - {measure: TRANSACTION_COUNT, state: SEMANTIC_BOUNDARY_NOT_LIMIT, classification: NOT_NEEDED_FOR_E1}
+      - {measure: PARSER_PEAK_MEMORY, state: DEFERRED, classification: REQUIRES_OWNER_APPROVAL}
+      - {measure: END_TO_END_TIMEOUT, state: DEFERRED, classification: REQUIRES_OWNER_APPROVAL}
+      - {measure: UPLOAD_DURATION, state: DEFERRED, classification: REQUIRES_OWNER_APPROVAL}
     fixed_e1_semantic_boundary: One PmtInf and one CdtTrfTxInf only after source/profile approval; this is not a performance threshold.
     rejected_alternatives: [invented production values, unbounded DOM parsing, browser-only enforcement]
     blocking_questions: [fixture sizes, target environment, failure taxonomy, timeout ownership]

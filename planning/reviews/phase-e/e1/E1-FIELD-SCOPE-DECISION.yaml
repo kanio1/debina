@@ -1,0 +1,386 @@
+version: 1
+status: AI_DRAFT
+semantic_review_state: NOT_REVIEWED
+use_case_id: UC-SCT-002
+scope: minimal E1 single PmtInf single CdtTrfTxInf signed pain.001.001.09
+classification_vocabulary:
+  - MAP_AND_PERSIST
+  - VALIDATE_ONLY
+  - PRESERVE_IN_RAW_EVIDENCE
+  - EXPOSE_IN_READ_MODEL
+  - DEFER_FROM_E1
+  - SOURCE_BLOCKED
+  - DECISION_BLOCKED
+summary_counts:
+  MAP_AND_PERSIST: 10
+  VALIDATE_ONLY: 4
+  PRESERVE_IN_RAW_EVIDENCE: 1
+  EXPOSE_IN_READ_MODEL: 0
+  DEFER_FROM_E1: 11
+  SOURCE_BLOCKED: 1
+  DECISION_BLOCKED: 1
+entries:
+  - mapping_id: E1-MAP-001
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/MsgId
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC C2PSP row 1.1 MsgId 1..1
+    current_behavior: Mapped to iso.iso_messages.msg_id and payment_iso_identifiers.msg_id
+    e1_necessity: Required for lineage and correlation
+    owner: ISO-adapter
+    persistence_decision: Persist in iso schema
+    validation_decision: Max35Text; uniqueness scope tenant/message context review
+    read_visibility: visible in payment-detail ISO identifier section
+    migration_need: Review uniqueness index scope only
+    primary_test_layer: unit/property plus database integration
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-002
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/CreDtTm
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC row 1.2 CreDtTm 1..1 ISODateTime
+    current_behavior: IMPLEMENTATION_GAP — recordedAt written to cre_dt_tm; source not parsed
+    e1_necessity: Source creation time distinct from receive/record time
+    owner: ISO-adapter
+    persistence_decision: source_message_created_at supplement per correction proposal
+    validation_decision: Parse ISODateTime; reject if absent after profile admission
+    read_visibility: visible as safe source-creation timestamp metadata in payment detail
+    migration_need: Flyway expand-contract required
+    primary_test_layer: unit plus database integration
+    blocking_review: DATABASE_MAPPING_REVIEW
+  - mapping_id: E1-MAP-003
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/NbOfTxs
+    e1_classification: VALIDATE_ONLY
+    source_claim: EPC group NbOfTxs 1..1
+    current_behavior: Not validated
+    e1_necessity: Reconcile with actual transaction count
+    owner: ISO-adapter
+    persistence_decision: No column for E1
+    validation_decision: Must equal 1 for E1 profile
+    read_visibility: Validation outcome only
+    migration_need: none
+    primary_test_layer: unit/property
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-004
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/CtrlSum
+    e1_classification: SOURCE_BLOCKED
+    source_claim: ISO 0..1; EPC profile row to reconfirm
+    current_behavior: Not validated
+    e1_necessity: Blocked until EPC cardinality confirmed
+    owner: ISO-adapter
+    persistence_decision: none until source confirmed
+    validation_decision: blocked pending EPC CtrlSum cardinality confirmation
+    read_visibility: not exposed in the minimal E1 read model
+    migration_need: none
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-005
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/PmtInfId
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC PmtInfId 1..1
+    current_behavior: Mapped to payment_iso_identifiers.pmt_inf_id
+    e1_necessity: Required payment-information identifier
+    owner: ISO-adapter
+    persistence_decision: Persist
+    validation_decision: Max35Text
+    read_visibility: visible in payment-detail ISO identifier section
+    migration_need: index scope review
+    primary_test_layer: unit plus database
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-006
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/PmtMtd
+    e1_classification: VALIDATE_ONLY
+    source_claim: EPC TRF only for SCT C2PSP
+    current_behavior: Not validated
+    e1_necessity: Profile enforcement
+    owner: ISO-adapter
+    persistence_decision: none
+    validation_decision: Must be TRF after TVS
+    read_visibility: none
+    migration_need: none
+    primary_test_layer: unit/property
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-007
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/NbOfTxs
+    e1_classification: VALIDATE_ONLY
+    source_claim: EPC 1..1 equals transaction count
+    current_behavior: Not validated
+    e1_necessity: Must equal 1 for E1
+    owner: ISO-adapter
+    persistence_decision: none
+    validation_decision: Equals CdtTrfTxInf count
+    read_visibility: none
+    migration_need: none
+    primary_test_layer: unit/property
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-008
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CtrlSum
+    e1_classification: VALIDATE_ONLY
+    source_claim: EPC row 2.5 control sum
+    current_behavior: Not validated
+    e1_necessity: Reconcile with instructed amount for single tx
+    owner: ISO-adapter
+    persistence_decision: none for E1
+    validation_decision: Decimal exact match to InstdAmt
+    read_visibility: none
+    migration_need: none
+    primary_test_layer: unit/property
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-009
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/ReqdExctnDt/Dt|DtTm
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC requested execution 1..1
+    current_behavior: Not mapped
+    e1_necessity: Product decision on minimal outcome
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer until admitted
+    read_visibility: defer
+    migration_need: none in E1
+    primary_test_layer: ISO_MESSAGE_REVIEW decision first
+    blocking_review: PAYMENTS_DOMAIN_REVIEW
+  - mapping_id: E1-MAP-010
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/Dbtr/Nm
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC debtor name required in profile
+    current_behavior: Not in canonical command
+    e1_necessity: Beyond minimal mapper today; not blocking smoke if IBANs present
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: defer
+    migration_need: none E1
+    primary_test_layer: source/schema when admitted
+    blocking_review: PAYMENTS_DOMAIN_REVIEW
+  - mapping_id: E1-MAP-011
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/Dbtr/PstlAdr/*
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC153-22 address transition
+    current_behavior: Not mapped
+    e1_necessity: Address policy not minimal E1 blocker
+    owner: payment-lifecycle
+    persistence_decision: defer; bytes indirectly preserved via E1-MAP-028 raw evidence entry
+    validation_decision: defer profile rules
+    read_visibility: none
+    migration_need: none E1
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-012
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/DbtrAcct/Id/IBAN
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC IBAN only
+    current_behavior: Mapped to payment.payments.debtor_iban
+    e1_necessity: Core payment instruction
+    owner: payment-lifecycle
+    persistence_decision: Persist masked in reads
+    validation_decision: IBAN check digit
+    read_visibility: masked operational read
+    migration_need: none
+    primary_test_layer: unit/property plus database
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-013
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/DbtrAgt/FinInstnId/BICFI
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC optional BIC path
+    current_behavior: Not mapped
+    e1_necessity: Optional in minimal admitted message
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: defer
+    migration_need: none E1
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-014
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/PmtId/InstrId
+    e1_classification: MAP_AND_PERSIST
+    source_claim: ISO 0..1 InstrId
+    current_behavior: Mapped when present
+    e1_necessity: Lineage identifier
+    owner: ISO-adapter
+    persistence_decision: Persist nullable
+    validation_decision: Max35Text when present
+    read_visibility: visible in payment-detail ISO identifier section
+    migration_need: none
+    primary_test_layer: unit plus database
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-015
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/PmtId/EndToEndId
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC 1..1 EndToEndId
+    current_behavior: Mapped
+    e1_necessity: Required correlation identifier
+    owner: ISO-adapter
+    persistence_decision: Persist
+    validation_decision: Max35Text required
+    read_visibility: visible in payment-detail ISO identifier section
+    migration_need: none
+    primary_test_layer: unit plus database
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-016
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/PmtId/UETR
+    e1_classification: MAP_AND_PERSIST
+    source_claim: ISO UUIDv4 UETR 0..1
+    current_behavior: Mapped when present
+    e1_necessity: Preserve when supplied
+    owner: ISO-adapter
+    persistence_decision: Persist nullable
+    validation_decision: UUIDv4 syntax when present
+    read_visibility: visible in payment-detail ISO identifier section when present
+    migration_need: none
+    primary_test_layer: unit/property
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-017
+    xml_path: NOT_APPLICABLE_IN_PAIN001
+    e1_classification: DEFER_FROM_E1
+    source_claim: TxId from downstream rail messages
+    current_behavior: Column exists; must not fabricate
+    e1_necessity: Not in pain.001
+    owner: ISO-adapter
+    persistence_decision: none at intake
+    validation_decision: negative test must not fabricate
+    read_visibility: defer until downstream
+    migration_need: none
+    primary_test_layer: unit negative
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-018
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Amt/InstdAmt
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC instructed amount
+    current_behavior: Mapped to payment.payments.amount
+    e1_necessity: Core payment value
+    owner: payment-lifecycle
+    persistence_decision: numeric(18,2)
+    validation_decision: positive decimal
+    read_visibility: visible in payment-detail amount section
+    migration_need: none
+    primary_test_layer: unit/property plus database
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-019
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Amt/InstdAmt/@Ccy
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC currency
+    current_behavior: Mapped to payment.payments.currency
+    e1_necessity: Core payment value
+    owner: payment-lifecycle
+    persistence_decision: char(3)
+    validation_decision: EUR for SCT after profile
+    read_visibility: visible in payment-detail amount/currency section
+    migration_need: none
+    primary_test_layer: unit/property
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-020
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/CdtrAgt/FinInstnId/BICFI
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC optional creditor agent
+    current_behavior: Not mapped
+    e1_necessity: Optional minimal message
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: defer
+    migration_need: none E1
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-021
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Cdtr/Nm
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC creditor name
+    current_behavior: Not mapped
+    e1_necessity: defer minimal E1
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: defer
+    migration_need: none E1
+    primary_test_layer: source/schema
+    blocking_review: PAYMENTS_DOMAIN_REVIEW
+  - mapping_id: E1-MAP-022
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Cdtr/PstlAdr/*
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC153-22 address
+    current_behavior: Not mapped
+    e1_necessity: defer; bytes indirectly preserved via E1-MAP-028 raw evidence entry
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: none
+    migration_need: none E1
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-023
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/CdtrAcct/Id/IBAN
+    e1_classification: MAP_AND_PERSIST
+    source_claim: EPC creditor IBAN
+    current_behavior: Mapped
+    e1_necessity: Core payment instruction
+    owner: payment-lifecycle
+    persistence_decision: Persist
+    validation_decision: IBAN check digit
+    read_visibility: masked operational read
+    migration_need: none
+    primary_test_layer: unit plus database
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-024
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/RmtInf/Ustrd|Strd
+    e1_classification: DEFER_FROM_E1
+    source_claim: EPC remittance optional/restricted
+    current_behavior: Not mapped
+    e1_necessity: Not minimal smoke blocker; bytes indirectly preserved via E1-MAP-028 raw evidence entry
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: defer
+    migration_need: none E1
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-025
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Purp/Cd|Prtry
+    e1_classification: DEFER_FROM_E1
+    source_claim: Purpose optional
+    current_behavior: Not mapped
+    e1_necessity: defer
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: defer
+    migration_need: none
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-026
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/PmtTpInf/CtgyPurp|CdtTrfTxInf/PmtTpInf/CtgyPurp
+    e1_classification: DEFER_FROM_E1
+    source_claim: Category purpose optional
+    current_behavior: Not mapped
+    e1_necessity: defer
+    owner: payment-lifecycle
+    persistence_decision: defer
+    validation_decision: defer
+    read_visibility: defer
+    migration_need: none
+    primary_test_layer: source/schema
+    blocking_review: ISO_MESSAGE_REVIEW
+  - mapping_id: E1-MAP-027
+    xml_path: OUT_OF_BAND_DETACHED_SIGNATURE_METADATA
+    e1_classification: DECISION_BLOCKED
+    source_claim: Project BR-SCT-003 security policy
+    current_behavior: Tables exist; trust profile open
+    e1_necessity: Required for signed channel
+    owner: signature
+    persistence_decision: verdict events when profile approved
+    validation_decision: DEBINA-E1-DETACHED-ED25519-V1 pending SECURITY_REVIEW
+    read_visibility: safe metadata only
+    migration_need: none until profile approved
+    primary_test_layer: integration plus database
+    blocking_review: SECURITY_REVIEW
+  - mapping_id: E1-MAP-028
+    xml_path: WHOLE_ORIGINAL_XML_BYTES
+    e1_classification: PRESERVE_IN_RAW_EVIDENCE
+    source_claim: Project evidence policy
+    current_behavior: ingress.raw_inbound_messages payload stored
+    e1_necessity: Immutable signed evidence root
+    owner: ingress
+    persistence_decision: bytea append-only
+    validation_decision: archive before verify
+    read_visibility: restricted; no GraphQL raw bytes
+    migration_need: RLS policy review
+    primary_test_layer: database integration
+    blocking_review: SECURITY_REVIEW

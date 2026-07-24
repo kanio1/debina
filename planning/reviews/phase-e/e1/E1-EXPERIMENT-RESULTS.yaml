@@ -1,0 +1,83 @@
+version: 1
+status: AI_DRAFT
+semantic_review_state: NOT_REVIEWED
+decision_id: DEC-E1-LIMITS
+policy: No production threshold may be invented from these results.
+machine:
+  hostname: review-host
+  note: Disposable review-only measurements; not production configuration.
+fixture_baseline: Pain001CanonicalMapperTest.minimal
+raw_output_path: /tmp/e1-experiment-minimal-fixture.json
+experiments:
+  - measure: HTTP_BODY_BYTES
+    classification: SAFE_LIGHTWEIGHT_EXECUTE
+    execution_state: EXECUTED
+    fixture: Pain001CanonicalMapperTest.minimal UTF-8
+    command: python3 xml measurement on minimal fixture bytes
+    measured_result: 660
+    accepted_limit: NOT_SET
+    note: Measured byte length of minimal test fixture only.
+  - measure: DECOMPRESSED_BYTES
+    classification: SAFE_LIGHTWEIGHT_EXECUTE
+    execution_state: EXECUTED
+    fixture: same uncompressed XML
+    command: python3 len(bytes)
+    measured_result: 660
+    accepted_limit: NOT_SET
+    note: No compression in E1 channel baseline.
+  - measure: XML_DEPTH
+    classification: SAFE_LIGHTWEIGHT_EXECUTE
+    execution_state: EXECUTED
+    fixture: Pain001CanonicalMapperTest.minimal
+    command: python3 ElementTree depth walk
+    measured_result: 6
+    accepted_limit: NOT_SET
+    note: Depth of minimal fixture DOM tree.
+  - measure: MAX_TEXT_LENGTH
+    classification: SAFE_LIGHTWEIGHT_EXECUTE
+    execution_state: EXECUTED
+    fixture: Pain001CanonicalMapperTest.minimal
+    command: python3 max text node length
+    measured_result: 27
+    accepted_limit: NOT_SET
+    note: Longest text node in minimal fixture (IBAN length).
+  - measure: TRANSACTION_COUNT
+    classification: NOT_NEEDED_FOR_E1
+    execution_state: EXECUTED
+    fixture: Pain001CanonicalMapperTest.minimal
+    command: python3 count CdtTrfTxInf elements
+    measured_result: 1
+    accepted_limit: NOT_SET
+    note: E1 semantic boundary is one transaction; enforced by mapper not performance limit.
+  - measure: PARSER_PEAK_MEMORY
+    classification: REQUIRES_OWNER_APPROVAL
+    execution_state: DEFERRED
+    reason: Requires JVM process and HardenedXmlFactory; unknown peak memory cost on host.
+    measured_result: null
+    accepted_limit: NOT_SET
+  - measure: END_TO_END_TIMEOUT
+    classification: REQUIRES_OWNER_APPROVAL
+    execution_state: DEFERRED
+    reason: Requires running backend/Testcontainers or Dagger stack; not SAFE_LIGHTWEIGHT.
+    measured_result: null
+    accepted_limit: NOT_SET
+  - measure: UPLOAD_DURATION
+    classification: REQUIRES_OWNER_APPROVAL
+    execution_state: DEFERRED
+    reason: Requires live HTTP endpoint and network path; not SAFE_LIGHTWEIGHT.
+    measured_result: null
+    accepted_limit: NOT_SET
+xsd_tvs_artifact_state:
+  iso_xsd:
+    artifact: pain.001.001.09.xsd from ISO 20022 Payments Initiation 2019 archive
+    namespace: urn:iso:std:iso:20022:tech:xsd:pain.001.001.09
+    checksum_sha256: VERIFY_ON_LAWFUL_ACQUISITION
+    repository_distribution: HUMAN_REVIEW_REQUIRED
+    gap_id: GAP-E1-TVS
+  epc_tvs:
+    artifact: EPC132-08 SCT C2PSP IG 2025 V1.0 XSD ZIP
+    ig: EPC132-08 / 2025 v1.0 effective 2025-10-05
+    checksum_sha256: VERIFY_ON_LAWFUL_ACQUISITION
+    repository_distribution: HUMAN_REVIEW_REQUIRED
+    gap_id: GAP-E1-TVS
+  smallest_next_action: ISO/legal reviewers approve lawful acquisition and repository policy, then authorised run records checksums.

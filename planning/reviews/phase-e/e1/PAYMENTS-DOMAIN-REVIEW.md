@@ -61,6 +61,24 @@ partial processing.
 `EPIC-19/19.2`, `EPIC-19/19.4`, `EPIC-26/26.3`, `EPIC-26/26.4`, proposed
 `EPIC-24/24.10`.
 
+## Council recommendations (AI_DRAFT)
+
+Council date: 2026-07-24. Review state remains `NOT_REVIEWED`.
+
+- **Primary actor:** authenticated payment submitter.
+- **UCS-SCT-002-A:** verified signed input through validation, mapping and
+  accepted-payment lineage; business payment order exists after payment-lifecycle
+  persistence.
+- **UCS-SCT-002-B:** failed signature with durable verdict/evidence; no parse or
+  payment mapping; not operational-read.
+- **Inbound submission** exists when raw bytes are archived; failed signature
+  creates evidence-only rejection without payment record.
+- **Approval:** excluded from E1 smoke; optional project prefix after intake.
+- **ReqdExctnDt:** defer from minimal E1 persistence pending owner decision.
+
+See [E1-RECOMMENDATIONS.yaml](E1-RECOMMENDATIONS.yaml) and
+[E1-OWNER-DECISION-PACKET.md](E1-OWNER-DECISION-PACKET.md).
+
 ## Blocking consequences
 
 Without approval, actor/goal semantics and the point at which a payment exists

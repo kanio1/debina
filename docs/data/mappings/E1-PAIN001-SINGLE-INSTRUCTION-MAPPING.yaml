@@ -548,7 +548,7 @@ mappings:
     mapping_id: E1-MAP-028
     xml_path: WHOLE_ORIGINAL_XML_BYTES
     business_term: Immutable Raw Message Evidence
-    cardinality: "1 per submission attempt"
+    cardinality: "1 per logical tenant-scoped submission (raw evidence artifact)"
     datatype: byte sequence plus SHA-256
     scheme_restriction: Project evidence policy; not an EPC XML element
     validation_rule: Archive before verification and parsing
@@ -576,6 +576,8 @@ mappings:
     mapping_status: CURRENTLY_STORED_SECURITY_REVIEW_REQUIRED
 review_summary:
   total_entries: 28
+  field_scope_artifact: planning/reviews/phase-e/e1/E1-FIELD-SCOPE-DECISION.yaml
+  council_date: 2026-07-24
   currently_mapped_review_required: 9
   currently_stored_security_review_required: 1
   implementation_gap: 13

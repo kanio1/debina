@@ -61,8 +61,10 @@ The six cohort records are `EPIC-31/31.2`, `EPIC-19/19.2`,
 ## Project decisions proposed
 
 - Backend REST plus a fixed-destination browser/BFF upload adapter.
-- A versioned synthetic `DEBINA-E1-DETACHED-ED25519-V1` profile, subject to
-  security review; it is not an EPC requirement.
+- Candidate `VERSIONED_DETACHED_ED25519_PROFILE` (`DEBINA-E1-DETACHED-ED25519-V1`):
+  not an EPC requirement; normative acceptance remains `DECISION_BLOCKED`; HTTP
+  transport and signer-identifier representation remain `DECISION_BLOCKED`; current
+  headers are `IMPLEMENTATION_EVIDENCE_ONLY`.
 - ISO XSD + EPC TVS + project-rule stages with lawful artifact acquisition and
   pinned checksums.
 - Measured, not invented, size/depth/count/memory/time limits.
@@ -71,7 +73,9 @@ The six cohort records are `EPIC-31/31.2`, `EPIC-19/19.2`,
 
 ## Open questions
 
-- Who authoritatively binds `X-Signer-Id` to an E1 verification key?
+- Who authoritatively binds a tenant-scoped signer/key identity to a verification
+  key? Current `X-Signer-Id` header and UUID shape are implementation evidence only;
+  public API contract remains DECISION_BLOCKED pending SECURITY_REVIEW.
 - May the EPC TVS ZIP and ISO archive XSD be stored in the repository, or only
   fetched/verified under an approved policy?
 - Which requested-execution-date choice is admitted, and how is source
@@ -114,10 +118,24 @@ where licensing/retention applicability requires it. Current state for every
 role is `NOT_REVIEWED`. Dated approval evidence placeholder:
 `PENDING_DATED_HUMAN_RECORD`.
 
+## Council closure (2026-07-24)
+
+The E1 review council produced an owner decision packet without human approval
+fabrication. All approval queues remain `NOT_REVIEWED`. Canonical migration and
+production implementation remain disallowed.
+
+Markers: `DEBINA-E1-REVIEW-COUNCIL-COMPLETE`, `E1-OWNER-DECISION-PACK-READY`,
+`HUMAN-OWNER-DECISION-REQUIRED`, `IMPLEMENTATION-NOT-AUTHORIZED`.
+
 ## Pack contents
 
 - `E1-DECISION-REGISTER.yaml`
 - `E1-APPROVALS.yaml`
+- `E1-OWNER-DECISION-PACKET.md`
+- `E1-RECOMMENDATIONS.yaml`
+- `E1-FIELD-SCOPE-DECISION.yaml`
+- `E1-CRE-DT-TM-CORRECTION-PROPOSAL.md`
+- `E1-EXPERIMENT-RESULTS.yaml`
 - `PAYMENTS-DOMAIN-REVIEW.md`
 - `ISO-MESSAGE-REVIEW.md`
 - `SECURITY-CHANNEL-SIGNATURE-REVIEW.md`

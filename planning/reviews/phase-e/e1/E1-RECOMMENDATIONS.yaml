@@ -1,0 +1,361 @@
+version: 1
+status: AI_DRAFT
+semantic_review_state: NOT_REVIEWED
+use_case_id: UC-SCT-002
+slice_ids: [UCS-SCT-002-A, UCS-SCT-002-B]
+council_completion_markers:
+  - DEBINA-E1-REVIEW-COUNCIL-COMPLETE
+  - E1-OWNER-DECISION-PACK-READY
+  - HUMAN-OWNER-DECISION-REQUIRED
+  - IMPLEMENTATION-NOT-AUTHORIZED
+execution_metadata:
+  baseline_head: 4fa21fc58aafdcc3926159d94cbe8ae4112222b5
+  specialist_execution: parent_sequential_fallback
+  streams_completed:
+    - {role: PAYMENTS_DOMAIN, mode: parent_sequential}
+    - {role: ISO_EPC, mode: parent_sequential}
+    - {role: SECURITY_CHANNEL_SIGNATURE, mode: parent_sequential}
+    - {role: POSTGRESQL_MAPPING, mode: parent_sequential}
+    - {role: ARCHITECTURE, mode: parent_sequential}
+    - {role: PRODUCT_QA, mode: parent_sequential}
+architecture_verdict:
+  outcome: CURRENT_ARCHITECTURE_SUFFICIENT
+  review_state: NOT_REVIEWED
+  summary: >-
+    Existing ingress, signature, ISO-adapter and payment-lifecycle modules plus REST command
+    and query-only GraphQL are sufficient for E1. Add one BFF upload adapter and tighten
+    validation/profile layers; no new module, aggregate, Kafka topic or GraphQL mutation owner.
+br_sct_003_authority_correction:
+  current_catalog_authority: iso20022-catalogue
+  current_catalog_classification: PROJECT-DECISION
+  defect: >-
+    BR-SCT-003 signature-before-mapping ordering cites iso20022-catalogue as authority.
+    That catalogue is not a valid authority for this ordering. The rule is already
+    classified PROJECT-DECISION; no reclassification is required.
+  normative_authority: DECISION_BLOCKED
+  normative_authority_note: >-
+    Remains DECISION_BLOCKED until an accepted dedicated security/evidence project
+    decision or ADR exists. Do not treat backend/AGENTS.md, implementation code, or
+    the pipeline as final normative project authority; they may be recorded only as
+    current project evidence.
+  rejected_authorities: [iso20022-catalogue, project-adr-n10]
+  reviewed_non_authorities:
+    - ADR-N2 — unrelated to signature-before-mapping ordering; no registered
+      source-registry id project-adr-n2
+    - ADR-N8 — unrelated to signature-before-mapping ordering; no registered
+      source-registry id project-adr-n8
+    - ADR-N10 / project-adr-n10 — registered project ADR id exists but is unrelated
+      to Debina signature-before-mapping ordering
+  proposed_classification: PROJECT-DECISION
+  proposed_authority_note: >-
+    Ordering derives from Debina evidence/security policy (archive → verify → parse → map),
+    grounded in UC-SCT-002 and current implementation evidence. Do not apply to canonical
+    BUSINESS-RULE-CATALOG until owner approval.
+  catalog_edit_authorized: false
+specialist_reviews:
+  - review_role: PAYMENTS_DOMAIN
+    findings:
+      - Primary actor is authenticated payment submitter; goal is durable single SCT instruction intake with provenance.
+      - UCS-SCT-002-A begins at verified signed input through validation, mapping and accepted-payment lineage.
+      - UCS-SCT-002-B is failed signature with durable verdict/evidence before parse or payment mapping; not operational-read.
+      - Inbound submission exists when raw bytes are archived; customer instruction exists after successful map; business payment order exists after payment-lifecycle persistence.
+      - Failed signature (B) creates evidence and safe rejection without payment mapping; validation failures after verify may create visible rejected-submission with correlation.
+      - Approval is optional Debina prefix after intake; exclude from E1 smoke to avoid maker-checker duplication.
+    confirmed_claims:
+      - Concept separation envelope/message/instruction/order/transaction.
+      - One PmtInf and one CdtTrfTxInf for E1 semantic boundary.
+      - Upload is not clearing acceptance or settlement.
+    incorrect_claims:
+      - Treating UCS-SCT-002-B as payment detail/lineage slice.
+      - Claiming maker-checker as EPC scheme law.
+    required_decisions:
+      - Confirm business outcome wording at each validation boundary.
+      - Confirm ReqdExctnDt inclusion in minimal E1 outcome.
+    recommended_decisions:
+      - Actor goal wording accepted payment instruction lineage linked to existing detail.
+      - Evidence-only for B-path signature failure; visible rejected record for post-verify validation failure with safe correlation.
+      - ReqdExctnDt DEFER_FROM_E1 minimal persistence; validate when admitted.
+      - Approval excluded from E1 smoke.
+    rejected_alternatives:
+      - Payment aggregate equals one XML document.
+      - Multi-item partial processing in E1.
+    blocking_questions:
+      - Owner confirmation of outcome copy at validation boundaries.
+    affected_artifacts: [PAYMENTS-DOMAIN-REVIEW.md, E1-DECISION-REGISTER.yaml, E1-OWNER-DECISION-PACKET.md]
+    affected_stories: [EPIC-31/31.2, EPIC-19/19.2, EPIC-19/19.4, EPIC-26/26.3, EPIC-26/26.4, EPIC-24/24.10]
+    test_implications: >-
+      Accepted journey — Dagger composed runtime proof plus exactly one Playwright
+      login → upload → deterministic accepted result → payment detail smoke.
+      Invalid signature — primary Spring/security integration test; optional
+      secondary Dagger composed rejection proof; no E1 Playwright negative smoke.
+      No approval in smoke.
+    risk_level: MEDIUM
+  - review_role: ISO_EPC
+    findings:
+      - pain.001.001.09 and default namespace urn:iso:std:iso:20022:tech:xsd:pain.001.001.09 are profile-pinned.
+      - ISO XSD, EPC TVS/profile and project business validation must remain distinct stages with stable problem taxonomy.
+      - Checksums and repository distribution remain blocked (GAP-E1-TVS).
+      - GrpHdr/CreDtTm is source creation time; must not be conflated with receive time.
+      - XML encoding/charset profile is not source-confirmed; admitted encodings,
+        declaration requirements and HTTP/XML charset precedence remain blocked per
+        ISO-MESSAGE-REVIEW.md § XML encoding and charset open questions (AI_DRAFT).
+    confirmed_claims:
+      - TVS is not production namespace.
+      - EPC153-22 address cutover 2026-11-15 applies to unstructured addresses.
+    incorrect_claims:
+      - Latest ISO catalogue version auto-applies.
+      - Current mapper behavior establishes EPC conformance.
+    required_decisions:
+      - Lawful XSD/TVS acquisition and checksum pinning.
+      - GrpHdr vs PmtInf CtrlSum enforcement for E1.
+      - ReqdExctnDt Dt vs DtTm policy.
+      - XML encoding/charset profile per ISO-MESSAGE-REVIEW encoding open questions.
+    recommended_decisions:
+      - ISO_XSD_PLUS_EPC_TVS_PLUS_PROJECT_RULES staged validation.
+      - No artifact commit until lawful acquisition review.
+      - Validate NbOfTxs, PmtMtd, CtrlSum at profile stage without persisting all as columns for E1.
+    rejected_alternatives:
+      - ISO_XSD_ONLY
+      - EPC_TVS_AS_PRODUCTION_NAMESPACE
+    blocking_questions:
+      - ISO archive SHA-256 after lawful acquisition.
+      - EPC ZIP distribution terms.
+      - XML encoding admission, XML declaration requirement, HTTP charset parameter
+        and HTTP/XML charset conflict handling (ISO-MESSAGE-REVIEW encoding open questions).
+    affected_artifacts: [ISO-MESSAGE-REVIEW.md, E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml, E1-EXPERIMENT-RESULTS.yaml]
+    affected_stories: [EPIC-19/19.4, EPIC-26/26.3, EPIC-26/26.4]
+    test_implications: source/schema fixtures for XSD/TVS drift; unit/property for field rules.
+    risk_level: HIGH
+  - review_role: SECURITY_CHANNEL_SIGNATURE
+    findings:
+      - POST /api/v1/iso/pain001 exists with application/xml, Idempotency-Key, detached headers, payment_submitter role.
+      - No BFF signed-upload route; browser journey incomplete without REST_PLUS_BFF_UPLOAD.
+      - DEBINA-E1-DETACHED-ED25519-V1 is a candidate detached Ed25519 cryptographic/evidence profile, not an EPC requirement; normative acceptance remains DECISION_BLOCKED.
+      - Current PaymentController headers and signature pipeline are implementation evidence only; public API contract DECISION_BLOCKED pending SECURITY_REVIEW.
+    confirmed_claims:
+      - Archive before verify/parse.
+      - Tenant from token only.
+      - No raw XML/signature in logs.
+    incorrect_claims:
+      - Ed25519/detached headers are EPC requirements.
+      - Browser may hold bearer tokens.
+    required_decisions:
+      - Signer identity authority model.
+      - Browser signature bytes through BFF vs pre-signed envelope only.
+      - Rate/replay and anti-malware boundary ownership.
+    recommended_decisions:
+      - REST_PLUS_BFF_UPLOAD with CSRF, same-origin, fixed backend destination.
+      - VERSIONED_DETACHED_ED25519_PROFILE (DEBINA-E1-DETACHED-ED25519-V1) as candidate cryptographic/evidence profile with explicit algorithm allowlist and stable outcome taxonomy; normative acceptance DECISION_BLOCKED pending dated SECURITY_REVIEW and accepted security/evidence decision or ADR.
+      - Idempotency-Key opaque per logical tenant-scoped submission; transport retries reuse the same key; same key plus same payload identity/hash returns original outcome; same key plus materially different payload returns deterministic conflict; key ownership, TTL and retention remain SECURITY/DATABASE decisions.
+    rejected_alternatives:
+      - GraphQL mutation
+      - Certificate profile before E1 without ADR
+      - Private key upload
+    blocking_questions:
+      - Trust and revocation source for verification keys.
+      - Role visibility for raw payload and signature lineage.
+    affected_artifacts: [SECURITY-CHANNEL-SIGNATURE-REVIEW.md, E1-DECISION-REGISTER.yaml]
+    affected_stories: [EPIC-31/31.2, EPIC-19/19.4, EPIC-24/24.10]
+    test_implications: >-
+      Accepted journey — Dagger composed runtime proof plus exactly one Playwright
+      login → upload → deterministic accepted result → payment detail smoke.
+      Invalid signature — primary Spring/security integration test;
+      optional secondary Dagger composed rejection proof; no E1 Playwright negative
+      smoke. BFF component tests for session/CSRF; signature integration tests remain
+      backend-primary.
+    risk_level: HIGH
+  - review_role: POSTGRESQL_MAPPING
+    findings:
+      - cre_dt_tm column stores recordedAt from Pain001LineageRecorder, not GrpHdr/CreDtTm; semantic defect confirmed.
+      - ingress.raw_inbound_messages.received_at already captures receive time.
+      - Raw bytes stored append-only; hash is not dedupe key.
+      - RLS for raw/signature evidence needs explicit fail-closed policies.
+    confirmed_claims:
+      - One-writer per schema.
+      - Identifier distinctness MsgId/PmtInfId/InstrId/EndToEndId/UETR/TxId.
+    incorrect_claims:
+      - Payload hash uniqueness for dedupe.
+      - cre_dt_tm currently means source CreDtTm.
+    required_decisions:
+      - CreDtTm correction design approval.
+      - Persist validation facts vs evidence-only for counts/control sums.
+      - Retention and legal hold.
+    recommended_decisions:
+      - Supplement received_at/recorded_at semantics; add source_message_created_at; repurpose cre_dt_tm via expand-contract.
+      - VALIDATE_ONLY for NbOfTxs/CtrlSum/PmtMtd for E1; do not add columns without query evidence.
+      - RAW_BYTES_IN_POSTGRES_FOR_E1_WITH_REVIEWED_CONTROLS.
+    rejected_alternatives:
+      - One column per XML element.
+      - HASH_ONLY evidence.
+      - Cross-schema direct writes.
+    blocking_questions:
+      - Encryption at rest boundary.
+      - Auditor export policy.
+    affected_artifacts: [DATABASE-MAPPING-REVIEW.md, E1-CRE-DT-TM-CORRECTION-PROPOSAL.md, E1-FIELD-SCOPE-DECISION.yaml]
+    affected_stories: [EPIC-19/19.2, EPIC-19/19.4, EPIC-26/26.3, EPIC-26/26.4]
+    test_implications: Testcontainers for RLS, lineage, idempotency, CreDtTm correction.
+    risk_level: HIGH
+  - review_role: ARCHITECTURE
+    findings:
+      - MODULE-CATALOG and ADR-N1/N3/N5/N7/N10/N16/N17 support REST command, BFF session, query-only GraphQL, per-schema ownership.
+      - SignedChannelIngestionPipeline implements archive→verify→parse without new Kafka topic for E1.
+      - BFF upload route is new adapter surface, not new bounded context.
+    confirmed_claims:
+      - No new module or aggregate required for E1 pilot.
+      - CSM/rail behavior must not leak into common core.
+    incorrect_claims:
+      - GraphQL should own upload mutation.
+      - New File/Group aggregate needed for single instruction.
+    required_decisions:
+      - Admit BFF route as session adapter only.
+    recommended_decisions:
+      - CURRENT_ARCHITECTURE_SUFFICIENT with NEW_READ_MODEL limited to safe operational reads only if needed; no NEW_PUBLIC_PORT beyond BFF→existing REST.
+    rejected_alternatives:
+      - New payment-ingestion module.
+      - Kafka event for E1 intake.
+    blocking_questions:
+      - None architectural beyond human approval of boundary claim.
+    affected_artifacts: [README.md, E1-RECOMMENDATIONS.yaml, phase-e-reconciliation.yaml]
+    affected_stories: [EPIC-19/19.4, EPIC-24/24.10]
+    test_implications: Dagger composed proof; Modulith boundary tests unchanged.
+    risk_level: LOW
+  - review_role: PRODUCT_QA
+    findings:
+      - Vertical outcome login → upload → deterministic accepted result → payment detail
+        smoke; validation breadth below UI.
+      - Test allocation per SEPA-PAYMENT-TEST-ALLOCATION-MATRIX preserved.
+      - Proposed EPIC-24/24.10 placement remains ADD_STORY_TO_EXISTING_EPIC.
+    confirmed_claims:
+      - One Playwright smoke only.
+      - REST command owner; BFF adapts session/security.
+    incorrect_claims:
+      - Browser matrix for every validation case.
+      - Separate stories for backend/BFF/UI for this small journey.
+    required_decisions:
+      - Accepted/rejected user copy and safe field visibility.
+      - Stable executable verify names post-implementation.
+    recommended_decisions:
+      - User-visible states success, invalid-signature, validation-rejected, duplicate/idempotent, unauthorized.
+      - Accepted journey — Dagger composed runtime proof plus exactly one Playwright
+        login → upload → deterministic accepted result → payment detail smoke.
+      - Invalid signature — primary Spring/security integration test; optional secondary Dagger composed rejection proof; no E1 Playwright negative smoke.
+      - Verify names Pain001SubmissionEndpointTest (existing); test:pain001-upload-route, dagger smoke-signed-pain001, e2e/e1-signed-pain001.spec.ts as PLANNED_NOT_IMPLEMENTED.
+      - Approval excluded from smoke.
+    rejected_alternatives:
+      - GraphQL mutation in UI path.
+      - Broad Playwright duplication.
+    blocking_questions:
+      - Final copy strings for owner approval.
+    affected_artifacts: [PRODUCT-QA-REVIEW.md, E1-OWNER-DECISION-PACKET.md]
+    affected_stories: [EPIC-24/24.10]
+    test_implications: See PRODUCT-QA-REVIEW.md allocation table.
+    risk_level: MEDIUM
+conflicts_reconciled:
+  - conflict: B-path creates payment record vs evidence-only rejection
+    resolution: B-path is evidence-only before parse; no payment mapping or visible payment order.
+  - conflict: cre_dt_tm column name vs receive time storage
+    resolution: Supplement columns; expand-contract correction per E1-CRE-DT-TM-CORRECTION-PROPOSAL.md.
+  - conflict: DIRECT_REST_ONLY vs browser journey
+    resolution: REST_PLUS_BFF_UPLOAD; REST remains command owner.
+working_hypotheses:
+  - id: HYP-ARCHITECTURE
+    starting_candidate: CURRENT_ARCHITECTURE_SUFFICIENT
+    supporting_evidence:
+      - UC-SCT-002 architecture section and MODULE-CATALOG module ownership.
+      - Existing POST /api/v1/iso/pain001 and SignedChannelIngestionPipeline.
+      - ADR-N17 GraphQL query-only; ADR-N3 BFF session.
+    contradicting_evidence:
+      - Missing BFF upload route for browser actor.
+      - Missing EPC TVS/XSD validation layer in production path.
+    strongest_alternative: NEW_PUBLIC_PORT for dedicated upload gateway module.
+    rejection_condition: Requires new bounded context or aggregate without use-case evidence.
+    final_ai_recommendation: CONFIRMED with REVISED note that BFF adapter and validation stages are in-scope implementation work, not architecture expansion.
+    human_decision_still_required: true
+    outcome: CONFIRMED
+  - id: HYP-CHANNEL
+    starting_candidate: REST_PLUS_BFF_UPLOAD
+    supporting_evidence:
+      - PaymentController REST command exists; frontend AGENTS BFF conventions.
+      - EPIC-24 vertical journey requires browser path.
+    contradicting_evidence:
+      - DIRECT_REST_ONLY sufficient for API clients; BFF adds CSRF/origin contract work.
+    strongest_alternative: DIRECT_REST_ONLY for E1 backend-only cohort.
+    rejection_condition: Cannot close browser actor journey for EPIC-24/24.10 smoke.
+    final_ai_recommendation: CONFIRMED REST_PLUS_BFF_UPLOAD with application/xml, payment_submitter, Idempotency-Key, CSRF/same-origin.
+    human_decision_still_required: true
+    outcome: CONFIRMED
+  - id: HYP-SIGNATURE
+    starting_candidate: DEBINA-E1-DETACHED-ED25519-V1
+    supporting_evidence:
+      - Current headers and Ed25519 in PaymentController and signature module (implementation evidence only).
+      - BR-SCT-003 verify-before-map ordering in current pipeline (implementation evidence only).
+    contradicting_evidence:
+      - Signer identity and revocation source undefined.
+      - Certificate profile may be required for some customer channels.
+    strongest_alternative: CERTIFICATE_PROFILE or NO_BROWSER_SIGNATURE.
+    rejection_condition: Customer channel mandate for X.509 with approved trust store.
+    final_ai_recommendation: >-
+      Candidate VERSIONED_DETACHED_ED25519_PROFILE (DEBINA-E1-DETACHED-ED25519-V1);
+      normative acceptance DECISION_BLOCKED pending dated SECURITY_REVIEW and accepted
+      dedicated security/evidence decision or ADR.
+    human_decision_still_required: true
+    outcome: REVISED
+  - id: HYP-ISO-TVS
+    starting_candidate: ISO XSD + EPC TVS + project rules staged validation
+    supporting_evidence:
+      - SE-E1-SCT-TVS-001 and EPC publication disclaimer.
+      - E1 decision register DEC-E1-XML-TVS.
+    contradicting_evidence:
+      - Checksums and lawful repository distribution not approved (GAP-E1-TVS).
+    strongest_alternative: ISO_XSD_ONLY interim validation.
+    rejection_condition: ISO-only fails to establish C2PSP usage profile.
+    final_ai_recommendation: CONFIRMED staged model; checksum acquisition remains BLOCKED.
+    human_decision_still_required: true
+    outcome: BLOCKED
+  - id: HYP-APPROVAL-SMOKE
+    starting_candidate: Approval excluded from E1 smoke
+    supporting_evidence:
+      - Maker-checker is project prefix; UC-SCT-APPROVAL-001 is separate use case.
+      - PRODUCT-QA allocation avoids duplicate coverage.
+    contradicting_evidence:
+      - PaymentController returns 202 PENDING_APPROVAL when maker-checker enabled.
+    strongest_alternative: Include approval step in smoke when tenant policy enables it.
+    rejection_condition: Product requires end-to-end approval demonstration in E1 cohort.
+    final_ai_recommendation: CONFIRMED exclude approval from E1 smoke; test approval separately under UC-SCT-APPROVAL-001.
+    human_decision_still_required: true
+    outcome: CONFIRMED
+  - id: HYP-CREDTTM
+    starting_candidate: Supplement receive/record; restore source CreDtTm
+    supporting_evidence:
+      - E1-MAP-002 defect; ingress.received_at exists; Pain001LineageRecorder uses recordedAt.
+      - Database rule keep CreDtTm distinct from receive time.
+    contradicting_evidence:
+      - Renaming cre_dt_tm may break IsoPaymentEvidenceReadModel COALESCE(im.cre_dt_tm, im.created_at).
+    strongest_alternative: Rename cre_dt_tm in place without supplement column.
+    rejection_condition: Historical rows cannot be distinguished after in-place rename.
+    final_ai_recommendation: REVISED expand-contract add source_message_created_at; migrate semantics per proposal.
+    human_decision_still_required: true
+    outcome: REVISED
+  - id: HYP-EVIDENCE
+    starting_candidate: Raw bytes in PostgreSQL for E1
+    supporting_evidence:
+      - ingress.raw_inbound_messages current implementation.
+      - BR-SCT-003 and signature covered_sha256 linkage.
+    contradicting_evidence:
+      - Capacity, encryption and retention legal review open.
+    strongest_alternative: ENCRYPTED_OBJECT_STORAGE with DB metadata only.
+    rejection_condition: Approved storage integration and ADR before E1.
+    final_ai_recommendation: CONFIRMED for E1 with reviewed RLS, encryption, retention controls; HASH_ONLY rejected.
+    human_decision_still_required: true
+    outcome: CONFIRMED
+  - id: HYP-EXPERIMENTS
+    starting_candidate: Classify first; SAFE_LIGHTWEIGHT_EXECUTE only
+    supporting_evidence:
+      - DEC-E1-LIMITS requires measured thresholds; plan forbids invented limits.
+    contradicting_evidence:
+      - JVM/HTTP endpoint experiments need running stack or unknown cost.
+    strongest_alternative: Defer all experiments until implementation environment approved.
+    rejection_condition: Owner accepts risk-based provisional limits without measurement.
+    final_ai_recommendation: CONFIRMED classify-first; most measures DEFERRED or REQUIRES_OWNER_APPROVAL; minimal fixture measurement only.
+    human_decision_still_required: true
+    outcome: CONFIRMED

@@ -15,56 +15,56 @@ advisory_or_scope_specific:
 approvals:
   - queue: PAYMENTS_DOMAIN_REVIEW
     reviewer_role: SEPA payments domain specialist
-    reviewed_artifacts: [PAYMENTS-DOMAIN-REVIEW.md, E1-DECISION-REGISTER.yaml, phase-e-reconciliation.yaml]
-    blocking_questions: [actor goal, SCT scope, canonical concepts, maker-checker boundary]
+    reviewed_artifacts: [PAYMENTS-DOMAIN-REVIEW.md, E1-DECISION-REGISTER.yaml, E1-RECOMMENDATIONS.yaml, E1-OWNER-DECISION-PACKET.md, phase-e-reconciliation.yaml]
+    blocking_questions: [actor goal, slice A/B outcome boundaries, evidence-only vs visible rejection, ReqdExctnDt minimal scope, approval in smoke]
     review_state: NOT_REVIEWED
     reviewer_identity: PENDING_HUMAN
     decision_date: PENDING
     approval_evidence: PENDING_DATED_HUMAN_RECORD
   - queue: ISO_MESSAGE_REVIEW
     reviewer_role: ISO 20022 and EPC implementation-guideline specialist
-    reviewed_artifacts: [ISO-MESSAGE-REVIEW.md, E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml]
-    blocking_questions: [message version, XSD, TVS, field rules, address transition]
+    reviewed_artifacts: [ISO-MESSAGE-REVIEW.md, E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml, E1-FIELD-SCOPE-DECISION.yaml, E1-EXPERIMENT-RESULTS.yaml]
+    blocking_questions: [message version, XSD checksum, TVS distribution, field rules, address transition, CtrlSum cardinality]
     review_state: NOT_REVIEWED
     reviewer_identity: PENDING_HUMAN
     decision_date: PENDING
     approval_evidence: PENDING_DATED_HUMAN_RECORD
   - queue: SECURITY_REVIEW
     reviewer_role: application security and Keycloak architect
-    reviewed_artifacts: [SECURITY-CHANNEL-SIGNATURE-REVIEW.md, E1-DECISION-REGISTER.yaml]
-    blocking_questions: [channel, CSRF/origin, signature trust, rotation/revocation, evidence access]
+    reviewed_artifacts: [SECURITY-CHANNEL-SIGNATURE-REVIEW.md, E1-DECISION-REGISTER.yaml, E1-RECOMMENDATIONS.yaml, E1-OWNER-DECISION-PACKET.md]
+    blocking_questions: [channel CSRF/origin, Idempotency-Key lifecycle, signer authority, trust rotation revocation, browser signature bytes, evidence role visibility]
     review_state: NOT_REVIEWED
     reviewer_identity: PENDING_HUMAN
     decision_date: PENDING
     approval_evidence: PENDING_DATED_HUMAN_RECORD
   - queue: DATABASE_MAPPING_REVIEW
     reviewer_role: PostgreSQL data owner and RLS reviewer
-    reviewed_artifacts: [DATABASE-MAPPING-REVIEW.md, E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml]
-    blocking_questions: [owners, types, constraints, RLS, immutable lineage, retention]
+    reviewed_artifacts: [DATABASE-MAPPING-REVIEW.md, E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml, E1-FIELD-SCOPE-DECISION.yaml, E1-CRE-DT-TM-CORRECTION-PROPOSAL.md]
+    blocking_questions: [CreDtTm correction design, owners types constraints, RLS raw signature evidence, validation facts persistence, retention encryption]
     review_state: NOT_REVIEWED
     reviewer_identity: PENDING_HUMAN
     decision_date: PENDING
     approval_evidence: PENDING_DATED_HUMAN_RECORD
   - queue: ARCHITECTURE_REVIEW
     reviewer_role: enterprise and Spring Modulith architect
-    reviewed_artifacts: [README.md, E1-DECISION-REGISTER.yaml, phase-e-reconciliation.yaml]
-    blocking_questions: [current boundaries, public ports, transaction ownership, no new aggregate/module]
+    reviewed_artifacts: [README.md, E1-DECISION-REGISTER.yaml, E1-RECOMMENDATIONS.yaml, phase-e-reconciliation.yaml]
+    blocking_questions: [CURRENT_ARCHITECTURE_SUFFICIENT, BFF adapter boundary, public ports, transaction ownership, no new aggregate module Kafka topic]
     review_state: NOT_REVIEWED
     reviewer_identity: PENDING_HUMAN
     decision_date: PENDING
     approval_evidence: PENDING_DATED_HUMAN_RECORD
   - queue: PRODUCT_REVIEW
     reviewer_role: Product Manager and Product Owner
-    reviewed_artifacts: [PAYMENTS-DOMAIN-REVIEW.md, PRODUCT-QA-REVIEW.md, E1-DECISION-REGISTER.yaml]
-    blocking_questions: [vertical outcome, non-goals, user-visible copy, role visibility]
+    reviewed_artifacts: [PAYMENTS-DOMAIN-REVIEW.md, PRODUCT-QA-REVIEW.md, E1-DECISION-REGISTER.yaml, E1-OWNER-DECISION-PACKET.md]
+    blocking_questions: [vertical outcome copy, non-goals, role visibility, approval excluded from smoke, ReqdExctnDt minimal outcome]
     review_state: NOT_REVIEWED
     reviewer_identity: PENDING_HUMAN
     decision_date: PENDING
     approval_evidence: PENDING_DATED_HUMAN_RECORD
   - queue: QA_REVIEW
     reviewer_role: QA/SDET test architect
-    reviewed_artifacts: [PRODUCT-QA-REVIEW.md, SEPA-PAYMENT-TEST-ALLOCATION-MATRIX.md]
-    blocking_questions: [primary layers, non-duplicate secondary risk, Dagger proof, one Playwright smoke]
+    reviewed_artifacts: [PRODUCT-QA-REVIEW.md, SEPA-PAYMENT-TEST-ALLOCATION-MATRIX.md, E1-OWNER-DECISION-PACKET.md, E1-EXPERIMENT-RESULTS.yaml]
+    blocking_questions: [primary test layers, non-duplicate secondary risk, Dagger proof, one Playwright smoke, stable verify names, limit experiment deferrals]
     review_state: NOT_REVIEWED
     reviewer_identity: PENDING_HUMAN
     decision_date: PENDING

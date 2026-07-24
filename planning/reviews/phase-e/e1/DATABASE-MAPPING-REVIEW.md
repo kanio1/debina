@@ -17,7 +17,7 @@ not authorise migrations or a new aggregate.
 - E1 field map, mapping method/template and source evidence.
 - Current mapper/command/lineage/persistence/signature code.
 - Migrations `payment/V3`, `ingress/V10`, `iso/V11/V15/V21`,
-  `signature/V13/V14`, ownership/RLS blueprints and ADR-N1/N2/N8/N10.
+  `signature/V13/V14`, ownership/RLS blueprints and ADR-N1 (one-writer per schema).
 - EPC132-08 relevant field rows and EPC153-22 address guidance.
 
 ## Claims being approved
@@ -26,8 +26,9 @@ not authorise migrations or a new aggregate.
   database owner and read model are separate decisions.
 - `MsgId`, `PmtInfId`, `InstrId`, `EndToEndId`, UETR and later `TxId` are not
   interchangeable.
-- Raw payload hash is evidence, not a unique dedupe key; idempotency has a
-  separate source/key/request-hash contract.
+- Raw payload hash is evidence, not a unique dedupe key; idempotency uses one
+  opaque Idempotency-Key per logical tenant-scoped submission with transport-retry
+  reuse, payload-identity replay and conflict semantics.
 - `payment`, `ingress`, `iso` and `signature` retain one-writer ownership and
   fail-closed tenant access.
 
@@ -61,6 +62,16 @@ partitioning without measured need.
 `UC-SCT-002`; `UCS-SCT-002-A`, `UCS-SCT-002-B`; `EPIC-19/19.2`,
 `EPIC-19/19.4`, `EPIC-26/26.3`, `EPIC-26/26.4`, proposed
 `EPIC-24/24.10`.
+
+## Council recommendations (AI_DRAFT)
+
+Council date: 2026-07-24. Review state remains `NOT_REVIEWED`.
+
+- CreDtTm correction: expand-contract per
+  [E1-CRE-DT-TM-CORRECTION-PROPOSAL.md](E1-CRE-DT-TM-CORRECTION-PROPOSAL.md).
+- Raw bytes remain in PostgreSQL with reviewed RLS; hash is not dedupe key.
+- Validation facts (NbOfTxs, CtrlSum, PmtMtd) `VALIDATE_ONLY` for E1; no new
+  columns without query evidence.
 
 ## Blocking consequences
 

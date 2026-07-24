@@ -41,8 +41,11 @@ Allocate tests as follows:
   persistence;
 - BFF contract/component: session, role, CSRF/origin, content type/body,
   correlation and safe error forwarding;
-- Dagger: one composed acceptance using real dependencies;
-- Playwright: exactly one login → upload → result/detail smoke.
+- Dagger: one composed acceptance using real dependencies for the accepted journey;
+- Playwright: exactly one login → upload → deterministic accepted result → payment detail
+  smoke for the accepted journey only;
+- Invalid signature: primary Spring/security integration test; optional secondary
+  Dagger composed rejection proof; no E1 Playwright negative smoke.
 
 ## Open questions
 
@@ -64,6 +67,20 @@ frontend-only security, or Dagger claims without execution.
 
 `UC-SCT-002`; `UCS-SCT-002-A`, `UCS-SCT-002-B`; all five existing E1
 stories and proposed `EPIC-24/24.10`.
+
+## Council recommendations (AI_DRAFT)
+
+Council date: 2026-07-24. Review state remains `NOT_REVIEWED`.
+
+- User-visible outcomes: success, invalid-signature, validation-rejected,
+  duplicate/idempotent, unauthorized — safe messaging without raw evidence.
+- Approval excluded from E1 smoke.
+- Test allocation unchanged per SEPA-PAYMENT-TEST-ALLOCATION-MATRIX; exactly one
+  Playwright smoke — login → upload → deterministic accepted result → payment detail —
+  for the accepted journey; no E1 Playwright negative smoke for invalid signature.
+- Verify targets: `Pain001SubmissionEndpointTest` (existing);
+  `pnpm run test:pain001-upload-route`, `dagger call smoke-signed-pain001`,
+  `e2e/e1-signed-pain001.spec.ts` — all `PLANNED_NOT_IMPLEMENTED`.
 
 ## Blocking consequences
 
