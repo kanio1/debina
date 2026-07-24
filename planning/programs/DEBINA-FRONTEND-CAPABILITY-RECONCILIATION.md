@@ -1,7 +1,7 @@
 # Debina frontend capability reconciliation
 
 Status: `AI_DRAFT`, `NOT_REVIEWED`
-Baseline: `d5be545`, 2026-07-24
+Baseline: `8b86e254ffa29a436385c8c21974751b4b2b5535`, 2026-07-24
 Scope: Phase E planning only. No screen, BFF route, Keycloak role, or API was changed.
 
 The current frontend is Next.js 16.2.10 / React 19.2.7 / TypeScript 6.0.3 on
@@ -14,7 +14,7 @@ session/token handling, not payment semantics.
 | Authentication/session | Keycloak JWT and role checks | REST secured | N/A | login/callback/logout/session routes | session-aware shell | D3A | EPIC-02, 05, 74 | project policy | IMPLEMENTED_AND_PROVEN |
 | Workspace/role mapping | role/branch authorization | REST/GraphQL visibility | N/A | session claims | payment and approval workspaces | partial | EPIC-23, 24, 74 | project policy | PARTIALLY_IMPLEMENTED |
 | Payment submission (JSON) | command + idempotency | REST | outbox | payments POST | no dedicated form in inspected payment pages | D3A | 19.1, 24.1 | project policy | IMPLEMENTED_NOT_PLANNING_RECONCILED |
-| Signed file upload | signed pain endpoint exists | `POST /api/v1/iso/pain001` | payment outbox | no route | no upload/progress/result UI | none | 19.2, 19.4, proposed E1-06 | source/channel blocked | READY_FOR_SLICE_PLANNING |
+| Signed file upload | signed pain endpoint exists | `POST /api/v1/iso/pain001` | payment outbox | no route | no upload/progress/result UI | none | 19.2, 19.4, future `EPIC-24/24.10` proposal | `DECISION_BLOCKED`; source metadata verified but not human-approved | CAPABILITY_BLOCKED |
 | Payment list | visibility read model | REST | N/A | payments route | accessible table/states | D3A | 24.2A | project policy | IMPLEMENTED_AND_PROVEN |
 | Payment detail | payment + visibility | REST | N/A | payment detail route | detail screen/states | D3A | 24.2A | project policy | IMPLEMENTED_AND_PROVEN |
 | ISO identifiers | ISO source-owned read | GraphQL | ISO outbox | GraphQL allowlist proxy | ISO panel | D3B | 26.3, 26.4, 24.2A | message profile incomplete | IMPLEMENTED_NOT_PLANNING_RECONCILED |
@@ -32,8 +32,9 @@ session/token handling, not payment semantics.
 
 ## E1 frontend vertical slice
 
-The proposed `E1-06` story is one vertical outcome, not separate backend/BFF/UI
-stories:
+The typed proposal `PHASE-E1-STORY-PROPOSAL-001`, with future placement
+`EPIC-24/24.10` in the existing frontend epic, is one vertical outcome, not
+separate backend/BFF/UI stories:
 
 - authenticated submitter selects one XML file and detached signature metadata;
 - BFF enforces session, role, origin/CSRF, content type and a reviewed byte limit;
@@ -48,6 +49,10 @@ stories:
 
 GraphQL remains query-only and source-owned. A new upload mutation or frontend-owned
 payment model is explicitly out of scope.
+
+Channel, signature, TVS, measured limits and evidence visibility remain blocking
+decisions in `planning/reviews/phase-e/e1/E1-DECISION-REGISTER.yaml`. The story
+is only `candidate_after_gates: READY`; it is not currently ready.
 
 ## UI quality gate
 

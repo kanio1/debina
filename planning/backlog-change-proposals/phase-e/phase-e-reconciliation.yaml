@@ -1,209 +1,379 @@
-version: 1
+version: 2
 status: AI_DRAFT
 human_review_state: NOT_REVIEWED
 baseline:
-  commit: d5be545
+  commit: 8b86e254ffa29a436385c8c21974751b4b2b5535
   date: 2026-07-24
   use_case_warnings: 296
   planning_semantic_warnings: 69
-classifications:
-  - IMPLEMENTED_AND_PROVEN
-  - IMPLEMENTED_NOT_PLANNING_RECONCILED
-  - PARTIALLY_IMPLEMENTED
-  - PLANNED
-  - READY_CANDIDATE
-  - SOURCE_BLOCKED
-  - DECISION_BLOCKED
-  - CAPABILITY_BLOCKED
-  - STALE
-  - DUPLICATE
-  - OUT_OF_SCOPE
 selected_cohort:
   id: E1
-  use_case: UC-SCT-002
-  slice: UCS-SCT-002-A
-  records: [EPIC-31/31.2, EPIC-19/19.2, EPIC-19/19.4, EPIC-26/26.3, EPIC-26/26.4, PROPOSED-E1-06]
-  migration_rule: Every selected record must leave the cohort with semantic_enforcement ENFORCED and zero record-local legacy warnings.
+  use_case_id: UC-SCT-002
+  slice_id: [UCS-SCT-002-A, UCS-SCT-002-B]
+  slice_contract:
+    UCS-SCT-002-A: Verified signed input is archived, verified, source-qualified, mapped and linked to the accepted payment lineage.
+    UCS-SCT-002-B: Failed signature is archived with a safe verdict/evidence outcome and is not parsed or mapped to a payment.
+  records:
+    - EPIC-31/31.2
+    - EPIC-19/19.2
+    - EPIC-19/19.4
+    - EPIC-26/26.3
+    - EPIC-26/26.4
+    - EPIC-24/24.10
+  future_story_proposal: PHASE-E1-STORY-PROPOSAL-001
+  migration_rule: Canonical stories remain unchanged until all required E1 approvals are HUMAN_APPROVED; any migrated record must be ENFORCED with zero record-local warnings.
+reference_resolutions:
+  approval_capability:
+    outcome: LINK_EXISTING_USE_CASE
+    use_case_id: UC-SCT-APPROVAL-001
+    slice_ids: [UCS-SCT-APPROVAL-001-C, UCS-SCT-APPROVAL-001-D, UCS-SCT-APPROVAL-001-E, UCS-SCT-APPROVAL-001-I, UCS-SCT-APPROVAL-001-J]
+  operational_graphql_reads:
+    outcome: LINK_EXISTING_SLICE
+    use_case_id: UC-SCT-APPROVAL-001
+    slice_ids: [UCS-SCT-APPROVAL-001-C, UCS-SCT-APPROVAL-001-J]
+    audit_read_use_case_id: UC-AUDIT-001
+    audit_read_slice_id: UCS-AUDIT-001-B
+  returns:
+    outcome: LINK_EXISTING_USE_CASE
+    use_case_id: UC-RTRANS-001
+    slice_ids: [UCS-RTRANS-001-A, UCS-RTRANS-001-B]
+  recall:
+    outcome: LINK_EXISTING_USE_CASE
+    use_case_id: UC-RTRANS-002
+    slice_ids: [UCS-RTRANS-002-A, UCS-RTRANS-002-B]
+  investigation_messages_without_admitted_actor_goal:
+    outcome: HUMAN_REVIEW_REQUIRED
+    use_case_proposal_created: false
 proposals:
-  - epic_story_id: EPIC-31/31.2
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-31/31.2
     cohort: E1
     current_status: done
     current_code_state: Ed25519 verification, key lookup, append-only verdict evidence and signature-before-parse integration exist.
     implementation_evidence: [SignatureVerificationTest, SignatureBeforeParseOrderingTest, KeyRegistryLookupTest]
-    use_case: UC-SCT-002
-    slice: UCS-SCT-002-A
-    source_status: Project algorithm and detached-signature transport profile remain OPEN-QUESTION; no EPC signature requirement is claimed.
-    architecture: Existing signature module and SignatureVerificationPort are sufficient; channel profile review is required.
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-A, UCS-SCT-002-B]
+    business_process_id: BP-01
+    source_classification: HUMAN_REVIEW_REQUIRED
+    source_tags: [PROJECT-ADR, OPEN-QUESTION]
+    source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [signature, payment-lifecycle]
+    quality_scenarios: [QS-SEC-02, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [signature-profile, key-identity, rotation-expiry, trust-revocation]
     tests: Retain crypto and ordering integration proofs; add channel-profile contract tests only after the decision.
     proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: Runtime evidence is strong, but the story contract must distinguish project Ed25519 policy from scheme authority.
+    rationale: Runtime evidence is strong, but Ed25519 and detached headers are project choices, not EPC requirements.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-19/19.2
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-19/19.2
     cohort: E1
     current_status: done
     current_code_state: Raw archive precedes signature verification and failed verification prevents parsing.
     implementation_evidence: [SignatureBeforeParseOrderingTest]
-    use_case: UC-SCT-002
-    slice: UCS-SCT-002-A
-    source_status: Ordering is a security/project decision; exact signed-channel profile is unresolved.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-A, UCS-SCT-002-B]
+    business_process_id: BP-01
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR, OPEN-QUESTION]
+    source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [ingress, signature, payment-lifecycle]
+    quality_scenarios: [QS-SEC-02, QS-TRC-01, QS-REL-02]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [channel-profile, archive-visibility, retention]
     tests: Preserve the mutation-proven archive-verify-parse ordering integration test.
     proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: Implemented behavior needs ENFORCED actor, source classification, security context and executable verify metadata.
+    rationale: Implemented ordering needs an approved E1 channel and evidence contract before migration.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-19/19.4
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-19/19.4
     cohort: E1
     current_status: done
     current_code_state: Signed pain.001.001.09 endpoint maps one transaction and persists lineage/outbox, but lacks ISO XSD/EPC TVS validation, reviewed limits and complete profile rules.
-    implementation_evidence: [Pain001IngestionIntegrationTest, Pain001CanonicalMapperTest]
-    use_case: UC-SCT-002
-    slice: UCS-SCT-002-A
-    source_status: EPC132-08 2025 v1.0 verified; channel/signature and TVS artifact applicability require review.
-    architecture: Existing ingress/payment/ISO ownership is sufficient for the pilot; BOUNDARY_REVIEW_REQUIRED if a file aggregate is proposed.
-    tests: Add XSD/TVS fixtures, deterministic validation errors, database lineage proof and composed E1 acceptance.
+    implementation_evidence: [Pain001SubmissionEndpointTest, Pain001CanonicalMapperTest]
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-A, UCS-SCT-002-B]
+    business_process_id: BP-01
+    source_classification: VERIFY_PER_USE
+    source_tags: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
+    source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [ingress, ISO-adapter, payment-lifecycle, signature]
+    quality_scenarios: [QS-SEC-02, QS-INT-01, QS-REL-02, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: VERIFY_PER_USE
+    candidate_after_gates: READY
+    blocking_decisions: [ISO-XSD-artifact, EPC-TVS-artifact, validation-taxonomy, measured-limits]
+    tests: Add XSD/TVS selection fixtures, deterministic validation errors, database lineage proof and composed E1 acceptance.
     proposed_status: PARTIALLY_IMPLEMENTED
-    rationale: A done label currently overstates source-profile and validation completeness.
+    rationale: The done label reflects the historical implementation contract, not the complete source-qualified E1 profile.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-26/26.3
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-26/26.3
     cohort: E1
     current_status: done
-    current_code_state: Message, instruction, end-to-end and transaction identifiers are persisted in the ISO-owned schema.
-    implementation_evidence: [Pain001IngestionIntegrationTest, IsoIdentifierRepositoryTest]
-    use_case: UC-SCT-002
-    slice: UCS-SCT-002-A
-    source_status: EPC/ISO message paths are known for pain.001.001.09; normalization and uniqueness semantics need field-level mapping review.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
+    current_code_state: Message, instruction, end-to-end and UETR identifiers are persisted; transaction ID is not fabricated from pain.001.
+    implementation_evidence: [Pain001SubmissionEndpointTest, IsoPaymentEvidenceQueryIntegrationTest]
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-A]
+    business_process_id: BP-01
+    source_classification: HUMAN_REVIEW_REQUIRED
+    source_tags: [EPC-SCT, ISO20022, PROJECT-ADR]
+    source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [ISO-adapter, payment-lifecycle]
+    quality_scenarios: [QS-INT-01, QS-TRC-01, QS-SEC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [field-normalization, uniqueness-scope, RLS-owner, retention]
     tests: Allocate identifier mapping to unit/integration and constraints/RLS to database tests.
     proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: The implementation exists but its legacy story lacks the Phase E mapping and source-evidence contract.
+    rationale: The implementation exists but its legacy story lacks the approved field mapping.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-26/26.4
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-26/26.4
     cohort: E1
     current_status: in-progress
-    current_code_state: Query-only GraphQL ISO lineage and the BFF/detail panel exist despite stale story prose claiming GraphQL is absent.
-    implementation_evidence: [GraphqlSmokeIntegrationTest, Dagger_D3B_frontend_graphql_smoke]
-    use_case: UC-SCT-002
-    slice: UCS-SCT-002-B
-    source_status: Source-owned operational read; no scheme behavior is inferred.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT under ADR-N17.
+    current_code_state: Query-only GraphQL ISO lineage and the BFF/detail panel exist despite stale story prose.
+    implementation_evidence: [IsoPaymentEvidenceQueryIntegrationTest, Dagger_D3B_frontend_graphql_smoke]
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-A]
+    business_process_id: BP-01
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR]
+    source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [ISO-adapter, graphql, nextjs-bff]
+    quality_scenarios: [QS-SEC-01, QS-TRC-01, QS-OPS-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [evidence-field-visibility, masking, role-access]
     tests: Keep GraphQL contract and one composed read smoke; do not repeat mapping cases in UI.
     proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: Code and runtime proof invalidate the old blocker, but human review is required before changing status.
+    rationale: Code and runtime proof invalidate the old blocker, but human review is required before status reconciliation.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: PROPOSED-E1-06
+  - record_type: STORY_PROPOSAL
+    proposal_id: PHASE-E1-STORY-PROPOSAL-001
+    future_canonical_id: EPIC-24/24.10
+    placement_decision: ADD_STORY_TO_EXISTING_EPIC
     cohort: E1
     current_status: absent
     current_code_state: Backend command exists; signed upload BFF route, UI journey and smoke do not.
     implementation_evidence: []
-    use_case: UC-SCT-002
-    slice: UCS-SCT-002-B
-    source_status: Channel profile, accepted signature representation and upload byte limit are DECISION_BLOCKED.
-    architecture: One Next.js BFF command route and Payments workspace journey; REST command ownership remains backend, GraphQL remains query-only.
-    tests: BFF contract/component tests plus exactly one Playwright signed-upload smoke and composed Dagger acceptance.
-    proposed_status: READY_CANDIDATE
-    rationale: This closes the actor journey without creating frontend-owned payment semantics or broad browser duplication.
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-A, UCS-SCT-002-B]
+    business_process_id: BP-01
+    source_classification: DECISION_BLOCKED
+    source_tags: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
+    source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [nextjs-bff, payment-lifecycle, ISO-adapter, signature]
+    quality_scenarios: [QS-SEC-01, QS-SEC-02, QS-TRC-01, QS-REL-02]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: DECISION_BLOCKED
+    candidate_after_gates: READY
+    blocking_decisions: [channel, signature, TVS, limits, evidence-visibility]
+    tests: BFF contract/component tests, Dagger composed acceptance and exactly one Playwright login-upload-result-detail smoke.
+    proposed_status: PLANNED
+    rationale: The existing frontend epic owns the Payments workspace; one vertical story closes the actor journey without frontend-owned payment semantics.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-19/19.3
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-19/19.3
     cohort: E1-supporting
     current_status: done
     current_code_state: DTD, external entities, XInclude and entity expansion are hardened.
     implementation_evidence: [XmlHardeningTest]
-    use_case: UC-SCT-002
-    slice: UCS-SCT-002-A
-    source_status: Security/project requirement; size, depth and text limits remain QUALITY_EXPERIMENT_REQUIRED.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
-    tests: Keep focused parser security tests; exercise endpoint propagation once in E1.
+    use_case_id: UC-SCT-002
+    slice_id: [UCS-SCT-002-A]
+    business_process_id: BP-01
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR]
+    source_evidence: [SE-E1-SCT-TVS-001]
+    applicable_rules: [BR-SCT-003]
+    module_owners: [ingress, payment-lifecycle]
+    quality_scenarios: [QS-SEC-02, QS-REL-02]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT, QUALITY_EXPERIMENT_REQUIRED]
+    review_queues: [SECURITY_REVIEW, ARCHITECTURE_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [measured-parser-limits]
     proposed_status: IMPLEMENTED_AND_PROVEN
-    rationale: Proven dependency; not one of the six records selected for material migration.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-24/24.2A
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-24/24.2A
     cohort: E2
     current_status: done
     current_code_state: Payment list/detail, ISO panel and timeline exist.
     implementation_evidence: [Dagger_D3A_frontend_rest_smoke, Dagger_D3B_frontend_graphql_smoke]
-    use_case: UC-SCT-001
-    slice: UCS-SCT-001-A
-    source_status: Project operational read.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
-    tests: Reuse existing component/build and composed smoke evidence.
+    use_case_id: UC-SCT-001
+    slice_id: [UCS-SCT-001-A]
+    business_process_id: BP-01
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR]
+    source_evidence: [SE-SCT-001]
+    applicable_rules: [BR-SCT-001]
+    module_owners: [nextjs-bff, payment-lifecycle, ISO-adapter]
+    quality_scenarios: [QS-SEC-01, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [E2-planning-reconciliation]
     proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: Migrate metadata in E2; do not reopen the screen implementation.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-24/24.2B
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-24/24.2B
     cohort: deferred
     current_status: blocked
     current_code_state: Broad historical Playwright acceptance is absent.
     implementation_evidence: []
-    use_case: UC-SCT-001
-    slice: UCS-SCT-001-A
-    source_status: Project test policy superseded in scope by ADR-N16.
-    architecture: No architecture change.
-    tests: Replace broad screen gate with named risk-focused smoke only through a reviewed backlog change.
+    use_case_id: UC-SCT-001
+    slice_id: [UCS-SCT-001-A]
+    business_process_id: BP-01
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR]
+    source_evidence: [SE-SCT-001]
+    applicable_rules: [BR-SCT-001]
+    module_owners: [nextjs-bff]
+    quality_scenarios: [QS-TRC-01]
+    architecture_outcomes: [NO_ARCHITECTURE_CHANGE]
+    review_queues: [PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [ADR-N16-test-scope-reconciliation]
     proposed_status: STALE
-    rationale: Its broad sequencing conflicts with the current minimal-smoke policy and must not block E1.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-76/76.1-76.6
+  - record_type: CANONICAL_STORY_GROUP
+    canonical_story_ids: [EPIC-76/76.1, EPIC-76/76.2, EPIC-76/76.3, EPIC-76/76.4, EPIC-76/76.5, EPIC-76/76.6]
     cohort: E2
-    current_status: mixed done and in-progress
-    current_code_state: Approval persistence, policy, commands, queue/read model and UI are substantially implemented.
-    implementation_evidence: [ApprovalServiceTest, ApprovalGraphqlIntegrationTest, Dagger_D3B_frontend_graphql_smoke]
-    use_case: UC-APPROVAL-001
-    slice: UCS-APPROVAL-001-A
-    source_status: Maker-checker is project policy, not an EPC requirement.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT; transaction proof remains binding.
-    tests: Reconcile per command, database/RLS and one approval journey; no broad browser matrix.
+    current_status: mixed
+    use_case_id: UC-SCT-APPROVAL-001
+    slice_id: [UCS-SCT-APPROVAL-001-C, UCS-SCT-APPROVAL-001-D, UCS-SCT-APPROVAL-001-E, UCS-SCT-APPROVAL-001-I, UCS-SCT-APPROVAL-001-J]
+    business_process_id: BP-03
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR]
+    source_evidence: [SE-PROJECT-APPROVAL-001]
+    applicable_rules: [BR-APPROVAL-001, BR-APPROVAL-002]
+    module_owners: [payment-lifecycle, evidence-audit, graphql, nextjs-bff]
+    quality_scenarios: [QS-SEC-01, QS-INT-01, QS-REL-01, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [E2-story-by-story-reconciliation]
     proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: Status/prose lag implementation; E2 should reconcile rather than rebuild.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-77/77.1-77.3
-    cohort: E2
-    current_status: done
-    current_code_state: Append-only command audit, same-transaction writes and integrity reads exist.
-    implementation_evidence: [AuditCommandIntegrationTest, AuditImmutabilityDatabaseTest]
-    use_case: UC-AUDIT-001
-    slice: UCS-AUDIT-001-A
-    source_status: Project evidence policy; legal retention remains LEGAL_REVIEW_REQUIRED.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
-    tests: Retain database immutability/RLS and command transaction proofs.
-    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: Runtime capability exists; retention and access policy need Phase E review metadata.
-    human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-78/78.1-78.4
+  - record_type: CANONICAL_STORY_GROUP
+    canonical_story_ids: [EPIC-77/77.1, EPIC-77/77.2, EPIC-77/77.3]
     cohort: E2
     current_status: done
-    current_code_state: Secured query-only GraphQL, source-owned data fetchers and fixed BFF proxy exist.
-    implementation_evidence: [GraphqlSmokeIntegrationTest, Dagger_D3B_frontend_graphql_smoke]
-    use_case: UC-OPS-001
-    slice: UCS-OPS-001-A
-    source_status: Accepted ADR-N17 and project read contract.
-    architecture: CURRENT_ARCHITECTURE_SUFFICIENT
-    tests: Reconcile unchecked task prose with executed contract/runtime evidence.
+    use_case_id: UC-AUDIT-001
+    slice_id: [UCS-AUDIT-001-A, UCS-AUDIT-001-B]
+    business_process_id: BP-10
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR, OPEN-QUESTION]
+    source_evidence: []
+    applicable_rules: []
+    module_owners: [evidence-audit]
+    quality_scenarios: [QS-SEC-01, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW, LEGAL_REGULATORY_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [retention, evidence-access]
     proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
-    rationale: Done frontmatter conflicts with unchecked task markers and legacy warnings.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-73/73.1-73.4
+  - record_type: CANONICAL_STORY_GROUP
+    canonical_story_ids: [EPIC-78/78.1, EPIC-78/78.2, EPIC-78/78.3]
+    cohort: E2
+    current_status: done
+    use_case_id: UC-SCT-APPROVAL-001
+    slice_id: [UCS-SCT-APPROVAL-001-C, UCS-SCT-APPROVAL-001-J]
+    business_process_id: BP-03
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR]
+    source_evidence: [SE-PROJECT-APPROVAL-001]
+    applicable_rules: [BR-APPROVAL-002]
+    module_owners: [graphql, nextjs-bff, payment-lifecycle]
+    quality_scenarios: [QS-SEC-01, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [SECURITY_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [E2-planning-reconciliation]
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    human_review_state: NOT_REVIEWED
+  - record_type: CANONICAL_STORY
+    epic_story_id: EPIC-78/78.4
+    cohort: E2
+    current_status: done
+    use_case_id: UC-AUDIT-001
+    slice_id: [UCS-AUDIT-001-B]
+    business_process_id: BP-10
+    source_classification: PROJECT_INTERPRETATION
+    source_tags: [PROJECT-ADR]
+    source_evidence: []
+    applicable_rules: []
+    module_owners: [graphql, nextjs-bff, evidence-audit]
+    quality_scenarios: [QS-SEC-01, QS-TRC-01]
+    architecture_outcomes: [CURRENT_ARCHITECTURE_SUFFICIENT]
+    review_queues: [SECURITY_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: HUMAN_REVIEW_REQUIRED
+    candidate_after_gates: READY
+    blocking_decisions: [E2-planning-reconciliation]
+    proposed_status: IMPLEMENTED_NOT_PLANNING_RECONCILED
+    human_review_state: NOT_REVIEWED
+  - record_type: CANONICAL_STORY_GROUP
+    canonical_story_ids: [EPIC-73/73.1, EPIC-73/73.2, EPIC-73/73.3, EPIC-73/73.4]
     cohort: E3
     current_status: not-started
-    current_code_state: No admitted File/Group/Batch aggregate or file-result flow.
-    implementation_evidence: []
-    use_case: UC-SCT-003
-    slice: UCS-SCT-003-A
-    source_status: Participant documentation and partial-processing policy are unresolved.
-    architecture: BOUNDARY_REVIEW_REQUIRED and AGGREGATE_REVIEW_REQUIRED; Spring Batch is not preselected.
-    tests: Decide file/group/count/control-sum and restart risks before allocating tests.
+    use_case_id: UC-SCT-003
+    slice_id: [UCS-SCT-003-A, UCS-SCT-003-B]
+    business_process_id: BP-01
+    source_classification: SOURCE_BLOCKED
+    source_tags: [EPC-SCT, ISO20022, OPEN-QUESTION]
+    source_evidence: []
+    applicable_rules: [BR-SCT-004]
+    module_owners: [ingress, ISO-adapter, payment-lifecycle]
+    quality_scenarios: [QS-REL-02, QS-INT-01]
+    architecture_outcomes: [BOUNDARY_REVIEW_REQUIRED, AGGREGATE_REVIEW_REQUIRED, QUALITY_EXPERIMENT_REQUIRED]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: SOURCE_BLOCKED
+    candidate_after_gates: READY
+    blocking_decisions: [partial-processing, file-group-owner, limits, restart-policy]
     proposed_status: DECISION_BLOCKED
-    rationale: Existing stories assume MsgId idempotency, Spring Batch and partial acceptance without sufficient authority.
     human_review_state: NOT_REVIEWED
-  - epic_story_id: EPIC-28/28.2-28.4
+  - record_type: CANONICAL_STORY_GROUP
+    canonical_story_ids: [EPIC-28/28.2, EPIC-28/28.3, EPIC-28/28.4]
     cohort: E4-E6
     current_status: blocked
-    current_code_state: Message catalogue placeholders exist; no participant-qualified rail contracts.
-    implementation_evidence: []
-    use_case: UC-CLEARING-001
-    slice: UCS-CLEARING-001-A
-    source_status: Public EPC message set is known; detailed CSM participant profile is restricted.
-    architecture: NEW_INTEGRATION_CONTRACT and BOUNDARY_REVIEW_REQUIRED per rail.
-    tests: Contract fixtures require lawful participant artifacts or an explicitly synthetic profile.
+    use_case_id: UC-CLEARING-001
+    slice_id: [UCS-CLEARING-001-A]
+    business_process_id: BP-05
+    source_classification: PARTICIPANT_DOCUMENTATION_REQUIRED
+    source_tags: [EPC-SCT, ISO20022, STEP2, STET]
+    source_evidence: []
+    applicable_rules: []
+    module_owners: [ISO-adapter, egress]
+    quality_scenarios: [QS-DEP-01, QS-REL-02]
+    architecture_outcomes: [NEW_INTEGRATION_CONTRACT, BOUNDARY_REVIEW_REQUIRED]
+    review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]
+    current_readiness: SOURCE_BLOCKED
+    candidate_after_gates: READY
+    blocking_decisions: [participant-profile, receipt-retry-report-contract]
     proposed_status: SOURCE_BLOCKED
-    rationale: Do not infer STEP2, RT1, TIPS or STET participant rules from public summaries.
     human_review_state: NOT_REVIEWED

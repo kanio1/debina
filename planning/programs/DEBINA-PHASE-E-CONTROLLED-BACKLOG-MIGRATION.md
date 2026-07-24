@@ -1,8 +1,8 @@
 # Debina Phase E — controlled backlog migration and end-to-end SEPA payment research program
 
 Status: `AI_DRAFT`, `NOT_REVIEWED`
-Planning baseline: `d5be545`, branch `rebase/enterprise-evolution`, 2026-07-24
-Session mode: `RESEARCH + RECONCILIATION + PROGRAM PLANNING`
+Planning baseline: `8b86e254ffa29a436385c8c21974751b4b2b5535`, branch `rebase/enterprise-evolution`, 2026-07-24
+Session mode: `PREPARE_REVIEW`; no production implementation or canonical story migration
 Completion authority: human review plus the cohort exit gates defined below
 
 ## 1. Executive summary
@@ -44,7 +44,7 @@ remain open.
 
 | Item | Baseline |
 |---|---|
-| HEAD | `d5be545` |
+| HEAD | `8b86e254ffa29a436385c8c21974751b4b2b5535` |
 | Branch | `rebase/enterprise-evolution` |
 | Upstream | `origin/rebase/phase-b-product-domain-architecture` |
 | Ahead / behind at preflight | `0 / 0` |
@@ -53,11 +53,15 @@ remain open.
 | Use-case traceability warnings | 296 legacy warnings |
 | Planning-semantic warnings | 69 legacy warnings |
 | Phase D | complete and runtime-proven; not reopened |
-| Phase E | not started before this planning session |
+| Phase E | E0 baseline complete; E1 integrity closure prepared for human review |
 | Protected Modulith javadoc SHA-256 | `47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054` |
 
 No warning is removed by this planning session. No existing story status or capability
 claim is changed without human review and runtime evidence.
+
+The E1 review pack is canonical for pending decisions:
+`planning/reviews/phase-e/e1/README.md`. Its approval gate is false, all queues
+remain `NOT_REVIEWED`, and canonical migration remains forbidden.
 
 ### 2.2 Actual stack versions
 
@@ -293,8 +297,13 @@ operations ownership.
 
 ### E1 — signed `pain.001` pilot
 
-- Stories: `31.2`, `19.2`, `19.4`, `26.3`, `26.4`, proposed `E1-06`.
-- Use case/slices: `UC-SCT-002`, `UCS-SCT-002-A/B`.
+- Stories: `EPIC-31/31.2`, `EPIC-19/19.2`, `EPIC-19/19.4`,
+  `EPIC-26/26.3`, `EPIC-26/26.4`, and future proposal `EPIC-24/24.10`.
+- Use case/slices: `UC-SCT-002`, `UCS-SCT-002-A`, `UCS-SCT-002-B`.
+- Canonical slice meaning: `UCS-SCT-002-A` is the verified-input path through
+  archive, verification, source-qualified validation, mapping and accepted-payment
+  lineage; `UCS-SCT-002-B` is the failed-signature path with durable safe
+  verdict/evidence and no parse or payment mapping.
 - Scope: REST/BFF channel, detached-signature decision, raw envelope/evidence,
   safe parsing, XSD/TVS/profile validation, canonical single-payment mapping,
   persistence/lineage, existing approval/status evidence, minimal upload UI and one
@@ -389,11 +398,15 @@ business_process_id: BP-01
 actor_or_external_system: authenticated payment submitter
 actor_goal: submit one source-qualified signed SCT instruction and obtain durable evidence
 main_flow: authenticate -> archive -> verify -> validate -> map -> persist -> expose outcome
-source_classification: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
+source_classification: HUMAN_REVIEW_REQUIRED
+source_tags: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
 source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
 applicable_rules: [BR-SCT-003]
 security_context: tenant claim, role, RLS, least privilege, redacted telemetry
 quality_scenarios: [QS-SEC-01, QS-SEC-02, QS-REL-01]
+current_readiness: HUMAN_REVIEW_REQUIRED
+candidate_after_gates: READY
+blocking_decisions: [channel, signature, TVS, limits, evidence-visibility]
 human_review_state: NOT_REVIEWED
 ```
 
@@ -449,7 +462,7 @@ Specific `slice_id`, owner, realization and verify remain per record:
 - **Kafka/events:** outbox only after committed accepted outcome.
 - **Security/Keycloak:** tenant/role, XXE/entity/depth/text/size limits.
 - **API/contracts:** REST command with deterministic accepted/rejected/idempotent result.
-- **BFF/Frontend:** delegated to E1-06.
+- **BFF/Frontend:** delegated to the proposed `EPIC-24/24.10`.
 - **Observability:** validation class/reason/count, never XML or party/account data.
 - **Tests:** XSD/TVS fixtures, mapping/limits, DB/RLS and composed intake.
 - **Runtime verify:** accepted, corrupt XML, wrong namespace, invalid profile, duplicate.
@@ -488,7 +501,7 @@ Specific `slice_id`, owner, realization and verify remain per record:
 - **Migration/compatibility:** reconcile stale story prose.
 - **Acceptance/Dependencies/Risks:** no direct cross-schema repository; access review.
 
-### `E1-06` — signed upload actor journey
+### Proposed `EPIC-24/24.10` — signed upload actor journey
 
 - **Business outcome:** authenticated user submits one signed XML and reaches its
   validation/payment evidence.
@@ -514,8 +527,9 @@ Specific `slice_id`, owner, realization and verify remain per record:
   slice: UCS-SCT-002-A
   primary_actor: authenticated payment submitter
   goal: durably submit and validate one signed SCT instruction
-  source_classification: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
-  module_owner: ingress for envelope; signature for verdict; ISO adapter for message lineage; payment-lifecycle for payment command
+  source_classification: VERIFY_PER_USE
+  source_tags: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
+  module_owners: [ingress, signature, ISO-adapter, payment-lifecycle]
   command_port: signed pain.001 intake REST command
   query_port: none in A
   database_schema: [ingress, signature, iso, payment]
@@ -526,44 +540,46 @@ Specific `slice_id`, owner, realization and verify remain per record:
   rest: POST /api/v1/iso/pain001
   grpc: none
   graphql: none for commands
-  bff: E1-06 fixed backend command route
+  bff: proposed EPIC-24/24.10 fixed backend command route
   frontend_workspace: Payments
   keycloak_roles: reviewed submitter role; key administration separate
   rls: tenant-scoped owner policies on mutable/lineage records
   observability: trace/correlation/stage/reason metrics with strict redaction
-  quality_scenarios: [invalid-signature, corrupted-XML, duplicate-replay, tenant-isolation, restricted-evidence]
+  quality_scenarios: [QS-SEC-01, QS-SEC-02, QS-REL-02, QS-TRC-01]
   executable_verify: focused tests plus Dagger E1 signed-upload acceptance
   architecture_outcome: CURRENT_ARCHITECTURE_SUFFICIENT
 - use_case: UC-SCT-002
   slice: UCS-SCT-002-B
-  primary_actor: payment operator
-  goal: inspect validation, identifiers and evidence
-  source_classification: [PROJECT-ADR]
-  module_owner: source modules expose owned reads
-  command_port: none
-  query_port: REST payment detail and query-only GraphQL lineage
-  database_schema: no frontend/BFF schema
+  primary_actor: authenticated payment submitter
+  goal: receive a deterministic rejection when signature verification fails
+  source_classification: DECISION_BLOCKED
+  source_tags: [PROJECT-ADR, OPEN-QUESTION]
+  module_owners: [ingress, signature, evidence-audit, nextjs-bff]
+  command_port: signed pain.001 intake REST command
+  query_port: safe provenance result only; no payment-detail query because no payment is mapped
+  database_schema: [ingress, signature, audit]
   events: none
   kafka_topics: none
   outbox: no
   inbox: no
-  rest: payment detail/timeline
+  rest: deterministic safe signature-rejection response
   grpc: none
-  graphql: allowlisted query-only lineage
-  bff: fixed destination, session-aware
+  graphql: no raw evidence and no command
+  bff: fixed destination, session-aware error translation
   frontend_workspace: Payments
-  keycloak_roles: submitter/operator visibility matrix
-  rls: database-enforced tenant isolation
-  observability: redacted query and evidence-access audit
-  quality_scenarios: [tenant-isolation, restricted-evidence, log-redaction]
-  executable_verify: GraphQL contract plus one composed detail proof
+  keycloak_roles: submitter; evidence access remains separately restricted
+  rls: tenant isolation on raw and verdict evidence
+  observability: safe verdict/reason/correlation only; no XML or signature bytes
+  quality_scenarios: [QS-SEC-02, QS-REL-02, QS-TRC-01]
+  executable_verify: archive-before-verify ordering plus rejected-upload component proof
   architecture_outcome: CURRENT_ARCHITECTURE_SUFFICIENT
 - use_case: UC-SCT-003
   slice: UCS-SCT-003-A
   primary_actor: file-channel submitter
   goal: submit a multi-instruction file with deterministic file and item outcomes
-  source_classification: [EPC-SCT, ISO20022, PARTICIPANT_DOCUMENTATION_REQUIRED, OPEN-QUESTION]
-  module_owner: not admitted
+  source_classification: SOURCE_BLOCKED
+  source_tags: [EPC-SCT, ISO20022, OPEN-QUESTION]
+  module_owners: [ingress, ISO-adapter, payment-lifecycle]
   command_port: not admitted
   query_port: not admitted
   database_schema: not admitted
@@ -579,15 +595,16 @@ Specific `slice_id`, owner, realization and verify remain per record:
   keycloak_roles: review required
   rls: mandatory for tenant data
   observability: file/group/item counts without sensitive data
-  quality_scenarios: [large-file, many-transactions, partial-failure, recovery]
+  quality_scenarios: [QS-INT-01, QS-REL-02]
   executable_verify: unavailable until decisions resolve
   architecture_outcome: AGGREGATE_REVIEW_REQUIRED
 - use_case: UC-CLEARING-001
   slice: UCS-CLEARING-001-A
   primary_actor: clearing operations system
   goal: submit a rail-qualified SCT item and retain receipt evidence
-  source_classification: [EPC-SCT, PARTICIPANT_DOCUMENTATION_REQUIRED]
-  module_owner: adapter admission pending
+  source_classification: PARTICIPANT_DOCUMENTATION_REQUIRED
+  source_tags: [EPC-SCT, STEP2, STET]
+  module_owners: [ISO-adapter, egress]
   command_port: NEW_PUBLIC_PORT
   query_port: NEW_READ_MODEL
   database_schema: owner review required
@@ -603,15 +620,16 @@ Specific `slice_id`, owner, realization and verify remain per record:
   keycloak_roles: operations roles review
   rls: mandatory
   observability: delivery/receipt/latency/retry/DLQ
-  quality_scenarios: [unavailable-CSM, retry, duplicate-replay, certificate-expiry]
+  quality_scenarios: [QS-DEP-01, QS-REL-02]
   executable_verify: synthetic adapter contract or lawful participant sandbox
   architecture_outcome: NEW_INTEGRATION_CONTRACT
 - use_case: UC-SCTINST-001
   slice: UCS-SCTINST-001-A
   primary_actor: instant-payment submitter
   goal: submit an eligible instant instruction and obtain explicit finality evidence
-  source_classification: [EU-LAW, EPC-SCT-INST, PARTICIPANT_DOCUMENTATION_REQUIRED]
-  module_owner: existing common core plus separate rail adapter review
+  source_classification: PARTICIPANT_DOCUMENTATION_REQUIRED
+  source_tags: [EU-LAW, EPC-SCT-INST, TIPS, RT1, STET]
+  module_owners: [payment-lifecycle, routing, settlement, ledger]
   command_port: reviewed instant submission port
   query_port: separate eligibility/finality reads
   database_schema: existing owners unless admission proves otherwise
@@ -627,15 +645,16 @@ Specific `slice_id`, owner, realization and verify remain per record:
   keycloak_roles: reviewed
   rls: mandatory
   observability: latency, timeout, liquidity and finality evidence
-  quality_scenarios: [instant-latency, unavailable-CSM, database-failure, out-of-order-Kafka]
+  quality_scenarios: [QS-INT-02, QS-REL-01, QS-DEP-01]
   executable_verify: concurrency/failure composed proof
   architecture_outcome: BOUNDARY_REVIEW_REQUIRED
 - use_case: UC-STATUS-001
   slice: UCS-STATUS-001-A
   primary_actor: external status source
   goal: correlate a status without inventing lifecycle or finality
-  source_classification: [EPC-SCT, ISO20022, PARTICIPANT_DOCUMENTATION_REQUIRED]
-  module_owner: ISO adapter for message; payment/settlement owners for qualified transitions
+  source_classification: VERIFY_PER_USE
+  source_tags: [EPC-SCT, ISO20022]
+  module_owners: [ISO-adapter, payment-lifecycle, settlement]
   command_port: inbound status correlation
   query_port: source-owned status/evidence read
   database_schema: separate source owners
@@ -651,15 +670,16 @@ Specific `slice_id`, owner, realization and verify remain per record:
   keycloak_roles: operator/investigator
   rls: mandatory
   observability: unmatched/late/out-of-order/retry metrics
-  quality_scenarios: [out-of-order-Kafka, duplicate-replay, reconciliation-mismatch]
+  quality_scenarios: [QS-REL-01, QS-TRC-01]
   executable_verify: status ordering/correlation and finality-negative proofs
   architecture_outcome: CURRENT_ARCHITECTURE_SUFFICIENT
 - use_case: UC-SETTLEMENT-001
   slice: UCS-SETTLEMENT-001-A
   primary_actor: settlement adapter
   goal: record authoritative settlement/finality and reconcile money movement
-  source_classification: [PROJECT-ADR, PARTICIPANT_DOCUMENTATION_REQUIRED]
-  module_owner: settlement with LedgerPort-only money movement
+  source_classification: PARTICIPANT_DOCUMENTATION_REQUIRED
+  source_tags: [PROJECT-ADR, TIPS, STEP2, RT1, STET]
+  module_owners: [settlement, ledger]
   command_port: rail-qualified settlement evidence
   query_port: settlement/reconciliation operational read
   database_schema: settlement, ledger and evidence owners
@@ -675,7 +695,7 @@ Specific `slice_id`, owner, realization and verify remain per record:
   keycloak_roles: settlement/reconciliation operator
   rls: mandatory
   observability: settlement latency, mismatch, retry and audit
-  quality_scenarios: [database-failure, recovery, reconciliation-mismatch]
+  quality_scenarios: [QS-INT-02, QS-TRC-01]
   executable_verify: one-transaction and failure-injection proof
   architecture_outcome: BOUNDARY_REVIEW_REQUIRED
 ```
@@ -846,8 +866,8 @@ workspace patterns are the E1 design baseline. This is non-blocking.
   planning_warnings_introduced: 0
   planning_warnings_after: 69
 - cohort: E1
-  stories: [31.2, 19.2, 19.4, 26.3, 26.4, E1-06]
-  use_case_warnings_before: 5 on existing selected records; proposed E1-06 is not yet canonical
+  stories: [EPIC-31/31.2, EPIC-19/19.2, EPIC-19/19.4, EPIC-26/26.3, EPIC-26/26.4, EPIC-24/24.10]
+  use_case_warnings_before: 5 on existing selected records; EPIC-24/24.10 is proposal-only and not canonical
   use_case_warnings_resolved: target 5
   use_case_warnings_introduced: target 0
   use_case_warnings_after: target 0 on the six cohort records

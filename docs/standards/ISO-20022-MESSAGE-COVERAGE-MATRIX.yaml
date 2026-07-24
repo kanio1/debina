@@ -79,7 +79,8 @@ families:
         direction: INBOUND_AND_OUTBOUND
         lifecycle_stage: RETURN_OR_RECALL_RESPONSE
         current_support: NOT_IMPLEMENTED
-        use_cases: [UC-RETURN-001]
+        use_cases: [UC-RTRANS-001]
+        use_case_resolution: LINK_EXISTING_USE_CASE
       - message: pacs.028.001.03
         purpose: "FI-to-FI Payment Status Request"
         sender: "Inquiring PSP"
@@ -97,28 +98,32 @@ families:
         direction: INBOUND_AND_OUTBOUND
         lifecycle_stage: RECALL_OR_REQUEST_FOR_RECALL
         current_support: NOT_IMPLEMENTED
-        use_cases: [UC-RECALL-001]
+        use_cases: [UC-RTRANS-002]
+        use_case_resolution: LINK_EXISTING_USE_CASE
       - message: camt.029.001.09
         purpose: "Resolution of Investigation"
         scheme: [SCT, SCT_INST]
         direction: INBOUND_AND_OUTBOUND
         lifecycle_stage: INVESTIGATION_RESPONSE
         current_support: NOT_IMPLEMENTED
-        use_cases: [UC-RECALL-001, UC-CASE-001]
+        use_cases: [UC-RTRANS-002]
+        use_case_resolution: LINK_EXISTING_USE_CASE
       - message: camt.027.001.07
         purpose: "Claim Non-Receipt"
         scheme: [SCT]
         direction: INBOUND_AND_OUTBOUND
         lifecycle_stage: INQUIRY
         current_support: NOT_IMPLEMENTED
-        use_cases: [UC-CASE-001]
+        use_cases: []
+        use_case_resolution: HUMAN_REVIEW_REQUIRED
       - message: camt.087.001.06
         purpose: "Request to Modify Payment"
         scheme: [SCT]
         direction: INBOUND_AND_OUTBOUND
         lifecycle_stage: VALUE_DATE_CORRECTION
         current_support: NOT_IMPLEMENTED
-        use_cases: [UC-CASE-001]
+        use_cases: []
+        use_case_resolution: HUMAN_REVIEW_REQUIRED
       - message: "camt.052 / camt.053 / camt.054, exact profile version TBD"
         purpose: "Account report / statement / debit-credit notification"
         scheme: [SCT, SCT_INST, SDD_CORE, SDD_B2B]
