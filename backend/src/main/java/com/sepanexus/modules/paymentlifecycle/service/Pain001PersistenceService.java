@@ -62,7 +62,7 @@ public class Pain001PersistenceService {
                 paymentId -> pain001LineageRecorder.record(paymentId, tenantId, rawMessageId, canonical,
                         clockPort.now()));
         idempotencyStore.complete(tenantId, idempotencyKey, result.payment().getId(),
-                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE);
+                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE, rawMessageId);
 
         return result;
     }

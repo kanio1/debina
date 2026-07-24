@@ -1,88 +1,83 @@
 # HANDOFF
 
-## Zadanie
+## Current objective
 
-Debina realizuje Phase E1 jako kontrolowane domknięcie integralności kohorty
-signed `pain.001`, bez implementacji produkcyjnej i bez migracji kanonicznych
-stories. Bieżący rezultat to mechanicznie zwalidowany pakiet decyzyjny dla
-rzeczywistych ludzkich review.
+Deliver educational E1 for `UC-SCT-002` (signed single-instruction pain.001
+intake) using production-grade thinking with an educational-grade process:
+classify → plan → one implementation tranche → focused tests → one review →
+one coherent commit.
 
-## Zrobione
+## Current use case
 
-- Skorygowano referencje Phase E do katalogów kanonicznych: approval wskazuje
-  `UC-SCT-APPROVAL-001`, return/recall wskazują `UC-RTRANS-001` i
-  `UC-RTRANS-002`, a wiadomości investigation bez przyjętego actor goal
-  pozostają `HUMAN_REVIEW_REQUIRED`. Pseudo-slice `UC-SCT-002/S1` zastąpiono
-  kanonicznym `UCS-SCT-002-A`.
-- Ustalono kontrakt slices `UC-SCT-002`: `UCS-SCT-002-A` to zweryfikowane
-  wejście przez walidację, mapowanie i accepted-payment lineage;
-  `UCS-SCT-002-B` to nieudany podpis z trwałym bezpiecznym verdict/evidence,
-  bez parsowania i mapowania płatności.
-- Zastąpiono niekanoniczny `PROPOSED-E1-06` typowanym
-  `PHASE-E1-STORY-PROPOSAL-001` i rekomendacją
-  `ADD_STORY_TO_EXISTING_EPIC` jako przyszłe `EPIC-24/24.10`. Istniejących
-  plików epików/stories nie zmieniono.
-- Utworzono pełny pakiet
-  `planning/reviews/phase-e/e1/` z rejestrem decyzji, bramką approvals i
-  pięcioma dokumentami review. Wszystkie stany pozostają `NOT_REVIEWED`;
-  migracja kanonicznych stories jest wyłączona.
-- Dodano 28-polowy artefakt
-  `docs/data/mappings/E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml`. Wykrywa on
-  m.in. semantyczne pomieszanie source `GrpHdr/CreDtTm` z receive time oraz
-  brak mapowania `NbOfTxs`, `CtrlSum`, `PmtMtd`, requested execution date,
-  parties/agents, remittance, purpose i addresses.
-- Rozdzielono `evidence_status` jako kompletność metadata od
-  `semantic_review_state` jako ludzkiego domain/ISO/legal assurance.
-  `SOURCE_CONFIRMED + READY` wymaga teraz `VERIFIED + HUMAN_APPROVED` dla
-  każdego materialnego evidence.
-- Dodano `tools/planning/validate-phase-e-artifacts.py`, 13 negatywnych
-  fixtures i jeden poprawny przypadek. Walidator sprawdza referencje,
-  ownership slices, źródła/evidence/rules, moduły, quality scenarios,
-  story/proposal typing, scalar classifications, tags, outcomes, review
-  queues, readiness, approval gate i zgodność E1 między artefaktami. Jest
-  uruchamiany przez `validate-enterprise-governance.sh`.
-- Focused source refresh potwierdził bez zmiany wersji EPC132-08 2025 v1.0,
-  publiczny charakter EPC TVS/XSD ZIP, namespace
-  `urn:iso:std:iso:20022:tech:xsd:pain.001.001.09` oraz EPC153-22 v2.1.
-  Checksumy, lawful repository distribution i semantyczne approval pozostają
-  otwarte.
-- Wszystkie wymagane walidatory oraz 10 testów jednostkowych przeszły.
-  Końcowy audyt `/tmp/phase-e-reference-audit-final.tsv` ma 442 rozwiązane
-  referencje i zero nierozwiązanych. Baseline pozostał 79 epików, 304
-  stories, 296 legacy use-case warnings i 69 planning-semantic warnings.
-- Lokalne commity przed handoffem: `a403659`, `323e4da`, `5b5b9cf`,
-  `ef218b8`, `c0bf6a6`. Nie wykonano push i nie zmieniono kodu produkcyjnego.
+`UC-SCT-002` / `UCS-SCT-002-A` / `UCS-SCT-002-B` (customer pain.001 submission).
+Do not modify canonical use-case text unless a consciously accepted clarification
+is required after reconcile.
 
-## Utknęliśmy na
+## Current state
 
-Nic nie blokuje kompletności pakietu review. Implementacja i migracja stories
-są celowo zablokowane brakiem datowanych `HUMAN_APPROVED` dla
-`PAYMENTS_DOMAIN_REVIEW`, `ISO_MESSAGE_REVIEW`, `SECURITY_REVIEW`,
-`DATABASE_MAPPING_REVIEW`, `ARCHITECTURE_REVIEW`, `PRODUCT_REVIEW` i
-`QA_REVIEW`. Otwarte decyzje obejmują kanał REST+BFF, profil detached
-Ed25519, trust/rotation/revocation, lawful XSD/TVS acquisition i checksumy,
-mierzone limity, raw evidence visibility, RLS, retencję i archiwizację.
+- Delivery process simplified: operating-model rules and PM/BA/TA/SM role skills
+  are in place; Phase E governance is narrowed to Phase E review/planning paths.
+- Working tree may contain draft E1 backend/mapping/signature/idempotency work
+  that has **not** yet been committed through the new flow.
+- No claim of production readiness, EPC TVS closure, or regulatory conformance.
 
-## Plan na następny krok
+## Completed
 
-Otwórz `planning/reviews/phase-e/e1/E1-APPROVALS.yaml` i rozpocznij prawdziwy
-`PAYMENTS_DOMAIN_REVIEW` od zatwierdzenia albo odrzucenia kontraktu slices i
-claimów w `PAYMENTS-DOMAIN-REVIEW.md`; zapisz tożsamość reviewera, datę i
-dowód decyzji, nie zmieniając jeszcze kanonicznych stories.
+- Educational operating model documented in `.cursor/rules/00-project-operating-model.mdc`
+  and related planning/review/handoff rules.
+- Role skills: `product-manager`, `business-analyst`, `technical-architect`,
+  `scrum-master`; BA integrates existing `enterprise-use-case-engineering`.
+- Phase E rule limited to Phase E artifact paths; ordinary implementation no
+  longer depends on review councils, approval queues, or admission records.
 
-## Pułapki, których nie wolno powtórzyć
+## Decisions
 
-- `UCS-SCT-002-B` nie jest operational-read slice; oznacza failure podpisu
-  przed parse/mapping. Payment detail i ISO lineage są kontynuacją A.
-- Nie używać authority tags jako `source_classification` ani nie nazywać
-  metadata `VERIFIED` ludzkim semantic approval.
-- Nie przedstawiać detached headers lub Ed25519 jako wymogu EPC i nie uznawać
-  ISO XSD za EPC TVS.
-- Nie pobierać/commitować XSD lub TVS bez lawful acquisition, policy i
-  checksum review.
-- Nie tworzyć `EPIC-24/24.10` ani nie migrować pięciu legacy stories bez
-  kompletu datowanych approvals.
-- Nie rozszerzać E1 na batch, clearing, settlement, R-transactions, SDD,
-  broad Playwright lub nowy moduł/agregat.
-- Nie wykonywać push ani nie modyfikować
-  `build/generated-spring-modulith/javadoc.json`.
+Educational directions for E1 (local/non-production; not production closure):
+
+- Channel direction: `REST_PLUS_BFF_UPLOAD` (backend owns XML command; BFF is
+  session-aware upload adapter). GraphQL mutation rejected for commands.
+- Signature direction: versioned project profile `DEBINA-E1-DETACHED-ED25519-V1`
+  (covered bytes, base64, outcomes). HTTP header/signer UUID transport remain
+  implementation evidence only — not a frozen public contract.
+- Validation direction: ISO XSD + EPC TVS + project business rules when lawfully
+  available; E1 local work may proceed with ISO/project checks while TVS stays
+  `BLOCKED_FOR_PRODUCTION`.
+- Field scope: minimal single `PmtInf` / single `CdtTrfTxInf`; `NbOfTxs=1`,
+  `PmtMtd=TRF`, `CtrlSum` consistency as VALIDATE_ONLY.
+- CreDtTm: source message creation time distinct from record/receive time
+  (`source_message_created_at` vs `recorded_at`); do not treat legacy
+  `cre_dt_tm` as source CreDtTm.
+- Architecture: current modular monolith sufficient for E1; no new aggregate,
+  module, or Kafka topic for this tranche.
+- Flyway: global versioning — do not reuse proposal numbers such as `V22`.
+
+## Blocked for production
+
+- Dated specialist approvals / review councils / canonical migration admission
+- EPC TVS lawful acquisition, checksums and production validation claim
+- Normative detached-signature transport contract and signer-identity authority
+- XML encoding/charset acceptance profile
+- Evidence retention, encryption-at-rest and legal hold
+- Measured production intake limits acceptance
+- External ISO/EPC conformance or settlement/clearing claims
+
+These are `BLOCKED_FOR_PRODUCTION` and must not block safe local educational
+implementation.
+
+## Next tasks
+
+1. Inspect and plan CreDtTm persistence semantics (source vs recorded timestamps,
+   migration/expand-contract, mapper/lineage touchpoints).
+2. Implement the minimal approved E1 mapping (VALIDATE_ONLY + MAP_AND_PERSIST
+   fields only; no silent scope expansion).
+3. Implement the detached Ed25519 verification boundary
+   (`DEBINA-E1-DETACHED-ED25519-V1` outcomes; do not freeze HTTP headers).
+4. Implement tenant-scoped idempotency (opaque key, same-payload replay,
+   conflict on payload mismatch).
+5. Perform one focused implementation review (BLOCKER/HIGH before commit).
+
+## Resume from here
+
+Start next task 1: inspect current CreDtTm / timestamp persistence and write a
+concise Technical Architect plan (≤10 steps + verify commands) before further
+implementation or commit.

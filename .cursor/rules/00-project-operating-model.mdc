@@ -1,0 +1,79 @@
+---
+description: Educational Debina delivery model — production-grade thinking, educational-grade process.
+globs: []
+alwaysApply: true
+---
+
+# Project operating model
+
+Principle: **production-grade thinking, educational-grade process**.
+
+Default flow:
+
+`task classification → mini use case when required → concise technical plan →
+one implementation tranche → focused tests → one review → HANDOFF update →
+one coherent commit`
+
+## Task levels
+
+1. **Quick technical task or spike**
+   analysis → implementation → test → review → commit.
+
+2. **Normal feature**
+   mini use case → plan → implementation → tests → review → handoff → commit.
+
+3. **Major architectural decision**
+   PM/BA analysis → use case → ADR when required → plan → implementation →
+   review → commit.
+
+ADR is required only for a new module, aggregate, public API, database schema,
+Kafka topic, security-boundary change, or another costly-to-reverse decision.
+
+## What ordinary local work must not depend on
+
+Do **not** block safe local educational implementation on:
+
+- review councils;
+- owner decision packets;
+- approval queues;
+- implementation admission records;
+- canonical migration admission;
+- repeated closure audits;
+- production legal/regulatory closure;
+- multiple documentation-only commits.
+
+Unresolved production topics are recorded as `BLOCKED_FOR_PRODUCTION`.
+They must not block safe local educational implementation.
+
+## Role routing (not all roles every time)
+
+| Task kind | Roles |
+|---|---|
+| Quick technical task | Technical Architect + Scrum Master |
+| Normal feature | Business Analyst + `enterprise-use-case-engineering` + Technical Architect + Scrum Master |
+| New epic / unclear direction | Product Manager + Business Analyst + `enterprise-use-case-engineering` + Technical Architect + Scrum Master |
+| Technical spike | Technical Architect + Scrum Master |
+
+Role skills live under `.claude/skills/{product-manager,business-analyst,technical-architect,scrum-master}/`.
+
+## Validation policy
+
+Focused validation only:
+
+- use-case change → use-case/traceability validator;
+- database change → migration, Testcontainers and RLS tests;
+- backend change → relevant module and integration tests;
+- UI change → typecheck, component tests and at most the relevant smoke;
+- every commit → focused tests plus `git diff --check`.
+
+Full governance validation is reserved for epic closure, milestone, major merge,
+or production-readiness work.
+
+## Safety and authority
+
+- Read `HANDOFF.md` before material work.
+- Preserve ADR-N1…N17 and `[FREEZE]` decisions; do not invent rail or regulatory facts.
+- Do not fabricate human approval.
+- Do not push or run destructive Git operations unless the user explicitly authorises them.
+- Prefer one coherent commit after review; do not create documentation-only commit chains for process theatre.
+- Phase E review/planning paths use `.cursor/rules/10-phase-e-governance.mdc` only when those paths are touched; that rule does not govern ordinary implementation.

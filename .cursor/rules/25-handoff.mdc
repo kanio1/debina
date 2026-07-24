@@ -1,0 +1,34 @@
+---
+description: Concise operational HANDOFF.md structure for educational delivery.
+globs:
+  - "HANDOFF.md"
+  - ".claude/skills/session-handoff/**"
+alwaysApply: false
+---
+
+# HANDOFF
+
+Overwrite root `HANDOFF.md` at the end of material sessions. It is current
+operational state, not a growing log.
+
+## Required sections (exactly this order)
+
+1. **Current objective** — what the project is doing now
+2. **Current use case** — ID/slice or `none` for pure technical work
+3. **Current state** — factual working-tree / verification status
+4. **Completed** — durable results still relevant
+5. **Decisions** — accepted educational directions; keep short
+6. **Blocked for production** — unresolved production topics (`BLOCKED_FOR_PRODUCTION`)
+7. **Next tasks** — **3 to 5** dependency-ordered tasks only; never the full backlog
+8. **Resume from here** — the single first action of the next session
+
+## Rules
+
+- Keep next tasks between 3 and 5.
+- Do not copy the full backlog.
+- Do not claim production readiness or regulatory conformance.
+- Preserve important accepted decisions; remove obsolete audit narration and
+  duplicated procedure text.
+- Unresolved production topics belong in **Blocked for production**; they do
+  not block safe local educational work.
+- Align content with skill `session-handoff`.

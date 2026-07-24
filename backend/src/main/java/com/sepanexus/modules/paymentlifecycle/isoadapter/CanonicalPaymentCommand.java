@@ -1,6 +1,7 @@
 package com.sepanexus.modules.paymentlifecycle.isoadapter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 /**
  * The canonical, channel-agnostic payment shape that {@link CanonicalMapper} produces
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
  */
 public record CanonicalPaymentCommand(
         String msgId,
+        Instant sourceMessageCreatedAt,
         String pmtInfId,
         String instrId,
         String endToEndId,

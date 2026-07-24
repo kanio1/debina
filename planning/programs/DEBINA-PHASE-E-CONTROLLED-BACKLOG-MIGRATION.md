@@ -53,15 +53,21 @@ remain open.
 | Use-case traceability warnings | 296 legacy warnings |
 | Planning-semantic warnings | 69 legacy warnings |
 | Phase D | complete and runtime-proven; not reopened |
-| Phase E | E0 baseline complete; E1 integrity closure prepared for human review |
-| Protected Modulith javadoc SHA-256 | `47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054` |
+| Phase E | E0 baseline complete; E1 bounded non-production admission recorded 2026-07-24 |
+| Protected Modulith javadoc `committed_baseline_sha256` | `47b1b89f63804b4062cd6abe9242a7d56b2212636de95a64784d53723c03e054` |
+| Protected Modulith javadoc `preexisting_worktree_sha256` | `f4c4ce5e6801b7142246a3edb1542b0af1e402fa7ae1b2970ec7bbe46f0c963d` (dirty working-tree; predates E1 pack work; out of scope; not part of E1 pack; not edited/staged/restored/committed by E1 tasks) |
 
 No warning is removed by this planning session. No existing story status or capability
 claim is changed without human review and runtime evidence.
 
 The E1 review pack is canonical for pending decisions:
-`planning/reviews/phase-e/e1/README.md`. Its approval gate is false, all queues
-remain `NOT_REVIEWED`, and canonical migration remains forbidden.
+`planning/reviews/phase-e/e1/README.md`. Bounded owner admission record:
+`planning/reviews/phase-e/e1/E1-DEVELOPMENT-ADMISSION.yaml`
+(`E1-DEVELOPMENT-ADMISSION-2026-07-24`) authorises non-production implementation and
+bounded canonical backlog migration for `UC-SCT-002` and slices
+`UCS-SCT-002-A`/`UCS-SCT-002-B` only. Specialist queues remain `NOT_REVIEWED`;
+`canonical_story_migration_allowed` is false; production release and Phase E2-E8
+remain `NOT_AUTHORIZED`. Baseline at admission: `dedc080`.
 
 ### 2.2 Actual stack versions
 

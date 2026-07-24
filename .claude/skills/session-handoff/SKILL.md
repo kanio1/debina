@@ -1,44 +1,61 @@
 ---
 name: session-handoff
-description: Użyj na końcu każdej dłuższej sesji, gdy kontekst się zapełnia, albo gdy użytkownik sygnalizuje koniec — żeby zapisać HANDOFF.md; użyj też na początku nowej sesji, żeby go przeczytać jako pierwsze.
+description: Read HANDOFF.md first at session start; overwrite it at session end with the eight-section operational format. Use when ending a session, resuming work, or recording blockers. Do not append history or invent answers to unresolved questions.
 ---
 
 # session-handoff
 
-## Na początku sesji
+## At session start
 
-Jeśli `HANDOFF.md` istnieje w korzeniu repo — przeczytaj go **pierwszy, przed jakimkolwiek innym działaniem**. To jedyny nośnik pamięci między sesjami; bez niego zaczynasz na ślepo. Traktuj sekcję "Plan na następny krok" jako punkt startowy, nie jako sugestię do renegocjacji.
+If root `HANDOFF.md` exists, read it **first**, before other work. Treat
+**Resume from here** as the starting action, not a suggestion to renegotiate.
 
-## Na końcu sesji
+Also follow `.cursor/rules/25-handoff.mdc`.
 
-Zapisz `HANDOFF.md` w korzeniu repo, **CAŁKOWICIE nadpisując** poprzednią wersję. To jest jeden zawsze-aktualny dokument opisujący stan bieżący — nie rosnący log, nie historia sesji. Nie dopisuj, nie zachowuj starych sekcji "na wszelki wypadek" — jeśli coś ze starej wersji jest wciąż aktualne, przepisz to na nowo we właściwej sekcji.
+## At session end
 
-Pisz tak, jakby czytał to zupełnie nowy agent bez żadnego kontekstu tej rozmowy — bez skrótów myślowych, bez "jak ustaliliśmy wcześniej", bez odwołań do czegoś, co nie jest w tym pliku ani w repo.
+Overwrite `HANDOFF.md` completely with current operational state. It is not a
+growing log. Rewrite still-relevant facts into the correct sections; drop
+obsolete audit narration and duplicated procedure text.
 
-Zapisuj `HANDOFF.md` **zawsze**, niezależnie jak krótka lub jak mało istotna wydawała się sesja. Brak zmian merytorycznych to też stan wart zapisania (np. sesja spędzona wyłącznie na dyskusji bez decyzji).
+Write for a new agent with no chat context. Always update HANDOFF after material
+sessions, including discussion-only sessions.
 
-## Wymagany format — dokładnie pięć sekcji, w tej kolejności
+## Required format — eight sections, this order
 
 ```markdown
 # HANDOFF
 
-## Zadanie
-Jedno-dwa zdania: co to za projekt i co się w nim właśnie robi. Zrozumiałe dla kogoś, kto nigdy nie widział tego repo.
+## Current objective
+One or two sentences: what Debina work is in progress now.
 
-## Zrobione
-Konkretnie, co zostało wykonane w tej sesji (i wcześniej, jeśli wciąż istotne) — z odniesieniem do realnych plików/epików/stories w /planning/ (np. "EPIC-01-platform-skeleton, story 0.2 — zaznaczona jako done"), a nie ogólnikami typu "trochę popracowaliśmy nad backendem".
+## Current use case
+Use-case / slice IDs, or `none` for pure technical work.
 
-## Utknęliśmy na
-Dokładny bieżący stan pracy w toku. Jeśli coś nie działa — dokładny ostatni błąd (komunikat, komenda, plik). Jeśli nic nie blokuje i sesja zakończyła się czysto — napisz to wprost ("nic nie blokuje, następny task jeszcze nierozpoczęty").
+## Current state
+Factual status of the working tree, verification, and open educational work.
 
-## Plan na następny krok
-Jednoznacznie: pierwsza czynność następnej sesji. Nie lista opcji do rozważenia — jedna konkretna czynność (np. "otwórz /planning/epics/EPIC-03-payment-lifecycle.md, story 1.2, wykonaj pierwszy nieodhaczony task i uruchom jego `verify:`").
+## Completed
+Durable completed items still relevant to the next agent.
 
-## Pułapki, których nie wolno powtórzyć
-Konkretne błędy już napotkane w tej lub poprzednich sesjach i jak ich uniknąć. Puste/"brak" jeśli faktycznie nic takiego się nie wydarzyło — nie wymyślaj pułapek na siłę.
+## Decisions
+Short accepted educational directions. Do not paste full decision registers.
+
+## Blocked for production
+Unresolved production/legal/regulatory topics as `BLOCKED_FOR_PRODUCTION`.
+These must not block safe local educational implementation.
+
+## Next tasks
+Exactly 3 to 5 dependency-ordered immediate tasks. Never the full backlog.
+
+## Resume from here
+The single first action for the next session.
 ```
 
-## Zasady
+## Rules
 
-- `HANDOFF.md` ≠ `CLAUDE.md`. `CLAUDE.md` to stałe zasady projektu, zmieniane rzadko. `HANDOFF.md` to zmienny stan bieżącej pracy, nadpisywany co sesję. Nigdy nie przenoś treści z jednego do drugiego i nigdy ich nie łącz w jeden plik.
-- Jeśli w trakcie sesji natrafiono na pytanie, na które dokumentacja projektu nie odpowiada (patrz skill `artifact-derived-planning`) i nie zostało ono rozstrzygnięte — musi się pojawić w `HANDOFF.md`, najczęściej w sekcji "Utknęliśmy na" lub "Plan na następny krok", nigdy rozstrzygnięte samodzielnie tylko po to, by handoff wyglądał czyściej.
+- `HANDOFF.md` ≠ stable project constitution (`AGENTS.md` / CLAUDE). Never merge them.
+- Do not claim production readiness or regulatory conformance.
+- Unresolved questions go in **Blocked for production** or **Current state**;
+  never invent closure to make the handoff look cleaner.
+- Keep next tasks between 3 and 5; align with Scrum Master task shaping when used.

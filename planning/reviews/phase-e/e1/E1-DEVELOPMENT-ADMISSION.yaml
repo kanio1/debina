@@ -1,0 +1,248 @@
+human_owner_decision:
+  schema_version: 1
+
+  decision_id: E1-DEVELOPMENT-ADMISSION-2026-07-24
+  title: Bounded non-production implementation admission for Debina Phase E1
+
+  decision_date: 2026-07-24
+
+  decision_maker:
+    name: "<PRAWDZIWE IMIĘ I NAZWISKO>"
+    role: "PROJECT_OWNER"
+    organisation: "<ORGANIZACJA LUB DEBINA PROJECT>"
+    mandate: >-
+      Authorised to approve bounded backlog migration and non-production
+      implementation for Debina Phase E1. This mandate does not include
+      production release, legal determination, ISO/EPC conformance approval
+      or specialist security certification.
+
+  authorship: HUMAN_DECISION
+  decision_status: APPROVED
+  decision: APPROVED_FOR_BOUNDED_NON_PRODUCTION_IMPLEMENTATION
+
+  reviewed_evidence:
+    - planning/reviews/phase-e/e1/E1-OWNER-DECISION-PACKET.md
+    - planning/reviews/phase-e/e1/E1-RECOMMENDATIONS.yaml
+    - planning/reviews/phase-e/e1/E1-DECISION-REGISTER.yaml
+    - planning/reviews/phase-e/e1/E1-FIELD-SCOPE-DECISION.yaml
+    - planning/reviews/phase-e/e1/E1-CRE-DT-TM-CORRECTION-PROPOSAL.md
+    - planning/reviews/phase-e/e1/E1-EXPERIMENT-RESULTS.yaml
+    - planning/reviews/phase-e/e1/E1-APPROVALS.yaml
+    - docs/data/mappings/E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml
+
+  authorised_scope:
+    phase: E1
+    use_case: UC-SCT-002
+    slices:
+      - UCS-SCT-002-A
+      - UCS-SCT-002-B
+
+    canonical_backlog_migration:
+      status: AUTHORIZED_FOR_LISTED_SCOPE_ONLY
+      allowed:
+        - migrate UC-SCT-002 and slices UCS-SCT-002-A/B into the canonical implementation backlog
+        - create or update implementation stories and tasks required only for E1
+        - preserve source, decision and test traceability
+      prohibited:
+        - Phase E2-E8 migration
+        - unrelated epic or story changes
+        - broad rewrite of canonical requirements
+        - change of unrelated story statuses
+
+    non_production_implementation:
+      status: AUTHORIZED
+      environments:
+        - local
+        - development
+        - test
+        - disposable integration environment
+
+      allowed:
+        - backend E1 implementation
+        - Flyway-safe database migration implementation
+        - database and RLS tests
+        - unit, property, integration and Testcontainers tests
+        - BFF upload adapter implementation
+        - Dagger composed runtime proof
+        - exactly one accepted Playwright smoke
+        - documentation and traceability updates required by E1
+
+      prohibited:
+        - production deployment
+        - production data migration
+        - production traffic enablement
+        - external ISO/EPC conformance claim
+        - settlement or clearing implementation
+        - Phase E2-E8 implementation
+
+  accepted_directions:
+    architecture:
+      decision: CURRENT_ARCHITECTURE_SUFFICIENT
+      conditions:
+        - no new module without separate architecture admission
+        - no new aggregate without separate architecture admission
+        - no new Kafka topic for E1
+        - REST remains command owner
+        - GraphQL remains query-only
+        - BFF remains a session and security adapter
+
+    channel:
+      decision: REST_PLUS_BFF_UPLOAD
+      conditions:
+        - backend REST endpoint owns the command
+        - BFF uses a fixed backend destination
+        - browser bearer tokens remain prohibited
+        - CSRF and same-origin controls are required
+        - final public signature-header contract remains blocked
+
+    signature:
+      decision: VERSIONED_DETACHED_ED25519_PROFILE
+      accepted:
+        - exact archived request bytes are the covered bytes
+        - Ed25519 is the candidate algorithm allowlist entry
+        - signature verification outcomes must be stable
+        - immutable signature evidence must be recorded
+        - telemetry must not expose XML, signatures, keys or payment data
+      not_accepted:
+        - X-Signer-Id as a frozen public contract
+        - UUID as a frozen signer representation
+        - current HTTP header names as a frozen public contract
+        - signer-to-key authority for production
+        - final trust, rotation and revocation model
+      production_acceptance: DECISION_BLOCKED
+
+    idempotency:
+      decision: ONE_LOGICAL_SUBMISSION_PER_KEY
+      rules:
+        - one tenant-scoped Idempotency-Key identifies one logical submission
+        - transport retries reuse the same key
+        - same key plus the same payload identity returns the original deterministic outcome
+        - same key plus a materially different payload returns a deterministic conflict
+      unresolved:
+        - key ownership
+        - TTL
+        - retention
+        - production uniqueness and archival policy
+
+    field_scope:
+      decision: ACCEPT_E1_FIELD_SCOPE_AS_REVIEWED
+      source: planning/reviews/phase-e/e1/E1-FIELD-SCOPE-DECISION.yaml
+      conditions:
+        - implement only approved MAP_AND_PERSIST fields
+        - implement approved VALIDATE_ONLY fields
+        - preserve the complete raw evidence artifact
+        - do not expand E1 into full pain.001 support
+
+    creation_time:
+      decision: CRE_DTTM_EXPAND_CONTRACT
+      conditions:
+        - GrpHdr/CreDtTm is stored as source message creation time
+        - Debina receive or record time remains a separate timestamp
+        - historical unknown values must not be silently reinterpreted
+        - migration and rollback must follow the reviewed Flyway-safe proposal
+
+    approval_journey:
+      decision: EXCLUDED_FROM_MINIMAL_E1_SMOKE
+      conditions:
+        - maker-checker behavior remains a separate use case
+        - E1 intake must not duplicate the approval journey
+
+    testing:
+      decision: ACCEPT_E1_TEST_ALLOCATION
+      allocation:
+        accepted_journey:
+          - backend integration
+          - Dagger composed runtime proof
+          - exactly one Playwright smoke: login → upload → deterministic accepted result → payment detail
+        invalid_signature:
+          - primary Spring/security integration test
+          - optional Dagger composed rejection proof
+          - no E1 Playwright negative smoke
+        database:
+          - Flyway
+          - ownership
+          - RLS
+          - constraints
+          - lineage
+          - idempotency
+
+  unresolved_and_still_blocked:
+    iso_epc:
+      status: SOURCE_BLOCKED
+      includes:
+        - final XSD entry point
+        - EPC TVS acquisition
+        - checksum pinning
+        - lawful repository distribution
+        - final XML encoding profile
+
+    security:
+      status: DECISION_BLOCKED
+      includes:
+        - public signature-header contract
+        - signer identifier transport and representation
+        - signer-to-key authority
+        - trust source
+        - rotation overlap
+        - revocation source
+        - production cryptographic acceptance
+
+    legal_regulatory:
+      status: LEGAL_REGULATORY_REVIEW
+      includes:
+        - retention
+        - deletion
+        - legal hold
+        - evidence export
+        - auditor access
+        - personal-data handling
+
+    quality_limits:
+      status: QUALITY_EXPERIMENT_REQUIRED
+      includes:
+        - HTTP body size
+        - decompressed size
+        - XML depth
+        - maximum text length
+        - transaction count
+        - parser peak memory
+        - endpoint timeout
+        - upload duration
+
+  specialist_review_state:
+    payments_domain: NOT_REVIEWED
+    iso_epc: NOT_REVIEWED
+    security: NOT_REVIEWED
+    database: NOT_REVIEWED
+    architecture: NOT_REVIEWED
+    product_qa: NOT_REVIEWED
+    legal_regulatory: NOT_REVIEWED
+
+  release_gates:
+    canonical_e1_backlog_migration: AUTHORIZED_FOR_LISTED_SCOPE_ONLY
+    non_production_e1_implementation: AUTHORIZED
+    production_release: NOT_AUTHORIZED
+    production_deployment: NOT_AUTHORIZED
+    external_conformance_claim: NOT_AUTHORIZED
+    phase_e2_e8: NOT_AUTHORIZED
+
+  mandatory_conditions:
+    - unresolved specialist decisions must remain visibly blocked
+    - no specialist review queue may be marked HUMAN_APPROVED by this decision
+    - production release requires separate dated specialist and owner approvals
+    - implementation must remain within UC-SCT-002 and UCS-SCT-002-A/B
+    - public contracts that remain blocked must be implemented behind replaceable boundaries
+    - no copyrighted or access-restricted ISO/EPC artifacts may be committed without approved policy
+    - all repository governance validators must pass
+    - production implementation must not be inferred from this non-production admission
+
+  human_attestation:
+    statement: >-
+      I have reviewed the Debina E1 owner decision packet and authorise only
+      the bounded canonical backlog migration and non-production implementation
+      described in this record. I do not authorise production release,
+      production deployment, an ISO/EPC conformance claim, Phase E2-E8, or the
+      closure of specialist review queues.
+    confirmed_by: "<PRAWDZIWE IMIĘ I NAZWISKO>"
+    confirmed_role: "PROJECT_OWNER"
+    confirmed_on: 2026-07-24

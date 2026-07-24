@@ -40,7 +40,7 @@ class DeferredSettlementCycleMigrationUpgradePathTest {
 
         try (Connection connection = admin(); Statement statement = connection.createStatement()) {
             try (ResultSet current = statement.executeQuery("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank DESC LIMIT 1")) {
-                current.next(); assertThat(current.getString(1)).isEqualTo("60");
+                current.next(); assertThat(current.getString(1)).isEqualTo("61");
             }
             try (ResultSet route = statement.executeQuery("SELECT count(*) FROM routing.route_decisions WHERE id = '" + decision + "'")) {
                 route.next(); assertThat(route.getInt(1)).isEqualTo(1);

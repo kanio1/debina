@@ -65,7 +65,7 @@ public class ApprovalDecisionService {
                 snapshot(approval.getId(), decision, approval.getMakerUserId(), command.checkerUserId(), approval.getSubmittedForApprovalAt(), approval.getExpiresAt(), now),
                 CommandAuditOutcome.SUCCESS, UUID.randomUUID(), now));
         if (decision == ApprovalStatus.APPROVED) creationWriter.releaseReceived(payment, command.tenantId());
-        idempotency.complete(source, command.idempotencyKey(), payment.getId(), 200);
+        idempotency.complete(source, command.idempotencyKey(), payment.getId(), 200, null);
         return result(payment.getId());
     }
     private ApprovalDecisionResult result(UUID paymentId) {

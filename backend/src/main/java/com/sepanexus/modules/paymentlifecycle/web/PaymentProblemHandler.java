@@ -2,6 +2,7 @@ package com.sepanexus.modules.paymentlifecycle.web;
 
 import com.sepanexus.modules.paymentlifecycle.ingress.SignatureVerificationFailedException;
 import com.sepanexus.modules.paymentlifecycle.ingress.XmlHardeningRejectedException;
+import com.sepanexus.signature.DetachedEd25519ProfileV1;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.CanonicalMappingException;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.MissingPrimaryIdentifierException;
 import com.sepanexus.modules.paymentlifecycle.service.IdempotencyConflictException;
@@ -50,6 +51,8 @@ public class PaymentProblemHandler {
                 + "verification failed", request);
         problem.setProperty("errorCode", "SIGNATURE_FAILED");
         problem.setProperty("reasonCode", exception.reasonCode());
+        problem.setProperty("profileId", DetachedEd25519ProfileV1.PROFILE_ID);
+        problem.setProperty("profileOutcome", exception.profileOutcome().name());
         return problem;
     }
 

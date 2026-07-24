@@ -118,6 +118,12 @@ class Pain001SubmissionEndpointTest {
         assertThat(count("SELECT count(*) FROM signature.signature_verification_events WHERE verdict = 'VERIFIED'"))
                 .isEqualTo(1);
         assertThat(count("SELECT count(*) FROM iso.iso_message_parse_errors")).isZero();
+        assertThat(count("SELECT count(*) FROM iso.iso_messages im "
+                + "JOIN iso.payment_iso_identifiers pii ON pii.iso_message_id = im.id "
+                + "WHERE pii.end_to_end_id = 'E2E-HAPPY' "
+                + "AND im.source_message_created_at = '2026-07-15 10:00:00+00' "
+                + "AND im.recorded_at IS NOT NULL "
+                + "AND im.recorded_at = im.cre_dt_tm")).isEqualTo(1);
         assertThat(count("SELECT count(*) FROM payment.payment_status_history h "
                 + "JOIN iso.payment_iso_identifiers pii ON pii.payment_id = h.payment_id "
                 + "WHERE pii.end_to_end_id = 'E2E-HAPPY' AND h.seq = 1 AND h.from_status IS NULL "
@@ -136,7 +142,8 @@ class Pain001SubmissionEndpointTest {
 
         mockMvc.perform(pain001Request(UUID.randomUUID(), xml, signature, UUID.randomUUID().toString()))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.errorCode").value("SIGNATURE_FAILED"));
+                .andExpect(jsonPath("$.errorCode").value("SIGNATURE_FAILED"))
+                .andExpect(jsonPath("$.profileOutcome").value("INVALID_SIGNATURE"));
 
         assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-TAMPER'")).isZero();
         assertThat(count("SELECT count(*) FROM ingress.raw_inbound_messages WHERE message_type = 'pain.001'"))
@@ -154,7 +161,8 @@ class Pain001SubmissionEndpointTest {
 
         mockMvc.perform(pain001Request(UUID.randomUUID(), xml, null, UUID.randomUUID().toString()))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.errorCode").value("SIGNATURE_FAILED"));
+                .andExpect(jsonPath("$.errorCode").value("SIGNATURE_FAILED"))
+                .andExpect(jsonPath("$.profileOutcome").value("MISSING_SIGNATURE"));
 
         assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-NOSIG'")).isZero();
         assertThat(count("SELECT count(*) FROM iso.iso_message_parse_errors")).isZero();
@@ -351,6 +359,9 @@ class Pain001SubmissionEndpointTest {
                     </GrpHdr>
                     <PmtInf>
                       <PmtInfId>%s</PmtInfId>
+                      <PmtMtd>TRF</PmtMtd>
+                      <NbOfTxs>1</NbOfTxs>
+                      <CtrlSum>%s</CtrlSum>
                       <DbtrAcct><Id><IBAN>DE89370400440532013000</IBAN></Id></DbtrAcct>
                       <CdtTrfTxInf>
                         <PmtId><EndToEndId>%s</EndToEndId></PmtId>
@@ -360,7 +371,7 @@ class Pain001SubmissionEndpointTest {
                     </PmtInf>
                   </CstmrCdtTrfInitn>
                 </Document>
-                """.formatted(msgId, pmtInfId, endToEndId, currency, amount);
+                """.formatted(msgId, pmtInfId, amount, endToEndId, currency, amount);
     }
 
     private static int count(String sql) throws Exception {

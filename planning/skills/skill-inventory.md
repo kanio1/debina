@@ -10,7 +10,11 @@ Inventory date: 2026-07-20, finalized with bridge commit `fcf1470`. The single t
 | keycloak-realm-config | `.claude/skills/keycloak-realm-config` | yes | realm/client/role | none | useful; fixed-four-role assumption stale and removed |
 | shadcn-component-scaffold | `.claude/skills/shadcn-component-scaffold` | yes | components/screens | none | useful; npm and blanket Playwright assumptions stale and removed |
 | epic-story-task-catalog | `.claude/skills/epic-story-task-catalog` | yes | planning format | none | preserved; distinct formatting scope |
-| session-handoff | `.claude/skills/session-handoff` | yes | session memory | none | preserved; distinct lifecycle scope |
+| session-handoff | `.claude/skills/session-handoff` | yes | session memory | none | eight-section educational HANDOFF format |
+| product-manager | `.claude/skills/product-manager` | yes | new epic / unclear direction | none | educational role skill; concise problem framing |
+| business-analyst | `.claude/skills/business-analyst` | yes | behaviour-changing features | none | educational role skill; integrates enterprise-use-case-engineering |
+| technical-architect | `.claude/skills/technical-architect` | yes | concise technical plan | none | educational role skill; ≤10 steps |
+| scrum-master | `.claude/skills/scrum-master` | yes | 3–5 immediate tasks | none | educational role skill; no Scrum ceremony |
 | nextjs-bff-route | `.claude/skills/nextjs-bff-route` | yes | BFF security | none | preserved; distinct server/BFF scope |
 | sepa-nexus-database-review | `.claude/skills/sepa-nexus-database-review` | yes | post-change DB review | 4 refs | preserved; independent review scope |
 | sepa-nexus-database-testing | `.claude/skills/sepa-nexus-database-testing` | yes | DB/Kafka tests | 8 refs | preserved; integration-test scope |

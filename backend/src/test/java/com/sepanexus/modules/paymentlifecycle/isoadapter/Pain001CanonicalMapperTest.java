@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sepanexus.modules.paymentlifecycle.ingress.HardenedXmlFactory;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -26,6 +27,7 @@ class Pain001CanonicalMapperTest {
         assertThat(result.success()).isTrue();
         CanonicalPaymentCommand command = result.command();
         assertThat(command.msgId()).isEqualTo("MSG-0001");
+        assertThat(command.sourceMessageCreatedAt()).isEqualTo(Instant.parse("2026-07-15T10:00:00Z"));
         assertThat(command.pmtInfId()).isEqualTo("PMTINF-0001");
         assertThat(command.instrId()).isNull();
         assertThat(command.endToEndId()).isEqualTo("E2E-0001");
@@ -56,6 +58,58 @@ class Pain001CanonicalMapperTest {
         CanonicalMappingResult second = map(xml);
 
         assertThat(first).isEqualTo(second);
+    }
+
+    @Test
+    void rejectsMissingCreDtTm() {
+        CanonicalMappingResult result = map(withoutElement("<CreDtTm>2026-07-15T10:00:00</CreDtTm>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.MISSING_REQUIRED_ELEMENT);
+        assertThat(result.error().fieldPath()).isEqualTo("GrpHdr/CreDtTm");
+    }
+
+    @Test
+    void rejectsInvalidCreDtTm() {
+        CanonicalMappingResult result = map(minimal().replace("<CreDtTm>2026-07-15T10:00:00</CreDtTm>",
+                "<CreDtTm>not-a-date</CreDtTm>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("GrpHdr/CreDtTm");
+    }
+
+    @Test
+    void parsesCreDtTmWithOffset() {
+        CanonicalMappingResult result = map(minimal().replace("<CreDtTm>2026-07-15T10:00:00</CreDtTm>",
+                "<CreDtTm>2026-07-15T12:00:00+02:00</CreDtTm>"));
+
+        assertThat(result.success()).isTrue();
+        assertThat(result.command().sourceMessageCreatedAt()).isEqualTo(Instant.parse("2026-07-15T10:00:00Z"));
+    }
+
+    @Test
+    void rejectsGrpHdrNbOfTxsNotOne() {
+        CanonicalMappingResult result = map(minimal().replace("<NbOfTxs>1</NbOfTxs>", "<NbOfTxs>2</NbOfTxs>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().fieldPath()).isEqualTo("GrpHdr/NbOfTxs");
+    }
+
+    @Test
+    void rejectsNonTrfPaymentMethod() {
+        CanonicalMappingResult result = map(minimal().replace("<PmtMtd>TRF</PmtMtd>", "<PmtMtd>CHK</PmtMtd>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/PmtMtd");
+    }
+
+    @Test
+    void rejectsCtrlSumMismatch() {
+        CanonicalMappingResult result = map(minimal().replace("<CtrlSum>100.00</CtrlSum>", "<CtrlSum>99.00</CtrlSum>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/CtrlSum");
     }
 
     @Test
@@ -184,6 +238,9 @@ class Pain001CanonicalMapperTest {
                     </GrpHdr>
                     <PmtInf>
                       <PmtInfId>PMTINF-0001</PmtInfId>
+                      <PmtMtd>TRF</PmtMtd>
+                      <NbOfTxs>1</NbOfTxs>
+                      <CtrlSum>100.00</CtrlSum>
                       <DbtrAcct>
                         <Id>
                           <IBAN>DE89370400440532013000</IBAN>
@@ -222,6 +279,8 @@ class Pain001CanonicalMapperTest {
                     <PmtInf>
                       <PmtInfId>PMTINF-REAL-0001</PmtInfId>
                       <PmtMtd>TRF</PmtMtd>
+                      <NbOfTxs>1</NbOfTxs>
+                      <CtrlSum>1250.50</CtrlSum>
                       <ReqdExctnDt><Dt>2026-07-16</Dt></ReqdExctnDt>
                       <Dbtr><Nm>ACME Corp</Nm></Dbtr>
                       <DbtrAcct>

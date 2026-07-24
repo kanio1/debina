@@ -1,0 +1,46 @@
+---
+description: One independent post-implementation review before commit.
+globs: []
+alwaysApply: false
+---
+
+# Implementation review
+
+After implementation and focused tests, perform **one** independent review.
+Do not run review councils, repeated closure audits, or an audit of the audit.
+
+## Focus areas
+
+- correctness
+- business-use-case alignment
+- architecture boundaries
+- database and tenant safety
+- security
+- migration safety
+- test quality
+- accidental scope expansion
+
+## Severity
+
+Report **BLOCKER**, **HIGH** and **MEDIUM** only.
+
+- **BLOCKER** and **HIGH** must be fixed before commit.
+- **MEDIUM** may be fixed or recorded in `HANDOFF.md`.
+
+## Independence
+
+Prefer a read-only reviewer or fresh pass that did not author the change.
+The implementing agent may incorporate fixes; do not invent a second process layer.
+
+## Out of scope for this review
+
+- production legal/regulatory closure
+- approval-queue completeness
+- owner decision packets
+- canonical migration admission
+- full enterprise governance suite (unless epic/milestone/production-readiness)
+
+## Exit
+
+When BLOCKER/HIGH are cleared and focused verification passes: update
+`HANDOFF.md`, then create **one coherent commit** (only when the user asks).

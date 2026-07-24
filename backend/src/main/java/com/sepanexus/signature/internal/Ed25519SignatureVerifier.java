@@ -1,5 +1,6 @@
 package com.sepanexus.signature.internal;
 
+import com.sepanexus.signature.DetachedEd25519ProfileV1;
 import com.sepanexus.signature.KeyPurpose;
 import com.sepanexus.signature.KeyRegistryPort;
 import com.sepanexus.signature.SignatureKeyView;
@@ -60,6 +61,10 @@ public class Ed25519SignatureVerifier implements SignatureVerificationPort {
                     ? new Verdict(Verdict.Result.FAILED, null, request.algo(), Verdict.REASON_MISSING_REQUIRED_SIGNATURE)
                     : new Verdict(Verdict.Result.NOT_APPLICABLE, null, request.algo(), null);
             return recordAndReturn(request, verdict);
+        }
+        if (request.signatureBytes().length != DetachedEd25519ProfileV1.ED25519_SIGNATURE_LENGTH_BYTES) {
+            return recordAndReturn(request, new Verdict(Verdict.Result.FAILED, null, request.algo(),
+                    Verdict.REASON_MALFORMED_SIGNATURE));
         }
 
         Optional<SignatureKeyView> key = keyRegistryPort.lookup(request.declaredSignerId(), KeyPurpose.VERIFY,

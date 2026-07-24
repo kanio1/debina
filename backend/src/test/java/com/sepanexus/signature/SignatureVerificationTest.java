@@ -192,6 +192,20 @@ class SignatureVerificationTest {
     }
 
     @Test
+    void malformedSignatureLengthFailsBeforeCryptographicVerification() throws Exception {
+        registerKey(participantId, signingKeyPair, Instant.now().minus(1, ChronoUnit.HOURS), null);
+        UUID rawMessageId = archiveRawMessage();
+
+        Verdict verdict = signaturePort.verify(new SignatureVerificationRequest(rawMessageId, rawBytes,
+                new byte[] {1, 2, 3}, participantId, "Ed25519", "bank-xml", true, Instant.now()));
+
+        assertThat(verdict.result()).isEqualTo(Verdict.Result.FAILED);
+        assertThat(verdict.reasonCode()).isEqualTo(Verdict.REASON_MALFORMED_SIGNATURE);
+        assertThat(verdict.profileOutcome()).isEqualTo(DetachedEd25519ProfileV1.ProfileOutcome.MALFORMED_SIGNATURE);
+        assertThat(countRows("signature.message_signatures", rawMessageId)).isZero();
+    }
+
+    @Test
     void missingSignatureOnARequiredChannelFails() throws Exception {
         UUID rawMessageId = archiveRawMessage();
 

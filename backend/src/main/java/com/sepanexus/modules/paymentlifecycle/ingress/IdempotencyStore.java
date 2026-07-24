@@ -10,5 +10,5 @@ public interface IdempotencyStore {
 
     IdempotencyClaim claim(UUID sourceId, String idempotencyKey, byte[] requestHash);
 
-    void complete(UUID sourceId, String idempotencyKey, UUID paymentId, int responseCode);
+    void complete(UUID sourceId, String idempotencyKey, UUID paymentId, int responseCode, UUID rawMessageId);
 }

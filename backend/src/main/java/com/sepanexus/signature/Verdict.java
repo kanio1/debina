@@ -21,5 +21,10 @@ public record Verdict(Result result, UUID keyId, String algo, String reasonCode)
      * the same {@link KeyRegistryPort#lookup} empty result, so they share one reason code. */
     public static final String REASON_KEY_NOT_FOUND_OR_INACTIVE = "KEY_NOT_FOUND_OR_INACTIVE";
     public static final String REASON_MISSING_REQUIRED_SIGNATURE = "MISSING_REQUIRED_SIGNATURE";
+    public static final String REASON_MALFORMED_SIGNATURE = "MALFORMED_SIGNATURE";
     public static final String REASON_UNSUPPORTED_ALGORITHM = "UNSUPPORTED_ALGORITHM";
+
+    public DetachedEd25519ProfileV1.ProfileOutcome profileOutcome() {
+        return DetachedEd25519ProfileV1.toProfileOutcome(this);
+    }
 }

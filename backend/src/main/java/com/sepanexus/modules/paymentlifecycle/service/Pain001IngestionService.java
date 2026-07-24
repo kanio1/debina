@@ -56,7 +56,8 @@ public class Pain001IngestionService {
                 command.declaredSignerId(), command.algo(), true, clockPort.now());
 
         if (result.verdict().result() == Verdict.Result.FAILED) {
-            throw new SignatureVerificationFailedException(result.verdict().reasonCode());
+            throw new SignatureVerificationFailedException(result.verdict().reasonCode(),
+                    result.verdict().profileOutcome());
         }
 
         HardenedXmlFactory.HardenedParseResult parseResult = result.parseResult();

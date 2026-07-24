@@ -80,4 +80,16 @@ approvals:
 gate:
   all_required_human_approved: false
   canonical_story_migration_allowed: false
-  reason: Required dated HUMAN_APPROVED records are absent; AI_DRAFT is not approval.
+  bounded_owner_admission:
+    decision_id: E1-DEVELOPMENT-ADMISSION-2026-07-24
+    decision_date: 2026-07-24
+    admission_record: E1-DEVELOPMENT-ADMISSION.yaml
+    canonical_backlog_migration_bounded: AUTHORIZED_FOR_LISTED_SCOPE_ONLY
+    non_production_implementation: AUTHORIZED
+    production_release: NOT_AUTHORIZED
+    phase_e2_e8: NOT_AUTHORIZED
+  reason: >-
+    Bounded owner admission recorded 2026-07-24 for UC-SCT-002 and
+    UCS-SCT-002-A/B non-production work only. Required specialist queues remain
+    NOT_REVIEWED; full canonical_story_migration_allowed requires all required
+    dated HUMAN_APPROVED records.

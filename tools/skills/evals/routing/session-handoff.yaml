@@ -1,9 +1,9 @@
 skill: session-handoff
 scenarios:
-  - {kind: positive, prompt: "End this session", expected: [session-handoff], must_not: [], first: "read and overwrite HANDOFF", forbidden: "append history", evidence: ["five sections"]}
-  - {kind: positive, prompt: "Resume work", expected: [session-handoff], must_not: [], first: "read HANDOFF", forbidden: "ignore blocker", evidence: ["next step"]}
-  - {kind: positive, prompt: "Record unresolved decision", expected: [session-handoff], must_not: [], first: "write exact blocker", forbidden: "invent answer", evidence: ["HANDOFF"]}
-  - {kind: positive, prompt: "Finish docs-only session", expected: [session-handoff], must_not: [], first: "update handoff", forbidden: "skip short session", evidence: ["five sections"]}
+  - {kind: positive, prompt: "End this session", expected: [session-handoff], must_not: [], first: "read and overwrite HANDOFF", forbidden: "append history", evidence: ["eight sections"]}
+  - {kind: positive, prompt: "Resume work", expected: [session-handoff], must_not: [], first: "read HANDOFF", forbidden: "ignore blocker", evidence: ["Resume from here"]}
+  - {kind: positive, prompt: "Record unresolved decision", expected: [session-handoff], must_not: [], first: "write exact blocker", forbidden: "invent answer", evidence: ["BLOCKED_FOR_PRODUCTION"]}
+  - {kind: positive, prompt: "Finish docs-only session", expected: [session-handoff], must_not: [], first: "update handoff", forbidden: "skip short session", evidence: ["eight sections"]}
   - {kind: negative, prompt: "Create ADR", expected: [artifact-derived-planning], must_not: [session-handoff], first: "read authority", forbidden: "handoff only", evidence: ["ADR"]}
   - {kind: negative, prompt: "Add UI", expected: [shadcn-component-scaffold], must_not: [session-handoff], first: "read UI rules", forbidden: "end session", evidence: ["a11y"]}
   - {kind: negative, prompt: "Run migration", expected: [postgres-rls-migration], must_not: [session-handoff], first: "read DB rules", forbidden: "handoff", evidence: ["test"]}

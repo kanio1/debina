@@ -50,11 +50,11 @@ public class JdbcIdempotencyStore implements IdempotencyStore {
     }
 
     @Override
-    public void complete(UUID sourceId, String idempotencyKey, UUID paymentId, int responseCode) {
+    public void complete(UUID sourceId, String idempotencyKey, UUID paymentId, int responseCode, UUID rawMessageId) {
         jdbcTemplate.update("""
                 UPDATE ingress.idempotency_keys
-                SET payment_id = ?, response_code = ?, last_seen_at = ?
+                SET payment_id = ?, response_code = ?, raw_message_id = ?, last_seen_at = ?
                 WHERE source_id = ? AND idem_key = ?
-                """, paymentId, responseCode, Timestamp.from(clockPort.now()), sourceId, idempotencyKey);
+                """, paymentId, responseCode, rawMessageId, Timestamp.from(clockPort.now()), sourceId, idempotencyKey);
     }
 }

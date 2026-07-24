@@ -8,6 +8,12 @@ import static com.sepanexus.modules.paymentlifecycle.isoadapter.MappingErrorCode
 import static com.sepanexus.modules.paymentlifecycle.isoadapter.MappingErrorCode.UNSUPPORTED_TRANSACTION_COUNT;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -71,6 +77,22 @@ public class Pain001CanonicalMapper implements CanonicalMapper {
             return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "GrpHdr/MsgId", "MsgId is required");
         }
 
+        String creDtTmText = textOf(firstChildElement(grpHdr, "CreDtTm"));
+        if (isBlank(creDtTmText)) {
+            return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "GrpHdr/CreDtTm", "CreDtTm is required");
+        }
+        Instant sourceMessageCreatedAt = parseCreDtTm(creDtTmText);
+        if (sourceMessageCreatedAt == null) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "GrpHdr/CreDtTm",
+                    "CreDtTm is not a valid ISODateTime");
+        }
+
+        CanonicalMappingResult grpHdrNbOfTxs = validateEqualsOne(firstChildElement(grpHdr, "NbOfTxs"),
+                "GrpHdr/NbOfTxs");
+        if (grpHdrNbOfTxs != null) {
+            return grpHdrNbOfTxs;
+        }
+
         List<Element> pmtInfs = childElements(cstmrCdtTrfInitn, "PmtInf");
         if (pmtInfs.size() != 1) {
             return CanonicalMappingResult.failure(UNSUPPORTED_TRANSACTION_COUNT, "CstmrCdtTrfInitn/PmtInf",
@@ -81,6 +103,21 @@ public class Pain001CanonicalMapper implements CanonicalMapper {
         String pmtInfId = textOf(firstChildElement(pmtInf, "PmtInfId"));
         if (isBlank(pmtInfId)) {
             return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "PmtInf/PmtInfId", "PmtInfId is required");
+        }
+
+        String pmtMtd = textOf(firstChildElement(pmtInf, "PmtMtd"));
+        if (isBlank(pmtMtd)) {
+            return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "PmtInf/PmtMtd", "PmtMtd is required");
+        }
+        if (!"TRF".equals(pmtMtd)) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "PmtInf/PmtMtd",
+                    "PmtMtd must be TRF for E1 SCT profile");
+        }
+
+        CanonicalMappingResult pmtInfNbOfTxs = validateEqualsOne(firstChildElement(pmtInf, "NbOfTxs"),
+                "PmtInf/NbOfTxs");
+        if (pmtInfNbOfTxs != null) {
+            return pmtInfNbOfTxs;
         }
 
         String debtorIban = ibanOf(firstChildElement(pmtInf, "DbtrAcct"));
@@ -126,14 +163,60 @@ public class Pain001CanonicalMapper implements CanonicalMapper {
             return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "Amt/InstdAmt", "amount must be positive");
         }
 
+        CanonicalMappingResult ctrlSumResult = validateCtrlSumMatchesAmount(firstChildElement(pmtInf, "CtrlSum"),
+                amount);
+        if (ctrlSumResult != null) {
+            return ctrlSumResult;
+        }
+
         String creditorIban = ibanOf(firstChildElement(transaction, "CdtrAcct"));
         if (isBlank(creditorIban)) {
             return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "CdtTrfTxInf/CdtrAcct/Id/IBAN",
                     "creditor IBAN is required");
         }
 
-        return CanonicalMappingResult.success(new CanonicalPaymentCommand(msgId, pmtInfId, instrId, endToEndId, uetr,
-                amount, currency, debtorIban, creditorIban));
+        return CanonicalMappingResult.success(new CanonicalPaymentCommand(msgId, sourceMessageCreatedAt, pmtInfId,
+                instrId, endToEndId, uetr, amount, currency, debtorIban, creditorIban));
+    }
+
+    private static CanonicalMappingResult validateEqualsOne(Element element, String fieldPath) {
+        String text = textOf(element);
+        if (isBlank(text)) {
+            return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, fieldPath, fieldPath + " is required");
+        }
+        if (!"1".equals(text.trim())) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, fieldPath, fieldPath + " must equal 1 for E1");
+        }
+        return null;
+    }
+
+    private static CanonicalMappingResult validateCtrlSumMatchesAmount(Element ctrlSumElement, BigDecimal amount) {
+        String text = textOf(ctrlSumElement);
+        if (isBlank(text)) {
+            return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "PmtInf/CtrlSum",
+                    "CtrlSum is required for E1 profile");
+        }
+        BigDecimal ctrlSum = parseAmount(text);
+        if (ctrlSum == null) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "PmtInf/CtrlSum",
+                    "CtrlSum is not a valid decimal");
+        }
+        if (ctrlSum.compareTo(amount) != 0) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "PmtInf/CtrlSum",
+                    "CtrlSum must equal InstdAmt for single-transaction E1 profile");
+        }
+        return null;
+    }
+
+    private static Instant parseCreDtTm(String text) {
+        try {
+            if (text.endsWith("Z") || text.contains("+") || text.lastIndexOf('-') > 10) {
+                return OffsetDateTime.parse(text, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant();
+            }
+            return LocalDateTime.parse(text, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZoneOffset.UTC);
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
     }
 
     private static BigDecimal parseAmount(String text) {

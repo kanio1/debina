@@ -32,7 +32,7 @@ class IsoPaymentEvidenceReadModel implements PaymentIsoEvidenceQuery {
                 LEFT JOIN LATERAL (
                     SELECT effective_from FROM iso.iso_message_versions imv
                     WHERE imv.message_type = im.message_type
-                      AND imv.effective_from <= COALESCE(im.cre_dt_tm, im.created_at)::date
+                      AND imv.effective_from <= COALESCE(im.recorded_at, im.cre_dt_tm, im.created_at)::date
                     ORDER BY imv.effective_from DESC LIMIT 1
                 ) version ON true
                 WHERE ml.payment_id = ? AND im.tenant_id = ?

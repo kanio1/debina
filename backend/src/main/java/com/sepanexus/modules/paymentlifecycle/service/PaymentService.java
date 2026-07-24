@@ -80,7 +80,7 @@ public class PaymentService {
                 command.currency(), command.debtorIban(), command.creditorIban(), command.makerUserId(),
                 paymentId -> jsonDirectLineageRecorder.record(paymentId, tenantId, rawMessageId, command.endToEndId()));
         idempotencyStore.complete(tenantId, command.idempotencyKey(), result.payment().getId(),
-                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE);
+                result.approvalStatus().name().equals("PENDING_APPROVAL") ? 202 : SUBMIT_RESPONSE_CODE, rawMessageId);
 
         return result.payment();
     }
