@@ -51,7 +51,7 @@ class C1ValidatorRepositoryTests(unittest.TestCase):
             "technical-only-use-case.json": "ESR-017",
             "stale-reference.json": "ESR-004",
             "missing-source-classification.json": "ESR-007",
-            "verify-per-use-without-resolved-evidence.json": "ESR-015",
+            "verify-per-use-without-resolved-evidence.json": "ESR-018",
             "done-not-run.json": "ESR-016",
         }
         for name, diagnostic_code in cases.items():
@@ -63,3 +63,59 @@ class C1ValidatorRepositoryTests(unittest.TestCase):
                 )
                 self.assertNotEqual(0, result.returncode, result.stdout)
                 self.assertIn(diagnostic_code, result.stdout)
+
+    def test_source_freshness_fixtures_are_fail_closed(self):
+        fixture_dir = (
+            ROOT / "tools/requirements/tests/fixtures/source-evidence-freshness"
+        )
+        valid = self.run_validator(
+            "tools/requirements/validate-source-traceability.py",
+            "--fixture",
+            fixture_dir / "valid-verified-evidence.json",
+        )
+        self.assertEqual(0, valid.returncode, valid.stdout)
+        cases = {
+            "verified-with-unknown-version.json": "SRC-013",
+            "verified-with-unknown-effective-date.json": "SRC-013",
+            "verified-with-missing-section.json": "SRC-013",
+        }
+        for fixture, code in cases.items():
+            with self.subTest(fixture=fixture):
+                result = self.run_validator(
+                    "tools/requirements/validate-source-traceability.py",
+                    "--fixture",
+                    fixture_dir / fixture,
+                )
+                self.assertNotEqual(0, result.returncode, result.stdout)
+                self.assertIn(code, result.stdout)
+                self.assertIn("SE-FIXTURE-", result.stdout)
+
+    def test_readiness_freshness_fixtures_are_fail_closed(self):
+        fixture_dir = (
+            ROOT / "tools/requirements/tests/fixtures/enforced-story-readiness"
+        )
+        valid = self.run_validator(
+            "tools/requirements/validate-planning-semantics.py",
+            "--fixture",
+            fixture_dir / "valid-verified-evidence.json",
+        )
+        self.assertEqual(0, valid.returncode, valid.stdout)
+        cases = {
+            "ready-with-incomplete-evidence.json": "ESR-018",
+            "ready-with-stale-evidence.json": "ESR-019",
+            "ready-with-conflicting-evidence.json": "ESR-018",
+            "ready-with-restricted-participant-evidence.json": "ESR-018",
+            "project-interpretation-without-adr.json": "ESR-021",
+            "project-simulation-without-boundary.json": "ESR-022",
+            "superseded-evidence-used-as-current.json": "ESR-019",
+        }
+        for fixture, code in cases.items():
+            with self.subTest(fixture=fixture):
+                result = self.run_validator(
+                    "tools/requirements/validate-planning-semantics.py",
+                    "--fixture",
+                    fixture_dir / fixture,
+                )
+                self.assertNotEqual(0, result.returncode, result.stdout)
+                self.assertIn(code, result.stdout)
+                self.assertIn("SE-FIXTURE-", result.stdout)

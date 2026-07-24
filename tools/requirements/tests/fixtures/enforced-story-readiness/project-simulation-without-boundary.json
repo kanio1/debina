@@ -1,0 +1,21 @@
+{
+  "id": "project-simulation-without-boundary",
+  "meta": {
+    "semantic_enforcement": "ENFORCED", "status": "not-started", "readiness": "READY",
+    "use_case_id": "UC-SCT-APPROVAL-001", "slice_id": "[UCS-SCT-APPROVAL-001-D]",
+    "business_process_id": "BP-03", "actor_or_external_system": "payment-approver",
+    "actor_goal": "decide a pending approval", "main_flow": "BF-3",
+    "source_classification": "PROJECT_SIMULATION",
+    "source_evidence": "[SE-FIXTURE-SIMULATION]", "applicable_rules": "[BR-APPROVAL-002]",
+    "module_owner": "payment-lifecycle", "architecture_realization": "synthetic approval policy",
+    "security_context": "approver tenant and branch scope", "quality_scenarios": "[QS-SEC-01]",
+    "executable_verify": "./mvnw -f backend test -Dtest=ApprovalSubmissionIntegrationTest"
+  },
+  "evidence_overrides": [{
+    "id": "SE-FIXTURE-SIMULATION", "source_registry_id": "project-adr-n10",
+    "document_version": "accepted-ADR", "applicable_rules": ["BR-APPROVAL-002"],
+    "evidence_status": "VERIFIED", "superseded_by": "NONE",
+    "verification_method": "PROJECT_ADR", "public_or_restricted": "project-internal"
+  }],
+  "body": ""
+}

@@ -1,0 +1,21 @@
+{
+  "id": "ready-with-incomplete-evidence",
+  "meta": {
+    "semantic_enforcement": "ENFORCED", "status": "not-started", "readiness": "READY",
+    "use_case_id": "UC-SCT-001", "slice_id": "[UCS-SCT-001-A]",
+    "business_process_id": "BP-01", "actor_or_external_system": "payment-submitter",
+    "actor_goal": "submit an SCT payment", "main_flow": "BF-1",
+    "source_classification": "SOURCE_CONFIRMED",
+    "source_evidence": "[SE-FIXTURE-INCOMPLETE]", "applicable_rules": "[BR-SCT-001]",
+    "module_owner": "payment-lifecycle", "architecture_realization": "payment command port",
+    "security_context": "tenant and branch scope", "quality_scenarios": "[QS-INT-01]",
+    "executable_verify": "./mvnw -f backend test -Dtest=PaymentSubmissionIntegrationTest"
+  },
+  "evidence_overrides": [{
+    "id": "SE-FIXTURE-INCOMPLETE", "source_registry_id": "epc-sct",
+    "document_version": "2026.1", "applicable_rules": ["BR-SCT-001"],
+    "evidence_status": "INCOMPLETE", "superseded_by": "NONE",
+    "verification_method": "OTHER", "public_or_restricted": "public"
+  }],
+  "body": ""
+}

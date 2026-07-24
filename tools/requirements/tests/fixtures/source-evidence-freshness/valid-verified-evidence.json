@@ -1,0 +1,28 @@
+{
+  "id": "valid-verified-evidence",
+  "evidence": [{
+    "id": "SE-FIXTURE-VERIFIED",
+    "source_registry_id": "epc-sct",
+    "document_title": "Fixture official scheme document",
+    "publisher": "Fixture official publisher",
+    "document_version": "2026.1",
+    "publication_date": "2026-01-01",
+    "effective_date": "2026-02-01",
+    "section": "2.1",
+    "rail": "generic-SCT",
+    "public_or_restricted": "public",
+    "access_date": "2026-07-24",
+    "supported_claim": "Fixture claim for validator proof.",
+    "project_interpretation": "No project reinterpretation.",
+    "applicable_rules": ["BR-SCT-001"],
+    "confidence": "HIGH",
+    "evidence_status": "VERIFIED",
+    "last_verified_date": "2026-07-24",
+    "next_review_date": "2027-01-01",
+    "effective_from": "2026-02-01",
+    "effective_until": "OPEN",
+    "superseded_by": "NONE",
+    "verification_method": "OFFICIAL_DOCUMENT_REVIEW",
+    "reviewer": "fixture-reviewer"
+  }]
+}
