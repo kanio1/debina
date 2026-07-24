@@ -1,0 +1,83 @@
+version: 1
+status: AI_DRAFT
+use_case_id: UC-SCT-002
+slice_ids: [UCS-SCT-002-A, UCS-SCT-002-B]
+required_for_canonical_migration:
+  - PAYMENTS_DOMAIN_REVIEW
+  - ISO_MESSAGE_REVIEW
+  - SECURITY_REVIEW
+  - DATABASE_MAPPING_REVIEW
+  - ARCHITECTURE_REVIEW
+  - PRODUCT_REVIEW
+  - QA_REVIEW
+advisory_or_scope_specific:
+  - LEGAL_REGULATORY_REVIEW
+approvals:
+  - queue: PAYMENTS_DOMAIN_REVIEW
+    reviewer_role: SEPA payments domain specialist
+    reviewed_artifacts: [PAYMENTS-DOMAIN-REVIEW.md, E1-DECISION-REGISTER.yaml, phase-e-reconciliation.yaml]
+    blocking_questions: [actor goal, SCT scope, canonical concepts, maker-checker boundary]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - queue: ISO_MESSAGE_REVIEW
+    reviewer_role: ISO 20022 and EPC implementation-guideline specialist
+    reviewed_artifacts: [ISO-MESSAGE-REVIEW.md, E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml]
+    blocking_questions: [message version, XSD, TVS, field rules, address transition]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - queue: SECURITY_REVIEW
+    reviewer_role: application security and Keycloak architect
+    reviewed_artifacts: [SECURITY-CHANNEL-SIGNATURE-REVIEW.md, E1-DECISION-REGISTER.yaml]
+    blocking_questions: [channel, CSRF/origin, signature trust, rotation/revocation, evidence access]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - queue: DATABASE_MAPPING_REVIEW
+    reviewer_role: PostgreSQL data owner and RLS reviewer
+    reviewed_artifacts: [DATABASE-MAPPING-REVIEW.md, E1-PAIN001-SINGLE-INSTRUCTION-MAPPING.yaml]
+    blocking_questions: [owners, types, constraints, RLS, immutable lineage, retention]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - queue: ARCHITECTURE_REVIEW
+    reviewer_role: enterprise and Spring Modulith architect
+    reviewed_artifacts: [README.md, E1-DECISION-REGISTER.yaml, phase-e-reconciliation.yaml]
+    blocking_questions: [current boundaries, public ports, transaction ownership, no new aggregate/module]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - queue: PRODUCT_REVIEW
+    reviewer_role: Product Manager and Product Owner
+    reviewed_artifacts: [PAYMENTS-DOMAIN-REVIEW.md, PRODUCT-QA-REVIEW.md, E1-DECISION-REGISTER.yaml]
+    blocking_questions: [vertical outcome, non-goals, user-visible copy, role visibility]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - queue: QA_REVIEW
+    reviewer_role: QA/SDET test architect
+    reviewed_artifacts: [PRODUCT-QA-REVIEW.md, SEPA-PAYMENT-TEST-ALLOCATION-MATRIX.md]
+    blocking_questions: [primary layers, non-duplicate secondary risk, Dagger proof, one Playwright smoke]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - queue: LEGAL_REGULATORY_REVIEW
+    reviewer_role: qualified legal and source-governance reviewer
+    reviewed_artifacts: [ISO-MESSAGE-REVIEW.md, DATABASE-MAPPING-REVIEW.md, E1-DECISION-REGISTER.yaml]
+    blocking_questions: [artifact licensing, retention, evidence access, applicability disclaimer]
+    review_state: NOT_REVIEWED
+    reviewer_identity: PENDING_HUMAN
+    decision_date: PENDING
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+gate:
+  all_required_human_approved: false
+  canonical_story_migration_allowed: false
+  reason: Required dated HUMAN_APPROVED records are absent; AI_DRAFT is not approval.

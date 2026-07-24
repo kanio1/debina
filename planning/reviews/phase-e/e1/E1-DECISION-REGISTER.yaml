@@ -1,0 +1,160 @@
+version: 1
+status: AI_DRAFT
+semantic_review_state: NOT_REVIEWED
+scope:
+  use_case_id: UC-SCT-002
+  slice_ids: [UCS-SCT-002-A, UCS-SCT-002-B]
+  story_records: [EPIC-31/31.2, EPIC-19/19.2, EPIC-19/19.4, EPIC-26/26.3, EPIC-26/26.4, EPIC-24/24.10]
+  future_story_proposal: PHASE-E1-STORY-PROPOSAL-001
+source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+decisions:
+  - id: DEC-E1-CHANNEL
+    title: E1 submission channel profile
+    source_classification: DECISION_BLOCKED
+    source_tags: [EPC-SCT, ISO20022, PROJECT-ADR, OPEN-QUESTION]
+    authority_boundary: EPC C2PSP defines the message usage profile, not Debina HTTP/BFF transport.
+    options:
+      - id: DIRECT_REST_ONLY
+        description: Authenticated clients call the existing application/xml REST command directly.
+        consequence: Does not close the browser actor journey.
+      - id: REST_PLUS_BFF_UPLOAD
+        description: Retain backend REST command ownership and add one fixed-destination session-aware BFF upload adapter.
+        consequence: Closes the vertical browser journey without GraphQL mutation or frontend semantics.
+      - id: MANAGED_FILE_CHANNEL
+        description: Add SFTP or scheduled pickup.
+        consequence: Deferred beyond E1; requires a separate actor/channel contract.
+    recommendation: REST_PLUS_BFF_UPLOAD
+    proposed_profile:
+      backend_content_type: application/xml
+      encoding: XML declaration plus supported UTF policy requires ISO_MESSAGE_REVIEW
+      authentication: Keycloak bearer token at backend; server-side session at BFF
+      authorization: payment_submitter
+      tenant_resolution: signed tenant_id token claim; no body/header override
+      bff_security: same-origin, CSRF token, fixed backend destination, no browser token exposure
+      idempotency: caller/BFF supplied opaque Idempotency-Key; retry contract requires review
+      replay_and_rate_limits: QUALITY_EXPERIMENT_REQUIRED
+    rejected_alternatives: [GraphQL mutation, frontend direct bearer-token storage, SFTP in E1]
+    blocking_questions: [accepted encoding, CSRF/origin contract, retry key lifecycle, measured limits]
+    affected_slices: [UCS-SCT-002-A, UCS-SCT-002-B]
+    affected_stories: [EPIC-19/19.4, EPIC-24/24.10]
+    reviewer_roles: [security architect, frontend/BFF architect, product owner, payments domain specialist]
+    review_state: NOT_REVIEWED
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - id: DEC-E1-SIGNATURE
+    title: E1 detached signature project profile
+    source_classification: DECISION_BLOCKED
+    source_tags: [PROJECT-ADR, OPEN-QUESTION]
+    authority_boundary: Detached headers and Ed25519 are Debina project security policy, not EPC requirements.
+    options:
+      - id: VERSIONED_ED25519_HEADERS
+        description: Version the current X-Signer-Id, base64 X-Signature and X-Signature-Algo Ed25519 convention as an explicitly synthetic E1 profile.
+        consequence: Preserves current implementation while making its non-EPC boundary explicit.
+      - id: CERTIFICATE_PROFILE
+        description: Replace signer UUID/key lookup with a reviewed X.509/certificate profile.
+        consequence: Requires trust-store, chain, revocation and likely architecture work before E1.
+      - id: NO_BROWSER_SIGNATURE
+        description: Limit browser journey to already signed bytes and metadata obtained outside Debina.
+        consequence: Avoids browser cryptography but still requires a trusted signer identity representation.
+    recommendation: VERSIONED_ED25519_HEADERS
+    proposed_profile:
+      profile_id: DEBINA-E1-DETACHED-ED25519-V1
+      covered_bytes: exact archived HTTP request body before parsing or normalization
+      signature_encoding: standard base64; malformed encoding needs a stable problem code
+      signer_identity: X-Signer-Id maps to an approved verification key; semantics require SECURITY_REVIEW
+      algorithm: Ed25519 allowlist entry, explicit rather than trusted client default
+      rotation_expiry_revocation: required decisions; current active/expired/revoked key model is implementation evidence only
+      immutable_evidence: raw_message_id, covered_sha256, key_id, algorithm, verdict, safe reason and verification time
+      telemetry: no XML, signature bytes, public/private material, party/account/address data
+    outcomes: [MISSING_SIGNATURE, MALFORMED_SIGNATURE, INVALID_SIGNATURE, UNKNOWN_SIGNER, UNTRUSTED_KEY, EXPIRED_KEY, REVOKED_KEY, VERIFIED]
+    rejected_alternatives: [custom cryptography, EPC-signature claim, private key upload]
+    blocking_questions: [signer identity authority, trust model, rotation overlap, revocation source, browser responsibility]
+    affected_slices: [UCS-SCT-002-A, UCS-SCT-002-B]
+    affected_stories: [EPIC-31/31.2, EPIC-19/19.2, EPIC-19/19.4, EPIC-24/24.10]
+    reviewer_roles: [security architect, payments domain specialist, architecture reviewer]
+    review_state: NOT_REVIEWED
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - id: DEC-E1-XML-TVS
+    title: ISO XSD, EPC TVS and validation taxonomy
+    source_classification: VERIFY_PER_USE
+    source_tags: [EPC-SCT, ISO20022, OPEN-QUESTION]
+    options:
+      - id: ISO_XSD_ONLY
+        description: Validate only the ISO pain.001.001.09 schema.
+        consequence: Rejected because it does not establish EPC C2PSP usage restrictions.
+      - id: ISO_XSD_PLUS_EPC_TVS_PLUS_PROJECT_RULES
+        description: Pin ISO schema and EPC TVS separately, then run explicit project business validation.
+        consequence: Preserves distinct error provenance and is the recommended E1 contract.
+      - id: EPC_TVS_AS_PRODUCTION_NAMESPACE
+        description: Serialize/accept a TVS namespace as the production message namespace.
+        consequence: Rejected by the EPC publication disclaimer; production instances use the default ISO namespace.
+    recommendation: ISO_XSD_PLUS_EPC_TVS_PLUS_PROJECT_RULES
+    proposed_profile:
+      message: pain.001.001.09
+      namespace: "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
+      iso_artifact: pain.001.001.09.xsd from the ISO 20022 Payments Initiation 2019 archive
+      epc_ig: EPC132-08 / 2025 v1.0, effective 2025-10-05
+      epc_tvs: EPC132-08 SCT C2PSP IG 2025 V1.0 XSD ZIP
+      artifact_location_policy: no commit until lawful acquisition/distribution review
+      checksums: VERIFY_ON_LAWFUL_ACQUISITION
+      validation_stages: [XML_WELL_FORMEDNESS, ISO_XSD, EPC_TVS_PROFILE, PROJECT_BUSINESS_VALIDATION, CANONICAL_MAPPING]
+      error_taxonomy: Stable stage, code, safe path and correlation; never raw XML or sensitive values
+    rejected_alternatives: [latest ISO pain version by default, search-result artifact, uncited hand-written TVS]
+    blocking_questions: [ISO archive artifact checksum, EPC ZIP distribution terms, TVS entry schema, error-code compatibility]
+    affected_slices: [UCS-SCT-002-A]
+    affected_stories: [EPIC-19/19.4, EPIC-26/26.3]
+    reviewer_roles: [ISO 20022 specialist, EPC scheme specialist, legal/source governance reviewer, QA architect]
+    review_state: NOT_REVIEWED
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - id: DEC-E1-LIMITS
+    title: Measured intake and parser limits
+    source_classification: HUMAN_REVIEW_REQUIRED
+    source_tags: [PROJECT-ADR, OPEN-QUESTION]
+    recommendation: Run bounded experiments before accepting production-like thresholds.
+    experiments:
+      - {measure: HTTP_BODY_BYTES, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: DECOMPRESSED_BYTES, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: XML_DEPTH, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: MAX_TEXT_LENGTH, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: TRANSACTION_COUNT, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: PARSER_PEAK_MEMORY, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: END_TO_END_TIMEOUT, state: QUALITY_EXPERIMENT_REQUIRED}
+      - {measure: UPLOAD_DURATION, state: QUALITY_EXPERIMENT_REQUIRED}
+    fixed_e1_semantic_boundary: One PmtInf and one CdtTrfTxInf only after source/profile approval; this is not a performance threshold.
+    rejected_alternatives: [invented production values, unbounded DOM parsing, browser-only enforcement]
+    blocking_questions: [fixture sizes, target environment, failure taxonomy, timeout ownership]
+    affected_slices: [UCS-SCT-002-A, UCS-SCT-002-B]
+    affected_stories: [EPIC-19/19.3, EPIC-19/19.4, EPIC-24/24.10]
+    reviewer_roles: [architecture reviewer, security architect, QA/SDET, platform owner]
+    review_state: NOT_REVIEWED
+    approval_evidence: PENDING_DATED_HUMAN_RECORD
+  - id: DEC-E1-EVIDENCE
+    title: Raw evidence, retention and role visibility
+    source_classification: HUMAN_REVIEW_REQUIRED
+    source_tags: [PROJECT-ADR, OPEN-QUESTION]
+    options:
+      - id: RAW_BYTES_IN_POSTGRES
+        description: Retain exact payload bytes and SHA-256 in ingress ownership, as current code does.
+        consequence: Requires RLS/access, encryption, capacity, retention and deletion/archival decisions.
+      - id: ENCRYPTED_OBJECT_STORAGE
+        description: Store immutable object externally with database metadata/hash reference.
+        consequence: Requires a new integration contract and is outside current architecture.
+      - id: HASH_ONLY
+        description: Retain only checksum and parsed facts.
+        consequence: Rejected for E1 because it cannot reproduce the exact signed evidence already required by project policy.
+    recommendation: RAW_BYTES_IN_POSTGRES_FOR_E1_WITH_REVIEWED_CONTROLS
+    proposed_visibility:
+      ordinary_submitter: safe validation/provenance outcome and link to owned payment only
+      payment_viewer: approved ISO identifiers and safe timeline; no raw XML/signature bytes
+      auditor: metadata and controlled evidence access through an admitted query/export policy
+      operator: safe reason/category and correlation, no unrestricted raw payload
+      graphql: query-only allowlisted metadata; no raw XML or signature bytes
+      rest: command result plus explicitly approved evidence endpoint only
+    retention: LEGAL_REVIEW_REQUIRED
+    masking: IBAN, party names, addresses, remittance and certificate/signature material are not logged
+    rejected_alternatives: [raw XML in logs, unrestricted GraphQL evidence, frontend-owned evidence cache]
+    blocking_questions: [legal schedule, RLS model, encryption at rest, evidence export, deletion versus legal hold]
+    affected_slices: [UCS-SCT-002-A, UCS-SCT-002-B]
+    affected_stories: [EPIC-19/19.2, EPIC-19/19.4, EPIC-26/26.4, EPIC-24/24.10]
+    reviewer_roles: [database owner, security architect, legal/regulatory reviewer, product owner]
+    review_state: NOT_REVIEWED
+    approval_evidence: PENDING_DATED_HUMAN_RECORD

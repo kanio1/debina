@@ -51,12 +51,25 @@ Primary E1 suite:
 6. one composed Dagger accepted journey, one invalid-signature rejection and one
    idempotent replay proof.
 
-Playwright remains a minimal smoke:
+Planned executable verifies become binding only after review and implementation:
 
-1. sign in as a user with the submission role;
-2. upload one signed `pain.001`;
-3. see validation outcome or payment detail with typed identifiers;
-4. maker-checker only if the reviewed E1 contract keeps approval in scope.
+| Allocation | Planned executable verify |
+|---|---|
+| ISO XSD/EPC TVS selection | `./mvnw -f backend test -Dtest=Pain001ProfileArtifactSelectionTest` |
+| Mapper boundaries/properties | `./mvnw -f backend test -Dtest=Pain001CanonicalMapperTest,Pain001MappingPropertyTest` |
+| PostgreSQL RLS/lineage/idempotency | `./mvnw -f backend test -Dtest=Pain001EvidenceDatabaseTest,Pain001SubmissionEndpointTest` |
+| Composed intake integration | `./mvnw -f backend test -Dtest=Pain001E1IntakeIntegrationTest` |
+| BFF route/session/CSRF/body contract | `cd frontend && pnpm run test:pain001-upload-route` |
+| Dagger composed E1 acceptance | `dagger call smoke-signed-pain001 --lock=frozen --progress=plain` |
+| One browser smoke | `cd frontend && pnpm exec playwright test e2e/e1-signed-pain001.spec.ts --project=chromium` |
+
+These names are an implementation contract, not claims that the commands or tests
+exist or passed in this planning run.
+
+Playwright remains exactly one minimal smoke: sign in as a user with the submission
+role → upload one signed `pain.001` → observe the deterministic result and, for an
+accepted instruction, follow the link to payment detail. Maker-checker is excluded
+from this browser smoke; its existing dedicated journey owns that risk.
 
 No browser matrix, visual regression, broad E2E, or repetition of backend validation
 cases is admitted in E1.
