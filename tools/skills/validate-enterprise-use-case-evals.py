@@ -3,12 +3,20 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from pathlib import Path
+
+import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 SKILL = "enterprise-use-case-engineering"
 BASE = ROOT / "tools/skills/evals"
+VOCABULARY = (
+    ROOT
+    / "docs/governance/methodology-assurance/CLASSIFICATION-VOCABULARY.yaml"
+)
+NON_CLASSIFICATION_MACHINE_TOKENS = {"FIXTURE_CONTRACT"}
 
 
 def load(relative: str) -> dict:
@@ -32,6 +40,28 @@ def unique_ids(cases: list[dict], label: str) -> None:
 
 def main() -> int:
     try:
+        vocabulary_result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools/governance/validate-classification-vocabulary.py"),
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        require(
+            vocabulary_result.returncode == 0,
+            f"classification vocabulary failed:\n{vocabulary_result.stdout}",
+        )
+        vocabulary = yaml.safe_load(VOCABULARY.read_text(encoding="utf-8"))
+        canonical = {
+            item["value"] for item in vocabulary["classifications"]
+        }
+        deprecated = {
+            alias
+            for item in vocabulary["classifications"]
+            for alias in item.get("deprecated_aliases", [])
+        }
         routing = load("routing/enterprise-use-case-engineering.yaml")
         regression = load("regression/enterprise-use-case-engineering.json")
         adversarial = load("adversarial/enterprise-use-case-engineering.json")
@@ -44,6 +74,33 @@ def main() -> int:
             ("e2e", e2e),
         ):
             require(fixture.get("skill") == SKILL, f"{label}: wrong skill")
+
+        def assert_fixture_tokens(value: object, label: str) -> None:
+            if isinstance(value, dict):
+                for nested in value.values():
+                    assert_fixture_tokens(nested, label)
+            elif isinstance(value, list):
+                for nested in value:
+                    assert_fixture_tokens(nested, label)
+            elif isinstance(value, str):
+                if value in deprecated:
+                    raise AssertionError(f"{label}: deprecated classification {value}")
+                if (
+                    ("_" in value or "-" in value)
+                    and value.upper() == value
+                    and " " not in value
+                    and value not in canonical
+                    and value not in NON_CLASSIFICATION_MACHINE_TOKENS
+                ):
+                    raise AssertionError(f"{label}: unknown machine token {value}")
+
+        for label, fixture in (
+            ("routing", routing),
+            ("regression", regression),
+            ("adversarial", adversarial),
+            ("cross-skill-chain", e2e),
+        ):
+            assert_fixture_tokens(fixture, label)
 
         scenarios = routing["scenarios"]
         unique_ids(scenarios, "routing")
@@ -86,6 +143,20 @@ def main() -> int:
             "architecture-evolution-review",
             "planning-semantic-integrity",
         ], "e2e: cross-skill chain order changed")
+        registry = json.loads(
+            (ROOT / "planning/skills/skills-registry.yaml").read_text(encoding="utf-8")
+        )
+        active_skills = {
+            item["name"] for item in registry["skills"] if item["status"] == "ACTIVE"
+        }
+        require(
+            set(e2e["chain"]) <= active_skills,
+            "cross-skill chain contains a non-ACTIVE registry skill",
+        )
+        require(
+            e2e.get("assurance_level") == "FIXTURE_CONTRACT",
+            "cross-skill chain must declare FIXTURE_CONTRACT assurance",
+        )
         required_outputs = {
             "external actor goal", "source gaps", "business rules",
             "file/group/instruction distinction", "parent use case", "main flow",
@@ -102,11 +173,14 @@ def main() -> int:
         for phrase in regression["contains"]:
             require(phrase.lower() in skill_text, f"skill contract missing phrase: {phrase}")
 
-        print(f"ROUTING-CONTRACT: PASS positive={len(positive)} negative={len(negative)}")
-        print(f"REGRESSION-CONTRACT: PASS cases={len(regression_cases)}")
-        print(f"ADVERSARIAL-CONTRACT: PASS cases={len(adversarial_cases)}")
-        print("CROSS-SKILL-CHAIN: PASS stages=4 required_outputs=16")
-        print("ASSURANCE: deterministic fixture/contract proof; implicit model routing NOT_EXECUTED")
+        print(f"ROUTING-FIXTURE-CONTRACT: PASS positive={len(positive)} negative={len(negative)}")
+        print(f"REGRESSION-FIXTURE-CONTRACT: PASS cases={len(regression_cases)}")
+        print(f"ADVERSARIAL-FIXTURE-CONTRACT: PASS cases={len(adversarial_cases)}")
+        print("CROSS-SKILL-CHAIN-FIXTURE-CONTRACT: PASS stages=4 required_outputs=16")
+        print(
+            'MODEL-BEHAVIOR: NOT_EXECUTED '
+            'reason="no approved safe model evaluator exposes reliable skill-selection evidence"'
+        )
         return 0
     except (AssertionError, KeyError, TypeError) as exc:
         print(f"ENTERPRISE USE-CASE EVALS: FAIL: {exc}")

@@ -6,6 +6,7 @@ bash tools/agent-config/validate-agent-instructions.sh
 python3 tools/agent-config/generate-story-inventory.py --check
 python3 tools/agent-config/validate-story-inventory.py
 python3 tools/agent-config/validate-capability-graph.py
+python3 tools/governance/validate-classification-vocabulary.py
 bash tools/skills/validate-all-skills.sh
 python3 tools/requirements/validate-use-case-traceability.py
 python3 tools/requirements/validate-planning-semantics.py

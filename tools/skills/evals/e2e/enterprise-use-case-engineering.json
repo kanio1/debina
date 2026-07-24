@@ -1,5 +1,6 @@
 {
   "skill": "enterprise-use-case-engineering",
+  "assurance_level": "FIXTURE_CONTRACT",
   "scenario": "Import pliku SCT zawierającego wiele instrukcji, walidacja pliku i transakcji, częściowe błędy, utworzenie indywidualnych płatności, evidence i możliwość sprawdzenia wyniku.",
   "chain": [
     "enterprise-use-case-engineering",
