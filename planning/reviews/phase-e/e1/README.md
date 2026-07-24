@@ -102,9 +102,12 @@ The six cohort records are `EPIC-31/31.2`, `EPIC-19/19.2`,
 
 ## Blocking consequences and architecture review
 
-Until every required queue in `E1-APPROVALS.yaml` is dated
-`HUMAN_APPROVED`, all six records remain proposals/current legacy records and
-canonical migration is forbidden. The proposed architecture outcome is
+Bounded owner admission is recorded in
+`E1-DEVELOPMENT-ADMISSION.yaml` (2026-07-24) for UC-SCT-002 and slices
+`UCS-SCT-002-A`/`UCS-SCT-002-B` non-production implementation and bounded
+canonical backlog migration only. Until every required queue in
+`E1-APPROVALS.yaml` is dated `HUMAN_APPROVED`, specialist review remains open
+and full cohort exit migration is forbidden. The proposed architecture outcome is
 `CURRENT_ARCHITECTURE_SUFFICIENT`: REST owns the command, module query ports own
 reads, GraphQL stays query-only, BFF owns session adaptation, and frontend owns
 no payment semantics. Any new module, aggregate, storage integration or public
@@ -118,19 +121,23 @@ where licensing/retention applicability requires it. Current state for every
 role is `NOT_REVIEWED`. Dated approval evidence placeholder:
 `PENDING_DATED_HUMAN_RECORD`.
 
-## Council closure (2026-07-24)
+## Council closure and owner admission (2026-07-24)
 
 The E1 review council produced an owner decision packet without human approval
-fabrication. All approval queues remain `NOT_REVIEWED`. Canonical migration and
-production implementation remain disallowed.
+fabrication. A dated bounded owner admission record authorises non-production
+implementation and canonical backlog migration for the listed use case and slices
+only. All specialist approval queues remain `NOT_REVIEWED`. Production release
+remains `NOT_AUTHORIZED`.
 
 Markers: `DEBINA-E1-REVIEW-COUNCIL-COMPLETE`, `E1-OWNER-DECISION-PACK-READY`,
-`HUMAN-OWNER-DECISION-REQUIRED`, `IMPLEMENTATION-NOT-AUTHORIZED`.
+`E1-BOUNDED-DEVELOPMENT-ADMISSION-RECORDED`, `NON-PRODUCTION-IMPLEMENTATION-AUTHORIZED`,
+`PRODUCTION-RELEASE-NOT-AUTHORIZED`, `PHASE-E2-E8-NOT-AUTHORIZED`.
 
 ## Pack contents
 
 - `E1-DECISION-REGISTER.yaml`
 - `E1-APPROVALS.yaml`
+- `E1-DEVELOPMENT-ADMISSION.yaml`
 - `E1-OWNER-DECISION-PACKET.md`
 - `E1-RECOMMENDATIONS.yaml`
 - `E1-FIELD-SCOPE-DECISION.yaml`
