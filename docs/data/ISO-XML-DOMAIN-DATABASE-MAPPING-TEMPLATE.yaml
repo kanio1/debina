@@ -1,0 +1,45 @@
+version: 1
+status: AI_DRAFT
+human_review_state: NOT_REVIEWED
+instructions:
+  - "Copy one entry per mapped business element; do not edit this template into an implementation claim."
+  - "Use SOURCE_BLOCKED, DECISION_BLOCKED, AGGREGATE_REVIEW_REQUIRED, or NOT_APPLICABLE explicitly."
+mapping:
+  message: "pain.001.001.09"
+  message_version: "2019 ISO message version / exact identifier pain.001.001.09"
+  namespace: "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
+  xml_path: "Document/CstmrCdtTrfInitn/GrpHdr/MsgId"
+  business_term: "Message Identification"
+  cardinality: "1..1"
+  datatype: "Max35Text"
+  scheme_restriction: "EPC 2025 SCT C2PSP IG section 2.1; exact format rules to cite"
+  validation_rule: "TBD_FROM_PROFILE"
+  normalization_rule: "No silent trimming/transliteration; identifier rule profile decides"
+  domain_concept: "Inbound ISO message identifier"
+  domain_owner: "iso-adapter"
+  aggregate_or_entity: "ISO message lineage entity; not a Payment aggregate identity"
+  database_schema: "iso"
+  table: "iso_messages"
+  column: "message_id"
+  postgresql_type: "text"
+  nullable: false
+  constraint: "TBD_SCOPE_AWARE_UNIQUENESS"
+  index: "TBD_QUERY_JUSTIFICATION"
+  encrypted: "REVIEW_REQUIRED"
+  masked: true
+  tenant_scoped: true
+  rls_policy: "FAIL_CLOSED_TENANT_POLICY_REQUIRED"
+  retention: "LEGAL_REVIEW_REQUIRED"
+  raw_xml_lineage: "raw_message_id → ingress.raw_inbound_messages exact bytes and SHA-256"
+  source_evidence:
+    - "EPC132-08 2025 v1.0, section 2.1 / Message Identification row"
+    - "ISO 20022 pain.001.001.09 XSD/MDR"
+  use_case: "UC-SCT-002"
+  slice: "UC-SCT-002/S1"
+  test_owner: "iso-adapter contract + PostgreSQL integration"
+decisions:
+  lossiness: "LOSSLESS | LOSSY_WITH_JUSTIFICATION | NOT_APPLICABLE"
+  generated_or_preserved: "PRESERVED | GENERATED_WITH_OWNER"
+  aggregate_review: "CURRENT_ARCHITECTURE_SUFFICIENT | AGGREGATE_REVIEW_REQUIRED"
+  architecture_outcome: "CURRENT_ARCHITECTURE_SUFFICIENT | NEW_PUBLIC_PORT | NEW_READ_MODEL | NEW_ADR_REQUIRED | BOUNDARY_REVIEW_REQUIRED"
+  review_queues: [ISO_MESSAGE_REVIEW, DATABASE_MAPPING_REVIEW, SECURITY_REVIEW, ARCHITECTURE_REVIEW, QA_REVIEW]
