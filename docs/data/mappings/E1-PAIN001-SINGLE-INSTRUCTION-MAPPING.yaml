@@ -1,0 +1,592 @@
+version: 1
+status: AI_DRAFT
+semantic_review_state: NOT_REVIEWED
+scope:
+  use_case_id: UC-SCT-002
+  slice_ids: [UCS-SCT-002-A, UCS-SCT-002-B]
+  channel: proposed REST command plus browser/BFF adapter
+  message: pain.001.001.09
+  namespace: "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
+  implementation_baseline:
+    mapper: backend/src/main/java/com/sepanexus/modules/paymentlifecycle/isoadapter/Pain001CanonicalMapper.java
+    command: backend/src/main/java/com/sepanexus/modules/paymentlifecycle/isoadapter/CanonicalPaymentCommand.java
+    lineage: backend/src/main/java/com/sepanexus/modules/paymentlifecycle/isoadapter/Pain001LineageRecorder.java
+    migrations: [ingress/V10, iso/V11, iso/V15, iso/V21, signature/V13, signature/V14]
+  non_claim: This map records current behavior and review candidates; it is not an EPC conformance statement or an approved database design.
+source_profile:
+  c2psp_ig: EPC132-08 / 2025 v1.0, effective 2025-10-05
+  iso_artifact: pain.001.001.09.xsd from the ISO 20022 Payments Initiation 2019 archive
+  epc_tvs_artifact: EPC132-08 SCT C2PSP IG 2025 V1.0 XSD ZIP
+  artifact_checksums: VERIFY_ON_LAWFUL_ACQUISITION
+  artifact_distribution_policy: HUMAN_REVIEW_REQUIRED
+  address_guidance: EPC153-22 v2.1; unstructured address end date 2026-11-15
+mapping_defaults: &defaults
+  message: pain.001.001.09
+  message_version: pain.001.001.09
+  namespace: "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
+  scheme_restriction: REVIEW_REQUIRED
+  validation_rule: BR-SCT-003 plus exact EPC row/TVS rule after ISO_MESSAGE_REVIEW
+  normalization_rule: No silent truncation, transliteration or identifier conflation
+  domain_owner: REVIEW_REQUIRED
+  aggregate_or_entity: No aggregate admission implied by this row
+  encrypted: REVIEW_REQUIRED
+  masked: true
+  tenant_scoped: true
+  rls_policy: FAIL_CLOSED_TENANT_POLICY_REQUIRED
+  retention: LEGAL_REVIEW_REQUIRED
+  raw_xml_lineage: ingress.raw_inbound_messages exact bytes plus payload_sha256 and signature evidence
+  source_evidence: [SE-E1-SCT-C2PSP-001, SE-E1-SCT-TVS-001, SE-E1-ADDRESS-001]
+  use_case: UC-SCT-002
+  slice: UCS-SCT-002-A
+  test_owner: REVIEW_REQUIRED
+mappings:
+  - <<: *defaults
+    mapping_id: E1-MAP-001
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/MsgId
+    business_term: Message Identification
+    cardinality: "1..1"
+    datatype: Max35Text
+    domain_concept: Inbound ISO message identifier
+    domain_owner: ISO-adapter
+    aggregate_or_entity: ISO message lineage entity
+    database_schema: iso
+    table: iso_messages
+    column: msg_id
+    postgresql_type: text
+    nullable: true
+    constraint: REVIEW_REQUIRED for instructed-party and pre-agreed-period uniqueness scope
+    index: REVIEW_REQUIRED
+    test_owner: ISO mapper unit plus PostgreSQL lineage integration
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-002
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/CreDtTm
+    business_term: Message Creation Date Time
+    cardinality: "1..1"
+    datatype: ISODateTime
+    domain_concept: Source message creation timestamp
+    domain_owner: ISO-adapter
+    aggregate_or_entity: ISO message lineage entity
+    database_schema: iso
+    table: iso_messages
+    column: cre_dt_tm
+    postgresql_type: timestamptz(3)
+    nullable: true
+    constraint: Source value must remain distinct from receive/record timestamps
+    index: NOT_APPLICABLE
+    test_owner: ISO mapper unit plus lineage integration
+    mapping_status: IMPLEMENTATION_GAP
+    current_behavior: Pain001LineageRecorder writes clockPort receive time; Pain001CanonicalMapper does not read GrpHdr/CreDtTm.
+  - <<: *defaults
+    mapping_id: E1-MAP-003
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/NbOfTxs
+    business_term: Group Number Of Transactions
+    cardinality: "1..1"
+    datatype: Max15NumericText
+    domain_concept: Source group transaction count
+    domain_owner: ISO-adapter
+    aggregate_or_entity: Message validation fact; no Group aggregate admitted for E1
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: false
+    constraint: Must reconcile with actual transaction count after exact profile review
+    index: NOT_APPLICABLE
+    test_owner: Source/schema plus mapper integration
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-004
+    xml_path: Document/CstmrCdtTrfInitn/GrpHdr/CtrlSum
+    business_term: Group Control Sum
+    cardinality: "0..1 ISO; EPC profile row to reconfirm"
+    datatype: DecimalNumber
+    domain_concept: Source group control sum
+    domain_owner: ISO-adapter
+    aggregate_or_entity: Message validation fact
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: REVIEW_REQUIRED
+    constraint: Reconcile against source instructed amounts without floating point
+    index: NOT_APPLICABLE
+    test_owner: Source/schema plus decimal property test
+    mapping_status: SOURCE_BLOCKED
+  - <<: *defaults
+    mapping_id: E1-MAP-005
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/PmtInfId
+    business_term: Payment Information Identification
+    cardinality: "1..1"
+    datatype: Max35Text
+    domain_concept: Customer payment-information group identifier
+    domain_owner: ISO-adapter
+    aggregate_or_entity: ISO payment identifier
+    database_schema: iso
+    table: payment_iso_identifiers
+    column: pmt_inf_id
+    postgresql_type: text
+    nullable: true
+    constraint: REVIEW_REQUIRED for message-scoped uniqueness
+    index: REVIEW_REQUIRED
+    test_owner: ISO mapper unit plus PostgreSQL lineage integration
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-006
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/PmtMtd
+    business_term: Payment Method
+    cardinality: "1..1"
+    datatype: PaymentMethod3Code
+    scheme_restriction: EPC permits only TRF for this SCT profile
+    domain_concept: Credit-transfer method validation fact
+    domain_owner: ISO-adapter
+    aggregate_or_entity: Validation fact; not an aggregate
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: false
+    constraint: Value TRF after TVS/profile validation
+    index: NOT_APPLICABLE
+    test_owner: Source/schema and mapper unit
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-007
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/NbOfTxs
+    business_term: Payment Information Number Of Transactions
+    cardinality: "1..1 in EPC C2PSP"
+    datatype: Max15NumericText
+    domain_concept: Payment-information transaction count
+    domain_owner: ISO-adapter
+    aggregate_or_entity: Validation fact; E1 accepts one transaction and admits no batch aggregate
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: false
+    constraint: Must equal actual CdtTrfTxInf count; E1 reviewed profile must equal one
+    index: NOT_APPLICABLE
+    test_owner: Source/schema plus mapper integration
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-008
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CtrlSum
+    business_term: Payment Information Control Sum
+    cardinality: "1..1 in EPC C2PSP"
+    datatype: DecimalNumber, maximum two fractional digits under EPC row 2.5
+    domain_concept: Payment-information amount control total
+    domain_owner: ISO-adapter
+    aggregate_or_entity: Validation fact
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: false
+    constraint: Must equal sum of instructed amounts; pre-agreed C2PSP validation conditions require review
+    index: NOT_APPLICABLE
+    test_owner: Source/schema plus decimal property test
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-009
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/ReqdExctnDt/Dt|DtTm
+    business_term: Requested Execution Date
+    cardinality: "1..1 choice"
+    datatype: DateAndDateTime2Choice
+    domain_concept: Requested execution date/time
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Payment order scheduling attribute; admission review required
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: false
+    constraint: Date-versus-date-time policy and timezone handling require product/ISO review
+    index: NOT_APPLICABLE
+    test_owner: ISO mapper unit plus date boundary tests
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-010
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/Dbtr/Nm
+    business_term: Debtor Name
+    cardinality: "1..1 in EPC C2PSP"
+    datatype: Max140Text restricted to 70 characters by EPC
+    domain_concept: Debtor party name
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Party value object candidate; AGGREGATE_REVIEW_REQUIRED
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: false
+    constraint: Masking/minimisation and retention review required
+    index: NOT_APPLICABLE
+    test_owner: Source/schema boundary test
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-011
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/Dbtr/PstlAdr/*
+    business_term: Debtor Postal Address
+    cardinality: "0..1 address; child cardinalities profile-specific"
+    datatype: PostalAddress24
+    scheme_restriction: Structured/hybrid/unstructured transition under EPC153-22 v2.1; unstructured ends 2026-11-15
+    domain_concept: Debtor address and source-format lineage
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Address value object candidate; AGGREGATE_REVIEW_REQUIRED
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: true
+    constraint: Preserve structured/hybrid source form; do not silently flatten
+    index: NOT_APPLICABLE
+    test_owner: Source/schema transition fixtures
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-012
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/DbtrAcct/Id/IBAN
+    business_term: Debtor Account IBAN
+    cardinality: "1..1 under EPC C2PSP"
+    datatype: IBAN2007Identifier
+    scheme_restriction: Only IBAN is allowed
+    domain_concept: Debtor payment account identifier
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Payment order account value
+    database_schema: payment
+    table: payments
+    column: debtor_iban
+    postgresql_type: text
+    nullable: false
+    constraint: REVIEW_REQUIRED for canonicalization and check-digit validation
+    index: NO_INDEX_WITHOUT_QUERY_JUSTIFICATION
+    test_owner: IBAN property/unit plus PostgreSQL persistence/RLS
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-013
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/DbtrAgt/FinInstnId/BICFI
+    business_term: Debtor Agent BIC
+    cardinality: "0..1 BICFI choice under reviewed profile"
+    datatype: BICFIDec2014Identifier
+    domain_concept: Debtor servicing agent identifier
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Agent value object candidate
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: REVIEW_REQUIRED
+    constraint: EPC alternative NOTPROVIDED path and BIC applicability require review
+    index: NOT_APPLICABLE
+    test_owner: Source/schema decision table
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-014
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/PmtId/InstrId
+    business_term: Instruction Identification
+    cardinality: "0..1"
+    datatype: Max35Text
+    domain_concept: Point-to-point instruction identifier
+    domain_owner: ISO-adapter
+    aggregate_or_entity: ISO payment identifier
+    database_schema: iso
+    table: payment_iso_identifiers
+    column: instr_id
+    postgresql_type: text
+    nullable: true
+    constraint: Preserve independently from message/end-to-end/transaction identifiers
+    index: REVIEW_REQUIRED for correlation only
+    test_owner: ISO mapper unit plus lineage integration
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-015
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/PmtId/EndToEndId
+    business_term: End To End Identification
+    cardinality: "1..1"
+    datatype: Max35Text
+    domain_concept: Originator-assigned end-to-end identifier
+    domain_owner: ISO-adapter
+    aggregate_or_entity: ISO payment identifier
+    database_schema: iso
+    table: payment_iso_identifiers
+    column: end_to_end_id
+    postgresql_type: text
+    nullable: true
+    constraint: Preserve unchanged; uniqueness is context/profile scoped, not globally assumed
+    index: Existing read/correlation indexes require database review
+    test_owner: ISO mapper unit plus lineage/correlation integration
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-016
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/PmtId/UETR
+    business_term: UETR
+    cardinality: "0..1"
+    datatype: UUIDv4Identifier
+    domain_concept: Universal transaction reference supplied in customer message
+    domain_owner: ISO-adapter
+    aggregate_or_entity: ISO payment identifier
+    database_schema: iso
+    table: payment_iso_identifiers
+    column: uetr
+    postgresql_type: text
+    nullable: true
+    constraint: UUIDv4 syntax; generation/preservation authority requires review
+    index: REVIEW_REQUIRED
+    test_owner: Identifier property/unit plus lineage integration
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-017
+    xml_path: NOT_APPLICABLE_IN_PAIN001
+    business_term: Inter-PSP Transaction Identification
+    cardinality: NOT_APPLICABLE
+    datatype: Max35Text in applicable downstream message
+    domain_concept: Transaction identifier generated/preserved at a later rail transformation
+    domain_owner: ISO-adapter
+    aggregate_or_entity: ISO payment identifier
+    database_schema: iso
+    table: payment_iso_identifiers
+    column: tx_id
+    postgresql_type: text
+    nullable: true
+    constraint: Must not be fabricated from MsgId, PmtInfId, InstrId or EndToEndId
+    index: NOT_APPLICABLE_FOR_E1
+    test_owner: Negative mapper test
+    mapping_status: NOT_APPLICABLE
+  - <<: *defaults
+    mapping_id: E1-MAP-018
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Amt/InstdAmt
+    business_term: Instructed Amount
+    cardinality: "1..1"
+    datatype: ActiveOrHistoricCurrencyAndAmount
+    domain_concept: Business payment amount
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: PaymentOrder amount value
+    database_schema: payment
+    table: payments
+    column: amount
+    postgresql_type: numeric(18,2)
+    nullable: false
+    constraint: Positive; exact EPC EUR/fraction/digit restrictions require profile review
+    index: NOT_APPLICABLE
+    test_owner: Amount property/unit plus PostgreSQL constraint integration
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-019
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Amt/InstdAmt/@Ccy
+    business_term: Instructed Amount Currency
+    cardinality: "1..1"
+    datatype: ActiveOrHistoricCurrencyCode
+    domain_concept: Business payment currency
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: PaymentOrder amount value
+    database_schema: payment
+    table: payments
+    column: currency
+    postgresql_type: char(3)
+    nullable: false
+    constraint: Mapper checks three uppercase letters; SCT EUR restriction requires reviewed profile enforcement
+    index: NOT_APPLICABLE
+    test_owner: Currency property/unit plus persistence integration
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-020
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/CdtrAgt/FinInstnId/BICFI
+    business_term: Creditor Agent BIC
+    cardinality: "0..1 under EPC C2PSP row"
+    datatype: BICFIDec2014Identifier
+    domain_concept: Creditor servicing agent identifier
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Agent value object candidate
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: true
+    constraint: BICFI-only if the agent structure is present
+    index: NOT_APPLICABLE
+    test_owner: Source/schema decision table
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-021
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Cdtr/Nm
+    business_term: Creditor Name
+    cardinality: "1..1 under EPC C2PSP"
+    datatype: Max140Text with EPC restriction
+    domain_concept: Creditor party name
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Party value object candidate; AGGREGATE_REVIEW_REQUIRED
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: false
+    constraint: Masking/minimisation and retention review required
+    index: NOT_APPLICABLE
+    test_owner: Source/schema boundary test
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-022
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Cdtr/PstlAdr/*
+    business_term: Creditor Postal Address
+    cardinality: "0..1 address; child cardinalities profile-specific"
+    datatype: PostalAddress24
+    scheme_restriction: Structured/hybrid/unstructured transition under EPC153-22 v2.1; unstructured ends 2026-11-15
+    domain_concept: Creditor address and source-format lineage
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Address value object candidate; AGGREGATE_REVIEW_REQUIRED
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: true
+    constraint: Preserve structured/hybrid source form; do not silently flatten
+    index: NOT_APPLICABLE
+    test_owner: Source/schema transition fixtures
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-023
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/CdtrAcct/Id/IBAN
+    business_term: Creditor Account IBAN
+    cardinality: "1..1 under EPC C2PSP"
+    datatype: IBAN2007Identifier
+    scheme_restriction: Only IBAN is allowed
+    domain_concept: Creditor payment account identifier
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Payment order account value
+    database_schema: payment
+    table: payments
+    column: creditor_iban
+    postgresql_type: text
+    nullable: false
+    constraint: REVIEW_REQUIRED for canonicalization and check-digit validation
+    index: NO_INDEX_WITHOUT_QUERY_JUSTIFICATION
+    test_owner: IBAN property/unit plus PostgreSQL persistence/RLS
+    mapping_status: CURRENTLY_MAPPED_REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-024
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/RmtInf/Ustrd|Strd
+    business_term: Remittance Information
+    cardinality: "0..1 container; profile alternatives restricted"
+    datatype: RemittanceInformation16
+    domain_concept: Remittance information preserving structured/unstructured choice
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Remittance value object candidate
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: true
+    constraint: Lossless-versus-lossy mapping and extended remittance option require review
+    index: NOT_APPLICABLE
+    test_owner: Source/schema plus mapping tests
+    mapping_status: IMPLEMENTATION_GAP
+  - <<: *defaults
+    mapping_id: E1-MAP-025
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/CdtTrfTxInf/Purp/Cd|Prtry
+    business_term: Purpose
+    cardinality: "0..1 choice"
+    datatype: Purpose2Choice
+    domain_concept: Payment purpose
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Purpose value object candidate
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: true
+    constraint: Applicable special-purpose rules and code list require per-use review
+    index: NOT_APPLICABLE
+    test_owner: Source/schema decision table
+    mapping_status: REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-026
+    xml_path: Document/CstmrCdtTrfInitn/PmtInf/PmtTpInf/CtgyPurp|CdtTrfTxInf/PmtTpInf/CtgyPurp
+    business_term: Category Purpose
+    cardinality: "0..1 at one admitted level"
+    datatype: CategoryPurpose1Choice
+    domain_concept: Processing category purpose
+    domain_owner: payment-lifecycle
+    aggregate_or_entity: Category-purpose value candidate
+    database_schema: NOT_APPLICABLE
+    table: NOT_APPLICABLE
+    column: NOT_APPLICABLE
+    postgresql_type: NOT_APPLICABLE
+    nullable: true
+    constraint: Agreement-dependent forwarding and level precedence require review
+    index: NOT_APPLICABLE
+    test_owner: Source/schema decision table
+    mapping_status: REVIEW_REQUIRED
+  - <<: *defaults
+    mapping_id: E1-MAP-027
+    xml_path: OUT_OF_BAND_DETACHED_SIGNATURE_METADATA
+    business_term: Detached Signature Provenance
+    cardinality: PROJECT_POLICY
+    datatype: Versioned signature profile metadata
+    scheme_restriction: Not an EPC C2PSP requirement
+    validation_rule: Project security decision linked to BR-SCT-003 ordering
+    normalization_rule: Verify exact archived bytes; never transform before hash/verification
+    domain_concept: Signature attempt, verdict, key identity and covered payload hash
+    domain_owner: signature
+    aggregate_or_entity: Append-only signature evidence; no Payment aggregate ownership
+    database_schema: signature
+    table: signature_verification_events and message_signatures
+    column: verdict, reason_code, key_id, covered_sha256, verified_at
+    postgresql_type: constrained text, uuid, bytea, timestamptz(3)
+    nullable: Profile-specific
+    constraint: Algorithm/profile/trust/rotation/revocation decisions are DECISION_BLOCKED
+    index: Existing key lookup index; evidence access indexes require review
+    encrypted: true
+    masked: true
+    tenant_scoped: Via raw-message/payment linkage; direct tenant column review required
+    rls_policy: Cross-schema visibility and direct-role access require SECURITY_REVIEW
+    retention: LEGAL_REVIEW_REQUIRED
+    raw_xml_lineage: raw_message_id and covered_sha256 bind verdict to exact archived bytes
+    source_evidence: [SE-E1-SCT-C2PSP-001]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-A
+    test_owner: Signature crypto/integration plus database append-only proof
+    mapping_status: DECISION_BLOCKED
+  - <<: *defaults
+    mapping_id: E1-MAP-028
+    xml_path: WHOLE_ORIGINAL_XML_BYTES
+    business_term: Immutable Raw Message Evidence
+    cardinality: "1 per submission attempt"
+    datatype: byte sequence plus SHA-256
+    scheme_restriction: Project evidence policy; not an EPC XML element
+    validation_rule: Archive before verification and parsing
+    normalization_rule: NONE; retain exact received bytes and encoding
+    domain_concept: Inbound envelope payload evidence
+    domain_owner: ingress
+    aggregate_or_entity: Raw inbound message evidence record
+    database_schema: ingress
+    table: raw_inbound_messages
+    column: payload and payload_sha256
+    postgresql_type: bytea
+    nullable: false
+    constraint: Append-only evidence; duplicate payload is allowed and separately archived
+    index: Existing tenant/receive-time index; hash is not a dedupe uniqueness key
+    encrypted: SECURITY_REVIEW_REQUIRED
+    masked: true
+    tenant_scoped: true
+    rls_policy: IMPLEMENTATION_GAP_REVIEW_REQUIRED
+    retention: LEGAL_REVIEW_REQUIRED
+    raw_xml_lineage: This is the root evidence object linked by raw_message_id
+    source_evidence: [SE-E1-SCT-C2PSP-001]
+    use_case: UC-SCT-002
+    slice: UCS-SCT-002-A
+    test_owner: PostgreSQL ownership/RLS/append-only plus composed intake proof
+    mapping_status: CURRENTLY_STORED_SECURITY_REVIEW_REQUIRED
+review_summary:
+  total_entries: 28
+  currently_mapped_review_required: 9
+  currently_stored_security_review_required: 1
+  implementation_gap: 13
+  review_required: 2
+  source_blocked: 1
+  decision_blocked: 1
+  not_applicable: 1
+  semantic_mismatch: 1
+  blocking_findings:
+    - GrpHdr/CreDtTm is not parsed; the current lineage writer stores receive time in the source-named cre_dt_tm column.
+    - NbOfTxs, CtrlSum, PmtMtd and requested execution date are not validated/mapped by the current mapper.
+    - Parties, agents, remittance, purpose/category-purpose and addresses are not in the current canonical command.
+    - Raw archive, signature evidence visibility, RLS and retention require security/database/legal review.
+review_queues: [PAYMENTS_DOMAIN_REVIEW, ISO_MESSAGE_REVIEW, SECURITY_REVIEW, DATABASE_MAPPING_REVIEW, ARCHITECTURE_REVIEW, PRODUCT_REVIEW, QA_REVIEW]

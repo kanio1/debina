@@ -20,7 +20,7 @@ mapping:
   aggregate_or_entity: "ISO message lineage entity; not a Payment aggregate identity"
   database_schema: "iso"
   table: "iso_messages"
-  column: "message_id"
+  column: "msg_id"
   postgresql_type: "text"
   nullable: false
   constraint: "TBD_SCOPE_AWARE_UNIQUENESS"
@@ -35,7 +35,7 @@ mapping:
     - "EPC132-08 2025 v1.0, section 2.1 / Message Identification row"
     - "ISO 20022 pain.001.001.09 XSD/MDR"
   use_case: "UC-SCT-002"
-  slice: "UC-SCT-002/S1"
+  slice: "UCS-SCT-002-A"
   test_owner: "iso-adapter contract + PostgreSQL integration"
 decisions:
   lossiness: "LOSSLESS | LOSSY_WITH_JUSTIFICATION | NOT_APPLICABLE"
