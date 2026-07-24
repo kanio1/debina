@@ -577,14 +577,13 @@ review_summary:
   total_entries: 28
   field_scope_artifact: planning/reviews/phase-e/e1/E1-FIELD-SCOPE-DECISION.yaml
   council_date: 2026-07-24
-  currently_mapped_review_required: 15
+  currently_mapped_review_required: 14
   currently_stored_security_review_required: 1
-  implementation_gap: 7
+  implementation_gap: 8
   review_required: 2
   source_blocked: 1
   decision_blocked: 1
   not_applicable: 1
-  semantic_mismatch: 1
   blocking_findings:
     - ReqdExctnDt and deferred party/agent/remittance/purpose fields remain outside E1 mapper scope by design.
     - Raw archive, signature evidence visibility, RLS and retention require security/database/legal review.

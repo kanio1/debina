@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sepanexus.SepaNexusApplication;
+import com.sepanexus.modules.paymentlifecycle.domain.ApprovalStatus;
 import com.sepanexus.evidenceaudit.CommandAuditPort;
 import com.sepanexus.evidenceaudit.ActorType;
 import com.sepanexus.evidenceaudit.CommandAuditEntry;
@@ -111,6 +112,8 @@ class ApprovalSubmissionIntegrationTest {
         var replay = paymentService.submitPayment(command);
 
         assertThat(replay.payment().getId()).isEqualTo(first.payment().getId());
+        assertThat(replay.submissionResponseCode()).isEqualTo(PaymentSubmissionResult.ACCEPTED_RESPONSE_CODE);
+        assertThat(replay.approvalStatus()).isEqualTo(ApprovalStatus.PENDING_APPROVAL);
         assertThat(paymentService.approvalStatus(tenantId, branchId, first.payment().getId()).name()).isEqualTo("PENDING_APPROVAL");
         assertThat(count("SELECT count(*) FROM payment.outbox_events WHERE aggregate_id = ?", first.payment().getId())).isZero();
         assertThat(count("SELECT count(*) FROM payment.payment_status_history WHERE payment_id = ?", first.payment().getId())).isZero();

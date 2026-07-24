@@ -6,6 +6,7 @@ import com.sepanexus.signature.DetachedEd25519ProfileV1;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.CanonicalMappingException;
 import com.sepanexus.modules.paymentlifecycle.isoadapter.MissingPrimaryIdentifierException;
 import com.sepanexus.modules.paymentlifecycle.service.IdempotencyConflictException;
+import com.sepanexus.modules.paymentlifecycle.service.IdempotencyDataCorruptionException;
 import com.sepanexus.modules.paymentlifecycle.service.PaymentNotFoundException;
 import com.sepanexus.modules.paymentlifecycle.service.ApprovalDecisionConflictException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,11 @@ public class PaymentProblemHandler {
     @ExceptionHandler(IdempotencyConflictException.class)
     ProblemDetail idempotencyConflict(IdempotencyConflictException exception, HttpServletRequest request) {
         return problem(HttpStatus.CONFLICT, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(IdempotencyDataCorruptionException.class)
+    ProblemDetail idempotencyDataCorruption(IdempotencyDataCorruptionException exception, HttpServletRequest request) {
+        return problem(HttpStatus.INTERNAL_SERVER_ERROR, "Idempotency data integrity error", request);
     }
 
     @ExceptionHandler(PaymentNotFoundException.class)

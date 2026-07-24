@@ -475,6 +475,9 @@ class Pain001SubmissionEndpointTest {
                         .contentType("application/json"))
                 .andExpect(status().isOk());
 
+        assertThat(count("SELECT count(*) FROM payment.payment_approvals WHERE payment_id = '" + paymentId
+                + "' AND status = 'APPROVED'")).isEqualTo(1);
+
         var replayResponse = mockMvc.perform(pain001Request(tenantId, xml, sign(xml), idempotencyKey))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.paymentId").value(paymentId))
@@ -483,6 +486,36 @@ class Pain001SubmissionEndpointTest {
 
         assertThat(replayResponse.getResponse().getHeader("Location")).isEqualTo(firstLocation);
         assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-REPLAY-202'"))
+                .isEqualTo(1);
+    }
+
+    @Test
+    void corruptedIdempotencyResponseCodeFailsDeterministicallyOnReplay() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        byte[] xml = pain001("MSG-CORRUPT", "PMTINF-CORRUPT", "E2E-CORRUPT", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+        String idempotencyKey = UUID.randomUUID().toString();
+
+        mockMvc.perform(pain001Request(tenantId, xml, sign(xml), idempotencyKey))
+                .andExpect(status().isCreated());
+
+        int paymentCount = count("SELECT count(*) FROM payment.payments");
+        assertThat(paymentCount).isEqualTo(1);
+
+        try (Connection connection = adminConnection();
+                PreparedStatement update = connection.prepareStatement(
+                        "UPDATE ingress.idempotency_keys SET response_code = ? WHERE source_id = ? AND idem_key = ?")) {
+            update.setInt(1, 418);
+            update.setObject(2, tenantId);
+            update.setString(3, idempotencyKey);
+            assertThat(update.executeUpdate()).isEqualTo(1);
+        }
+
+        mockMvc.perform(pain001Request(tenantId, xml, sign(xml), idempotencyKey))
+                .andExpect(status().isInternalServerError());
+
+        assertThat(count("SELECT count(*) FROM payment.payments")).isEqualTo(paymentCount);
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-CORRUPT'"))
                 .isEqualTo(1);
     }
 

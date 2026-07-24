@@ -16,6 +16,9 @@ public record PaymentSubmissionResult(PaymentEntity payment, ApprovalStatus appr
 
     /** Replays the immutable HTTP submission outcome recorded in {@code ingress.idempotency_keys}. */
     public static PaymentSubmissionResult frozenReplay(PaymentEntity payment, int storedResponseCode) {
+        if (storedResponseCode != CREATED_RESPONSE_CODE && storedResponseCode != ACCEPTED_RESPONSE_CODE) {
+            throw new IdempotencyDataCorruptionException(storedResponseCode);
+        }
         ApprovalStatus frozenApprovalStatus = storedResponseCode == ACCEPTED_RESPONSE_CODE
                 ? ApprovalStatus.PENDING_APPROVAL
                 : ApprovalStatus.NOT_REQUIRED;

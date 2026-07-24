@@ -2,8 +2,7 @@
 
 ## Current objective
 
-Close the E1 backend tranche correction run (review HIGH/MEDIUM fixes) and prepare
-for a narrow re-review before one coherent commit.
+Prepare the E1 backend tranche for one coherent commit after final review fixes.
 
 ## Current use case
 
@@ -12,11 +11,10 @@ for a narrow re-review before one coherent commit.
 ## Current state
 
 - E1 backend tranche corrections applied in working tree (not committed).
-- Focused regression green (57): mapper (22), endpoint (18), V61 upgrade (1),
-  signature port (11), ordering (4), profile mapping (1).
+- Focused E1 regression green (93 tests).
 - Use-case traceability validator: 0 errors (legacy warnings only).
 - `git diff --check`: clean on changed paths.
-- No claim of production readiness, EPC TVS closure, or regulatory conformance.
+- Nothing staged.
 
 ## Completed
 
@@ -28,9 +26,11 @@ for a narrow re-review before one coherent commit.
 - Tenant-scoped idempotency with frozen submission HTTP outcome on replay
   (`response_code` from `ingress.idempotency_keys`; 202 body frozen as
   `PENDING_APPROVAL`).
-- Review-correction tranche: mapping/field-scope doc alignment, UC CreDtTm
-  offset-less interpretation, signer-registry and expired-key limitations
-  recorded, mapping-failure idempotency and post-approval replay tests added.
+- Review-correction tranche: mapping summary arithmetic, post-approval replay
+  proof, JSON-direct frozen replay assertions.
+- **HIGH fix:** unsupported stored idempotency `response_code` values fail with
+  `IdempotencyDataCorruptionException` → HTTP 500 idempotency data integrity
+  error; corruption integration test added.
 
 ## Decisions
 
@@ -46,7 +46,8 @@ Educational directions for E1 (local/non-production; not production closure):
 - CreDtTm: `GrpHdr/CreDtTm` → `source_message_created_at`; Debina record time →
   `recorded_at`; offset-less `CreDtTm` interpreted as UTC (project interpretation).
 - Idempotency: PostgreSQL `(source_id, idem_key)` with payload SHA-256; claim
-  only after successful verify+map; replay uses stored `response_code`.
+  only after successful verify+map; replay uses stored `response_code` (201/202
+  only; corrupt values are server-side integrity failures).
 - Architecture: current modular monolith sufficient for E1.
 
 ## Blocked for production
@@ -73,14 +74,10 @@ implementation.
 
 ## Next tasks
 
-1. Narrow independent re-review of the two corrected HIGH findings (frozen replay
-   HTTP outcome; CtrlSum mapping status).
-2. Run final focused regression before commit (same `Pain001*` + signature + V61
-   command as this session).
-3. Create one or at most two coherent commits for the E1 tranche.
-4. Plan the BFF and accepted-path Playwright tranche (out of current scope).
+1. Narrow verification pass and one coherent E1 commit (exclude CLAUDE files,
+   `.cursor/**`, generated javadoc).
+2. Plan the BFF and accepted-path Playwright tranche (out of current scope).
 
 ## Resume from here
 
-Start next task 1: narrow independent re-review of frozen idempotent replay and
-CtrlSum mapping documentation before commit.
+Stage E1 backend + docs only; commit when ready.
