@@ -1,0 +1,160 @@
+version: 1
+as_of: 2026-07-24
+review_state: AI_DRAFT
+human_review_state: NOT_REVIEWED
+namespace_rule: "Pin the exact message namespace from the admitted EPC/rail profile; never infer it from a family name."
+families:
+  pain:
+    discovery:
+      - message: pain.001.001.09
+        purpose: "Customer Credit Transfer Initiation"
+        sender: "Originator/customer"
+        receiver: "Originator PSP"
+        scheme: [SCT, SCT_INST]
+        direction: INBOUND
+        lifecycle_stage: INITIATION
+        namespace: "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
+        related_messages: [pain.002.001.10, pacs.008.001.08]
+        current_support: PARTIALLY_SUPPORTED
+        use_cases: [UC-SCT-002, UC-SCT-003]
+        gaps: ["EPC TVS", "full field/rule mapping", "multi-instruction", "source-approved channel profile"]
+      - message: pain.002.001.10
+        purpose: "Customer Payment Status Report"
+        sender: "PSP"
+        receiver: "Customer"
+        scheme: [SCT, SCT_INST]
+        direction: OUTBOUND
+        lifecycle_stage: CUSTOMER_STATUS
+        namespace: "urn:iso:std:iso:20022:tech:xsd:pain.002.001.10"
+        related_messages: [pain.001.001.09]
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-STATUS-001]
+        gaps: ["status/reason profile", "outbound evidence", "customer delivery contract"]
+      - message: pain.007.001.09
+        purpose: "Customer Payment Reversal"
+        sender: "Customer"
+        receiver: "PSP"
+        scheme: [SDD_CORE, SDD_B2B]
+        direction: DISCOVERY_ONLY
+        lifecycle_stage: REVERSAL
+        current_support: OUT_OF_SCOPE
+      - message: pain.008.001.08
+        purpose: "Customer Direct Debit Initiation"
+        sender: "Creditor/customer"
+        receiver: "Creditor PSP"
+        scheme: [SDD_CORE, SDD_B2B]
+        direction: DISCOVERY_ONLY
+        lifecycle_stage: INITIATION
+        current_support: OUT_OF_SCOPE
+  pacs:
+    discovery:
+      - message: pacs.008.001.08
+        purpose: "FI-to-FI Customer Credit Transfer"
+        sender: "Originator PSP"
+        receiver: "Beneficiary PSP through a CSM"
+        scheme: [SCT, SCT_INST]
+        direction: OUTBOUND_AND_INBOUND
+        lifecycle_stage: INTER_PSP_CLEARING
+        namespace: "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08"
+        related_messages: [pacs.002.001.10, pacs.004.001.09, camt.056.001.08]
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-ROUTING-001, UC-EGRESS-001]
+      - message: pacs.002.001.10
+        purpose: "FI-to-FI Payment Status Report"
+        sender: "CSM or instructed PSP"
+        receiver: "Instructing PSP"
+        scheme: [SCT, SCT_INST]
+        direction: INBOUND
+        lifecycle_stage: TECHNICAL_OR_BUSINESS_STATUS
+        namespace: "urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10"
+        related_messages: [pacs.008.001.08, pacs.028.001.03]
+        current_support: PARTIALLY_SUPPORTED
+        use_cases: [UC-STATUS-001]
+        gaps: ["EPC/rail reason profile", "five-axis transition policy", "out-of-order runtime proof"]
+      - message: pacs.004.001.09
+        purpose: "Payment Return / positive recall response"
+        sender: "Beneficiary PSP"
+        receiver: "Originator PSP"
+        scheme: [SCT, SCT_INST]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: RETURN_OR_RECALL_RESPONSE
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-RETURN-001]
+      - message: pacs.028.001.03
+        purpose: "FI-to-FI Payment Status Request"
+        sender: "Inquiring PSP"
+        receiver: "Other PSP/CSM"
+        scheme: [SCT, SCT_INST]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: STATUS_INQUIRY
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-STATUS-001]
+  camt:
+    discovery:
+      - message: camt.056.001.08
+        purpose: "FI-to-FI Payment Cancellation Request"
+        scheme: [SCT, SCT_INST]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: RECALL_OR_REQUEST_FOR_RECALL
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-RECALL-001]
+      - message: camt.029.001.09
+        purpose: "Resolution of Investigation"
+        scheme: [SCT, SCT_INST]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: INVESTIGATION_RESPONSE
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-RECALL-001, UC-CASE-001]
+      - message: camt.027.001.07
+        purpose: "Claim Non-Receipt"
+        scheme: [SCT]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: INQUIRY
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-CASE-001]
+      - message: camt.087.001.06
+        purpose: "Request to Modify Payment"
+        scheme: [SCT]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: VALUE_DATE_CORRECTION
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-CASE-001]
+      - message: "camt.052 / camt.053 / camt.054, exact profile version TBD"
+        purpose: "Account report / statement / debit-credit notification"
+        scheme: [SCT, SCT_INST, SDD_CORE, SDD_B2B]
+        direction: INBOUND
+        lifecycle_stage: REPORTING_AND_RECONCILIATION
+        current_support: NOT_IMPLEMENTED
+        use_cases: [UC-RECON-001]
+        gaps: ["CSM/account-servicer profile", "exact versions", "reconciliation semantics"]
+  admi:
+    discovery:
+      - message: "admi.* profile-specific"
+        purpose: "System administration, rejection, event or broadcast"
+        sender: "CSM/platform"
+        receiver: "Participant"
+        scheme: [RAIL_SPECIFIC]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: TRANSPORT_OR_OPERATIONS
+        current_support: NOT_IMPLEMENTED
+        gaps: ["TIPS/STEP2/RT1/STET participant message profile"]
+  head:
+    discovery:
+      - message: "head.001.001.04 catalogue current; rail version TBD"
+        purpose: "Business Application Header"
+        sender: "Business application"
+        receiver: "Business application"
+        scheme: [RAIL_SPECIFIC]
+        direction: INBOUND_AND_OUTBOUND
+        lifecycle_stage: ENVELOPE
+        current_support: NOT_IMPLEMENTED
+        gaps: ["AppHdr applicability and version must come from each rail/channel profile"]
+sources:
+  - "EPC132-08 SCT C2PSP IG 2025 v1.0, sections 2.1 and 2.2"
+  - "EPC115-06 SCT Inter-PSP IG 2025 v1.0, section 2"
+  - "EPC122-16 SCT Inst Inter-PSP IG 2025 v1.0, section 2"
+  - "ISO 20022 Catalogue and Financial Repository, accessed 2026-07-24"
+review_gates:
+  - "ISO_MESSAGE_REVIEW for exact version, namespace, cardinality and code set"
+  - "PAYMENTS_DOMAIN_REVIEW for lifecycle meaning"
+  - "ARCHITECTURE_REVIEW before a new port, aggregate, or schema"

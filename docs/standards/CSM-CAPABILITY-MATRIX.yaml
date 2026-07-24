@@ -1,0 +1,94 @@
+version: 1
+as_of: 2026-07-24
+review_state: AI_DRAFT
+human_review_state: NOT_REVIEWED
+classification: [PUBLIC_CSM_RULE, PARTICIPANT_RULE, LOCAL_COMMUNITY_RULE, PROJECT_SIMULATION]
+csms:
+  - id: TIPS
+    operator: "Eurosystem / ECB"
+    public_baseline: "TIPS R2026.JUN documentation, live since 2026-06-12"
+    schemes: [SCT_INST]
+    clearing_model: "settlement service; no common-core inference"
+    settlement: "real-time, final and irrevocable central-bank-money settlement, 24/7/365"
+    liquidity: "TIPS DCA; participants or reachable parties; instructing party possible"
+    reachability: "public model available"
+    messages: "UDFS/examples public; MyStandards carries authoritative current message variants"
+    source_state: PARTIALLY_VERIFIED
+    classification: PUBLIC_CSM_RULE
+    implementation_state: PLANNED
+    restrictions: ["production connectivity and participant setup require onboarding/participant evidence"]
+    source_ids: [tips-public, tips-r2026-jun]
+  - id: STEP2_SCT
+    operator: "EBA CLEARING"
+    schemes: [SCT]
+    clearing_model: "file/payment processing with warehousing, cycles and continuous gross settlement features"
+    settlement: "immediately available central-bank funds; service-specific settlement documentation"
+    reachability: "central routing tables and CSM interoperability"
+    reporting: ["real-time validation", "cancellation", "daily reconciliation"]
+    source_state: PUBLIC_OVERVIEW_ONLY
+    classification: PUBLIC_CSM_RULE
+    implementation_state: PLANNED
+    restrictions: ["detailed service documentation is customer-portal restricted"]
+    source_ids: [step2-public, step2-service-docs]
+  - id: STEP2_SDD
+    operator: "EBA CLEARING"
+    schemes: [SDD_CORE, SDD_B2B]
+    clearing_model: "file and payment validation, warehousing and batch settlement"
+    source_state: PUBLIC_OVERVIEW_ONLY
+    classification: PUBLIC_CSM_RULE
+    implementation_state: OUT_OF_SCOPE
+    restrictions: ["detailed service documentation is customer-portal restricted"]
+  - id: RT1
+    operator: "EBA CLEARING"
+    schemes: [SCT_INST, OCT_INST]
+    clearing_model: "real-time gross settlement"
+    settlement: "immediate finality in central-bank funds via TIPS AS technical account"
+    liquidity: "prefunded participant funds balance; negative balance unavailable"
+    reachability: "participant/addressable PSP and interoperability models"
+    source_state: PUBLIC_PFMI_AND_OVERVIEW
+    classification: PUBLIC_CSM_RULE
+    implementation_state: PLANNED
+    restrictions: ["detailed message/service documentation is customer-portal restricted"]
+    source_ids: [rt1-public, rt1-pfmi-2024, rt1-service-docs]
+  - id: STET_SEPA_EU
+    operator: STET
+    schemes: [SCT_INST]
+    clearing_model: "bilateral net clearing with prefunded payment capacity"
+    settlement: "TIPS technical account; transactions exceeding originator capacity rejected"
+    reachability: "public service overview; participant rules not reviewed"
+    source_state: PUBLIC_OVERVIEW_ONLY
+    classification: PUBLIC_CSM_RULE
+    implementation_state: PLANNED
+    restrictions: ["participant formats and operational rules require a contracted profile"]
+    source_ids: [stet-public, stet-sepa-eu-2025]
+  - id: STET_CORE_FR
+    operator: STET
+    schemes: [SCT, SDD_CORE, SDD_B2B, LOCAL_INSTRUMENTS]
+    clearing_model: "continuous processing with community-specific settlement/guarantee arrangements"
+    source_state: PUBLIC_LOCAL_COMMUNITY
+    classification: LOCAL_COMMUNITY_RULE
+    implementation_state: OUT_OF_SCOPE
+    restriction: "Do not project CORE(FR) rules into generic SCT."
+  - id: STET_CORE_BE
+    operator: STET
+    schemes: [SCT, SDD_CORE, SDD_B2B, LOCAL_INSTRUMENTS]
+    clearing_model: "multi-cycle delivery-after-settlement model"
+    source_state: PUBLIC_LOCAL_COMMUNITY
+    classification: LOCAL_COMMUNITY_RULE
+    implementation_state: OUT_OF_SCOPE
+    restriction: "Do not project CORE(BE) rules into generic SCT."
+  - id: T2_CLM_RTGS
+    operator: "Eurosystem / ECB"
+    schemes: [WHOLESALE_AND_LIQUIDITY_SUPPORT]
+    role: "liquidity, RTGS and shared TARGET components; not Debina's SCT common core"
+    source_state: PUBLIC_R2026_JUN
+    classification: PUBLIC_CSM_RULE
+    implementation_state: OUT_OF_SCOPE
+restricted_sources:
+  - id: PARTICIPANT_DOCUMENTATION_REQUIRED
+    systems: [STEP2_SCT, STEP2_SDD, RT1]
+    effect: "Rail adapter stories cannot become READY without lawful access and cited participant sections."
+no_leakage_rule: >-
+  Each adapter owns its rail profile. No TIPS, RT1, STEP2, STET, CORE(FR) or
+  CORE(BE) timeout, liquidity, receipt or finality rule may enter common core
+  without an explicit cross-profile business rule and architecture review.

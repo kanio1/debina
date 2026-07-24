@@ -1,0 +1,463 @@
+version: 1
+as_of: 2026-07-24
+review_state: AI_DRAFT
+human_review_state: NOT_REVIEWED
+changes:
+  - id: CHANGE-EPC-2025-V11
+    detected: 2026-07-24
+    change: "All five 2025 EPC payment scheme rulebooks moved from v1.0 to v1.1."
+    material_effect: "Unstructured address cutover changed from 2026-11-22 to 2026-11-15."
+    action: "E1 mapping must preserve address lineage; enforcement is planned before the cutover."
+  - id: CHANGE-VOP-2026-V11
+    detected: 2026-07-24
+    change: "VOP Rulebook v1.1 was published 2026-03-16 and becomes effective 2026-09-20."
+    action: "Keep v1.0 as current until effective date; schedule review before E5 or a VOP train."
+  - id: CHANGE-TIPS-R2026-JUN
+    detected: 2026-07-24
+    change: "TIPS R2026.JUN went live 2026-06-12 and changed message schemas."
+    action: "Do not use the older R2025.OCT baseline for a new TIPS adapter."
+  - id: CHANGE-PSD3-PSR-TRILOGUE
+    detected: 2026-07-24
+    change: "Council final compromise text was confirmed in April 2026."
+    action: "Track, but do not implement as binding law until adoption/publication is verified."
+source_manifests:
+  - id: epc-sct-c2psp-2025
+    authority_domain: EPC_SCHEME_IMPLEMENTATION_GUIDELINE
+    publisher: "European Payments Council"
+    document_title: "SEPA Credit Transfer Customer-to-PSP Implementation Guidelines"
+    document_version: "EPC132-08 / 2025 v1.0"
+    publication_date: 2024-11-28
+    effective_date: 2025-10-05
+    access_date: 2026-07-24
+    source_location: "https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/sepa-credit-transfer-customer-psp-implementation-1"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT]
+    related_rail: [CUSTOMER_TO_PSP]
+    related_messages: [pain.001.001.09, pain.002.001.10]
+    sections_reviewed: ["document information", "1.1-1.7", "2.1", "2.2", "change banner"]
+    supported_claims: ["2019 ISO baseline", "pain message versions", "TVS role", "single and bulk initiation"]
+    addenda: ["2025-10-06 address-date banner", "EPC153-22 v2.1", "EPC131-17 v4.0"]
+    supersedes: "2023 SCT C2PSP IG"
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: epc-sct-interpsp-2025
+    authority_domain: EPC_SCHEME_IMPLEMENTATION_GUIDELINE
+    publisher: "European Payments Council"
+    document_title: "SEPA Credit Transfer Inter-PSP Implementation Guidelines"
+    document_version: "EPC115-06 / 2025 v1.0"
+    publication_date: 2024-11-28
+    effective_date: 2025-10-05
+    access_date: 2026-07-24
+    source_location: "https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/sepa-credit-transfer-inter-psp-implementation-1"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT]
+    related_rail: [INTER_PSP]
+    related_messages: [pacs.008.001.08, pacs.004.001.09, pacs.002.001.10, camt.056.001.08, camt.029.001.09, pacs.028.001.03, camt.027.001.07, camt.087.001.06]
+    sections_reviewed: ["document information", "1", "2 table of contents and message purposes", "change banner"]
+    supported_claims: ["exact SCT inter-PSP message set and versions", "TVS role"]
+    addenda: ["2025-10-06 address-date banner", "EPC153-22 v2.1", "EPC131-17 v4.0"]
+    supersedes: "2023 SCT Inter-PSP IG"
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: epc-sctinst-interpsp-2025
+    authority_domain: EPC_SCHEME_IMPLEMENTATION_GUIDELINE
+    publisher: "European Payments Council"
+    document_title: "SEPA Instant Credit Transfer Inter-PSP Implementation Guidelines"
+    document_version: "EPC122-16 / 2025 v1.0"
+    publication_date: 2024-11-28
+    effective_date: "2025-10-05T03:30:00+01:00"
+    access_date: 2026-07-24
+    source_location: "https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/sepa-instant-credit-transfer-inter-psp-implementation-2"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT_INST]
+    related_rail: [INTER_PSP]
+    related_messages: [pacs.008.001.08, pacs.002.001.10, camt.056.001.08, camt.029.001.09, pacs.004.001.09, pacs.028.001.03]
+    sections_reviewed: ["document information", "1", "2 table of contents and message purposes", "change banner"]
+    supported_claims: ["exact SCT Inst inter-PSP message set", "single-instruction pacs.008", "timestamp rules"]
+    addenda: ["2025-10-06 address-date banner", "EPC153-22 v2.1", "EPC131-17 v4.0", "EPC059-18 v7.0"]
+    supersedes: "2023 SCT Inst Inter-PSP IG v1.2"
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: tips-r2026-jun
+    authority_domain: OFFICIAL_CSM
+    publisher: "European Central Bank / Eurosystem"
+    document_title: "TIPS UDFS/UHB and release documentation R2026.JUN"
+    document_version: R2026.JUN
+    publication_date: 2025-11-27
+    effective_date: 2026-06-12
+    access_date: 2026-07-24
+    source_location: "https://www.ecb.europa.eu/paym/target/target-professional-use-documents-links/tips/html/index.en.html"
+    public_or_restricted: "PUBLIC; exact message variants also referenced in MyStandards"
+    related_scheme: [SCT_INST]
+    related_rail: [TIPS]
+    related_messages: ["profile-specific pacs/camt/admi/head"]
+    sections_reviewed: ["release index", "cover note", "milestones", "public service description"]
+    supported_claims: ["current release baseline", "DCA/reachability model", "real-time central-bank-money finality"]
+    addenda: ["TIPS change-request register", "production status notices"]
+    supersedes: R2025.OCT
+    superseded_by: R2026.NOV_PLANNED
+    evidence_status: PARTIALLY_VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: rt1-pfmi-2024
+    authority_domain: OFFICIAL_CSM
+    publisher: "EBA CLEARING"
+    document_title: "RT1 PFMI Disclosure Report"
+    document_version: "version published 2024-12"
+    publication_date: 2024-12-01
+    effective_date: UNKNOWN
+    access_date: 2026-07-24
+    source_location: "https://www.ebaclearing.eu/wp-content/uploads/2024/12/ebacl_rt1-pfmi-disclosure-report_v10.pdf"
+    public_or_restricted: PUBLIC_CLOSED_USER_GROUP_LABEL
+    related_scheme: [SCT_INST]
+    related_rail: [RT1]
+    related_messages: ["not used as message-profile evidence"]
+    sections_reviewed: ["system overview", "settlement/finality and funds-balance description"]
+    supported_claims: ["RTGS", "central-bank funds", "instantaneous finality", "prefunded non-negative position"]
+    addenda: ["RT1 public overview and service-documentation restriction page"]
+    supersedes: UNKNOWN
+    superseded_by: NONE_FOUND
+    evidence_status: INCOMPLETE
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: stet-sepa-eu-2025
+    authority_domain: OFFICIAL_CSM
+    publisher: STET
+    document_title: "General Description SEPA(EU)"
+    document_version: "2025 public edition"
+    publication_date: 2025-01-01
+    effective_date: UNKNOWN
+    access_date: 2026-07-24
+    source_location: "https://www.stet.eu/assets/files/site/documentation/General%20description%20SEPA%28EU%29_Internet_VF2025.pdf"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT_INST]
+    related_rail: [STET_SEPA_EU]
+    related_messages: ["participant profile not public"]
+    sections_reviewed: ["general description", "clearing/liquidity model"]
+    supported_claims: ["bilateral net clearing", "prefunded payment capacity", "TIPS technical account"]
+    addenda: ["STET compliance/document library", "2026 price list"]
+    supersedes: "January 2021 public description"
+    superseded_by: NONE_FOUND
+    evidence_status: INCOMPLETE
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-ipr-2024
+    authority_domain: EU_LAW
+    publisher: "European Parliament and Council / EUR-Lex"
+    document_title: "Regulation (EU) 2024/886"
+    document_version: OJ_L_2024_886
+    publication_date: 2024-03-19
+    effective_date: 2024-04-08
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/reg/2024/886/oj"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT, SCT_INST, VOP]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: []
+    sections_reviewed: ["Articles 1-6; inserted SEPA Regulation Articles 5a-5d"]
+    supported_claims: ["instant-transfer availability/timing", "VOP", "targeted restrictive-measure checks", "reporting"]
+    addenda: ["consolidated Regulation (EU) 260/2012 at 2024-04-08", "EBA draft final ITS"]
+    supersedes: NONE
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2027-01-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-sepa-regulation-2012
+    authority_domain: EU_LAW
+    publisher: "European Parliament and Council / EUR-Lex"
+    document_title: "Regulation (EU) No 260/2012"
+    document_version: "consolidated 2024-04-08"
+    publication_date: 2012-03-30
+    effective_date: 2012-03-31
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/reg/2012/260/2024-04-08"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT, SCT_INST, SDD_CORE, SDD_B2B]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: []
+    sections_reviewed: ["consolidated scope and Articles 3-5 as amended"]
+    supported_claims: ["technical and business requirements for euro credit transfers and direct debits are applicability-scoped"]
+    addenda: ["Regulation (EU) 2024/886 amendments"]
+    supersedes: NONE
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2027-01-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-psd2-2015
+    authority_domain: EU_LAW
+    publisher: "European Parliament and Council / EUR-Lex"
+    document_title: "Directive (EU) 2015/2366"
+    document_version: "consolidated 2025-01-17"
+    publication_date: 2015-12-23
+    effective_date: 2016-01-12
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/dir/2015/2366/2025-01-17"
+    public_or_restricted: PUBLIC
+    related_scheme: [ALL_PAYMENT_SERVICES_SUBJECT_TO_APPLICABILITY]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: []
+    sections_reviewed: ["scope", "authentication", "operational and security provisions"]
+    supported_claims: ["PSD2 affects channel, authentication and operational planning only after applicability review"]
+    addenda: ["Delegated Regulation (EU) 2018/389", "PSD3/PSR legislative tracking"]
+    supersedes: "Directive 2007/64/EC"
+    superseded_by: "PSD3/PSR_NOT_YET_VERIFIED_AS_FINAL_LAW"
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-24
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-sca-rts-2018
+    authority_domain: EU_LAW
+    publisher: "European Commission / EUR-Lex"
+    document_title: "Commission Delegated Regulation (EU) 2018/389"
+    document_version: "consolidated 2023-09-12"
+    publication_date: 2018-03-13
+    effective_date: 2019-09-14
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/reg_del/2018/389/2023-09-12"
+    public_or_restricted: PUBLIC
+    related_scheme: [ALL_PAYMENT_SERVICES_SUBJECT_TO_APPLICABILITY]
+    related_rail: [CUSTOMER_CHANNELS]
+    related_messages: []
+    sections_reviewed: ["strong customer authentication", "common and secure communication"]
+    supported_claims: ["SCA and secure communication are channel/applicability gates, not generic XML mapping rules"]
+    addenda: ["consolidated amendments through 2023-09-12"]
+    supersedes: NONE
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2027-01-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-ftr3-2023
+    authority_domain: EU_LAW
+    publisher: "European Parliament and Council / EUR-Lex"
+    document_title: "Regulation (EU) 2023/1113"
+    document_version: OJ_L_2023_150
+    publication_date: 2023-06-09
+    effective_date: 2024-12-30
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/reg/2023/1113/oj"
+    public_or_restricted: PUBLIC
+    related_scheme: [PAYMENT_TRANSFERS_SUBJECT_TO_APPLICABILITY]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: []
+    sections_reviewed: ["payment-transfer information provisions", "Article 26"]
+    supported_claims: ["transfer information and retention require a legal/controller mapping; Article 26 sets a five-year baseline with national-law caveat"]
+    addenda: ["AMLR 2024/1624 applicability tracking"]
+    supersedes: "Regulation (EU) 2015/847"
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2027-01-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-gdpr-2016
+    authority_domain: EU_LAW
+    publisher: "European Parliament and Council / EUR-Lex"
+    document_title: "Regulation (EU) 2016/679"
+    document_version: "consolidated current at access date"
+    publication_date: 2016-05-04
+    effective_date: 2018-05-25
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+    public_or_restricted: PUBLIC
+    related_scheme: [ALL_WHERE_PERSONAL_DATA_IS_PROCESSED]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: []
+    sections_reviewed: ["Article 5", "Article 32"]
+    supported_claims: ["data minimisation, storage limitation and security must shape evidence access, masking and retention"]
+    addenda: []
+    supersedes: "Directive 95/46/EC"
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2027-01-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-dora-2022
+    authority_domain: EU_LAW
+    publisher: "European Parliament and Council / EUR-Lex"
+    document_title: "Regulation (EU) 2022/2554"
+    document_version: OJ_L_2022_333
+    publication_date: 2022-12-27
+    effective_date: 2025-01-17
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    public_or_restricted: PUBLIC
+    related_scheme: [PLATFORM_APPLICABILITY_REVIEW]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: []
+    sections_reviewed: ["scope", "ICT risk", "incident", "testing and third-party provisions"]
+    supported_claims: ["operational resilience, incident evidence and testing are applicability-gated platform concerns"]
+    addenda: ["Commission 2026 preparedness report and NIS2 lex-specialis relationship"]
+    supersedes: NONE
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2027-01-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eu-nis2-2022
+    authority_domain: EU_LAW
+    publisher: "European Parliament and Council / EUR-Lex"
+    document_title: "Directive (EU) 2022/2555"
+    document_version: OJ_L_2022_333
+    publication_date: 2022-12-27
+    effective_date: 2024-10-18
+    access_date: 2026-07-24
+    source_location: "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    public_or_restricted: PUBLIC
+    related_scheme: [PLATFORM_APPLICABILITY_REVIEW]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: []
+    sections_reviewed: ["Article 4", "scope", "risk-management and incident provisions"]
+    supported_claims: ["NIS2 is an applicability and national-transposition review; DORA may be sectoral lex specialis"]
+    addenda: ["national transposition and Commission implementation tracking"]
+    supersedes: "Directive (EU) 2016/1148"
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2027-01-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: epc-2025-rulebook-v11-bundle
+    authority_domain: EPC_SCHEME_RULEBOOK
+    publisher: "European Payments Council"
+    document_title: "Updated versions of the 2025 SEPA payment scheme rulebooks"
+    document_version: "SCT, SCT Inst, SDD Core, SDD B2B and OCT Inst 2025 v1.1"
+    publication_date: 2025-10-06
+    effective_date: 2025-10-05
+    access_date: 2026-07-24
+    source_location: "https://www.europeanpaymentscouncil.eu/news-insights/news/epc-publishes-updated-versions-2025-sepa-payment-scheme-rulebooks"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT, SCT_INST, SDD_CORE, SDD_B2B, OCT_INST]
+    related_rail: [SCHEME_LEVEL]
+    related_messages: ["see scheme-specific implementation guidelines"]
+    sections_reviewed: ["version change", "effective period", "address migration"]
+    supported_claims: ["v1.1 is current", "unstructured-address end date is 2026-11-15"]
+    addenda: ["EPC153-22 v2.1", "scheme-specific clarification papers"]
+    supersedes: "2025 scheme rulebooks v1.0"
+    superseded_by: NONE
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: iso20022-financial-repository
+    authority_domain: ISO_20022
+    publisher: "ISO 20022 Registration Management Group"
+    document_title: "ISO 20022 Catalogue of Messages and Financial Repository"
+    document_version: "continuously maintained; message-version-specific"
+    publication_date: UNKNOWN
+    effective_date: PROFILE_SPECIFIC
+    access_date: 2026-07-24
+    source_location: "https://www.iso20022.org/catalogue-messages"
+    public_or_restricted: PUBLIC_METADATA_AND_DOWNLOADS
+    related_scheme: [ALL_PROFILE_QUALIFIED]
+    related_rail: [ALL_PROFILE_QUALIFIED]
+    related_messages: [pain.*, pacs.*, camt.*, admi.*, head.*]
+    sections_reviewed: ["payments catalogue", "financial repository", "archive"]
+    supported_claims: ["message definitions and namespaces are version-specific; catalogue latest does not select an EPC or rail version"]
+    addenda: ["EPC implementation guidelines and rail profiles select applicable versions"]
+    supersedes: CONTINUOUS_ARCHIVE
+    superseded_by: CONTINUOUS_MAINTENANCE
+    evidence_status: INCOMPLETE
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: step2-public-overview
+    authority_domain: OFFICIAL_CSM
+    publisher: "EBA CLEARING"
+    document_title: "STEP2 public service overview and documentation access page"
+    document_version: "public current at access date"
+    publication_date: UNKNOWN
+    effective_date: CURRENT_SERVICE
+    access_date: 2026-07-24
+    source_location: "https://www.ebaclearing.eu/services/step2-t/"
+    public_or_restricted: "PUBLIC_OVERVIEW; DETAILED_SERVICE_DOCUMENTATION_RESTRICTED"
+    related_scheme: [SCT, SDD_CORE, SDD_B2B]
+    related_rail: [STEP2]
+    related_messages: ["participant profile restricted"]
+    sections_reviewed: ["service overview", "processing/reachability/reporting", "documentation access"]
+    supported_claims: ["public clearing/settlement/reachability model only"]
+    addenda: ["customer-portal documentation metadata"]
+    supersedes: UNKNOWN
+    superseded_by: NONE_FOUND
+    evidence_status: INCOMPLETE
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: epc-vop-2026-v11
+    authority_domain: EPC_VOP_SCHEME
+    publisher: "European Payments Council"
+    document_title: "Verification Of Payee Scheme Rulebook"
+    document_version: "EPC218-23 v1.1 2026"
+    publication_date: 2026-03-16
+    effective_date: 2026-09-20
+    access_date: 2026-07-24
+    source_location: "https://www.europeanpaymentscouncil.eu/document-library/rulebooks/verification-payee-scheme-rulebook-0"
+    public_or_restricted: PUBLIC
+    related_scheme: [VOP, SCT, SCT_INST]
+    related_rail: [INTER_PSP_VOP]
+    related_messages: ["VOP API specifications are separate artifacts"]
+    sections_reviewed: ["document page", "version history", "scope and response overview", "Annex III change history"]
+    supported_claims: ["v1.1 effective date", "v1.0 remains effective until transition", "VOP is a separate verification capability"]
+    addenda: ["VOP API specifications v1.1.1", "API Security Framework v2.1", "v2.0 change consultation"]
+    supersedes: "EPC218-23 v1.0"
+    superseded_by: "V2.0_PLANNED_NOT_PUBLISHED"
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-09-15
+    reviewer: CODEX
+    review_state: AI_DRAFT
+  - id: eba-ipr-reporting-2025
+    authority_domain: EBA_REGULATORY_TECHNICAL_STANDARD
+    publisher: "European Banking Authority"
+    document_title: "Final draft ITS on uniform reporting under the SEPA Regulation and Reporting Framework 4.2"
+    document_version: "final draft 2025-02-04; framework 4.2 current at access date"
+    publication_date: 2025-02-04
+    effective_date: COMMISSION_ADOPTION_NOT_VERIFIED
+    access_date: 2026-07-24
+    source_location: "https://www.eba.europa.eu/publications-and-media/press-releases/eba-publishes-its-draft-final-technical-standards-reporting-data-charges-credit-transfers-and"
+    public_or_restricted: PUBLIC
+    related_scheme: [SCT, SCT_INST]
+    related_rail: [ALL_APPLICABLE]
+    related_messages: ["regulatory reporting templates, not payment messages"]
+    sections_reviewed: ["press release", "legal basis and next steps", "framework 4.2 implementation page"]
+    supported_claims: ["reporting covers charges and shares of rejected transactions", "first harmonised reporting moved to April 2026"]
+    addenda: ["EBA Reporting Framework 4.2 and FAQ changes"]
+    supersedes: "draft consultation package"
+    superseded_by: "COMMISSION_ADOPTED_ITS_NOT_VERIFIED"
+    evidence_status: INCOMPLETE
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-01
+    reviewer: CODEX
+    review_state: AI_DRAFT
+manifest_policy: >-
+  VERIFIED above means only that the cited metadata and reviewed sections support
+  the listed claims. It is not human legal, payment-domain, ISO, or participant approval.

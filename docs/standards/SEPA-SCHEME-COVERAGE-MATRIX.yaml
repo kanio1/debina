@@ -1,0 +1,90 @@
+version: 1
+as_of: 2026-07-24
+review_state: AI_DRAFT
+human_review_state: NOT_REVIEWED
+scope_notice: >-
+  Research inventory for a synthetic platform. A coverage state is not a claim of
+  scheme adherence, CSM participation, certification, or legal compliance.
+states: [SUPPORTED, PARTIALLY_SUPPORTED, PLANNED, SOURCE_BLOCKED, OUT_OF_SCOPE]
+schemes:
+  - scheme: SCT
+    state: PARTIALLY_SUPPORTED
+    current_rulebook: "EPC125-05 2025 SCT Rulebook v1.1"
+    effective: 2025-10-05
+    current_until: 2027-11-21
+    implementation_guidelines:
+      - "EPC132-08 SCT Customer-to-PSP IG 2025 v1.0"
+      - "EPC115-06 SCT Inter-PSP IG 2025 v1.0"
+    iso_baseline: "ISO 20022 2019 message version"
+    current_support:
+      - "single-transaction pain.001.001.09 REST intake"
+      - "raw evidence, synthetic detached signature verification, hardened DOM parse"
+      - "canonical mapping, payment persistence, ISO identifier lineage"
+    gaps:
+      - "no EPC XSD/TVS validation"
+      - "no source-approved customer/channel/signature profile"
+      - "no file/group processing, SCT rail adapter, or participant evidence"
+      - "address transition rule is not implemented"
+    source_ids: [epc-sct, epc-sct-c2psp-2025, epc-sct-interpsp-2025]
+  - scheme: SCT_INST
+    state: PLANNED
+    current_rulebook: "EPC004-16 2025 SCT Inst Rulebook v1.1"
+    effective: "2025-10-05T03:30:00+01:00"
+    current_until: "2027-11-21T03:30:00+01:00"
+    implementation_guidelines:
+      - "2025 SCT Inst Customer-to-PSP IG v1.0"
+      - "EPC122-16 SCT Inst Inter-PSP IG 2025 v1.0"
+    iso_baseline: "ISO 20022 2019 message version"
+    current_support:
+      - "project-simulation routing and settlement primitives"
+      - "pacs.002 identifier extraction/correlation primitives"
+    gaps:
+      - "no admitted SCT Inst end-to-end slice"
+      - "no TIPS, RT1, or STET participant profile"
+      - "no sourced timeout, liquidity, reachability, or finality adapter contract"
+    source_ids: [epc-sct-inst, epc-sctinst-interpsp-2025]
+  - scheme: SDD_CORE
+    state: OUT_OF_SCOPE
+    current_rulebook: "2025 SDD Core Rulebook v1.1"
+    effective: 2025-10-05
+    reason: "Phase E discovery only; implementation requires a separate scope decision."
+    source_ids: [epc-2025-schemes-update]
+  - scheme: SDD_B2B
+    state: OUT_OF_SCOPE
+    current_rulebook: "EPC222-07 2025 SDD B2B Rulebook v1.1"
+    effective: 2025-10-05
+    reason: "Phase E discovery only; implementation requires a separate scope decision."
+    source_ids: [epc-2025-schemes-update]
+  - scheme: OCT_INST
+    state: OUT_OF_SCOPE
+    current_rulebook: "EPC158-22 2025 OCT Inst Rulebook v1.1"
+    effective: 2025-10-05
+    reason: "No one-leg-out actor goal admitted; revisit only in Cohort E8."
+    source_ids: [epc-2025-schemes-update]
+  - scheme: VERIFICATION_OF_PAYEE
+    state: PLANNED
+    current_rulebook: "EPC218-23 VOP Rulebook 2026 v1.1"
+    publication_date: 2026-03-16
+    effective: 2026-09-20
+    currently_effective_version: "VOP Rulebook v1.0, effective 2025-10-05"
+    reason: >-
+      Regulatory and anti-fraud boundary is relevant, but VOP is not a payment
+      scheme or an approval substitute. A separate capability decision is required.
+    source_ids: [epc-vop-2026]
+cross_scheme_changes:
+  - id: ADDRESS-2026
+    claim: >-
+      Version 1.1 of all five 2025 EPC payment rulebooks changes the last date for
+      unstructured party addresses to 15 November 2026; structured or hybrid
+      addresses are required thereafter.
+    source: "EPC153-22 v2.1, especially sections 7.1 and 7.4"
+    implementation_effect: "E1 must preserve address data and reject unsupported loss; enforcement is cohort-gated."
+  - id: TVS-NOT-PRODUCTION-XSD
+    claim: >-
+      EPC XSD packages instantiate IG restrictions as TVSs, while production
+      instances retain the default ISO 20022 namespace.
+    source: "EPC132-08 and EPC115-06 document pages/download notes"
+    implementation_effect: "Treat ISO XSD and EPC TVS/profile validation as distinct layers."
+unknowns:
+  - "Partial-file acceptance policy is DECISION_BLOCKED until a cited scheme/channel profile and product decision exist."
+  - "Participant-specific AOS, cut-offs, signatures, certificates, and network envelopes are SOURCE_BLOCKED."

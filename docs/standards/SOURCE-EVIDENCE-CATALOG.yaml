@@ -96,3 +96,75 @@ evidence:
     superseded_by: NONE
     verification_method: OTHER
     reviewer: NOT_RECORDED
+  - id: SE-E1-SCT-C2PSP-001
+    source_registry_id: epc-sct-c2psp-2025
+    document_title: 2025 SEPA Credit Transfer Customer-to-PSP Implementation Guidelines
+    publisher: European Payments Council
+    document_version: EPC132-08 2025 v1.0
+    publication_date: 2024-11-28
+    effective_date: 2025-10-05
+    section: Sections 1-3 and message-profile annexes
+    message_set: customer-to-PSP SCT
+    message_definition: pain.001.001.09 and pain.002.001.10
+    message_version: ISO 20022 2019
+    rail: generic-SCT
+    public_or_restricted: public
+    access_date: 2026-07-24
+    supported_claim: The current EPC SCT customer-to-PSP profile uses pain.001.001.09 for initiation and pain.002.001.10 for customer status reporting, with EPC usage restrictions layered on ISO.
+    project_interpretation: UC-SCT-002 may admit pain.001.001.09 only after its message profile, channel and validation responsibilities are explicit.
+    applicable_rules: [BR-SCT-003]
+    confidence: HIGH
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-24
+    effective_from: 2025-10-05
+    effective_until: 2027-11-21
+    superseded_by: NONE
+    verification_method: OFFICIAL_DOCUMENT_REVIEW
+    reviewer: AI_DRAFT_NOT_HUMAN_REVIEWED
+  - id: SE-E1-SCT-TVS-001
+    source_registry_id: epc-sct-c2psp-2025
+    document_title: 2025 SEPA Credit Transfer Customer-to-PSP Implementation Guidelines
+    publisher: European Payments Council
+    document_version: EPC132-08 2025 v1.0
+    publication_date: 2024-11-28
+    effective_date: 2025-10-05
+    section: Section 1.3 and Technical Validation Subset references
+    rail: generic-SCT
+    public_or_restricted: public
+    access_date: 2026-07-24
+    supported_claim: ISO XSD validation alone does not establish compliance with the EPC message usage profile; applicable EPC Technical Validation Subset constraints must be evaluated separately.
+    project_interpretation: E1 separates well-formedness, ISO schema validation, EPC profile validation and project business validation in evidence and error reporting.
+    applicable_rules: [BR-SCT-003]
+    confidence: HIGH
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-24
+    effective_from: 2025-10-05
+    effective_until: 2027-11-21
+    superseded_by: NONE
+    verification_method: OFFICIAL_DOCUMENT_REVIEW
+    reviewer: AI_DRAFT_NOT_HUMAN_REVIEWED
+  - id: SE-E1-ADDRESS-001
+    source_registry_id: epc-address-guidance-2025
+    document_title: EPC Guidance Document on the Provision of Addresses under the EPC Payment Schemes
+    publisher: European Payments Council
+    document_version: EPC153-22 v2.1
+    publication_date: 2025-10-06
+    effective_date: 2025-10-05
+    section: Address-format transition timeline and examples
+    rail: generic-SCT
+    public_or_restricted: public
+    access_date: 2026-07-24
+    supported_claim: Structured and hybrid addresses are supported under the current EPC guidance, while the final unstructured-address end date is 2026-11-15.
+    project_interpretation: E1 must not encode the superseded 2026-11-22 date and keeps address normalization profile-aware.
+    applicable_rules: [BR-SCT-003]
+    confidence: HIGH
+    evidence_status: VERIFIED
+    last_verified_date: 2026-07-24
+    next_review_date: 2026-10-24
+    effective_from: 2025-10-05
+    effective_until: OPEN
+    superseded_by: NONE
+    verification_method: OFFICIAL_DOCUMENT_REVIEW
+    reviewer: AI_DRAFT_NOT_HUMAN_REVIEWED

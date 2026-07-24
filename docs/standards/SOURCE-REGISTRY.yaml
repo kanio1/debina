@@ -10,6 +10,78 @@ sources:
     version: consolidated-text-to-be-verified-per-use
     sections: []
     hash: not-recorded
+  - id: eu-2024-886
+    tag: EU-LAW
+    authority: EU law/regulation
+    title: Regulation (EU) 2024/886 on instant credit transfers in euro
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/reg/2024/886/oj
+    version: OJ-L-2024-886
+    sections: [Articles 1, 5a, 5b, 5c, 5d, 5e]
+    hash: not-recorded
+  - id: eu-2015-2366
+    tag: EU-LAW
+    authority: EU law/directive
+    title: Directive (EU) 2015/2366 (PSD2)
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/dir/2015/2366/oj
+    version: consolidated-2025-01-17
+    sections: [Scope, authentication, operational and security provisions]
+    hash: not-recorded
+  - id: eu-2018-389
+    tag: EU-LAW
+    authority: EU delegated regulation
+    title: Delegated Regulation (EU) 2018/389 on strong customer authentication and secure communication
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/reg_del/2018/389/oj
+    version: consolidated-2023-09-12
+    sections: [SCA and common secure communication]
+    hash: not-recorded
+  - id: eu-2023-1113
+    tag: EU-LAW
+    authority: EU law/regulation
+    title: Regulation (EU) 2023/1113 on information accompanying transfers of funds and certain crypto-assets
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/reg/2023/1113/oj
+    version: OJ-L-2023-150
+    sections: [Payment-transfer information, Article 26]
+    hash: not-recorded
+  - id: eu-2016-679
+    tag: EU-LAW
+    authority: EU law/regulation
+    title: Regulation (EU) 2016/679 (GDPR)
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    version: consolidated-current-at-2026-07-24
+    sections: [Articles 5 and 32]
+    hash: not-recorded
+  - id: eu-2022-2554
+    tag: EU-LAW
+    authority: EU law/regulation
+    title: Regulation (EU) 2022/2554 on digital operational resilience
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    version: OJ-L-2022-333
+    sections: [Scope, ICT risk, incidents and resilience testing]
+    hash: not-recorded
+  - id: eu-2022-2555
+    tag: EU-LAW
+    authority: EU law/directive
+    title: Directive (EU) 2022/2555 (NIS2)
+    publisher: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    version: OJ-L-2022-333
+    sections: [Scope, risk management, incidents, Article 4]
+    hash: not-recorded
+  - id: eba-ipr-reporting-2025
+    tag: EU-LAW
+    authority: EBA final draft implementing technical standards and reporting framework
+    title: Uniform reporting under the SEPA Regulation
+    publisher: European Banking Authority
+    url: https://www.eba.europa.eu/publications-and-media/press-releases/eba-publishes-its-draft-final-technical-standards-reporting-data-charges-credit-transfers-and
+    version: final-draft-ITS-2025 plus reporting-framework-4.2
+    sections: [Templates, instructions, methodology, implementation status]
+    hash: not-recorded
   - id: epc-sct
     tag: EPC-SCT
     authority: EPC Scheme Rulebook
@@ -27,6 +99,60 @@ sources:
     url: https://www.europeanpaymentscouncil.eu/what-we-do/epc-payment-schemes/sepa-instant-credit-transfer
     version: 2025-v1.1 (verify applicability per use)
     sections: []
+    hash: not-recorded
+  - id: epc-2025-schemes-update
+    tag: EPC-SCT
+    authority: EPC scheme rulebook publication and change notice
+    title: 2025 EPC payment scheme rulebooks version 1.1
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/news-insights/news/epc-publishes-updated-versions-2025-sepa-payment-scheme-rulebooks
+    version: 2025-v1.1
+    sections: [Version change, effective and migration dates]
+    hash: not-recorded
+  - id: epc-sct-c2psp-2025
+    tag: EPC-SCT
+    authority: EPC Customer-to-PSP Implementation Guidelines
+    title: 2025 SEPA Credit Transfer Customer-to-PSP Implementation Guidelines
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/2025-sepa-credit-transfer-customer-psp-implementation
+    version: EPC132-08 2025 v1.0
+    sections: [1, 2, 3, Annexes]
+    hash: not-recorded
+  - id: epc-sct-interpsp-2025
+    tag: EPC-SCT
+    authority: EPC Inter-PSP Implementation Guidelines
+    title: 2025 SEPA Credit Transfer Inter-PSP Implementation Guidelines
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/2025-sepa-credit-transfer-inter-psp-implementation
+    version: EPC115-06 2025 v1.0
+    sections: [1, 2, 3, Annexes]
+    hash: not-recorded
+  - id: epc-sctinst-interpsp-2025
+    tag: EPC-SCT-INST
+    authority: EPC Inter-PSP Implementation Guidelines
+    title: 2025 SEPA Instant Credit Transfer Inter-PSP Implementation Guidelines
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/document-library/implementation-guidelines/2025-sepa-instant-credit-transfer-inter-psp
+    version: EPC122-16 2025 v1.0
+    sections: [1, 2, 3, Annexes]
+    hash: not-recorded
+  - id: epc-address-guidance-2025
+    tag: EPC-SCT
+    authority: EPC implementation guidance
+    title: EPC Guidance Document on the Provision of Addresses under the EPC Payment Schemes
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/document-library/guidance-documents/epc-guidance-document-provision-addresses-under-epc-payment
+    version: EPC153-22 v2.1
+    sections: [Address-format timelines and examples]
+    hash: not-recorded
+  - id: epc-vop-2026
+    tag: EPC-SCT
+    authority: EPC Verification of Payee Scheme Rulebook
+    title: Verification of Payee Scheme Rulebook
+    publisher: European Payments Council
+    url: https://www.europeanpaymentscouncil.eu/what-we-do/other-schemes/verification-payee
+    version: 2025 v1.1
+    sections: [Version history, effective date]
     hash: not-recorded
   - id: iso20022-catalogue
     tag: ISO20022
@@ -46,6 +172,15 @@ sources:
     version: verify-per-use
     sections: []
     hash: not-recorded
+  - id: step2-service-docs
+    tag: PARTICIPANT_DOCUMENTATION_REQUIRED
+    authority: rail-specific participant documentation
+    title: STEP2 service documentation
+    publisher: EBA CLEARING
+    url: https://www.ebaclearing.eu/services/step2-t/documentation/
+    version: participant-portal-current
+    sections: [metadata-only]
+    hash: not-recorded
   - id: rt1-public
     tag: RT1
     authority: rail-specific official CSM specification
@@ -54,6 +189,24 @@ sources:
     url: https://www.ebaclearing.eu/services/rt1/
     version: verify-per-use
     sections: []
+    hash: not-recorded
+  - id: rt1-pfmi-2024
+    tag: RT1
+    authority: official CSM public disclosure
+    title: RT1 PFMI Disclosure Report
+    publisher: EBA CLEARING
+    url: https://www.ebaclearing.eu/services/rt1/pfmi/
+    version: 2024 public disclosure
+    sections: [Service and settlement model, Principle 8]
+    hash: not-recorded
+  - id: rt1-service-docs
+    tag: PARTICIPANT_DOCUMENTATION_REQUIRED
+    authority: rail-specific participant documentation
+    title: RT1 service documentation
+    publisher: EBA CLEARING
+    url: https://www.ebaclearing.eu/services/rt1/documentation/
+    version: participant-portal-current
+    sections: [metadata-only]
     hash: not-recorded
   - id: stet-public
     tag: STET
@@ -64,6 +217,15 @@ sources:
     version: verify-per-use
     sections: []
     hash: not-recorded
+  - id: stet-sepa-eu-2025
+    tag: STET
+    authority: official CSM public documentation
+    title: SEPA(EU) Service Description
+    publisher: STET
+    url: https://www.stet.eu/en/clearing/sepa-eu/
+    version: public-current-2025
+    sections: [Service overview, clearing and settlement]
+    hash: not-recorded
   - id: tips-public
     tag: TIPS
     authority: rail-specific official CSM specification
@@ -72,6 +234,15 @@ sources:
     url: https://www.ecb.europa.eu/paym/target/tips/html/index.en.html
     version: verify-per-use
     sections: []
+    hash: not-recorded
+  - id: tips-r2026-jun
+    tag: TIPS
+    authority: official Eurosystem service documentation
+    title: TIPS R2026.JUN user detailed functional specifications and user handbook
+    publisher: European Central Bank
+    url: https://www.ecb.europa.eu/paym/target/target-professional-use-documents-links/tips/html/index.en.html
+    version: R2026.JUN
+    sections: [UDFS, UHB, message examples and schemas index]
     hash: not-recorded
   - id: project-adr-n10
     tag: PROJECT-ADR

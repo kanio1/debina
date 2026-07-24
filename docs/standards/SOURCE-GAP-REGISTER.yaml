@@ -1,0 +1,85 @@
+version: 1
+as_of: 2026-07-24
+review_state: AI_DRAFT
+human_review_state: NOT_REVIEWED
+gaps:
+  - id: GAP-E1-CHANNEL-PROFILE
+    status: DECISION_BLOCKED
+    affects: [UC-SCT-002, EPIC-19, "19.4"]
+    missing: "approved customer/channel profile for signed pain.001, including signature and certificate semantics"
+    safe_next_step: "Payments, security and product review of the synthetic channel contract."
+  - id: GAP-E1-TVS
+    status: SOURCE_READY_IMPLEMENTATION_PENDING
+    affects: [UC-SCT-002, EPIC-28, "28.2"]
+    missing: "checked-in, provenance-recorded ISO XSD and EPC 2025 SCT C2PSP TVS validation set"
+    safe_next_step: "Lawfully retrieve official EPC ZIP, record checksum/license metadata, and approve fixture policy."
+  - id: GAP-E1-SIGNATURE
+    status: PROJECT_POLICY_REVIEW_REQUIRED
+    affects: [UC-SCT-002, EPIC-31, "31.2"]
+    missing: "evidence that the synthetic Ed25519 detached-header convention represents any selected customer channel"
+    safe_next_step: "Keep it PROJECT_SIMULATION or replace only through an admitted channel profile; do not call it EPC."
+  - id: GAP-PARTIAL-FILE
+    status: DECISION_BLOCKED
+    affects: [UC-SCT-003, EPIC-73, "73.2", "73.3", "73.4"]
+    missing: "source-backed and product-approved full-file versus transaction-level acceptance policy"
+    safe_next_step: "Review EPC C2PSP rules plus the selected submission channel; record a product decision."
+  - id: GAP-STEP2-PARTICIPANT
+    status: PARTICIPANT_DOCUMENTATION_REQUIRED
+    affects: [UC-ROUTING-001, UC-EGRESS-001, UC-RECON-001]
+    missing: "STEP2 current message, schedule, receipt, retry, report and operational participant specifications"
+    public_subset_available: true
+  - id: GAP-RT1-PARTICIPANT
+    status: PARTICIPANT_DOCUMENTATION_REQUIRED
+    affects: [UC-SCTINST-001, UC-STATUS-001, UC-RECON-001]
+    missing: "RT1 current message, timeout, liquidity, receipt and operational participant specifications"
+    public_subset_available: true
+  - id: GAP-STET-PARTICIPANT
+    status: PARTICIPANT_DOCUMENTATION_REQUIRED
+    affects: [UC-ROUTING-001, UC-SCTINST-001]
+    missing: "contracted SEPA(EU) format and participant operational profile"
+    public_subset_available: true
+  - id: GAP-TIPS-MYSTANDARDS
+    status: SOURCE_BLOCKED
+    affects: [UC-SCTINST-001, UC-STATUS-001]
+    missing: "lawfully accessible exact production message variants referenced by TIPS MyStandards"
+    public_subset_available: true
+  - id: GAP-LEGAL-APPLICABILITY
+    status: LEGAL_REVIEW_REQUIRED
+    affects: [ALL_PHASE_E_COHORTS]
+    missing: "legal determination of which PSP obligations apply to a synthetic research platform and any future operator"
+    safe_next_step: "Maintain requirement classifications and no-compliance-claim disclaimer."
+  - id: GAP-PSD3-PSR
+    status: LEGAL_REVIEW_REQUIRED
+    affects: [FUTURE_SECURITY_AND_FRAUD]
+    missing: "final Official Journal acts and application dates"
+    known_state: "political compromise confirmed by Council document ST 8220/26; not treated as law in force"
+  - id: GAP-EBA-ITS-ADOPTION
+    status: LEGAL_REVIEW_REQUIRED
+    affects: [FUTURE_REPORTING]
+    missing: "Commission-adopted ITS legal act verification"
+    known_state: "EBA final draft and reporting framework 4.2 reviewed; first PSP remittance indicated as 2026-04-09"
+  - id: GAP-RETENTION
+    status: LEGAL_REVIEW_REQUIRED
+    affects: [UC-SCT-002, UC-AUDIT-001, UC-RECON-001]
+    missing: "jurisdiction/role-specific retention schedule reconciling FTR3, AML/CFT, GDPR, audit and research data"
+  - id: GAP-STACK-KAFKA
+    status: CAPABILITY_BLOCKED
+    affects: [FUTURE_RUNTIME_PROOF]
+    missing: "single exact Kafka runtime baseline"
+    known_state: "Dagger pins 4.1.1; resolved client is 4.2.1; local Compose uses apache/kafka:latest"
+  - id: GAP-SKILL-SOURCE-EVIDENCE
+    status: SKILL_GAP
+    affects: [SOURCE_RESEARCH]
+    missing: "dedicated active source-evidence catalog maintenance skill"
+    assessment: "enterprise-use-case-engineering plus source policy are sufficient for this cohort; not blocking"
+  - id: GAP-SKILL-BFF-VERIFY
+    status: SKILL_GAP
+    affects: [FRONTEND_BFF]
+    missing: "active BFF skill verify command aligned with repository pnpm-only policy"
+    assessment: "repository AGENTS.md overrides skill npm wording; not blocking"
+  - id: GAP-DAGGER-ENGINE
+    status: ENVIRONMENT_DIAGNOSTIC
+    affects: [SESSION_VALIDATION_ONLY]
+    missing: "running Dagger engine socket during this planning session"
+    known_state: "dagger version v0.21.4 available; dagger core version failed on /run/dagger/engine.sock"
+    effect: "Phase D remains closed; Phase E uses its recorded runtime proof and does not reopen hardening."
