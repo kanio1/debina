@@ -10,4 +10,5 @@ done
 for assertion in tools/skills/evals/regression/*.json; do
   python3 tools/skills/check-content-assertions.py "$assertion"
 done
+python3 tools/skills/validate-enterprise-use-case-evals.py
 echo "RESULT: PASS"

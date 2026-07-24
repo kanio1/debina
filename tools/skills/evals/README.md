@@ -4,4 +4,10 @@ Routing fixtures are reusable prompt expectations, not proof that a model select
 
 Behavioral evidence is intentionally split: explicit discovery/invocation/reference loading/read-only behavior for `$debina-payment-state-finality` is `VERIFIED`; implicit routing is `NOT_EXECUTED`. Fixture files do not prove model routing. A future implicit-routing evaluator should use a disposable read-only worktree, inspect `codex --help` for a documented evaluator, record model/config and raw results, and avoid recursive or uncontrolled sessions.
 
-Run deterministic checks from any directory with `bash tools/skills/validate-all-skills.sh`. Regression assertions check safety phrases, not model behavior.
+`enterprise-use-case-engineering` additionally has deterministic routing,
+regression, adversarial and cross-skill-chain contract evals. They prove fixture
+coverage and skill guardrail presence, not autonomous model selection.
+
+Run deterministic checks from any directory with
+`bash tools/skills/validate-all-skills.sh`. Regression assertions check safety
+phrases, not model behavior.

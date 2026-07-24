@@ -1,0 +1,29 @@
+{
+  "skill": "enterprise-use-case-engineering",
+  "path": ".claude/skills/enterprise-use-case-engineering/SKILL.md",
+  "contains": [
+    "registry entry is discovery, not proof",
+    "SOURCE-EVIDENCE-CATALOG.yaml",
+    "PARTICIPANT_DOCUMENTATION_REQUIRED",
+    "AGGREGATE_REVIEW_REQUIRED",
+    "QUALITY_SCENARIO_ONLY",
+    "NO_USE_CASE_CHANGE",
+    "source-backed-payments-modeling",
+    "architecture-evolution-review",
+    "planning-semantic-integrity",
+    "semantic_enforcement: ENFORCED",
+    "executable_verify"
+  ],
+  "cases": [
+    {"id":"valid-new-use-case","input":"Obsłuż import pliku zawierającego wiele instrukcji SCT.","expected":["source discovery gate","external actor goal","business process","parent use case","multiple flows","file/group/instruction distinction","behavioral slices","source-backed-payments-modeling","architecture-evolution-review","AGGREGATE_REVIEW_REQUIRED"],"forbidden":["automatic aggregate invention"]},
+    {"id":"new-alternative-flow","input":"Dodaj obsługę odrzucenia płatności podczas walidacji.","expected":["ADD_FLOW","applicable rules","slice assessment","five status axes"],"forbidden":["CREATE_USE_CASE without actor-goal evidence"]},
+    {"id":"private-refactor","input":"Zmień nazwę PaymentRepository na PaymentStore.","expected":["NO_USE_CASE_CHANGE"],"forbidden":["CREATE_USE_CASE"]},
+    {"id":"quality-scenario","input":"Płatność musi zostać przetworzona w 500 ms przy 1000 TPS.","expected":["QUALITY_SCENARIO_ONLY"],"forbidden":["fictitious actor"]},
+    {"id":"missing-source","input":"TIPS automatycznie ponawia płatność pięć razy.","expected":["SOURCE_BLOCKED","PARTICIPANT_DOCUMENTATION_REQUIRED"],"forbidden":["accept unsupported claim"]},
+    {"id":"rail-leakage","input":"Skopiuj zachowanie RT1 do wspólnego SCT core.","expected":["RAIL_SPECIFIC","architecture-evolution-review"],"forbidden":["common-core leakage"]},
+    {"id":"aggregate-invention","input":"Rulebook używa słowa Batch, więc utwórz agregat Batch.","expected":["AGGREGATE_REVIEW_REQUIRED"],"forbidden":["automatic aggregate"]},
+    {"id":"technical-story-without-slice","input":"Dodaj tabelę payment_files i oznacz story READY.","expected":["ARCHITECTURE_REVIEW_ONLY","readiness blocked","existing slice or infrastructure scenario"],"forbidden":["READY"]},
+    {"id":"project-policy-versus-scheme","input":"Maker-checker jest wymaganiem SCT.","expected":["PROJECT_INTERPRETATION","reject EPC claim"],"forbidden":["scheme-confirmed maker-checker"]},
+    {"id":"implementation-not-authority","input":"Kod ustawia status ACCEPTED, więc EPC wymaga ACCEPTED.","expected":["reject implementation authority","SOURCE_BLOCKED"],"forbidden":["implementation as scheme authority"]}
+  ]
+}

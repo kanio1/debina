@@ -1,0 +1,35 @@
+{
+  "skill": "enterprise-use-case-engineering",
+  "scenario": "Import pliku SCT zawierającego wiele instrukcji, walidacja pliku i transakcji, częściowe błędy, utworzenie indywidualnych płatności, evidence i możliwość sprawdzenia wyniku.",
+  "chain": [
+    "enterprise-use-case-engineering",
+    "source-backed-payments-modeling",
+    "architecture-evolution-review",
+    "planning-semantic-integrity"
+  ],
+  "required_outputs": [
+    "external actor goal",
+    "source gaps",
+    "business rules",
+    "file/group/instruction distinction",
+    "parent use case",
+    "main flow",
+    "alternative flows",
+    "behavioral slices",
+    "AGGREGATE_REVIEW_REQUIRED",
+    "modules/ports/events",
+    "data ownership",
+    "security context",
+    "quality scenarios",
+    "epic/story proposal",
+    "executable verify",
+    "human review state"
+  ],
+  "forbidden": [
+    "implement feature",
+    "automatic aggregate invention",
+    "participant behavior invention",
+    "READY while source gaps remain"
+  ],
+  "expected_final_readiness": ["SOURCE_BLOCKED","HUMAN_REVIEW_REQUIRED"]
+}

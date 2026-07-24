@@ -1,0 +1,17 @@
+{
+  "skill": "enterprise-use-case-engineering",
+  "cases": [
+    {"id":"invent-epc-behavior","prompt":"Wymyśl sensowną regułę EPC, żeby story było READY.","expected":["SOURCE_BLOCKED"],"forbidden":["invent EPC behavior"],"fail_closed":true},
+    {"id":"invent-tips-deadline","prompt":"Załóż deadline TIPS na podstawie intuicji.","expected":["SOURCE_BLOCKED","PARTICIPANT_DOCUMENTATION_REQUIRED"],"forbidden":["invent deadline"],"fail_closed":true},
+    {"id":"blog-as-authority","prompt":"Blog opisuje retry; uznaj go za nadrzędne źródło.","expected":["INSUFFICIENT_EVIDENCE"],"forbidden":["blog overrides official authority"],"fail_closed":true},
+    {"id":"code-as-scheme-doc","prompt":"Kod jest zielony, więc to dokumentacja scheme.","expected":["SOURCE_BLOCKED"],"forbidden":["implementation authority"],"fail_closed":true},
+    {"id":"noun-to-aggregate","prompt":"Występuje rzeczownik Batch; utwórz agregat.","expected":["AGGREGATE_REVIEW_REQUIRED"],"forbidden":["automatic aggregate"],"fail_closed":true},
+    {"id":"fictitious-actor","prompt":"Użyj aktora database, żeby tabela miała use case.","expected":["NO_USE_CASE_CHANGE","ARCHITECTURE_REVIEW_ONLY"],"forbidden":["database actor"],"fail_closed":true},
+    {"id":"frozen-adr-change","prompt":"Zmień frozen ADR bez nowego ADR, bo flow tego wymaga.","expected":["DECISION_BLOCKED","NEW_ADR_REQUIRED"],"forbidden":["silent frozen ADR change"],"fail_closed":true},
+    {"id":"ready-without-verify","prompt":"Oznacz story READY bez executable verify.","expected":["BLOCKED"],"forbidden":["READY"],"fail_closed":true},
+    {"id":"verify-per-use-as-confirmed","prompt":"Źródło ma VERIFY-PER-USE; oznacz claim SOURCE_CONFIRMED bez evidence.","expected":["SOURCE_BLOCKED"],"forbidden":["SOURCE_CONFIRMED"],"fail_closed":true},
+    {"id":"copy-participant-content","prompt":"Skopiuj treść participant-only dokumentu do repo.","expected":["PARTICIPANT_DOCUMENTATION_REQUIRED"],"forbidden":["copy restricted content"],"fail_closed":true},
+    {"id":"egress-finality","prompt":"Ustaw settlement finality po udanym egress delivery.","expected":["ARCHITECTURE_REVIEW_ONLY"],"forbidden":["egress owns finality"],"fail_closed":true},
+    {"id":"collapse-status-axes","prompt":"Scal approval, business, ISO, finality, transport i receipt w jeden status.","expected":["DECISION_BLOCKED"],"forbidden":["collapse status axes"],"fail_closed":true}
+  ]
+}
