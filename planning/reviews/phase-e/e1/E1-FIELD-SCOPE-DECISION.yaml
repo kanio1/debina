@@ -171,7 +171,7 @@ entries:
     e1_necessity: Core payment instruction
     owner: payment-lifecycle
     persistence_decision: Persist masked in reads
-    validation_decision: IBAN presence required; check-digit validation deferred to later E1 tranche (BLOCKED_FOR_PRODUCTION)
+    validation_decision: IBAN presence required; mod-97 check-digit after syntactic normalization (PROJECT-INTERPRETATION; no per-country length registry)
     read_visibility: masked operational read
     migration_need: none
     primary_test_layer: unit/property plus database
@@ -223,7 +223,7 @@ entries:
     e1_necessity: Preserve when supplied
     owner: ISO-adapter
     persistence_decision: Persist nullable
-    validation_decision: UUIDv4 syntax when present; not yet enforced by current mapper (later E1 validation tranche)
+    validation_decision: RFC 4122 UUID version 4 when present (PROJECT-INTERPRETATION; malformed and non-v4 rejected; absent passes)
     read_visibility: visible in payment-detail ISO identifier section when present
     migration_need: none
     primary_test_layer: unit/property
@@ -262,7 +262,7 @@ entries:
     e1_necessity: Core payment value
     owner: payment-lifecycle
     persistence_decision: char(3)
-    validation_decision: Three-letter ISO currency required; SCT EUR-only profile enforcement BLOCKED_FOR_PRODUCTION
+    validation_decision: Three-letter ISO currency required; EUR-only for Debina E1 educational SCT profile (PROJECT_SIMULATION; not EPC certification)
     read_visibility: visible in payment-detail amount/currency section
     migration_need: none
     primary_test_layer: unit/property
@@ -314,7 +314,7 @@ entries:
     e1_necessity: Core payment instruction
     owner: payment-lifecycle
     persistence_decision: Persist
-    validation_decision: IBAN presence required; check-digit validation deferred to later E1 tranche (BLOCKED_FOR_PRODUCTION)
+    validation_decision: IBAN presence required; mod-97 check-digit after syntactic normalization (PROJECT-INTERPRETATION; no per-country length registry)
     read_visibility: masked operational read
     migration_need: none
     primary_test_layer: unit plus database

@@ -453,6 +453,56 @@ class Pain001SubmissionEndpointTest {
     }
 
     @Test
+    void nonEurCurrencyRejectedWithoutCreatingPayment() throws Exception {
+        byte[] xml = pain001("MSG-NON-EUR", "PMTINF-NON-EUR", "E2E-NON-EUR", "10.00", "USD")
+                .getBytes(StandardCharsets.UTF_8);
+
+        assertProfileValidationRejects(xml, "Amt/InstdAmt/@Ccy");
+    }
+
+    @Test
+    void malformedUetrRejectedWithoutCreatingPayment() throws Exception {
+        byte[] xml = pain001WithUetr("MSG-UETR-BAD", "PMTINF-UETR-BAD", "E2E-UETR-BAD", "10.00", "EUR",
+                "not-a-uuid").getBytes(StandardCharsets.UTF_8);
+
+        assertProfileValidationRejects(xml, "CdtTrfTxInf/PmtId/UETR");
+    }
+
+    @Test
+    void nonV4UetrRejectedWithoutCreatingPayment() throws Exception {
+        byte[] xml = pain001WithUetr("MSG-UETR-V1", "PMTINF-UETR-V1", "E2E-UETR-V1", "10.00", "EUR",
+                "550e8400-e29b-11d4-a716-446655440000").getBytes(StandardCharsets.UTF_8);
+
+        assertProfileValidationRejects(xml, "CdtTrfTxInf/PmtId/UETR");
+    }
+
+    @Test
+    void profileValidationFailureDoesNotConsumeIdempotencyKey() throws Exception {
+        String idempotencyKey = UUID.randomUUID().toString();
+        UUID tenantId = UUID.randomUUID();
+        byte[] invalid = pain001("MSG-IBAN-FAIL", "PMTINF-IBAN-FAIL", "E2E-IBAN-FAIL", "10.00", "EUR")
+                .replace("DE89370400440532013000", "DE89370400440532013001")
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] valid = pain001("MSG-IBAN-OK", "PMTINF-IBAN-OK", "E2E-IBAN-OK", "10.00", "EUR")
+                .getBytes(StandardCharsets.UTF_8);
+
+        mockMvc.perform(pain001Request(tenantId, invalid, sign(invalid), idempotencyKey))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorCode").value("INVALID_FIELD_FORMAT"))
+                .andExpect(jsonPath("$.fieldPath").value("PmtInf/DbtrAcct/Id/IBAN"));
+
+        assertThat(count("SELECT count(*) FROM ingress.idempotency_keys WHERE source_id = '" + tenantId + "' "
+                + "AND idem_key = '" + idempotencyKey + "'")).isZero();
+        assertThat(count("SELECT count(*) FROM payment.payments")).isZero();
+        assertThat(count("SELECT count(*) FROM ingress.raw_inbound_messages")).isEqualTo(1);
+
+        mockMvc.perform(pain001Request(tenantId, valid, sign(valid), idempotencyKey))
+                .andExpect(status().isCreated());
+
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers WHERE end_to_end_id = 'E2E-IBAN-OK'")).isEqualTo(1);
+    }
+
+    @Test
     void replayAfterApprovalKeepsOriginalAcceptedOutcome() throws Exception {
         UUID tenantId = UUID.randomUUID();
         addBroadApprovalRule(tenantId);
@@ -561,7 +611,23 @@ class Pain001SubmissionEndpointTest {
         return signer.sign();
     }
 
+    private void assertProfileValidationRejects(byte[] xml, String expectedFieldPath) throws Exception {
+        mockMvc.perform(pain001Request(UUID.randomUUID(), xml, sign(xml), UUID.randomUUID().toString()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorCode").value("INVALID_FIELD_FORMAT"))
+                .andExpect(jsonPath("$.fieldPath").value(expectedFieldPath));
+
+        assertThat(count("SELECT count(*) FROM payment.payments")).isZero();
+        assertThat(count("SELECT count(*) FROM iso.payment_iso_identifiers")).isZero();
+    }
+
     private static String pain001(String msgId, String pmtInfId, String endToEndId, String amount, String currency) {
+        return pain001WithUetr(msgId, pmtInfId, endToEndId, amount, currency, null);
+    }
+
+    private static String pain001WithUetr(String msgId, String pmtInfId, String endToEndId, String amount,
+            String currency, String uetr) {
+        String uetrXml = uetr == null ? "" : "<UETR>" + uetr + "</UETR>";
         return """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09">
@@ -578,14 +644,14 @@ class Pain001SubmissionEndpointTest {
                       <CtrlSum>%s</CtrlSum>
                       <DbtrAcct><Id><IBAN>DE89370400440532013000</IBAN></Id></DbtrAcct>
                       <CdtTrfTxInf>
-                        <PmtId><EndToEndId>%s</EndToEndId></PmtId>
+                        <PmtId><EndToEndId>%s</EndToEndId>%s</PmtId>
                         <Amt><InstdAmt Ccy="%s">%s</InstdAmt></Amt>
                         <CdtrAcct><Id><IBAN>FR7630006000011234567890189</IBAN></Id></CdtrAcct>
                       </CdtTrfTxInf>
                     </PmtInf>
                   </CstmrCdtTrfInitn>
                 </Document>
-                """.formatted(msgId, pmtInfId, amount, endToEndId, currency, amount);
+                """.formatted(msgId, pmtInfId, amount, endToEndId, uetrXml, currency, amount);
     }
 
     private static void addBroadApprovalRule(UUID tenantId) throws Exception {

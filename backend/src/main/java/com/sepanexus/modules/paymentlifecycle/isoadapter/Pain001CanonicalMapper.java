@@ -120,11 +120,16 @@ public class Pain001CanonicalMapper implements CanonicalMapper {
             return pmtInfNbOfTxs;
         }
 
-        String debtorIban = ibanOf(firstChildElement(pmtInf, "DbtrAcct"));
-        if (isBlank(debtorIban)) {
+        String debtorIbanRaw = ibanOf(firstChildElement(pmtInf, "DbtrAcct"));
+        if (isBlank(debtorIbanRaw)) {
             return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "PmtInf/DbtrAcct/Id/IBAN",
                     "debtor IBAN is required");
         }
+        if (!Pain001ProfileFieldValidators.ibanMod97Valid(debtorIbanRaw)) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "PmtInf/DbtrAcct/Id/IBAN",
+                    "debtor IBAN is not a valid IBAN");
+        }
+        String debtorIban = Pain001ProfileFieldValidators.normalizeIbanSyntax(debtorIbanRaw);
 
         List<Element> transactions = childElements(pmtInf, "CdtTrfTxInf");
         if (transactions.size() != 1) {
@@ -140,7 +145,12 @@ public class Pain001CanonicalMapper implements CanonicalMapper {
                     "EndToEndId is required");
         }
         String instrId = blankToNull(textOf(firstChildElement(pmtId, "InstrId")));
-        String uetr = blankToNull(textOf(firstChildElement(pmtId, "UETR")));
+        String uetrRaw = textOf(firstChildElement(pmtId, "UETR"));
+        if (!isBlank(uetrRaw) && !Pain001ProfileFieldValidators.isUuidV4Uetr(uetrRaw)) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "CdtTrfTxInf/PmtId/UETR",
+                    "UETR must be a UUID version 4");
+        }
+        String uetr = blankToNull(uetrRaw);
 
         Element instdAmt = firstChildElement(firstChildElement(transaction, "Amt"), "InstdAmt");
         if (instdAmt == null) {
@@ -154,6 +164,10 @@ public class Pain001CanonicalMapper implements CanonicalMapper {
         if (!currency.matches("[A-Z]{3}")) {
             return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "Amt/InstdAmt/@Ccy",
                     "currency must be 3 uppercase letters");
+        }
+        if (!Pain001ProfileFieldValidators.isE1SctCurrency(currency)) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "Amt/InstdAmt/@Ccy",
+                    "currency must be EUR for E1 SCT profile");
         }
         BigDecimal amount = parseAmount(textOf(instdAmt));
         if (amount == null) {
@@ -169,11 +183,16 @@ public class Pain001CanonicalMapper implements CanonicalMapper {
             return ctrlSumResult;
         }
 
-        String creditorIban = ibanOf(firstChildElement(transaction, "CdtrAcct"));
-        if (isBlank(creditorIban)) {
+        String creditorIbanRaw = ibanOf(firstChildElement(transaction, "CdtrAcct"));
+        if (isBlank(creditorIbanRaw)) {
             return CanonicalMappingResult.failure(MISSING_REQUIRED_ELEMENT, "CdtTrfTxInf/CdtrAcct/Id/IBAN",
                     "creditor IBAN is required");
         }
+        if (!Pain001ProfileFieldValidators.ibanMod97Valid(creditorIbanRaw)) {
+            return CanonicalMappingResult.failure(INVALID_FIELD_FORMAT, "CdtTrfTxInf/CdtrAcct/Id/IBAN",
+                    "creditor IBAN is not a valid IBAN");
+        }
+        String creditorIban = Pain001ProfileFieldValidators.normalizeIbanSyntax(creditorIbanRaw);
 
         return CanonicalMappingResult.success(new CanonicalPaymentCommand(msgId, sourceMessageCreatedAt, pmtInfId,
                 instrId, endToEndId, uetr, amount, currency, debtorIban, creditorIban));

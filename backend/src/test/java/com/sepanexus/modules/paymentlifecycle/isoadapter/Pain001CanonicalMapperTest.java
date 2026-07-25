@@ -252,6 +252,128 @@ class Pain001CanonicalMapperTest {
         assertThat(result.error().fieldPath()).isEqualTo("CstmrCdtTrfInitn/PmtInf");
     }
 
+    @Test
+    void acceptsIbanWithInterstitialWhitespace() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "<IBAN>DE89370400440532013000</IBAN>",
+                "<IBAN>DE89 3704 0044 0532 0130 00</IBAN>"));
+
+        assertThat(result.success()).isTrue();
+        assertThat(result.command().debtorIban()).isEqualTo("DE89370400440532013000");
+    }
+
+    @Test
+    void rejectsInvalidDebtorIbanCheckDigit() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "DE89370400440532013000", "DE89370400440532013001"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/DbtrAcct/Id/IBAN");
+    }
+
+    @Test
+    void rejectsInvalidCreditorIbanCheckDigit() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "FR7630006000011234567890189", "FR7630006000011234567890180"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("CdtTrfTxInf/CdtrAcct/Id/IBAN");
+    }
+
+    @Test
+    void rejectsNonEurCurrency() {
+        CanonicalMappingResult result = map(minimal().replace("Ccy=\"EUR\"", "Ccy=\"USD\""));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("Amt/InstdAmt/@Ccy");
+        assertThat(result.error().detail()).contains("EUR");
+    }
+
+    @Test
+    void rejectsMalformedUetr() {
+        CanonicalMappingResult result = map(realistic().replace(
+                "<UETR>8a562c67-ca16-48ba-b074-65581be6f001</UETR>",
+                "<UETR>not-a-uuid</UETR>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("CdtTrfTxInf/PmtId/UETR");
+    }
+
+    @Test
+    void rejectsValidNonV4Uetr() {
+        CanonicalMappingResult result = map(realistic().replace(
+                "<UETR>8a562c67-ca16-48ba-b074-65581be6f001</UETR>",
+                "<UETR>550e8400-e29b-11d4-a716-446655440000</UETR>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("CdtTrfTxInf/PmtId/UETR");
+    }
+
+    @Test
+    void rejectsVersion4UuidWithNonRfc4122Variant() {
+        CanonicalMappingResult result = map(realistic().replace(
+                "<UETR>8a562c67-ca16-48ba-b074-65581be6f001</UETR>",
+                "<UETR>00000000-0000-4000-0000-000000000000</UETR>"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("CdtTrfTxInf/PmtId/UETR");
+    }
+
+    @Test
+    void rejectsTooShortDebtorIban() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "DE89370400440532013000", "DE89370400440"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/DbtrAcct/Id/IBAN");
+    }
+
+    @Test
+    void rejectsDebtorIbanLongerThanThirtyFourCharacters() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "DE89370400440532013000", "DE89370400440532013000XXXXXXXXXXXXX"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/DbtrAcct/Id/IBAN");
+    }
+
+    @Test
+    void rejectsDebtorIbanWithInvalidCharacter() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "DE89370400440532013000", "DE89-3704-0044-0532-0130-00"));
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.error().code()).isEqualTo(MappingErrorCode.INVALID_FIELD_FORMAT);
+        assertThat(result.error().fieldPath()).isEqualTo("PmtInf/DbtrAcct/Id/IBAN");
+    }
+
+    @Test
+    void acceptsLowercaseDebtorIbanAfterNormalization() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "DE89370400440532013000", "de89370400440532013000"));
+
+        assertThat(result.success()).isTrue();
+        assertThat(result.command().debtorIban()).isEqualTo("DE89370400440532013000");
+    }
+
+    @Test
+    void acceptsCreditorIbanWithInterstitialWhitespace() {
+        CanonicalMappingResult result = map(minimal().replace(
+                "<IBAN>FR7630006000011234567890189</IBAN>",
+                "<IBAN>FR76 3000 6000 0112 3456 7890 189</IBAN>"));
+
+        assertThat(result.success()).isTrue();
+        assertThat(result.command().creditorIban()).isEqualTo("FR7630006000011234567890189");
+    }
+
     private CanonicalMappingResult map(String xml) {
         HardenedXmlFactory.HardenedParseResult parsed = hardenedXmlFactory.parse(xml.getBytes(StandardCharsets.UTF_8));
         assertThat(parsed.accepted()).as("fixture must be well-formed XML").isTrue();
