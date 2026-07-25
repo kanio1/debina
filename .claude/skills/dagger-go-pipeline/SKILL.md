@@ -91,6 +91,12 @@ covers the changed contract). Never claim an unrun check passed, never use
 remote CI/`act`, never copy a compose graph into host orchestration, and never
 touch Wave 12.
 
+## CORRECT / WRONG
+
+CORRECT: explicit `proofNonce` forces a fresh isolated runtime proof
+
+WRONG: a repeated result-cache hit is described as a second test execution
+
 ## References
 
 - [Implementation](../../../docs/ci/DAGGER-IMPLEMENTATION.md)

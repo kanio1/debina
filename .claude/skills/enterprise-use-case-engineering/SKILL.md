@@ -83,6 +83,12 @@ classification, owner/realization, test examples, executable verify or explicit
 blocker, and epic/story trace. A layer, table, class, endpoint, message alone,
 “implement backend”, and “build UI” are not behavioral slices.
 
+## CORRECT / WRONG
+
+CORRECT: actor goal + flow + slice + sources + owner + executable verify
+
+WRONG: “implement endpoint” is treated as a behavioral slice
+
 ## Orchestrated workflow
 
 1. Classify the requested change and declare boundary, external actor and goal.

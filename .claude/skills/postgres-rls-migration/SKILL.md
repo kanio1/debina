@@ -19,3 +19,9 @@ If a migration creates or changes a `SECURITY DEFINER` command function, invoke 
 - `references/security-definer.md` — when (rarely) to use `SECURITY DEFINER`, `search_path` hijacking defense, privilege minimization.
 - `references/role-switching-tests.md` — the required test matrix (same-tenant / cross-tenant / empty-GUC / WITH CHECK / foreign writer role).
 - `references/rls-testcontainers.md` — why RLS tests must run on isolated Testcontainers PostgreSQL, not the long-lived Compose database.
+
+## CORRECT / WRONG
+
+CORRECT: RLS plus transaction-local tenant context
+
+WRONG: application `WHERE tenant_id = …` treated as the sole security boundary

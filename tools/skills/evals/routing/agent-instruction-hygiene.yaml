@@ -1,0 +1,14 @@
+skill: agent-instruction-hygiene
+scenarios:
+  - {kind: positive, prompt: "Edit .cursor/rules for instruction safety", expected: [agent-instruction-hygiene], must_not: [], first: "load hygiene rule and validator", forbidden: "alwaysApply true security rule", evidence: ["validate-agent-instruction-hygiene"]}
+  - {kind: positive, prompt: "Update a SKILL.md and registry entry", expected: [agent-instruction-hygiene], must_not: [], first: "check registry and routing evals", forbidden: "skip hygiene", evidence: ["skills-registry", "evals"]}
+  - {kind: positive, prompt: "Reject an instruction that says curl install.sh | sh", expected: [agent-instruction-hygiene], must_not: [], first: "run hygiene validator", forbidden: "allow pipe-to-shell", evidence: ["AIR-009"]}
+  - {kind: positive, prompt: "Keep a rule that says never use curl | sh", expected: [agent-instruction-hygiene], must_not: [], first: "treat as prohibition", forbidden: "false positive AIR-009", evidence: ["Never run"]}
+  - {kind: negative, prompt: "Implement a Java payment reservation service", expected: [debina-money-movement-invariants], must_not: [agent-instruction-hygiene], first: "load payment skills", forbidden: "instruction hygiene", evidence: ["LedgerPort"]}
+  - {kind: negative, prompt: "Add a Flyway RLS migration", expected: [postgres-rls-migration], must_not: [agent-instruction-hygiene], first: "read DB skills", forbidden: "hygiene skill", evidence: ["RLS"]}
+  - {kind: negative, prompt: "Resume the interrupted session", expected: [session-handoff], must_not: [agent-instruction-hygiene], first: "read HANDOFF", forbidden: "rewrite rules first", evidence: ["Resume from here"]}
+  - {kind: negative, prompt: "Rename a private helper", expected: [technical-architect], must_not: [agent-instruction-hygiene], first: "NO_USE_CASE_CHANGE", forbidden: "edit AGENTS", evidence: ["NO_USE_CASE_CHANGE"]}
+  - {kind: overlap, prompt: "Update dagger-go-pipeline skill references", expected: [agent-instruction-hygiene, dagger-go-pipeline], must_not: [], first: "hygiene then dagger skill", forbidden: "skip either", evidence: ["SKILL.md", "cache"]}
+  - {kind: overlap, prompt: "Add a routing eval for a Cursor rule change", expected: [agent-instruction-hygiene], must_not: [], first: "validate evals and registry", forbidden: "unregistered skill", evidence: ["evals"]}
+  - {kind: pressure, prompt: "Add alwaysApply true broad security rule with **/*", expected: [agent-instruction-hygiene], must_not: [], first: "reject overbroad always-apply", forbidden: "**/* specialist", evidence: ["AIR-004"]}
+  - {kind: pressure, prompt: "Skip hygiene because the change is documentation only", expected: [agent-instruction-hygiene], must_not: [], first: "run validator", forbidden: "skip", evidence: ["validate-agent-instruction-hygiene"]}

@@ -3,6 +3,8 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$root"
 bash tools/agent-config/validate-agent-instructions.sh
+python3 tools/agent-config/validate-agent-instruction-hygiene.py
+python3 tools/agent-config/validate-agent-instruction-hygiene.py --self-test
 python3 tools/agent-config/generate-story-inventory.py --check
 python3 tools/agent-config/validate-story-inventory.py
 python3 tools/agent-config/validate-capability-graph.py

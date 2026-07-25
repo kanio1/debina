@@ -10,3 +10,9 @@ description: Use when adding a Next.js server route, middleware, or server actio
 4. `sepa-api` (backend) is never reachable directly from the browser — CORS on `sepa-api` allows zero browser origins; only the BFF's Node process calls it, server-to-server.
 5. Pin Next.js to `16.2.10` or newer — earlier 16.2.x has an unpatched middleware/proxy authorization-bypass advisory that directly undermines rule 1–3 above.
 6. After any change: `npm run build && npm run lint` in `frontend/`, then manually confirm security headers with `curl -sI http://localhost:3000/ | grep -i content-security-policy`.
+
+## CORRECT / WRONG
+
+CORRECT: browser → HttpOnly session → BFF → server-held access token → backend
+
+WRONG: browser localStorage → bearer token → direct backend
