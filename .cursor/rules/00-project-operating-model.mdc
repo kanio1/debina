@@ -10,14 +10,18 @@ Principle: **production-grade thinking, educational-grade process**.
 
 Default flow:
 
-`task classification → mini use case when required → concise technical plan →
-one implementation tranche → focused tests → one review → HANDOFF update →
-one coherent commit`
+`task classification → candidate/readiness analysis → mini use case when
+required → source/architecture/planning gates → PRE_PLAN_READINESS verdict →
+concise technical plan → one implementation tranche → focused tests → one
+review → HANDOFF update → one coherent commit`
 
 ## Task levels
 
 1. **Quick technical task or spike**
    analysis → implementation → test → review → commit.
+   Behaviour-changing quick work still requires `PRE_PLAN_READINESS: READY`
+   (or reclassify as a normal feature). Pure technical work may use
+   `NO_USE_CASE_CHANGE`.
 
 2. **Normal feature**
    mini use case → plan → implementation → tests → review → handoff → commit.
@@ -28,6 +32,19 @@ one coherent commit`
 
 ADR is required only for a new module, aggregate, public API, database schema,
 Kafka topic, security-boundary change, or another costly-to-reverse decision.
+
+## PRE_PLAN_READINESS principles
+
+- Technical-only tasks may return `NO_USE_CASE_CHANGE` (or
+  `QUALITY_SCENARIO_ONLY` / `ARCHITECTURE_REVIEW_ONLY`).
+- Behaviour-changing work must pass `PRE_PLAN_READINESS`.
+- Technical planning for business work starts only when the verdict is `READY`.
+- Blocked work updates `HANDOFF.md` with the exact missing source, decision,
+  capability or executable verification.
+- Product Manager is used only for a new epic or unclear value/direction.
+
+The structured contract lives in `.cursor/rules/10-use-case-and-feature-planning.mdc`
+and is assembled by existing skills — do not duplicate the checklist here.
 
 ## What ordinary local work must not depend on
 

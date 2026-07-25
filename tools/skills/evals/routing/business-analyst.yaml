@@ -1,0 +1,14 @@
+skill: business-analyst
+scenarios:
+  - {kind: positive, prompt: "Implement a new settlement flow", expected: [business-analyst, enterprise-use-case-engineering], must_not: [], first: "capture actor and goal", forbidden: "emit final READY alone", evidence: ["actor", "acceptance criteria"]}
+  - {kind: positive, prompt: "Draft mini use case for customer pain.001 rejection path", expected: [business-analyst, enterprise-use-case-engineering], must_not: [], first: "define alternate flow", forbidden: "invent EPC", evidence: ["OPEN-QUESTION"]}
+  - {kind: positive, prompt: "Clarify acceptance criteria before architecture", expected: [business-analyst], must_not: [], first: "own business content", forbidden: "write ADR", evidence: ["acceptance criteria"]}
+  - {kind: positive, prompt: "Hand BA result into use-case engineering", expected: [business-analyst, enterprise-use-case-engineering], must_not: [], first: "handoff to EUC", forbidden: "PRE_PLAN alone", evidence: ["enterprise-use-case-engineering"]}
+  - {kind: negative, prompt: "Rename a private helper", expected: [technical-architect], must_not: [business-analyst], first: "NO_USE_CASE_CHANGE", forbidden: "create actor", evidence: ["NO_USE_CASE_CHANGE"]}
+  - {kind: negative, prompt: "Change Dagger Maven cache layout", expected: [dagger-go-pipeline], must_not: [business-analyst], first: "dagger skill", forbidden: "business flow", evidence: ["cache"]}
+  - {kind: negative, prompt: "Resume the interrupted session", expected: [session-handoff], must_not: [business-analyst], first: "read HANDOFF", forbidden: "rewrite requirements", evidence: ["Resume from here"]}
+  - {kind: negative, prompt: "Review completed implementation", expected: [], must_not: [business-analyst], first: "read-only review", forbidden: "new BA cycle", evidence: ["review"]}
+  - {kind: overlap, prompt: "Implement a new settlement flow with unclear product direction", expected: [product-manager, business-analyst, enterprise-use-case-engineering], must_not: [], first: "frame problem if unclear", forbidden: "skip PM when direction unclear", evidence: ["Product Manager"]}
+  - {kind: overlap, prompt: "Select READY story needing behavioural clarification", expected: [artifact-derived-planning, business-analyst, planning-semantic-integrity], must_not: [], first: "clarify actor goal", forbidden: "code first", evidence: ["READY"]}
+  - {kind: pressure, prompt: "Invent a Developer actor for a migration task", expected: [business-analyst], must_not: [], first: "return NO_USE_CASE_CHANGE", forbidden: "Developer actor", evidence: ["NO_USE_CASE_CHANGE"]}
+  - {kind: pressure, prompt: "Emit PRE_PLAN_READINESS READY without EUC", expected: [business-analyst], must_not: [], first: "handoff to EUC/PSI", forbidden: "final READY alone", evidence: ["planning-semantic-integrity"]}

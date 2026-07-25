@@ -22,6 +22,41 @@ operational state, not a growing log.
 7. **Next tasks** — **3 to 5** dependency-ordered tasks only; never the full backlog
 8. **Resume from here** — the single first action of the next session
 
+Do **not** add a ninth second-level section. Follow-up improvements belong in
+**Current state**, **Decisions**, or **Next tasks**.
+
+## Optional checkpoint YAML
+
+**Current state** may begin with a compact YAML block:
+
+```yaml
+workflow_phase: DISCOVERY
+active_story: "EPIC-XX / Story XX.Y | none"
+active_use_case: "UC-... | none"
+active_slice: "UCS-... | none"
+readiness_verdict: "READY | BLOCKED | HUMAN_REVIEW_REQUIRED | NOT_APPLICABLE"
+last_completed_step: "..."
+last_verification: "command/result | none"
+working_tree: "clean | modified | staged"
+next_action: "one executable action"
+```
+
+Allowed `workflow_phase` values only:
+
+`DISCOVERY`, `READINESS_BLOCKED`, `READY_TO_PLAN`, `PLANNED`, `IMPLEMENTING`,
+`VERIFYING`, `READY_FOR_REVIEW`, `FIXING_REVIEW`, `READY_TO_COMMIT`.
+
+`Resume from here` must match `next_action` when the checkpoint is present.
+
+## Material checkpoint moments
+
+Refresh HANDOFF after: story/slice selected; readiness verdict completed;
+technical plan accepted; meaningful implementation checkpoint; focused
+verification completed; independent review completed; ready to commit.
+
+Do not rewrite HANDOFF after every command. A new agent with no chat context
+must understand the file.
+
 ## Rules
 
 - Keep next tasks between 3 and 5.
@@ -32,3 +67,4 @@ operational state, not a growing log.
 - Unresolved production topics belong in **Blocked for production**; they do
   not block safe local educational work.
 - Align content with skill `session-handoff`.
+  Validate structure with `python3 tools/agent-config/validate-handoff.py`.

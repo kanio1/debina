@@ -167,3 +167,61 @@ Named Dagger caches may contain only dependency/build data. No host `.env.local`
 database/Kafka/Keycloak state, test outcome, credential, or runtime artifact is
 an input cache. Secrets are mounted as Dagger secrets and diagnostics export
 only bounded redacted artifacts.
+
+## PIPELINE_IMPACT and cache efficiency (normative)
+
+Technical plans that touch build/test commands, manifests/lockfiles, Dagger
+functions, service topology, migrations exercised by composed checks,
+Keycloak/runtime overlays, Playwright composed execution or verification
+classification must declare:
+
+```yaml
+PIPELINE_IMPACT:
+  classification: "NONE | EXISTING_CHECK_SUFFICIENT | PIPELINE_CHANGE_REQUIRED"
+  affected_checks: []
+  affected_service_graphs: []
+  cache_impact: "NONE | INPUT_CHANGE | CACHE_LAYOUT_CHANGE"
+  runtime_proof_required: true
+  reason: "..."
+```
+
+Do not modify Dagger merely because a feature changed. Load skill
+`dagger-go-pipeline` when classification is not `NONE`. Scope remains
+**local-only** Phase D Dagger verification; remote CI providers, GitHub
+Actions, `act`, deployment/release automation and Dagger Cloud stay out of
+scope unless a binding repository decision already authorises them.
+
+### Narrow inputs
+
+Prefer the smallest meaningful Directory/File. Keep backend, frontend, Dagger
+and governance inputs separate. Manifests/lockfiles form the dependency layer;
+source overlays follow. Exclude build/runtime noise. A documentation-only edit
+must not invalidate Maven, pnpm, Playwright or Go work unless intentionally
+listed as input.
+
+### Result cache versus named volumes
+
+- **Result/layer cache** follows graph inputs and may skip command execution.
+  A cache hit is not a second runtime proof.
+- **Named cache volumes** accelerate tool data only: Maven
+  (`debina-maven-jdk25`), pnpm (`debina-pnpm-node24.18.0-pnpm10.33.0`), Go
+  modules (`debina-dagger-go-1.26.5`), and Playwright browsers only when
+  justified.
+- **Forbidden named caches:** PostgreSQL, Kafka, Keycloak or application DB
+  state; credentials; cookies/tokens; payment/XML evidence; test reports or
+  pass/fail outcomes; `.env.local`; host runtime sockets; proof identities.
+
+The pipeline must remain correct with empty named caches. Cold runs execute
+commands; warm result-cache hits must be reported as hits, not as fresh
+execution. Named-cache reuse may still accompany actual command execution.
+
+### proofNonce semantics
+
+Optional `proofNonce` (and equivalent instance labels) isolates ephemeral
+service graphs for an explicit fresh runtime proof. It may bust result-cache
+inputs for that run. It must **not** create unbounded new dependency cache
+volume names. A bare repeated `dagger call` without such an input is not a
+reliability proof when result caching may skip Playwright or Maven.
+
+`smoke-signed-pain-001` remains outside the ADR-N16 `smoke-suite` cap and is
+separately callable.

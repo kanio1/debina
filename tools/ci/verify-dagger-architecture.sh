@@ -60,6 +60,7 @@ canonical_functions=(
   smoke-auth
   smoke-payments
   smoke-suite
+  smoke-signed-pain-001
   acceptance
   pipeline-assurance
   backend-testcontainers

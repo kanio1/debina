@@ -21,6 +21,11 @@ obsolete audit narration and duplicated procedure text.
 Write for a new agent with no chat context. Always update HANDOFF after material
 sessions, including discussion-only sessions.
 
+Refresh after material boundaries: story/slice selected; readiness verdict;
+technical plan accepted; meaningful implementation checkpoint; focused
+verification; independent review; ready to commit. Do not rewrite after every
+command.
+
 ## Required format — eight sections, this order
 
 ```markdown
@@ -33,7 +38,7 @@ One or two sentences: what Debina work is in progress now.
 Use-case / slice IDs, or `none` for pure technical work.
 
 ## Current state
-Factual status of the working tree, verification, and open educational work.
+Optional compact checkpoint YAML, then factual working-tree / verification status.
 
 ## Completed
 Durable completed items still relevant to the next agent.
@@ -51,6 +56,29 @@ Exactly 3 to 5 dependency-ordered immediate tasks. Never the full backlog.
 ## Resume from here
 The single first action for the next session.
 ```
+
+### Optional checkpoint YAML (start of Current state)
+
+```yaml
+workflow_phase: DISCOVERY
+active_story: "EPIC-XX / Story XX.Y | none"
+active_use_case: "UC-... | none"
+active_slice: "UCS-... | none"
+readiness_verdict: "READY | BLOCKED | HUMAN_REVIEW_REQUIRED | NOT_APPLICABLE"
+last_completed_step: "..."
+last_verification: "command/result | none"
+working_tree: "clean | modified | staged"
+next_action: "one executable action"
+```
+
+Allowed phases only: `DISCOVERY`, `READINESS_BLOCKED`, `READY_TO_PLAN`,
+`PLANNED`, `IMPLEMENTING`, `VERIFYING`, `READY_FOR_REVIEW`, `FIXING_REVIEW`,
+`READY_TO_COMMIT`.
+
+Do not add a ninth second-level section. Put follow-ups in Current state,
+Decisions, or Next tasks. `Resume from here` must match `next_action`.
+
+Validate with `python3 tools/agent-config/validate-handoff.py`.
 
 ## Rules
 

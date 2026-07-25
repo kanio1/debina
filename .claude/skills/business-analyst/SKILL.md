@@ -42,5 +42,11 @@ formatting, dependency updates, or technical spikes with no behaviour change.
 ## Handoff
 
 - Receive problem framing from Product Manager when used.
-- Pass accepted behavioural intent to Technical Architect.
-- Pass acceptance criteria and verify intent to Scrum Master.
+- Hand the BA result to `enterprise-use-case-engineering` for canonical
+  artifact and readiness orchestration. Do **not** emit final
+  `PRE_PLAN_READINESS` alone.
+- Pass accepted behavioural intent onward only after the readiness chain
+  produces a verdict; Technical Architect plans only when that verdict is
+  `READY` for behaviour-changing work.
+- Pass acceptance criteria and verify intent to Scrum Master after the plan
+  is accepted.

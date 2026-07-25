@@ -12,6 +12,10 @@ Maintain execution continuity **without Scrum ceremony**.
 After an accepted plan for any task level (quick, normal, spike, major).
 Not a substitute for BA use-case content or Technical Architect design.
 
+Receive **only a ready technical plan**. Planning documents alone are not
+readiness; for behaviour-changing work the plan must follow
+`PRE_PLAN_READINESS.verdict: READY`.
+
 ## Convert plans into 3–5 tasks
 
 Every task must contain:
@@ -38,8 +42,8 @@ list.
 
 Default educational flow:
 
-`classify → mini use case when required → plan → one tranche → focused tests →
-one review → HANDOFF → one coherent commit`
+`classify → readiness when required → mini use case when required → plan →
+one tranche → focused tests → one review → HANDOFF → one coherent commit`
 
 - Prefer one implementation tranche per commit cycle.
 - Ensure focused verification commands are executable.

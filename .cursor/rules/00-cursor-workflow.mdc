@@ -8,6 +8,7 @@ alwaysApply: true
 
 - Follow `.cursor/rules/00-project-operating-model.mdc` for delivery flow,
   task levels, role routing, validation policy and educational gates.
+  Behaviour-changing work needs `PRE_PLAN_READINESS` before technical planning.
 - Treat root and path-scoped `AGENTS.md` files as constitutional repository
   instructions (ADRs, freeze decisions, authority matrix).
 - Read `HANDOFF.md` before material work; use `.cursor/rules/25-handoff.mdc`
@@ -15,6 +16,8 @@ alwaysApply: true
 - Resolve applicable workflows from `planning/skills/skills-registry.yaml`
   and role skills under `.claude/skills/`; do not duplicate skill procedures
   in prompts.
+- For Dagger/CI-impacting paths, follow `.cursor/rules/40-dagger-ci-pipeline.mdc`
+  and declare `PIPELINE_IMPACT`.
 - Use Plan Mode before multi-file architecture, database, migration, security,
   or public-contract work when the change is costly to reverse.
 - For independent analysis or the single post-implementation review, prefer

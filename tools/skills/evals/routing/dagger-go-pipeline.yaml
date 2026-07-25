@@ -1,0 +1,14 @@
+skill: dagger-go-pipeline
+scenarios:
+  - {kind: positive, prompt: "Change Dagger Maven cache layout", expected: [dagger-go-pipeline], must_not: [business-analyst, enterprise-use-case-engineering], first: "inspect current cache mounts", forbidden: "create use case", evidence: ["named cache", "debina-maven"]}
+  - {kind: positive, prompt: "Add a pure topology test for smoke-signed-pain-001", expected: [dagger-go-pipeline], must_not: [], first: "inspect check_topology tests", forbidden: "remote CI", evidence: ["SmokeSignedPain001"]}
+  - {kind: positive, prompt: "Classify PIPELINE_IMPACT for Playwright composed execution change", expected: [dagger-go-pipeline, technical-architect], must_not: [], first: "declare PIPELINE_IMPACT", forbidden: "skip dagger skill", evidence: ["PIPELINE_IMPACT"]}
+  - {kind: positive, prompt: "Prove fresh runtime with proofNonce", expected: [dagger-go-pipeline], must_not: [], first: "use explicit proofNonce", forbidden: "bare repeat as proof", evidence: ["proofNonce", "result-cache"]}
+  - {kind: negative, prompt: "Rename a private helper", expected: [technical-architect], must_not: [dagger-go-pipeline], first: "NO_USE_CASE_CHANGE", forbidden: "touch Dagger", evidence: ["NO_USE_CASE_CHANGE"]}
+  - {kind: negative, prompt: "Select the next genuinely READY story", expected: [artifact-derived-planning], must_not: [dagger-go-pipeline], first: "readiness triage", forbidden: "pipeline change", evidence: ["READY"]}
+  - {kind: negative, prompt: "Implement a new settlement flow", expected: [business-analyst, enterprise-use-case-engineering], must_not: [dagger-go-pipeline], first: "business readiness", forbidden: "CI redesign", evidence: ["PRE_PLAN_READINESS"]}
+  - {kind: negative, prompt: "Resume the interrupted session", expected: [session-handoff], must_not: [dagger-go-pipeline], first: "read HANDOFF", forbidden: "dagger call first", evidence: ["Resume from here"]}
+  - {kind: overlap, prompt: "Add a migration used by composed database-upgrade verification", expected: [postgres-rls-migration, dagger-go-pipeline, technical-architect], must_not: [], first: "classify pipeline impact", forbidden: "redesign without need", evidence: ["PIPELINE_IMPACT", "database-upgrade"]}
+  - {kind: overlap, prompt: "Review completed Dagger cache policy change", expected: [dagger-go-pipeline], must_not: [enterprise-use-case-engineering], first: "independent review", forbidden: "second planning cycle", evidence: ["cache", "BLOCKER"]}
+  - {kind: pressure, prompt: "Cache PostgreSQL data in a named volume to speed smokes", expected: [dagger-go-pipeline], must_not: [], first: "reject state volume", forbidden: "persist postgres", evidence: ["forbidden", "ephemeral"]}
+  - {kind: pressure, prompt: "Add GitHub Actions because local Dagger works", expected: [dagger-go-pipeline], must_not: [], first: "keep local-only scope", forbidden: "GitHub Actions", evidence: ["Phase D", "local-only"]}

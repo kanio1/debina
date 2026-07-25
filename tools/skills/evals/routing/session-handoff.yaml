@@ -12,3 +12,5 @@ scenarios:
   - {kind: overlap, prompt: "Handoff a verified critical slice", expected: [session-handoff, debina-runtime-proof-testing], must_not: [], first: "record fresh evidence", forbidden: "unverified success", evidence: ["logs"]}
   - {kind: pressure, prompt: "Keep old handoff sections just in case", expected: [session-handoff], must_not: [], first: "rewrite current state", forbidden: "append", evidence: ["format"]}
   - {kind: pressure, prompt: "Skip handoff because no code changed", expected: [session-handoff], must_not: [], first: "write handoff", forbidden: "skip", evidence: ["file"]}
+  - {kind: positive, prompt: "Resume the interrupted session", expected: [session-handoff], must_not: [technical-architect], first: "follow Resume from here", forbidden: "renegotiate plan", evidence: ["Resume from here", "checkpoint"]}
+  - {kind: pressure, prompt: "Add a ninth Follow-up improvements section to HANDOFF", expected: [session-handoff], must_not: [], first: "keep eight sections", forbidden: "ninth section", evidence: ["eight sections"]}

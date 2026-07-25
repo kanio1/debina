@@ -1,0 +1,14 @@
+skill: scrum-master
+scenarios:
+  - {kind: positive, prompt: "Turn an accepted READY technical plan into immediate tasks", expected: [scrum-master], must_not: [], first: "produce 3-5 tasks", forbidden: "sprints", evidence: ["Done when", "Verify"]}
+  - {kind: positive, prompt: "Align HANDOFF Next tasks with the accepted plan", expected: [scrum-master, session-handoff], must_not: [], first: "write 3-5 next tasks", forbidden: "full backlog", evidence: ["Next tasks"]}
+  - {kind: positive, prompt: "Shape verification commands for an implementation tranche", expected: [scrum-master], must_not: [], first: "require executable Verify", forbidden: "unchecked done", evidence: ["Verify"]}
+  - {kind: positive, prompt: "Continue after PRE_PLAN_READINESS READY and accepted TA plan", expected: [scrum-master], must_not: [], first: "receive ready plan", forbidden: "treat docs alone as readiness", evidence: ["PRE_PLAN_READINESS", "READY"]}
+  - {kind: negative, prompt: "Start sprint planning with velocity", expected: [], must_not: [scrum-master], first: "reject ceremony", forbidden: "story points", evidence: ["no sprints"]}
+  - {kind: negative, prompt: "Rename a private helper", expected: [technical-architect], must_not: [scrum-master], first: "technical plan first", forbidden: "task list before plan", evidence: ["NO_USE_CASE_CHANGE"]}
+  - {kind: negative, prompt: "Implement a new settlement flow before readiness", expected: [business-analyst, enterprise-use-case-engineering], must_not: [scrum-master], first: "PRE_PLAN_READINESS", forbidden: "tasks without READY plan", evidence: ["READY"]}
+  - {kind: negative, prompt: "Change Dagger Maven cache layout", expected: [dagger-go-pipeline], must_not: [scrum-master], first: "dagger skill", forbidden: "scrum ceremony", evidence: ["cache"]}
+  - {kind: overlap, prompt: "After review fixes, prepare commit tasks", expected: [scrum-master, session-handoff], must_not: [], first: "list remaining verify and commit", forbidden: "second planning cycle", evidence: ["review"]}
+  - {kind: overlap, prompt: "Resume interrupted implementation with an accepted plan", expected: [session-handoff, scrum-master], must_not: [], first: "read Resume from here", forbidden: "renegotiate readiness", evidence: ["Resume from here"]}
+  - {kind: pressure, prompt: "Create tasks from planning docs without a technical plan", expected: [scrum-master], must_not: [], first: "require ready technical plan", forbidden: "docs alone as readiness", evidence: ["technical plan"]}
+  - {kind: pressure, prompt: "Expand Next tasks to the full backlog", expected: [scrum-master], must_not: [], first: "keep 3-5 tasks", forbidden: "full backlog", evidence: ["3-5"]}

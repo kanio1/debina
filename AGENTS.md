@@ -12,6 +12,8 @@ Debina is a synthetic, enterprise-grade SEPA/ISO 20022 payment-processing resear
 - GraphQL is a thin, source-owned, Query-only operational-read adapter; REST/gRPC own commands. Playwright is one validation layer; follow ADR-N16 sequencing.
 - Feature expansion is paused by [the rebase program](planning/programs/DEBINA-ENTERPRISE-REBASE-PROGRAM.md) until its governance phases complete.
 - Business work is use-case-first: apply `enterprise-use-case-engineering` before new/material business planning, beginning with its source-discovery gate; apply `source-backed-payments-modeling` for external payment semantics, `architecture-evolution-review` for boundary changes, and `planning-semantic-integrity` before marking planning complete. New/materially changed stories use explicit `ENFORCED` metadata and are not READY without a behavioral slice and executable verify; legacy stories migrate gradually.
+- Before technical planning for new or materially changed business work, obtain a `PRE_PLAN_READINESS` verdict through the existing use-case, source, architecture and planning skills. Only `READY` proceeds to technical planning.
+- Changes affecting build/test commands, package manifests or lockfiles, Dagger functions, service topology, migrations exercised by composed checks, Keycloak/runtime overlays, Playwright composed execution or verification classification must declare `PIPELINE_IMPACT` and use `dagger-go-pipeline` when that impact is not `NONE`.
 
 ## Map
 

@@ -32,3 +32,15 @@ vocabulary: docs/governance/methodology-assurance/CLASSIFICATION-VOCABULARY.yaml
 consumes: [CREATE_USE_CASE, UPDATE_USE_CASE, ADD_FLOW, ADD_SLICE, LINK_EXISTING_SLICE, QUALITY_SCENARIO_ONLY, ARCHITECTURE_REVIEW_ONLY, NO_USE_CASE_CHANGE, SOURCE_CONFIRMED, PROJECT_INTERPRETATION, PROJECT_SIMULATION, RAIL_SPECIFIC, INSUFFICIENT_EVIDENCE, CONFLICTING_SOURCES, PARTICIPANT_DOCUMENTATION_REQUIRED, VERIFY_PER_USE, SOURCE_BLOCKED, DECISION_BLOCKED, HUMAN_REVIEW_REQUIRED, CURRENT_ARCHITECTURE_SUFFICIENT, NEW_PUBLIC_PORT, NEW_READ_MODEL, NEW_INTEGRATION_CONTRACT, NEW_ADR_REQUIRED, BOUNDARY_REVIEW_REQUIRED, AGGREGATE_REVIEW_REQUIRED, QUALITY_EXPERIMENT_REQUIRED, NO_ARCHITECTURE_CHANGE]
 produces: [READY, BLOCKED, SOURCE_BLOCKED, DECISION_BLOCKED, CAPABILITY_BLOCKED, HUMAN_REVIEW_REQUIRED, NO_PLANNING_CHANGE]
 ```
+
+## PRE_PLAN_READINESS ownership
+
+This skill is the final producer of the readiness classification above. Map
+that classification into `PRE_PLAN_READINESS` using the rollup table in
+`.cursor/rules/10-use-case-and-feature-planning.mdc`: granular blocked tokens
+populate gate fields; `verdict` stays one of `READY`, `BLOCKED`, or
+`HUMAN_REVIEW_REQUIRED`. For `NO_PLANNING_CHANGE` / technical-only
+classifications, omit the business readiness block rather than inventing a
+verdict. Do not duplicate BA content, source-gate procedure or architecture
+review checklists here. Only `READY` allows Technical Architect planning to
+proceed for behaviour-changing work.

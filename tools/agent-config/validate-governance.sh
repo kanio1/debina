@@ -9,33 +9,40 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" || exit 1
 
 echo "###############################################################"
-echo "# 1/4 — agent instruction hierarchy"
+echo "# 1/6 — agent instruction hierarchy"
 echo "###############################################################"
 bash tools/agent-config/validate-agent-instructions.sh
 
 echo
 echo "###############################################################"
-echo "# 2/5 — story inventory reproducibility"
+echo "# 2/6 — HANDOFF structure"
+echo "###############################################################"
+python3 tools/agent-config/validate-handoff.py
+python3 tools/agent-config/validate-handoff.py --self-test
+
+echo
+echo "###############################################################"
+echo "# 3/6 — story inventory reproducibility"
 echo "###############################################################"
 python3 tools/agent-config/generate-story-inventory.py --check
 
 echo
 echo "###############################################################"
-echo "# 3/5 — story inventory"
+echo "# 4/6 — story inventory"
 echo "###############################################################"
 python3 tools/agent-config/validate-story-inventory.py
 
 echo
 echo "###############################################################"
-echo "# 4/5 — capability graph"
+echo "# 5/6 — capability graph"
 echo "###############################################################"
 python3 tools/agent-config/validate-capability-graph.py
 
 echo
 echo "###############################################################"
-echo "# 5/5 — database skills"
+echo "# 6/6 — database skills"
 echo "###############################################################"
 bash tools/agent-config/validate-database-skills.sh
 
 echo
-echo "RESULT: PASS (all 5 governance validators passed)"
+echo "RESULT: PASS (all 6 governance validators passed)"

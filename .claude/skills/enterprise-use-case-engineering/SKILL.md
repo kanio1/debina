@@ -96,9 +96,16 @@ blocker, and epic/story trace. A layer, table, class, endpoint, message alone,
    evidence and may return `AGGREGATE_REVIEW_REQUIRED`.
 6. Apply `planning-semantic-integrity`. Accept only `READY`, `BLOCKED`,
    `SOURCE_BLOCKED`, `DECISION_BLOCKED`, `CAPABILITY_BLOCKED`,
-   `HUMAN_REVIEW_REQUIRED`, or `NO_PLANNING_CHANGE`.
+   `HUMAN_REVIEW_REQUIRED`, or `NO_PLANNING_CHANGE`. Roll that classification
+   into the structured `PRE_PLAN_READINESS` block using the mapping in
+   `.cursor/rules/10-use-case-and-feature-planning.mdc` (granular blocks →
+   gate fields; `verdict` remains `READY`/`BLOCKED`/`HUMAN_REVIEW_REQUIRED`).
+   Include the block in the final output for behaviour-changing work. Do not
+   duplicate detailed logic owned by source, architecture or planning skills.
 
 Do not mark a story done because documents were created.
+Technical planning starts only when the verdict is `READY` for
+behaviour-changing work.
 
 ## ENFORCED readiness
 

@@ -12,6 +12,8 @@ import (
 //
 // proofNonce, when set, isolates ephemeral Postgres/Keycloak/Kafka instances so
 // a reliability rerun cannot reuse a prior service graph or Playwright result.
+// Isolation is the instance suffix passed to paymentSmokeRuntime; dependency
+// cache volume names must not incorporate the nonce.
 func (m *DebinaVerification) SmokeSignedPain001(ctx context.Context,
 	// +optional
 	proofNonce string,
@@ -25,8 +27,5 @@ func (m *DebinaVerification) SmokeSignedPain001(ctx context.Context,
 		runtime,
 		"pnpm run test:smoke:e1-pain001",
 	)
-	if proofNonce != "" {
-		browser = browser.WithEnvVariable("E1_SMOKE_PROOF_NONCE", proofNonce)
-	}
 	return browser.Stdout(ctx)
 }
