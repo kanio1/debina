@@ -29,6 +29,7 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures" / "instruction-hygiene"
 
 UNIVERSAL_ALWAYS_APPLY = {
     "00-core.mdc",
+    "05-terminal.mdc",
 }
 
 # alwaysApply: false with empty globs — invoked on demand, not auto-attached.

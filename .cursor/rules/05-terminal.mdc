@@ -1,0 +1,14 @@
+---
+description: Allowlist-first shell execution for Debina.
+globs: []
+alwaysApply: true
+---
+
+# Terminal
+
+- Shell cwd: `/home/suso/debina` (not `cd ... &&`).
+- One command per call; no `&&`, `;`, `||`, pipes or subshells unless unavoidable.
+- Prefixes in `.cursor/permissions.json` `terminalAllowlist` → run without asking.
+- No bypass via Python/Node/Perl or wrapper shells.
+- Off-list or destructive (writes, git, DB, secrets, container delete) → approval.
+- No `npx -y`; pinned packages or project wrappers only.

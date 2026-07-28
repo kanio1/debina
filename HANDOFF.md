@@ -2,79 +2,69 @@
 
 ## Current objective
 
-Kafka and PostgreSQL MCP runtime repair is complete. Resume prior product work:
-UCS-SCT-002-C remains ready for one coherent local commit after optional Cursor
-window reload for MCP.
+Closeout of `FIX-DOC-BASELINE-RECONCILIATION` is done (independent review PASS).
+Queue `NOW` is `FIX-WAVE11-STATUS-HYGIENE`. Do not promote master-planning package
+documents until that hygiene task finishes. Do not start hygiene implementation in
+this handoff — next session begins with `/debina-discover-and-specify`.
 
 ## Current use case
 
-none (MCP runtime repair); prior slice UC-SCT-002 / UCS-SCT-002-C still uncommitted
+none
 
 ## Current state
 
 ```yaml
-workflow_phase: READY_TO_COMMIT
-active_story: "none (FIX-MCP-RUNTIME done); prior E1 / UCS-SCT-002-C still pending commit"
-active_use_case: "none | prior UC-SCT-002"
-active_slice: "none | prior UCS-SCT-002-C"
+workflow_phase: READY_TO_PLAN
+active_story: "none"
+active_use_case: "none"
+active_slice: "none"
 readiness_verdict: NOT_APPLICABLE
-last_completed_step: "FIX-MCP-RUNTIME — kafka-debina and postgres-debina ready on Node 24 ABI 137"
-last_verification: "cursor-agent mcp list (kafka/postgres ready); list-tools OK; ./tools/agent/verify-fast PASS"
+last_completed_step: "FIX-DOC-BASELINE-RECONCILIATION archived after review PASS"
+last_verification: "closeout validators + task-status + verify-fast"
 working_tree: modified
-next_action: "Developer: Reload Window for in-IDE MCP, then create the coherent UCS-SCT-002-C commit when ready"
+next_action: "Run `/debina-discover-and-specify` for `FIX-WAVE11-STATUS-HYGIENE`. Do not promote master-planning documents before that task completes."
 ```
 
-- No `work/ACTIVE.json`. Queue `NOW` empty; `FIX-MCP-RUNTIME` in `RECENTLY_COMPLETED`.
-- User MCP secrets under `~/.config/debina/` (modes 700/600); caches under `~/.cache/debina-mcp/`.
-- Context7 mcp.json entry unchanged. CLI may still show context7/next-devtools as needing approval.
-- Backup: `/tmp/debina-mcp-repair-backup-20260728121029/`
+- No `work/ACTIVE.json` (active state cleared).
+- Archive: `work/archive/FIX-DOC-BASELINE-RECONCILIATION/` (`plan.md`, `progress.md`, `promotion-matrix.md`).
+- Package remains in staging only: `work/imports/SEPA-2027-MASTER-PLANNING/`.
+- No formal Wave 11 / EPIC-26 / Story 26.4 status change was made.
+- No canonical promotion from the promotion matrix.
 
 ## Completed
 
-- Lean Cursor harness (archived) plus MCP runtime fix: Node 24.18.0 / ABI 137 wrappers,
-  pinned `@confluentinc/mcp-confluent@1.5.0` and `@bytebase/dbhub@0.24.0`, isolated caches,
-  read-only role `debina_mcp_ro`, docs MCP section updated.
-- Prior UCS-SCT-002-C implementation remains in tree awaiting human commit.
+- Read-only baseline reconciliation of SEPA-2027 master-planning package vs local repo.
+- Independent review PASS; artifacts archived.
+- Wave 11 contradiction classified only (not formally closed).
 
 ## Decisions
 
-- Three lanes: FAST / STANDARD / DECISION; `planning/` stays canonical backlog; `work/` is operational overlay.
-- Kafka/Postgres MCP must run under absolute Node 24 path with ABI 137; never Cursor’s bundled Node for native Kafka addon.
-- Secrets for MCP stay outside the repo (`~/.config/debina/`); never in `.cursor/mcp.json`.
+- Current repo + ADR/`[FREEZE]` beat package baseline.
+- Epic/index status is not runtime proof.
+- Package is DRAFT synthesis only — not approved architecture or compliance assessment.
+- Do not promote master-planning docs before `FIX-WAVE11-STATUS-HYGIENE` completes.
 
 ## Blocked for production
 
-- Full EPC TVS / scheme certification for IBAN, EUR-only and UETR rules
-- Per-country IBAN length registry and BIC-only account paths
-- `csm.response.received` / status-reason FSM handoff (blocks EPIC-20 Story 20.3)
-- UC-SCT-003 file-rail partial-processing semantics (blocks EPIC-73 Story 73.3+)
-- Playwright first-three-screen gate for EPIC-76 Story 76.7
-- Dated specialist approvals / review councils / canonical migration admission
-- Remote CI provider selection, GitHub Actions, `act`, deployment/release automation
-- Dagger Cloud / persistent smoke-state volumes (forbidden)
-- Serena MCP not configured in this environment (manual if desired)
+- Full EPC TVS / scheme certification; participant-only STEP2/VOP/EDS artefacts
+- Formal Wave 11 `done` until Checkpoint 3 or explicit human acceptance of Checkpoint 2
+- SEPA 2027 corpus gaps (final rulebooks, VOP YAML, EDS, checksum mismatch)
+- Remote CI / `act` / deployment automation; Dagger Cloud
 
 ## Next tasks
 
-1. **Owner: human** — Run **Developer: Reload Window** so the IDE MCP panel picks up
-   kafka/postgres wrappers; confirm Context7 still authenticated.
-   **Done when:** IDE MCP shows kafka-debina and postgres-debina connected.
-   **Verify:** Cursor Settings → MCP; `cursor-agent mcp list`
+1. **Owner: discover-and-specify** — Start `FIX-WAVE11-STATUS-HYGIENE` via `/debina-discover-and-specify` (do not invent ACTIVE.json until that workflow runs).
+   **Done when:** ACTIVE + plan/progress exist for hygiene; scope limited to planning status alignment.
+   **Verify:** `test -f work/ACTIVE.json` with `task_id` hygiene after discover.
 
-2. **Owner: scrum-master** — Create one coherent commit for UCS-SCT-002-C with message
-   `feat(e1): harden pain001 profile validation` when the human authorises Git write.
-   **Done when:** commit exists; slice files clean. **Verify:** `git status --short`
+2. **Owner: human** — After hygiene, decide DR-001 (Checkpoint 2 vs Checkpoint 3) if still open.
+   **Done when:** decision recorded.
+   **Verify:** Wave 11 program and formal story status policy no longer contradict.
 
-3. **Owner: human** — Optionally commit lean harness + MCP wrapper/docs as a separate
-   config commit (no GitHub push unless asked).
-   **Done when:** harness/MCP paths committed or explicitly deferred.
-   **Verify:** `git status --short`
-
-4. **Owner: enterprise-use-case-engineering** — After E1 commit, advance capability queue
-   to EPIC-76.3–76.4.
-   **Done when:** HANDOFF names next active slice.
-   **Verify:** `python3 tools/agent-config/validate-handoff.py`
+3. **Owner: docs** — Only after hygiene: selective package promotion per archived promotion matrix (never package QUEUE/NEXT).
+   **Done when:** matrix rows promoted or explicitly deferred.
+   **Verify:** `git status --short docs work`
 
 ## Resume from here
 
-Developer: Reload Window for in-IDE MCP, then create the coherent UCS-SCT-002-C commit when ready
+Run `/debina-discover-and-specify` for `FIX-WAVE11-STATUS-HYGIENE`. Do not promote master-planning documents before that task completes.
