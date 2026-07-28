@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Wrapper so CLI allowlist need not permit bare python3.
+set -euo pipefail
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+exec python3 .cursor/hooks/health-check.py

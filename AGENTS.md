@@ -30,4 +30,13 @@ Debina is a synthetic, enterprise-grade SEPA/ISO 20022 payment-processing resear
 | CI/Dagger | `docs/ci/DAGGER-PIPELINE-ARCHITECTURE.md`; local Dagger acceptance checks are authoritative for composed verification. Apply `dagger-go-pipeline` for Dagger changes. Remote CI and `act` remain out of scope. |
 | Skills | `.claude/skills/`, `docs/governance/SKILL-ROADMAP.md` |
 
-Read local instructions before changing `backend/`, `frontend/`, `infra/`, or `planning/`. Before ending any session, overwrite `HANDOFF.md` using the `session-handoff` skill format.
+Read local instructions before changing `backend/`, `frontend/`, `infra/`, or `planning/`. Before ending any session, overwrite `HANDOFF.md` using the `session-handoff` skill format when the session was material (see that skill).
+
+## Lean delivery workflow
+
+Three lanes: **FAST** (small technical/docs/test fixes), **STANDARD** (behaviour, contracts, data, migrations), **DECISION** (costly/irreversible architecture, money path, security, new rail/product).
+
+- Canonical backlog remains `planning/` (epics, stories, capabilities). `work/QUEUE.md` is a tiny operational overlay (`NOW`≤1, `NEXT`≤1, `LATER`≤2). `work/ACTIVE.json` is the sole machine-readable active-task state.
+- STANDARD and DECISION require a human-authored approval under `work/approvals/` before implementation writes. One writer only; discovery and review use Ask/read-only.
+- Never auto-commit, push, or merge. Use wrappers: `tools/agent/task-status`, `verify-fast`, `verify-task`, `final-check`.
+- Explicit workflow skills (slash-invoked): `debina-discover-and-specify`, `debina-implement-and-verify`, `debina-decision-record`, `debina-review-and-next-work`. Domain procedures stay in existing `.claude/skills/` — do not copy them here.

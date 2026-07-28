@@ -33,7 +33,7 @@ REQUIRED_SECTIONS = [
 ]
 
 # Allowed phase/verdict/working_tree enums must stay aligned with
-# .cursor/rules/25-handoff.mdc and .claude/skills/session-handoff/SKILL.md.
+# session-handoff skill eight-section format and .claude/skills/session-handoff/SKILL.md.
 WORKFLOW_PHASES = {
     "DISCOVERY",
     "READINESS_BLOCKED",

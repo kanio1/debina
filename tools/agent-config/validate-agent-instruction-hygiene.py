@@ -28,14 +28,11 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures" / "instruction-hygiene"
 # Self-test builds an ephemeral tree under tempfile; do not mutate the repo.
 
 UNIVERSAL_ALWAYS_APPLY = {
-    "00-project-operating-model.mdc",
-    "00-cursor-workflow.mdc",
+    "00-core.mdc",
 }
 
 # alwaysApply: false with empty globs — invoked on demand, not auto-attached.
-ON_DEMAND_EMPTY_GLOBS = {
-    "20-implementation-review.mdc",
-}
+ON_DEMAND_EMPTY_GLOBS = set()
 
 BROAD_GLOBS = {"**", "**/*", "*", "**/**"}
 
@@ -789,8 +786,8 @@ def build_self_test_tree(base: Path) -> None:
     planning.mkdir(parents=True)
 
     write_fixture(
-        rules / "00-project-operating-model.mdc",
-        "---\ndescription: Universal operating model\nglobs: []\nalwaysApply: true\n---\n\nKeep rules short.\n",
+        rules / "00-core.mdc",
+        "---\ndescription: Universal lean core\nglobs: []\nalwaysApply: true\n---\n\nKeep rules short.\n",
     )
     write_fixture(
         rules / "valid-specialist.mdc",

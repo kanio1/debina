@@ -1,0 +1,11 @@
+# Manual approval for Debina lean harness
+
+TASK_ID=
+LANE=STANDARD|DECISION
+KIND=IMPLEMENTATION|DECISION
+APPROVER=
+DATE_UTC=
+SCOPE=
+
+I manually reviewed the active plan and approve this KIND for TASK_ID.
+This file is human-authored. Agents must not create or forge it.

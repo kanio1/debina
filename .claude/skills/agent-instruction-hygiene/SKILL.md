@@ -28,7 +28,7 @@ bash tools/skills/validate-all-skills.sh
 When only a subset changed, pass an explicit newline-delimited file list via
 `--changed-files` (caller-provided path; not a repository source of truth).
 
-Follow `.cursor/rules/60-agent-instruction-hygiene.mdc`.
+Follow `tools/agent-config/validate-agent-instruction-hygiene.py`.
 
 ## CORRECT / WRONG
 

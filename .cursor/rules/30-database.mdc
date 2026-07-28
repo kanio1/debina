@@ -1,0 +1,23 @@
+---
+description: PostgreSQL/Flyway — append-only, ownership, Testcontainers-first.
+globs:
+  - "backend/src/main/resources/db/**"
+  - "backend/**/*Repository*.java"
+  - "backend/**/*Jdbc*.java"
+  - "infra/postgres/**"
+  - "docs/data/**"
+  - "**/*.sql"
+alwaysApply: false
+---
+
+# Database
+
+- PostgreSQL 18 is the baseline. PostgreSQL 19 is lab-only until a frozen decision changes that.
+- Flyway is append-only. Never edit an already-applied migration; add a forward migration.
+- Preserve one-writer-per-schema at application and grant levels. Read `infra/AGENTS.md`.
+- Prefer DB constraints over application-only validation for invariants that belong in the schema.
+- Prove changes with Testcontainers-first tests. Shared Compose DB is not sole evidence.
+- Activate the matching skills: `sepa-nexus-flyway-safe-change`, `postgres-rls-migration`, and when needed `debina-postgres-transaction-coordination` / `sepa-nexus-database-review` (explicit).
+- Use Context7 for PostgreSQL 18 documentation.
+- Use `postgres-debina` only for local runtime/schema facts.
+- Never use MCP output as permission to alter a migration.

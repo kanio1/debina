@@ -102,4 +102,4 @@ WRONG: a repeated result-cache hit is described as a second test execution
 - [Implementation](../../../docs/ci/DAGGER-IMPLEMENTATION.md)
 - [Check manifest](../../../docs/ci/DAGGER-CHECK-MANIFEST.yaml)
 - [Toolchain baseline](../../../docs/ci/DAGGER-TOOLCHAIN-BASELINE.yaml)
-- Path-scoped rule: `.cursor/rules/40-dagger-ci-pipeline.mdc`
+- Path-scoped rule: `docs/ci/DAGGER-PIPELINE-ARCHITECTURE.md and dagger-go-pipeline`

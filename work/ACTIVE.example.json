@@ -1,0 +1,13 @@
+{
+  "task_id": "PAY-EXAMPLE",
+  "title": "Example task",
+  "lane": "FAST",
+  "status": "ACTIVE",
+  "allowed_paths": [
+    "docs/example.md"
+  ],
+  "approval_required": false,
+  "verify_commands": [
+    "./tools/agent/verify-fast"
+  ]
+}

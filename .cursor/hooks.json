@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "type": "command",
+        "command": "python3 .cursor/hooks/command-guard.py",
+        "timeout": 10,
+        "failClosed": true
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "python3 .cursor/hooks/scope-approval-gate.py",
+        "matcher": "Write|Edit|StrReplace|Delete|EditNotebook",
+        "timeout": 10,
+        "failClosed": true
+      }
+    ],
+    "preCompact": [
+      {
+        "type": "command",
+        "command": "python3 .cursor/hooks/checkpoint.py",
+        "timeout": 10,
+        "failClosed": false
+      }
+    ],
+    "stop": [
+      {
+        "type": "command",
+        "command": "python3 .cursor/hooks/checkpoint.py",
+        "timeout": 10,
+        "failClosed": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp/oauth"
+    },
+    "next-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "next-devtools-mcp@latest"
+      ],
+      "env": {
+        "NEXT_TELEMETRY_DISABLED": "1"
+      }
+    },
+    "postgres-debina": {
+      "command": "bash",
+      "args": [
+        "/home/suso/debina/tools/mcp/start-dbhub.sh"
+      ]
+    },
+    "kafka-debina": {
+      "command": "bash",
+      "args": [
+        "/home/suso/debina/tools/mcp/start-kafka-mcp.sh"
+      ]
+    }
+  }
+}

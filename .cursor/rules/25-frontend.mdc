@@ -1,0 +1,11 @@
+---
+description: Frontend Next.js — BFF boundaries, pnpm-only, version-pinned docs.
+globs:
+  - "frontend/**"
+alwaysApply: false
+---
+
+# Frontend
+
+- Resolve Next.js and TypeScript versions from `frontend/package.json`.
+- Use Next DevTools for runtime facts and Context7 for exact-version docs.

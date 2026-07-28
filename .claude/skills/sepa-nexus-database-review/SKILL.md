@@ -1,6 +1,7 @@
 ---
 name: sepa-nexus-database-review
 description: Use as a second, independent pass after a database-touching change (migration, schema, query, or security change) is implemented and its own tests pass — reviews for source-fidelity, ownership, grants, RLS, data types, constraints, indexes, locks, transactions, idempotency, append-only, rollback/forward-fix, and Testcontainers evidence, then reports a PASS/CHANGES REQUIRED verdict.
+disable-model-invocation: true
 ---
 # Database change review
 

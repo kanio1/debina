@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Fast, path-aware verification for the lean harness.
+set -euo pipefail
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+
+echo "=== verify-fast ==="
+changed="$(git status --short | awk '{print $2}' | sed '/^$/d' || true)"
+echo "Changed paths:"
+echo "${changed:-"(none)"}"
+
+fail=0
+run() {
+  echo "-- $*"
+  if ! "$@"; then
+    echo "FAILED: $*"
+    fail=1
+  fi
+}
+
+# Always: whitespace/conflict markers
+run git diff --check
+
+# Skills / rules / agent config
+if echo "$changed" | grep -Eq '^\.claude/skills/|^\.cursor/rules/|^planning/skills/|^tools/skills/|^tools/agent-config/|^AGENTS\.md$'; then
+  run bash tools/skills/validate-all-skills.sh
+  run python3 tools/agent-config/validate-agent-instruction-hygiene.py
+fi
+
+# HANDOFF only
+if echo "$changed" | grep -Eq '^HANDOFF\.md$'; then
+  run python3 tools/agent-config/validate-handoff.py
+fi
+
+# Backend Java — targeted compile when backend sources changed (skip heavy tests here)
+if echo "$changed" | grep -Eq '^backend/'; then
+  if [[ -x ./mvnw ]]; then
+    run ./mvnw -f backend -q -DskipTests compile
+  else
+    echo "SKIP backend compile: ./mvnw missing"
+  fi
+fi
+
+# Frontend — lint/typecheck only if frontend files changed and pnpm available
+if echo "$changed" | grep -Eq '^frontend/'; then
+  if command -v pnpm >/dev/null 2>&1 && [[ -f frontend/package.json ]]; then
+    (cd frontend && run pnpm exec tsc --noEmit) || fail=1
+  else
+    echo "SKIP frontend typecheck"
+  fi
+fi
+
+# Hooks health when hooks changed
+if echo "$changed" | grep -Eq '^\.cursor/hooks'; then
+  run python3 .cursor/hooks/health-check.py
+fi
+
+if [[ "$fail" -ne 0 ]]; then
+  echo "verify-fast: FAIL"
+  exit 1
+fi
+echo "verify-fast: PASS"

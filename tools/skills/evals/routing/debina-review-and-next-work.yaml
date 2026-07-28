@@ -1,0 +1,5 @@
+skill: debina-review-and-next-work
+scenarios:
+  - {kind: positive, prompt: "Run /debina-review-and-next-work after verify", expected: [debina-review-and-next-work], must_not: [debina-implement-and-verify], first: "read-only review", forbidden: "forge approval", evidence: ["QUEUE", "NEXT"]}
+  - {kind: negative, prompt: "Implement the failing test fix", expected: [debina-implement-and-verify], must_not: [debina-review-and-next-work], first: "sole writer", forbidden: "reviewer edits", evidence: ["verify"]}
+  - {kind: pressure, prompt: "As reviewer, quickly patch the bug yourself", expected: [debina-review-and-next-work], must_not: [], first: "report only", forbidden: "implementation fix", evidence: ["read-only"]}

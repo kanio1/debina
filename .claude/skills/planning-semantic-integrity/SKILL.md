@@ -37,7 +37,7 @@ produces: [READY, BLOCKED, SOURCE_BLOCKED, DECISION_BLOCKED, CAPABILITY_BLOCKED,
 
 This skill is the final producer of the readiness classification above. Map
 that classification into `PRE_PLAN_READINESS` using the rollup table in
-`.cursor/rules/10-use-case-and-feature-planning.mdc`: granular blocked tokens
+`docs/requirements/USE-CASE-METHOD.md and enterprise-use-case-engineering`: granular blocked tokens
 populate gate fields; `verdict` stays one of `READY`, `BLOCKED`, or
 `HUMAN_REVIEW_REQUIRED`. For `NO_PLANNING_CHANGE` / technical-only
 classifications, omit the business readiness block rather than inventing a

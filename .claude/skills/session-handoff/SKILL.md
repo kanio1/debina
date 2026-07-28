@@ -1,6 +1,6 @@
 ---
 name: session-handoff
-description: Read HANDOFF.md first at session start; overwrite it at session end with the eight-section operational format. Use when ending a session, resuming work, or recording blockers. Do not append history or invent answers to unresolved questions.
+description: Read HANDOFF.md first at session start; overwrite it at session end with the eight-section operational format when the session was material. Use when ending a material session, resuming work, or recording blockers. Do not append history or invent answers to unresolved questions.
 ---
 
 # session-handoff
@@ -10,16 +10,32 @@ description: Read HANDOFF.md first at session start; overwrite it at session end
 If root `HANDOFF.md` exists, read it **first**, before other work. Treat
 **Resume from here** as the starting action, not a suggestion to renegotiate.
 
-Also follow `.cursor/rules/25-handoff.mdc`.
+## When to update HANDOFF.md
 
-## At session end
+Overwrite `HANDOFF.md` only when at least one of these is true:
+
+- code, tests, documentation, or planning changed;
+- material validation ran;
+- a decision was recorded;
+- a blocker appeared or changed;
+- the next step changed;
+- a longer session is ending;
+- context compaction is about to discard operational state.
+
+Do **not** update `HANDOFF.md` after:
+
+- an ordinary question;
+- read-only exploration;
+- a short discussion with no decision;
+- a session that did not change project state.
+
+## At session end (material only)
 
 Overwrite `HANDOFF.md` completely with current operational state. It is not a
 growing log. Rewrite still-relevant facts into the correct sections; drop
 obsolete audit narration and duplicated procedure text.
 
-Write for a new agent with no chat context. Always update HANDOFF after material
-sessions, including discussion-only sessions.
+Write for a new agent with no chat context.
 
 Refresh after material boundaries: story/slice selected; readiness verdict;
 technical plan accepted; meaningful implementation checkpoint; focused
@@ -79,6 +95,8 @@ Do not add a ninth second-level section. Put follow-ups in Current state,
 Decisions, or Next tasks. `Resume from here` must match `next_action`.
 
 Validate with `python3 tools/agent-config/validate-handoff.py`.
+
+Also keep `work/ACTIVE.json` / `work/QUEUE.md` consistent when those files exist.
 
 ## Rules
 

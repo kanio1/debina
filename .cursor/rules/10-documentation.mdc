@@ -1,0 +1,20 @@
+---
+description: Documentation and planning — no duplicate sources, explicit gaps.
+globs:
+  - "docs/**"
+  - "planning/**"
+  - "work/**"
+  - "HANDOFF.md"
+  - "AGENTS.md"
+alwaysApply: false
+---
+
+# Documentation
+
+- Update the existing canonical source; do not create parallel docs for the same fact.
+- Separate current state, proposal, and decision. Label each clearly.
+- Mark missing authority as `[OPEN-QUESTION]` or `[ASSUMPTION]`; never invent rail facts.
+- Do not fabricate use-case/source/ADR traceability.
+- Master-planning documents synthesise; they are not a second backlog.
+- `planning/` remains the canonical epic/story/capability backlog. `work/` is operational overlay only.
+- Authority matrix: `docs/standards/SOURCE-AUTHORITY-MATRIX.md`. Use-case method: `docs/requirements/USE-CASE-METHOD.md`.

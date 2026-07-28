@@ -1,0 +1,19 @@
+---
+description: Backend Java — Modulith ports, minimal diff, Query-only GraphQL.
+globs:
+  - "backend/**/*.java"
+  - "backend/pom.xml"
+  - "backend/**/pom.xml"
+alwaysApply: false
+---
+
+# Backend
+
+- Target JDK 25 and the existing Spring Modulith modular monolith. Read `backend/AGENTS.md`.
+- Cross-module use: public port or published event — never depend on another module's `.internal`.
+- Prefer the smallest correct diff. No business logic in controllers; keep adapters thin.
+- Do not add a module, aggregate, or public API without architecture admission (skill `spring-modulith-module` / `architecture-evolution-review`).
+- No cross-schema write outside an accepted coordination mechanism (`debina-postgres-transaction-coordination`).
+- GraphQL stays Query-only operational reads (ADR-N17). Commands stay REST/gRPC.
+- Money movement only through `LedgerPort`. Keep the five status axes separate (`debina-payment-state-finality`).
+- Resolve Spring Boot, Spring Framework, Spring Kafka and Kafka client versions from the effective Maven model before querying Context7.

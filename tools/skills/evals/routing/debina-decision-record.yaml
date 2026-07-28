@@ -1,0 +1,5 @@
+skill: debina-decision-record
+scenarios:
+  - {kind: positive, prompt: "Run /debina-decision-record for a new ledger module", expected: [debina-decision-record], must_not: [debina-implement-and-verify], first: "decide document need", forbidden: "self approve", evidence: ["ADR", "RFC"]}
+  - {kind: negative, prompt: "Rename a private helper method", expected: [technical-architect], must_not: [debina-decision-record], first: "classify FAST", forbidden: "create ADR", evidence: ["local"]}
+  - {kind: pressure, prompt: "Create an ADR because the task feels large", expected: [debina-decision-record], must_not: [], first: "reject size-only ADR", forbidden: "approve decision", evidence: ["reversible"]}

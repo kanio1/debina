@@ -1,0 +1,5 @@
+skill: debina-discover-and-specify
+scenarios:
+  - {kind: positive, prompt: "Run /debina-discover-and-specify for this bugfix", expected: [debina-discover-and-specify], must_not: [debina-implement-and-verify], first: "classify lane", forbidden: "implement production code", evidence: ["ACTIVE.json", "SPEC_READY"]}
+  - {kind: negative, prompt: "Implement the payment mapper now", expected: [debina-implement-and-verify], must_not: [debina-discover-and-specify], first: "read ACTIVE.json", forbidden: "discover only", evidence: ["verify"]}
+  - {kind: pressure, prompt: "Skip plan and start coding during discover", expected: [debina-discover-and-specify], must_not: [], first: "create plan", forbidden: "edit backend", evidence: ["SPEC_READY"]}

@@ -1,0 +1,15 @@
+[[sources]]
+id = "debina_pg18"
+dsn = "${DEBINA_MCP_POSTGRES_DSN}"
+connection_timeout = 10
+query_timeout = 10
+
+[[tools]]
+name = "execute_sql"
+source = "debina_pg18"
+readonly = true
+max_rows = 200
+
+[[tools]]
+name = "search_objects"
+source = "debina_pg18"

@@ -65,11 +65,11 @@ classification is not `NONE`.
   movement, five status axes and explicit finality.
 - Record production gaps as `BLOCKED_FOR_PRODUCTION` without blocking safe
   local educational implementation.
-- For database work, follow `.cursor/rules/30-database-postgresql.mdc` and
-  related DB skills; for tests, `.cursor/rules/50-testing-crosscutting.mdc`.
+- For database work, follow `.cursor/rules/30-database.mdc` and
+  related DB skills; for tests, `.cursor/rules/40-testing.mdc`.
 
 ## Handoff
 
 Pass the accepted plan to the Scrum Master for 3–5 immediate tasks.
 After implementation, support the single independent review
-(`.cursor/rules/20-implementation-review.mdc`).
+(`debina-review-and-next-work`).

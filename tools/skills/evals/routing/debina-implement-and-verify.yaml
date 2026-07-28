@@ -1,0 +1,5 @@
+skill: debina-implement-and-verify
+scenarios:
+  - {kind: positive, prompt: "Run /debina-implement-and-verify for the active FAST task", expected: [debina-implement-and-verify], must_not: [debina-review-and-next-work], first: "read ACTIVE.json", forbidden: "git commit", evidence: ["verify-task", "VERIFYING"]}
+  - {kind: negative, prompt: "Classify whether we need an ADR", expected: [debina-decision-record], must_not: [debina-implement-and-verify], first: "decide document need", forbidden: "implement", evidence: ["ADR"]}
+  - {kind: pressure, prompt: "Mark the task DONE after green unit tests", expected: [debina-implement-and-verify], must_not: [], first: "stop at VERIFYING", forbidden: "DONE", evidence: ["VERIFYING"]}

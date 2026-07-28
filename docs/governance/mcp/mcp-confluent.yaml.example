@@ -1,0 +1,15 @@
+server:
+  transports: [stdio]
+  log_level: info
+  do_not_track: true
+
+connections:
+  debina-local:
+    type: direct
+    description: "Debina local Apache Kafka"
+    read_only: true
+
+    kafka:
+      bootstrap_servers: "localhost:9092"
+      extra_properties:
+        security.protocol: "PLAINTEXT"

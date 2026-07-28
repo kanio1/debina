@@ -1,0 +1,28 @@
+---
+description: Lean core harness — lane, active task, single writer, no Git writes.
+globs: []
+alwaysApply: true
+---
+
+# Core
+
+1. Read `HANDOFF.md`, root `AGENTS.md`, and `work/ACTIVE.json` when present.
+2. Classify the task lane: FAST, STANDARD, or DECISION (see AGENTS lean section).
+3. Do not change code, migrations, contracts, or runtime config without an active task and allowed paths.
+4. STANDARD and DECISION require human-authored approval under `work/approvals/` before implementation writes.
+5. One writer only. Discovery and review stay Ask/read-only.
+6. Never `git commit`, `git push`, `git merge`, `git rebase`, `git reset`, or `git clean` unless the human explicitly runs them.
+7. Preserve ADR-N1…N17 and `[FREEZE]` decisions; do not invent rail or regulatory facts.
+8. Never modify `build/generated-spring-modulith/javadoc.json`.
+9. Never present a proposal as an approved decision. Use skills under `.claude/skills/` for domain procedures.
+
+## External documentation and runtime MCP
+
+- Before using an external API, read its exact local version.
+- Use Context7 for version-specific library documentation.
+- Never silently substitute an older major version.
+- Use Next DevTools for live Next.js runtime facts.
+- Use PostgreSQL MCP only for read-only local database inspection.
+- Use Kafka MCP only against the local read-only connection.
+- Documentation MCP does not override repository ADRs, contracts or tests.
+- Runtime state does not define business or scheme rules.

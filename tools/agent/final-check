@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# Final pre-commit style checks without performing Git writes.
+set -euo pipefail
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+
+echo "=== final-check ==="
+
+echo "-- working tree"
+git status --short || true
+
+echo "-- git diff --check"
+git diff --check
+
+python3 - <<'PY'
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+fail = 0
+out = subprocess.check_output(["git", "status", "--short"], text=True)
+paths = []
+for line in out.splitlines():
+    parts = line.strip().split(maxsplit=1)
+    if len(parts) == 2:
+        paths.append(parts[1].replace(" -> ", " ").split()[-1])
+
+active_path = Path("work/ACTIVE.json")
+if active_path.is_file():
+    active = json.loads(active_path.read_text())
+    allowed = [str(p) for p in active.get("allowed_paths") or []]
+    lane = active.get("lane")
+    tid = active.get("task_id")
+
+    def ok(path: str) -> bool:
+        if path.startswith("work/") or path == "HANDOFF.md" or path == "AGENTS.md":
+            return True
+        if path.startswith(".cursor/") or path.startswith(".claude/skills/") or path.startswith("tools/agent"):
+            # harness overlays often include these during config tasks
+            if any(path.startswith(p.rstrip("*").rstrip("/")) or path == p for p in allowed):
+                return True
+            for pat in allowed:
+                if pat.endswith("/**") and path.startswith(pat[:-3]):
+                    return True
+                if "*" in pat:
+                    import fnmatch
+                    if fnmatch.fnmatch(path, pat):
+                        return True
+        for pat in allowed:
+            if pat.endswith("/**"):
+                pref = pat[:-3]
+                if path == pref.rstrip("/") or path.startswith(pref):
+                    return True
+            elif path == pat or path.startswith(pat.rstrip("/") + "/"):
+                return True
+            elif "*" in pat:
+                import fnmatch
+                if fnmatch.fnmatch(path, pat):
+                    return True
+        return False
+
+    outside = [p for p in paths if not ok(p)]
+    if outside:
+        print("FAIL paths outside allowed_paths:")
+        for p in outside:
+            print(f"  - {p}")
+        fail = 1
+    else:
+        print("PASS diff within allowed_paths (plus work/HANDOFF overlays)")
+
+    if lane == "STANDARD":
+        f = Path(f"work/approvals/{tid}.approved")
+        if not f.is_file():
+            print(f"FAIL missing approval {f}")
+            fail = 1
+        else:
+            print(f"PASS approval {f}")
+    elif lane == "DECISION":
+        for name in (f"{tid}.decision.approved", f"{tid}.implementation.approved"):
+            f = Path("work/approvals") / name
+            if not f.is_file():
+                print(f"FAIL missing approval {f}")
+                fail = 1
+            else:
+                print(f"PASS approval {f}")
+    else:
+        print("PASS FAST approval not required")
+else:
+    print("INFO no ACTIVE.json — scope check skipped")
+
+secret_hits = []
+for p in paths:
+    if re.search(r"(^|/)\.env($|\.)", p) and not re.search(r"\.(example|sample|template)$", p):
+        secret_hits.append(p)
+    if re.search(r"\.(pem|key)$", p):
+        secret_hits.append(p)
+if secret_hits:
+    print("FAIL possible secrets in diff:")
+    for p in secret_hits:
+        print(f"  - {p}")
+    fail = 1
+else:
+    print("PASS no obvious .env/.pem/.key in changed paths")
+
+javadoc = Path("build/generated-spring-modulith/javadoc.json")
+if javadoc.is_file():
+    try:
+        subprocess.check_call(["git", "diff", "--quiet", "--", str(javadoc)])
+        print("PASS generated javadoc unchanged vs HEAD")
+    except subprocess.CalledProcessError:
+        print("FAIL generated javadoc differs from HEAD — restore without destructive git")
+        fail = 1
+else:
+    print("INFO generated javadoc absent or untracked")
+
+for banned in (".git/MERGE_HEAD", ".git/CHERRY_PICK_HEAD"):
+    if Path(banned).exists():
+        print(f"FAIL in-progress git write state: {banned}")
+        fail = 1
+# Active rebase uses rebase-merge/ or rebase-apply/; a stale REBASE_HEAD alone is not proof.
+if Path(".git/rebase-merge").exists() or Path(".git/rebase-apply").exists():
+    print("FAIL in-progress git rebase state")
+    fail = 1
+
+print("NOTE final-check never runs git commit/push/merge")
+sys.exit(fail)
+PY
+
+echo "final-check: PASS"

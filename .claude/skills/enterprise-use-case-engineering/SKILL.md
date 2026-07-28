@@ -104,7 +104,7 @@ WRONG: “implement endpoint” is treated as a behavioral slice
    `SOURCE_BLOCKED`, `DECISION_BLOCKED`, `CAPABILITY_BLOCKED`,
    `HUMAN_REVIEW_REQUIRED`, or `NO_PLANNING_CHANGE`. Roll that classification
    into the structured `PRE_PLAN_READINESS` block using the mapping in
-   `.cursor/rules/10-use-case-and-feature-planning.mdc` (granular blocks →
+   `docs/requirements/USE-CASE-METHOD.md and enterprise-use-case-engineering` (granular blocks →
    gate fields; `verdict` remains `READY`/`BLOCKED`/`HUMAN_REVIEW_REQUIRED`).
    Include the block in the final output for behaviour-changing work. Do not
    duplicate detailed logic owned by source, architecture or planning skills.

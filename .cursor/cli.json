@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(./tools/agent/task-status)",
+      "Shell(./tools/agent/verify-fast)",
+      "Shell(./tools/agent/verify-task)",
+      "Shell(./tools/agent/final-check)",
+      "Shell(./tools/agent/health-check)",
+      "Shell(tools/agent/task-status)",
+      "Shell(tools/agent/verify-fast)",
+      "Shell(tools/agent/verify-task)",
+      "Shell(tools/agent/final-check)",
+      "Shell(tools/agent/health-check)",
+      "Read(**)",
+      "Grep(**)",
+      "Glob(**)"
+    ],
+    "deny": [
+      "Shell(git)",
+      "Shell(rm)",
+      "Shell(rmdir)",
+      "Shell(sudo)",
+      "Shell(chmod)",
+      "Shell(chown)",
+      "Shell(docker)",
+      "Shell(podman)",
+      "Shell(bash)",
+      "Shell(sh)",
+      "Shell(python)",
+      "Shell(python3)",
+      "Shell(mvn)",
+      "Shell(./mvnw)",
+      "Shell(pnpm)",
+      "Shell(npx)",
+      "Read(.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Write(.env*)",
+      "Write(**/*.pem)",
+      "Write(**/*.key)",
+      "Write(build/generated-spring-modulith/javadoc.json)"
+    ]
+  }
+}

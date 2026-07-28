@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Show lean harness task status.
+set -euo pipefail
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+
+echo "=== task-status ==="
+echo "branch: $(git branch --show-current 2>/dev/null || echo unknown)"
+echo "HEAD: $(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
+echo "working tree:"
+git status --short || true
+
+if [[ -f work/ACTIVE.json ]]; then
+  python3 - <<'PY'
+import json
+from pathlib import Path
+active = json.loads(Path("work/ACTIVE.json").read_text())
+print(f"active task: {active.get('task_id')}")
+print(f"title: {active.get('title')}")
+print(f"lane: {active.get('lane')}")
+print(f"status: {active.get('status')}")
+print(f"approval_required: {active.get('approval_required')}")
+print("allowed_paths:")
+for p in active.get("allowed_paths") or []:
+    print(f"  - {p}")
+tid = active.get("task_id") or ""
+lane = active.get("lane") or ""
+from pathlib import Path
+appr = Path("work/approvals")
+if lane == "STANDARD":
+    f = appr / f"{tid}.approved"
+    print(f"approval: {'PRESENT' if f.is_file() else 'MISSING'} ({f})")
+elif lane == "DECISION":
+    d = appr / f"{tid}.decision.approved"
+    i = appr / f"{tid}.implementation.approved"
+    print(f"decision approval: {'PRESENT' if d.is_file() else 'MISSING'} ({d})")
+    print(f"implementation approval: {'PRESENT' if i.is_file() else 'MISSING'} ({i})")
+else:
+    print("approval: not required (FAST)")
+progress = Path("work/active") / tid / "progress.md"
+if progress.is_file():
+    text = progress.read_text().splitlines()
+    last = next_step = ""
+    mode = None
+    for line in text:
+        low = line.strip().lower()
+        if low.startswith("## completed"):
+            mode = "completed"
+            continue
+        if low.startswith("## next step"):
+            mode = "next"
+            continue
+        if low.startswith("##"):
+            mode = None
+            continue
+        if mode == "completed" and line.strip():
+            last = line.strip()
+        if mode == "next" and line.strip() and not next_step:
+            next_step = line.strip()
+    print(f"last completed step: {last or 'n/a'}")
+    print(f"next step: {next_step or 'n/a'}")
+else:
+    print("last completed step: n/a (no progress.md)")
+    print("next step: n/a")
+PY
+else
+  echo "active task: none (work/ACTIVE.json absent)"
+fi

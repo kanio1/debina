@@ -1,0 +1,22 @@
+---
+description: Testing — risk-based proof intensity by lane; no vacuous tests.
+globs:
+  - "backend/src/test/**"
+  - "frontend/**/*.test.*"
+  - "frontend/**/*.spec.*"
+  - "frontend/e2e/**"
+  - "**/*Test.java"
+  - "**/playwright.config.*"
+  - "docs/testing/**"
+  - "dagger/**"
+alwaysApply: false
+---
+
+# Testing
+
+- Test the real risk of the change. Avoid vacuous assertions and duplicate coverage of the same risk.
+- Prefer state-transition, boundary, contract, and concurrency cases when those risks exist.
+- Mocks do not prove PostgreSQL or Kafka properties — use Testcontainers / broker proof when those boundaries matter.
+- Match proof intensity to lane (skill `debina-runtime-proof-testing`): FAST = targeted + `verify-fast`; STANDARD = targeted + integration/contract + review; DECISION/CRITICAL = full runtime proof chain when justified.
+- Playwright follows ADR-N16 sequencing; it is not automatic for every task.
+- Never claim a test passed unless the exact command ran successfully.

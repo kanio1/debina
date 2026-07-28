@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Run verify_commands from work/ACTIVE.json with a strict allowlist.
+set -euo pipefail
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+
+if [[ ! -f work/ACTIVE.json ]]; then
+  echo "verify-task: no work/ACTIVE.json" >&2
+  exit 1
+fi
+
+mapfile -t cmds < <(python3 - <<'PY'
+import json, re, sys
+from pathlib import Path
+active = json.loads(Path("work/ACTIVE.json").read_text())
+cmds = active.get("verify_commands") or []
+allow = [
+    r"^./tools/agent/(task-status|verify-fast|verify-task|final-check)$",
+    r"^tools/agent/(task-status|verify-fast|verify-task|final-check)$",
+    r"^bash tools/",
+    r"^python3 tools/",
+    r"^python3 \.cursor/hooks/health-check\.py$",
+    r"^./mvnw( |$)",
+    r"^mvn( |$)",
+    r"^pnpm( |$)",
+    r"^git diff --check$",
+    r"^git status",
+    r"^git diff",
+]
+compiled = [re.compile(a) for a in allow]
+deny = re.compile(r"(git\s+(push|commit|merge|rebase|reset|clean|restore|checkout|switch)|\brm\b|\bsudo\b|DROP|TRUNCATE|\|\s*(ba)?sh)")
+for c in cmds:
+    c = str(c).strip()
+    if not c:
+        continue
+    if deny.search(c):
+        print(f"DENIED destructive verify command: {c}", file=sys.stderr)
+        sys.exit(2)
+    if not any(p.search(c) for p in compiled):
+        print(f"DENIED non-allowlisted verify command: {c}", file=sys.stderr)
+        sys.exit(2)
+    print(c)
+PY
+)
+
+echo "=== verify-task ==="
+echo "Commands to run:"
+printf '  %s\n' "${cmds[@]}"
+
+task_id="$(python3 -c 'import json;print(json.load(open("work/ACTIVE.json"))["task_id"])')"
+progress="work/active/${task_id}/progress.md"
+mkdir -p "work/active/${task_id}"
+{
+  echo ""
+  echo "## Verify results"
+  echo "Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+} >> "$progress"
+
+for c in "${cmds[@]}"; do
+  echo "-- $c"
+  if bash -lc "$c"; then
+    echo "- PASS: \`$c\`" >> "$progress"
+  else
+    echo "- FAIL: \`$c\`" >> "$progress"
+    echo "verify-task: FAIL at: $c" >&2
+    exit 1
+  fi
+done
+
+echo "verify-task: PASS"
+echo "- verify-task: PASS at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$progress"
