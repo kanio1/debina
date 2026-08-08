@@ -2,10 +2,7 @@
 
 ## Current objective
 
-Closeout of `FIX-DOC-BASELINE-RECONCILIATION` is done (independent review PASS).
-Queue `NOW` is `FIX-WAVE11-STATUS-HYGIENE`. Do not promote master-planning package
-documents until that hygiene task finishes. Do not start hygiene implementation in
-this handoff — next session begins with `/debina-discover-and-specify`.
+`FIX-CURSOR-HOOK-PHASED-APPROVAL` closed PASS. Queue target is `PILOT-SPEC-KIT-CURSOR-ONLY` (disposable dir outside main repo). Do not install Spec Kit into the main tree. Do not start Design Council implementation.
 
 ## Current use case
 
@@ -19,52 +16,51 @@ active_story: "none"
 active_use_case: "none"
 active_slice: "none"
 readiness_verdict: NOT_APPLICABLE
-last_completed_step: "FIX-DOC-BASELINE-RECONCILIATION archived after review PASS"
-last_verification: "closeout validators + task-status + verify-fast"
+last_completed_step: "FIX-CURSOR-HOOK-PHASED-APPROVAL archived PASS; Spec Kit readiness PASS_WITH_FINDINGS"
+last_verification: "hook synthetic 37 PASS; health-check PASS; verify-fast PASS; py_compile PASS"
 working_tree: modified
-next_action: "Run `/debina-discover-and-specify` for `FIX-WAVE11-STATUS-HYGIENE`. Do not promote master-planning documents before that task completes."
+next_action: "Run isolated Cursor-only Spec Kit pilot outside main working tree. Do not touch .cursor/skills yet."
 ```
 
-- No `work/ACTIVE.json` (active state cleared).
-- Archive: `work/archive/FIX-DOC-BASELINE-RECONCILIATION/` (`plan.md`, `progress.md`, `promotion-matrix.md`).
-- Package remains in staging only: `work/imports/SEPA-2027-MASTER-PLANNING/`.
-- No formal Wave 11 / EPIC-26 / Story 26.4 status change was made.
-- No canonical promotion from the promotion matrix.
+- Archives: `work/archive/PREPARE-SPEC-KIT-INSTALLATION-READINESS/`, `work/archive/FIX-CURSOR-HOOK-PHASED-APPROVAL/`.
+- Hooks enforce `policy_profile` / `phase` / `approval_state` / `write_scope` via `tools/agent_policy`.
+- Design Council remains `ON_HOLD_PENDING_SPEC_KIT_EVALUATION`.
 
 ## Completed
 
-- Read-only baseline reconciliation of SEPA-2027 master-planning package vs local repo.
-- Independent review PASS; artifacts archived.
-- Wave 11 contradiction classified only (not formally closed).
+- Spec Kit readiness audit: `READY_FOR_ISOLATED_PILOT` with findings F-01..F-05.
+- Cursor phased-approval hook fix: STANDARD analysis WORK_ONLY without `.approved`; implementation requires approval; Shell write bypass blocked; wrappers for bootstrap/approve/set-state/closeout.
+- Prior: FIX-WAVE11-STATUS-HYGIENE archived after review PASS.
 
 ## Decisions
 
-- Current repo + ADR/`[FREEZE]` beat package baseline.
-- Epic/index status is not runtime proof.
-- Package is DRAFT synthesis only — not approved architecture or compliance assessment.
-- Do not promote master-planning docs before `FIX-WAVE11-STATUS-HYGIENE` completes.
+- `policy_profile` is rigor; `phase`/`write_scope` control write class; `lane` is compat mirror only.
+- `.approved` means implementation approval only.
+- Spec Kit not installed; Skills layout unchanged pending pilot.
 
 ## Blocked for production
 
 - Full EPC TVS / scheme certification; participant-only STEP2/VOP/EDS artefacts
-- Formal Wave 11 `done` until Checkpoint 3 or explicit human acceptance of Checkpoint 2
+- Formal Wave 11 `done` until Checkpoint 3 or explicit human acceptance of Checkpoint 2 (DR-001)
 - SEPA 2027 corpus gaps (final rulebooks, VOP YAML, EDS, checksum mismatch)
 - Remote CI / `act` / deployment automation; Dagger Cloud
 
 ## Next tasks
 
-1. **Owner: discover-and-specify** — Start `FIX-WAVE11-STATUS-HYGIENE` via `/debina-discover-and-specify` (do not invent ACTIVE.json until that workflow runs).
-   **Done when:** ACTIVE + plan/progress exist for hygiene; scope limited to planning status alignment.
-   **Verify:** `test -f work/ACTIVE.json` with `task_id` hygiene after discover.
+1. **Owner: harness** — Isolated `PILOT-SPEC-KIT-CURSOR-ONLY` in disposable directory.
+   **Done when:** Cursor integration inventoried; skills collision behavior documented; no main-tree install.
+   **Verify:** pilot report exists; main repo has no `.specify/` / `speckit-*`.
 
-2. **Owner: human** — After hygiene, decide DR-001 (Checkpoint 2 vs Checkpoint 3) if still open.
+2. **Owner: human** — After pilot, decide Spec Kit adoption and Skills Variant B prep.
    **Done when:** decision recorded.
-   **Verify:** Wave 11 program and formal story status policy no longer contradict.
+   **Verify:** written decision under work/approvals or governance note.
 
-3. **Owner: docs** — Only after hygiene: selective package promotion per archived promotion matrix (never package QUEUE/NEXT).
-   **Done when:** matrix rows promoted or explicitly deferred.
-   **Verify:** `git status --short docs work`
+3. **Owner: discover** — Resume `IMPLEMENT-PORTABLE-DEBINA-DESIGN-COUNCIL` only after Spec Kit evaluation decision.
+   **Done when:** hold lifted intentionally.
+   **Verify:** QUEUE no longer lists ON_HOLD for that reason.
+
+4. **Owner: human** — Decide DR-001 (Checkpoint 2 vs Checkpoint 3 as formal Wave 11 close) when ready.
 
 ## Resume from here
 
-Run `/debina-discover-and-specify` for `FIX-WAVE11-STATUS-HYGIENE`. Do not promote master-planning documents before that task completes.
+Start `PILOT-SPEC-KIT-CURSOR-ONLY` in a disposable directory/worktree outside the main Debina working tree. Do not modify `.cursor/skills` or install Spec Kit into the main repo yet.

@@ -1,0 +1,49 @@
+
+
+def path_matches(path, patterns):
+    for pat in patterns:
+        if pat.endswith("/**"):
+            prefix = pat[:-3].rstrip("/")
+            if path == prefix or path.startswith(prefix + "/"):
+                return True
+        elif "*" in pat or "?" in pat:
+            if fnmatch.fnmatch(path, pat):
+                return True
+        elif path == pat or path.startswith(pat.rstrip("/") + "/"):
+            return True
+    return False
+
+def _safe_rel(path):
+    if not path or path.startswith("/"):
+        return False
+    return ".." not in path.replace("\", "/").split("/")
+
+def file_sha256(path):
+    h = hashlib.sha256()
+    h.update(path.read_bytes())
+    return h.hexdigest()
+
+def mirror_pointer_path(repo, task_id):
+    return repo / "work" / "active" / task_id / MIRROR_POINTER_NAME
+
+def load_json(path):
+    if not path.is_file():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+def parse_binding_from_mirror(data, task_id):
+    mirror_dir = str(data.get("feature_directory") or "").strip()
+    canonical = str(data.get("canonical_target") or mirror_dir).strip()
+    debina_task = str(data.get("debina_task_id") or task_id).strip()
+    if not mirror_dir or not canonical or debina_task != task_id:
+        return None
+    slug = canonical.split("/")[-1]
+    number = slug.split("-", 1)[0]
+    if not number.isdigit():
+        return None
+    feature_slug = slug.partition("-")[2] or slug
+    return SpecKitBinding(task_id, number, feature_slug, canonical, CANONICAL_FEATURE_STATE, mirror_dir, canonical)
+

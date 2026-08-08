@@ -1,0 +1,67 @@
+
+
+def parse_binding_from_active_spec_kit(data, task_id):
+    sk = data.get("spec_kit")
+    if not isinstance(sk, dict):
+        return None
+    feature_dir = str(sk.get("feature_directory") or "").strip()
+    if not feature_dir:
+        return None
+    return SpecKitBinding(
+        task_id,
+        str(sk.get("feature_number") or ""),
+        str(sk.get("feature_slug") or ""),
+        feature_dir,
+        str(sk.get("feature_state_path") or CANONICAL_FEATURE_STATE),
+        sk.get("mirror_feature_directory"),
+        feature_dir,
+    )
+
+def parse_binding_from_canonical_feature(data, task_id):
+    feature_dir = str(data.get("feature_directory") or "").strip()
+    debina_task = str(data.get("debina_task_id") or "").strip()
+    if not feature_dir or debina_task != task_id:
+        return None
+    slug = feature_dir.split("/")[-1]
+    number = str(data.get("feature_number") or slug.split("-", 1)[0])
+    short_name = str(data.get("short_name") or data.get("feature_slug") or "")
+    if not short_name and "-" in slug:
+        short_name = slug.split("-", 1)[1]
+    return SpecKitBinding(task_id, number, short_name, feature_dir)
+
+def resolve_binding(state, repo):
+    task_id = state.task_id
+    if not task_id:
+        return None
+    b = parse_binding_from_active_spec_kit(state.raw, task_id)
+    if b:
+        return b
+    m = load_json(mirror_pointer_path(repo, task_id))
+    if m:
+        b = parse_binding_from_mirror(m, task_id)
+        if b:
+            return b
+    c = load_json(repo / CANONICAL_FEATURE_STATE)
+    if c:
+        return parse_binding_from_canonical_feature(c, task_id)
+    return None
+
+def is_protected_spec_kit_path(path):
+    return any(path == p.rstrip("/") or path.startswith(p) for p in PROTECTED)
+
+def is_implementation_source_path(path):
+    return any(path == p.rstrip("/") or path.startswith(p) for p in IMPL)
+
+def is_bound_spec_path(path, binding):
+    if not _safe_rel(path):
+        return False
+    prefix = binding.canonical_spec_prefix
+    return path == prefix or path.startswith(prefix + "/")
+
+def is_other_spec_path(path, binding):
+    if not path.startswith("specs/"):
+        return False
+    if binding is None:
+        return True
+    return not is_bound_spec_path(path, binding)
+

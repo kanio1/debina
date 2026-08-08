@@ -9,6 +9,14 @@
         "failClosed": true
       }
     ],
+    "afterShellExecution": [
+      {
+        "type": "command",
+        "command": "python3 .cursor/hooks/shell-post-check.py",
+        "timeout": 15,
+        "failClosed": false
+      }
+    ],
     "preToolUse": [
       {
         "type": "command",
@@ -16,6 +24,15 @@
         "matcher": "Write|Edit|StrReplace|Delete|EditNotebook",
         "timeout": 10,
         "failClosed": true
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "python3 .cursor/hooks/shell-post-check.py",
+        "matcher": "Shell",
+        "timeout": 15,
+        "failClosed": false
       }
     ],
     "preCompact": [

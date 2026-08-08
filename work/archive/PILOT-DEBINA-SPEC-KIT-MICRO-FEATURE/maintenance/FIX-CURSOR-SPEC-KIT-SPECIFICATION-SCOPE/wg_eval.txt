@@ -1,0 +1,108 @@
+def evaluate_write(
+    path,
+    *,
+    tool,
+    state=None,
+    repo=None,
+    contents=None,
+):
+    repo = repo or repo_root()
+    n = norm_path(path, repo)
+
+    if is_protected_path(n) or is_secret_path(n):
+        return "deny", f"protected or secret path blocked: {n}"
+
+    if state is None:
+        if not n.startswith("work/"):
+            return "deny", f"No work/ACTIVE.json — only work/** discovery writes allowed ({n})"
+        return "allow", "bootstrap work-only"
+
+    if not state.task_id:
+        return "deny", "ACTIVE.json missing task_id"
+
+    ok, reason = validate_state_combination(
+        state.policy_profile,
+        state.phase,
+        state.approval_state,
+        state.write_scope,
+        state.task_id,
+        state.raw,
+    )
+    if not ok:
+        return "deny", reason
+
+    task_prefix = f"work/active/{state.task_id}/"
+    task_glob = state.task_work_glob
+
+    if n in {"work/ACTIVE.json", "work/QUEUE.md"}:
+        if not wrapper_trusted():
+            return "deny", "ACTIVE.json/QUEUE.md must be updated via tools/agent wrappers"
+        if n == "work/ACTIVE.json" and contents:
+            ok2, reason2 = validate_active_mutation(state, contents, repo)
+            if not ok2:
+                return "deny", reason2
+        return "allow", "controlled wrapper state update"
+
+    if n.startswith("work/active/") and not (
+        n.startswith(task_prefix) or n == f"work/active/{state.task_id}"
+    ):
+        return "deny", f"path task id mismatch vs ACTIVE task_id={state.task_id}"
+
+    if state.phase == "BLOCKED":
+        maint = maintenance_paths(state.raw)
+        if maint and path_matches(n, maint):
+            return "allow", "BLOCKED maintenance path"
+        if path_matches(n, [task_glob, f"work/active/{state.task_id}"]):
+            return "allow", "BLOCKED task notes"
+        return "deny", f"BLOCKED phase write denied: {n}"
+
+    if specification_scope(state.write_scope):
+        return evaluate_specification_path(n, state, repo, contents=contents)
+
+    if state.write_scope == "WORK_ONLY":
+        if n.startswith("specs/") or n == ".specify/feature.json":
+            return "deny", "WORK_ONLY cannot write Spec Kit canonical paths"
+        if is_implementation_source_path(n):
+            return "deny", "WORK_ONLY cannot write implementation sources"
+        if analysis_phase(state) and not implementation_phase(state):
+            if path_matches(n, [task_glob, f"work/active/{state.task_id}"]):
+                return "allow", "WORK_ONLY task artifact"
+            if n.startswith("work/archive/") and wrapper_trusted():
+                return "allow", "wrapper closeout archive"
+            return "deny", f"WORK_ONLY cannot write outside task work dir: {n}"
+
+    if state.write_scope == "REVIEW":
+        if path_matches(n, [task_glob]):
+            return "allow", "review task notes"
+        if n == "work/QUEUE.md" and wrapper_trusted():
+            return "allow", "review queue wrapper"
+        return "deny", f"REVIEW scope blocked: {n}"
+
+    if state.write_scope == "CLOSEOUT":
+        if wrapper_trusted() and n.startswith("work/"):
+            return "allow", "closeout wrapper"
+        if path_matches(n, [task_glob]):
+            return "allow", "closeout task notes"
+        return "deny", f"CLOSEOUT blocked without wrapper: {n}"
+
+    if not state.allowed_paths:
+        return "deny", "ACTIVE.json missing allowed_paths for implementation"
+
+    if state.policy_profile in {"STANDARD", "DECISION"}:
+        if state.approval_state == "REJECTED":
+            return "deny", "approval_state=REJECTED"
+        approved = state.approval_state == "APPROVED" or implementation_approved(
+            state.policy_profile, state.task_id, repo
+        )
+        if not approved:
+            return "deny", (
+                f"{state.policy_profile} implementation requires approval_state=APPROVED "
+                f"(compat: work/approvals/{state.task_id}.approved)"
+            )
+
+    overlay = [task_glob, f"work/active/{state.task_id}"]
+    if not path_matches(n, state.allowed_paths + overlay):
+        return "deny", f"Path outside allowed_paths: {n}"
+
+    _ = tool
+    return "allow", "implementation path ok"

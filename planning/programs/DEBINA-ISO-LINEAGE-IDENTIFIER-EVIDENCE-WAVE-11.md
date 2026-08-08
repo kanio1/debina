@@ -21,10 +21,11 @@
 - PostgreSQL 18 Testcontainers: `IsoPaymentEvidenceQueryIntegrationTest` 3/3 PASS. It proves JSON_DIRECT and pain.001 source rows, version selection, controlled identifiers without TxId/UETR fabrication, repeatable equal-timestamp ordering, and tenant/branch/empty-context denial through the public payment visibility boundary.
 - GraphQL HTTP/runtime: `ApprovalGraphQlRuntimeTest` 10/10 PASS, including permitted `payment_viewer` DTO mapping and denial for `security_admin`.
 
-## Remaining mandatory proof
+## Remaining mandatory proof (as of Checkpoint 1)
 
-- Run live Keycloak+BFF+Spring+isolated PostgreSQL JSON_DIRECT and signed pain.001 proofs; run two full backend regressions, governance validators, database review and cleanup.
+- At Checkpoint 1 the remaining list was: live Keycloak+BFF+Spring+isolated PostgreSQL JSON_DIRECT and signed pain.001 proofs; two full backend regressions; governance validators; database review and cleanup.
 - No migration is added (`N/A`): this read uses existing source tables and indexes. Correlation is intentionally not exposed because no payment-scoped source-ready runtime evidence was verified.
+- Checkpoint 2 later satisfied the live Keycloak+BFF+Spring+isolated PostgreSQL portion. The two full backend regressions, governance validators, and database review/cleanup remain open (see Evidence status below).
 
 ## Checkpoint 2 — live runtime and version correction (2026-07-21)
 
@@ -32,3 +33,13 @@
 - Real isolated PostgreSQL 18 + Keycloak 26.6.4 + Spring + Next BFF: JSON BFF submission persisted `JSON_DIRECT` / `ORIGINAL_INSTRUCTION` / `W11-JSON-E2E-001`; its BFF GraphQL response matches those source facts.
 - Real signed pain.001: Keycloak authorization-code + PKCE submitter authentication and a temporary isolated-DB Ed25519 verification key produced 201. Source rows prove `pain.001`, ORIGINAL_INSTRUCTION, MsgId, PmtInfId, EndToEndId, null InstrId/TxId/UETR, and one VERIFIED event. BFF returns `messageVersion: pain.001.001.09` and only the three persisted identifiers.
 - Negative BFF probes: unauthenticated 401, unknown operation 400; `/api/session` exposes claims only. Focused backend gate: 32 tests, 0 failures/errors/skips.
+
+## Evidence status (hygiene 2026-07-28)
+
+- Implementation: delivered (Checkpoint 1 surface).
+- Focused tests: delivered (Checkpoint 1 suites + Checkpoint 2 focused gate 32/32).
+- Checkpoint 2: proven — live Keycloak+BFF+Spring+isolated PostgreSQL for JSON_DIRECT and signed pain.001.
+- Checkpoint 3: pending / not documented — no Checkpoint 3 section or completion record exists in this program.
+- Remaining runtime proofs still open: two full backend regressions; governance validators; database review and cleanup.
+- Formal Wave 11 completion: not reached. Story 26.4 remains non-terminal until remaining proofs are recorded under an explicit Checkpoint 3 (or a separate human decision recorded outside this hygiene task).
+- Out-of-scope figure: a later Dagger Phase D `testcontainers-regression` run reported `540/540` in `docs/ci/DAGGER-IMPLEMENTATION.md` (D2B, 2026-07-22). That figure is Dagger regression evidence only; it is not recorded here as Wave 11 Checkpoint 3 and must not be used as formal Wave 11 completion proof.

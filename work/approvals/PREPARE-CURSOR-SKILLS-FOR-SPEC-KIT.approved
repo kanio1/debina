@@ -1,0 +1,10 @@
+# Approval — PREPARE-CURSOR-SKILLS-FOR-SPEC-KIT
+
+Human approval via chat 2026-07-29 for layout migration only:
+
+- replace whole-directory `.cursor/skills` symlink with real directory
+- create per-Skill bridges to `.claude/skills`
+- add `tools/agent-config/sync-cursor-skills.py` + tests + short ownership docs
+- task artifacts under `work/active/PREPARE-CURSOR-SKILLS-FOR-SPEC-KIT/**`
+
+Does NOT approve Spec Kit install, Codex changes, skill content edits, commit/push, or `--force`.

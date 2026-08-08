@@ -368,10 +368,14 @@ capabilities:
         note: "Positive counter-example: this story already narrows its own EPIC-21 dependency to two specific stories inline, rather than the whole epic."
       - id: 26.4
         title: "Lineage panel in payment-detail GraphQL"
-        status: blocked
+        status: in-progress
         requires: ["26.2", "26.3"]
         produces: cap.iso.lineage-core
-        note: "H8: a read-model/GraphQL/frontend concern, unlike its sibling lineage-write stories — blocked because GraphQL doesn't exist anywhere in the repo yet."
+        note: >
+          H8: read-model/GraphQL/frontend concern. Query-only GraphQL and paymentIsoEvidence
+          exist (Waves 9–11). Implementation and Checkpoint 2 proven; Checkpoint 3 and remaining
+          runtime proofs open; formal done not reached. Historical “GraphQL does not exist”
+          blocker is superseded.
 
   - epic: EPIC-27
     title: "ISO: correlation engine"

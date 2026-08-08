@@ -14,29 +14,42 @@ if [[ -f work/ACTIVE.json ]]; then
   python3 - <<'PY'
 import json
 from pathlib import Path
+import sys
+sys.path.insert(0, "tools")
+from agent_policy.active_state import load_active, implementation_approved
+
 active = json.loads(Path("work/ACTIVE.json").read_text())
+state = load_active(Path("."))
 print(f"active task: {active.get('task_id')}")
 print(f"title: {active.get('title')}")
-print(f"lane: {active.get('lane')}")
+print(f"policy_profile: {active.get('policy_profile') or active.get('lane')}")
+print(f"phase: {active.get('phase')}")
+print(f"approval_state: {active.get('approval_state')}")
+print(f"write_scope: {active.get('write_scope')}")
+print(f"lane(compat): {active.get('lane')}")
 print(f"status: {active.get('status')}")
 print(f"approval_required: {active.get('approval_required')}")
 print("allowed_paths:")
 for p in active.get("allowed_paths") or []:
     print(f"  - {p}")
 tid = active.get("task_id") or ""
-lane = active.get("lane") or ""
+profile = (active.get("policy_profile") or active.get("lane") or "")
 from pathlib import Path
 appr = Path("work/approvals")
-if lane == "STANDARD":
+if profile == "STANDARD":
     f = appr / f"{tid}.approved"
-    print(f"approval: {'PRESENT' if f.is_file() else 'MISSING'} ({f})")
-elif lane == "DECISION":
+    print(f"approval marker: {'PRESENT' if f.is_file() else 'MISSING'} ({f})")
+elif profile == "DECISION":
     d = appr / f"{tid}.decision.approved"
     i = appr / f"{tid}.implementation.approved"
     print(f"decision approval: {'PRESENT' if d.is_file() else 'MISSING'} ({d})")
     print(f"implementation approval: {'PRESENT' if i.is_file() else 'MISSING'} ({i})")
 else:
-    print("approval: not required (FAST)")
+    print("approval marker: not required (FAST)")
+if state and state.anomaly_flags:
+    print("anomaly_flags:")
+    for a in state.anomaly_flags:
+        print(f"  - {a}")
 progress = Path("work/active") / tid / "progress.md"
 if progress.is_file():
     text = progress.read_text().splitlines()

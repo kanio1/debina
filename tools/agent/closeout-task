@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Archive active task and clear ACTIVE.json.
+set -euo pipefail
+export DEBINA_AGENT_WRAPPER=1
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+exec python3 tools/agent/closeout_task.py "$@"

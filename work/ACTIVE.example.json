@@ -1,13 +1,18 @@
 {
   "task_id": "PAY-EXAMPLE",
   "title": "Example task",
-  "lane": "FAST",
+  "lane": "STANDARD",
+  "policy_profile": "STANDARD",
+  "phase": "ANALYZING",
+  "approval_state": "NOT_REQUIRED",
+  "write_scope": "WORK_ONLY",
   "status": "ACTIVE",
   "allowed_paths": [
-    "docs/example.md"
+    "work/active/PAY-EXAMPLE/**"
   ],
   "approval_required": false,
   "verify_commands": [
     "./tools/agent/verify-fast"
-  ]
+  ],
+  "notes": "lane mirrors policy_profile for backward compatibility only. Analysis uses WORK_ONLY without implementation approval."
 }

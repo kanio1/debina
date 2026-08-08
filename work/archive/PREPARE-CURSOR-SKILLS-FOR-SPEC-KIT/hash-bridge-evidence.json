@@ -1,0 +1,210 @@
+{
+  "hash_mismatches": [],
+  "hashes_unchanged": true,
+  "bridge_count": 33,
+  "all_bridges_symlink": true,
+  "all_targets_expected": true,
+  "cursor_skills_is_symlink": false,
+  "cursor_skills_is_dir": true,
+  "speckit_entries": [],
+  "bridges": [
+    {
+      "name": "agent-instruction-hygiene",
+      "is_symlink": true,
+      "target": "../../.claude/skills/agent-instruction-hygiene",
+      "resolved_ok": true
+    },
+    {
+      "name": "architecture-evolution-review",
+      "is_symlink": true,
+      "target": "../../.claude/skills/architecture-evolution-review",
+      "resolved_ok": true
+    },
+    {
+      "name": "artifact-derived-planning",
+      "is_symlink": true,
+      "target": "../../.claude/skills/artifact-derived-planning",
+      "resolved_ok": true
+    },
+    {
+      "name": "business-analyst",
+      "is_symlink": true,
+      "target": "../../.claude/skills/business-analyst",
+      "resolved_ok": true
+    },
+    {
+      "name": "dagger-go-pipeline",
+      "is_symlink": true,
+      "target": "../../.claude/skills/dagger-go-pipeline",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-decision-record",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-decision-record",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-discover-and-specify",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-discover-and-specify",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-implement-and-verify",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-implement-and-verify",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-iso20022-validation-lineage",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-iso20022-validation-lineage",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-kafka-payment-contract",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-kafka-payment-contract",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-money-movement-invariants",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-money-movement-invariants",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-payment-state-finality",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-payment-state-finality",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-postgres-transaction-coordination",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-postgres-transaction-coordination",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-review-and-next-work",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-review-and-next-work",
+      "resolved_ok": true
+    },
+    {
+      "name": "debina-runtime-proof-testing",
+      "is_symlink": true,
+      "target": "../../.claude/skills/debina-runtime-proof-testing",
+      "resolved_ok": true
+    },
+    {
+      "name": "enterprise-use-case-engineering",
+      "is_symlink": true,
+      "target": "../../.claude/skills/enterprise-use-case-engineering",
+      "resolved_ok": true
+    },
+    {
+      "name": "epic-story-task-catalog",
+      "is_symlink": true,
+      "target": "../../.claude/skills/epic-story-task-catalog",
+      "resolved_ok": true
+    },
+    {
+      "name": "impeccable",
+      "is_symlink": true,
+      "target": "../../.claude/skills/impeccable",
+      "resolved_ok": true
+    },
+    {
+      "name": "keycloak-realm-config",
+      "is_symlink": true,
+      "target": "../../.claude/skills/keycloak-realm-config",
+      "resolved_ok": true
+    },
+    {
+      "name": "nextjs-bff-route",
+      "is_symlink": true,
+      "target": "../../.claude/skills/nextjs-bff-route",
+      "resolved_ok": true
+    },
+    {
+      "name": "planning-semantic-integrity",
+      "is_symlink": true,
+      "target": "../../.claude/skills/planning-semantic-integrity",
+      "resolved_ok": true
+    },
+    {
+      "name": "postgres-rls-migration",
+      "is_symlink": true,
+      "target": "../../.claude/skills/postgres-rls-migration",
+      "resolved_ok": true
+    },
+    {
+      "name": "product-manager",
+      "is_symlink": true,
+      "target": "../../.claude/skills/product-manager",
+      "resolved_ok": true
+    },
+    {
+      "name": "scrum-master",
+      "is_symlink": true,
+      "target": "../../.claude/skills/scrum-master",
+      "resolved_ok": true
+    },
+    {
+      "name": "sepa-nexus-database-review",
+      "is_symlink": true,
+      "target": "../../.claude/skills/sepa-nexus-database-review",
+      "resolved_ok": true
+    },
+    {
+      "name": "sepa-nexus-database-testing",
+      "is_symlink": true,
+      "target": "../../.claude/skills/sepa-nexus-database-testing",
+      "resolved_ok": true
+    },
+    {
+      "name": "sepa-nexus-flyway-safe-change",
+      "is_symlink": true,
+      "target": "../../.claude/skills/sepa-nexus-flyway-safe-change",
+      "resolved_ok": true
+    },
+    {
+      "name": "sepa-nexus-payments-data-integrity",
+      "is_symlink": true,
+      "target": "../../.claude/skills/sepa-nexus-payments-data-integrity",
+      "resolved_ok": true
+    },
+    {
+      "name": "session-handoff",
+      "is_symlink": true,
+      "target": "../../.claude/skills/session-handoff",
+      "resolved_ok": true
+    },
+    {
+      "name": "shadcn-component-scaffold",
+      "is_symlink": true,
+      "target": "../../.claude/skills/shadcn-component-scaffold",
+      "resolved_ok": true
+    },
+    {
+      "name": "source-backed-payments-modeling",
+      "is_symlink": true,
+      "target": "../../.claude/skills/source-backed-payments-modeling",
+      "resolved_ok": true
+    },
+    {
+      "name": "spring-modulith-module",
+      "is_symlink": true,
+      "target": "../../.claude/skills/spring-modulith-module",
+      "resolved_ok": true
+    },
+    {
+      "name": "technical-architect",
+      "is_symlink": true,
+      "target": "../../.claude/skills/technical-architect",
+      "resolved_ok": true
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+
+def validate_feature_json_payload(data, state, binding):
+    feature_dir = str(data.get("feature_directory") or "").strip()
+    debina_task = str(data.get("debina_task_id") or "").strip()
+    if debina_task != state.task_id:
+        return False, "feature.json debina_task_id mismatch"
+    if feature_dir != binding.feature_directory:
+        return False, "feature.json feature_directory mismatch"
+    if not _safe_rel(feature_dir) or not feature_dir.startswith("specs/"):
+        return False, "invalid feature_directory"
+    return True, "ok"
+
+def canonical_feature_json_for_binding(binding):
+    return {
+        "feature_directory": binding.feature_directory,
+        "debina_task_id": binding.task_id,
+        "short_name": binding.feature_slug,
+        "feature_number": binding.feature_number,
+    }
+
+def collect_tree_hashes(root):
+    out = {}
+    if not root.is_dir():
+        return out
+    for path in sorted(root.rglob("*")):
+        if path.is_file():
+            out[path.relative_to(root).as_posix()] = file_sha256(path)
+    return out
+
+
+def promote_mirror_to_canonical(repo, task_id, dry_run=False):
+    mirror_meta = load_json(mirror_pointer_path(repo, task_id))
+    if not mirror_meta:
+        return False, "missing mirror .specify-feature.json"
+    binding = parse_binding_from_mirror(mirror_meta, task_id)
+    if not binding or not binding.mirror_feature_directory:
+        return False, "invalid mirror binding"
+    mirror_root = repo / binding.mirror_feature_directory
+    if not mirror_root.is_dir():
+        return False, "mirror feature directory missing"
+    canonical_root = repo / binding.canonical_spec_prefix
+    mirror_hashes = collect_tree_hashes(mirror_root)
+    if canonical_root.exists():
+        existing = collect_tree_hashes(canonical_root)
+        if existing and existing != mirror_hashes:
+            return False, "SPEC_KIT_FEATURE_CONTENT_CONFLICT"
+        if existing == mirror_hashes:
+            payload = canonical_feature_json_for_binding(binding)
+            fj = repo / CANONICAL_FEATURE_STATE
+            if fj.is_file():
+                cur = load_json(fj) or {}
+                if cur != payload:
+                    return False, "SPEC_KIT_FEATURE_CONTENT_CONFLICT"
+            elif not dry_run:
+                fj.parent.mkdir(parents=True, exist_ok=True)
+                fj.write_bytes((json.dumps(payload, indent=2) + "\n").encode("utf-8"))
+            return True, "idempotent"
+    if dry_run:
+        return True, "dry-run ok"
+    tmp_parent = Path(tempfile.mkdtemp(prefix="debina-spec-promote-", dir=str(repo / "work")))
+    try:
+        staged = tmp_parent / "feature"
+        shutil.copytree(mirror_root, staged)
+        canonical_root.parent.mkdir(parents=True, exist_ok=True)
+        if canonical_root.exists():
+            shutil.rmtree(canonical_root)
+        shutil.move(str(staged), str(canonical_root))
+        fj = repo / CANONICAL_FEATURE_STATE
+        fj.parent.mkdir(parents=True, exist_ok=True)
+        fj.write_bytes((json.dumps(canonical_feature_json_for_binding(binding), indent=2) + "\n").encode("utf-8"))
+    except Exception as exc:
+        return False, "PROMOTION_FAILED: %s" % exc
+    finally:
+        shutil.rmtree(tmp_parent, ignore_errors=True)
+    return True, "promoted"
+
+def evaluate_specification_path(path, state, repo, contents=None):
+    binding = resolve_binding(state, repo)
+    if binding is None:
+        if path.startswith("specs/") or path == CANONICAL_FEATURE_STATE:
+            return "deny", "SPECIFICATION scope requires bound active feature"
+        if path_matches(path, [state.task_work_glob, "work/active/%s" % state.task_id]):
+            return "allow", "task artifact without feature binding"
+        return "deny", "SPECIFICATION blocked (no binding): %s" % path
+    if is_protected_spec_kit_path(path) or is_implementation_source_path(path):
+        return "deny", "protected path in SPECIFICATION scope: %s" % path
+    if path == CANONICAL_FEATURE_STATE:
+        if contents:
+            try:
+                data = json.loads(contents)
+            except json.JSONDecodeError:
+                return "deny", "feature.json is not valid JSON"
+            ok, reason = validate_feature_json_payload(data, state, binding)
+            if not ok:
+                return "deny", reason
+        return "allow", "canonical feature state"
+    if is_bound_spec_path(path, binding):
+        return "allow", "bound active feature spec path"
+    if is_other_spec_path(path, binding):
+        return "deny", "foreign Spec Kit feature path blocked"
+    if path_matches(path, [state.task_work_glob, "work/active/%s" % state.task_id]):
+        return "allow", "task artifact"
+    return "deny", "SPECIFICATION scope blocked: %s" % path

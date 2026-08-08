@@ -1,0 +1,29 @@
+
+
+def maintenance_paths(raw):
+    return [str(x) for x in (raw.get("maintenance_paths") or [])]
+
+
+def specification_scope(write_scope):
+    return write_scope == "SPECIFICATION"
+
+
+def validate_state_combination(profile, phase, approval_state, write_scope, task_id, raw):
+    if not task_id and approval_state == "APPROVED":
+        return False, "APPROVED without active task"
+    if phase == "ANALYZING" and write_scope == "IMPLEMENTATION":
+        return False, "ANALYZING + IMPLEMENTATION scope invalid"
+    if phase == "SPEC_READY" and write_scope == "SPECIFICATION":
+        return False, "SPEC_READY + SPECIFICATION invalid"
+    if phase == "IMPLEMENTING" and write_scope == "SPECIFICATION":
+        return False, "IMPLEMENTING + SPECIFICATION invalid"
+    if profile == "STANDARD" and phase == "IMPLEMENTING" and approval_state == "PENDING":
+        return False, "STANDARD + IMPLEMENTING + PENDING invalid"
+    if profile == "DECISION" and phase == "IMPLEMENTING" and approval_state == "PENDING":
+        return False, "DECISION + IMPLEMENTING + PENDING invalid"
+    if write_scope == "SPECIFICATION":
+        has_spec = bool(raw.get("spec_kit"))
+        mirror = Path(__file__).resolve().parents[2] / "work" / "active" / task_id / ".specify-feature.json"
+        if not has_spec and not mirror.is_file():
+            return False, "SPECIFICATION without bound feature"
+    return True, "ok"

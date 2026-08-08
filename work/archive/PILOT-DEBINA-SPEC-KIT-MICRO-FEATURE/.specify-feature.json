@@ -1,0 +1,6 @@
+{
+  "feature_directory": "work/active/PILOT-DEBINA-SPEC-KIT-MICRO-FEATURE/specs/001-markdown-h1-checker",
+  "canonical_target": "specs/001-markdown-h1-checker",
+  "debina_task_id": "PILOT-DEBINA-SPEC-KIT-MICRO-FEATURE",
+  "note": "Canonical .specify/feature.json at repo root blocked by write_gate during ANALYZING; promote on harness alignment or Phase B"
+}

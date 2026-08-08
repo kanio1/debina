@@ -1,0 +1,12 @@
+# Manual approval for Debina lean harness
+
+TASK_ID=FIX-CURSOR-HOOK-PHASED-APPROVAL
+LANE=STANDARD
+KIND=IMPLEMENTATION
+APPROVER=user (explicit chat command 2026-07-29)
+DATE_UTC=2026-07-29
+SCOPE=.cursor/hooks.json, .cursor/hooks/**, .cursor/cli.json, tools/agent/**, tools/agent-policy/**, tools/agent-config/**, harness docs, work/**
+
+I manually reviewed the active plan intent in the user command and approve this KIND for TASK_ID.
+This approval is the user's explicit acceptance of FIX-CURSOR-HOOK-PHASED-APPROVAL implementation only.
+It is not approval for Spec Kit install, Skills changes, production code, Codex, commit, push, or branch changes.

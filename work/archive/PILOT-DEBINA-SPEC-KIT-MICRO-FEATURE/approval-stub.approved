@@ -1,0 +1,13 @@
+# Manual approval for Debina lean harness
+
+TASK_ID=PILOT-DEBINA-SPEC-KIT-MICRO-FEATURE
+LANE=STANDARD
+KIND=IMPLEMENTATION
+APPROVER=user (explicit chat command 2026-08-08)
+DATE_UTC=2026-08-08
+SCOPE=tools/spec-kit-pilot/**, tests/tools/spec-kit-pilot/**, specs/001-markdown-h1-checker/** (metadata), work/active/PILOT-DEBINA-SPEC-KIT-MICRO-FEATURE/**
+
+I manually reviewed the active plan and approve IMPLEMENTATION for TASK_ID.
+Pilot Markdown H1 checker CLI and tests only. No commit, push, or production changes.
+
+**Action**: Copy this file to `work/approvals/PILOT-DEBINA-SPEC-KIT-MICRO-FEATURE.approved` (harness blocks agent writes to `work/approvals/`).

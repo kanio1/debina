@@ -1,0 +1,16 @@
+# Manual approval for Debina lean harness
+
+TASK_ID=PILOT-SPEC-KIT-CURSOR-ONLY
+LANE=STANDARD
+KIND=IMPLEMENTATION
+APPROVER=user (explicit chat command 2026-07-29)
+DATE_UTC=2026-07-29
+SCOPE=work/ACTIVE.json, work/QUEUE.md, work/active/PILOT-SPEC-KIT-CURSOR-ONLY/**, /tmp/debina-spec-kit-cursor-pilot/**
+
+I approve this KIND for TASK_ID for isolated Spec Kit Cursor pilot only:
+- disposable directories under /tmp
+- pinned Spec Kit via uvx
+- install/tests in disposable dirs
+- writing pilot results under the active task directory
+
+This is NOT approval to install Spec Kit in the main Debina repository, change Skills, Codex, production code, commit, or push.

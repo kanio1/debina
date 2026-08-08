@@ -1,0 +1,12 @@
+def _derive_approval_state(profile, phase, write_scope, task_id, repo):
+    if profile == "FAST":
+        return "NOT_REQUIRED"
+    if implementation_approved(profile, task_id, repo):
+        return "APPROVED"
+    if profile in {"STANDARD", "DECISION"} and phase in {"ANALYZING", "SPEC_READY", "BLOCKED"}:
+        return "PENDING"
+    if write_scope in {"WORK_ONLY", "SPECIFICATION", "REVIEW", "CLOSEOUT"}:
+        if phase in {"BOOTSTRAP", "ANALYZING", "SPEC_READY"}:
+            return "PENDING" if profile in {"STANDARD", "DECISION"} else "NOT_REQUIRED"
+    return "PENDING"
+

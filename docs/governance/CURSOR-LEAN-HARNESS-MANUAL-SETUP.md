@@ -10,21 +10,18 @@ Agent-configured repository pieces live under `.cursor/`, `work/`, `tools/agent/
 
 ## 2. Cursor Settings
 
-1. Open **Cursor Settings → Hooks** and confirm project hooks from `.cursor/hooks.json` are loaded (`command-guard`, `scope-approval-gate`, `checkpoint`).
-2. Open **Cursor Settings → Rules** and confirm the five project rules under `.cursor/rules/` appear (`00-core` always-on).
+1. Open **Cursor Settings → Hooks** and confirm project hooks from `.cursor/hooks.json` are loaded (`command-guard`, `shell-post-check`, `scope-approval-gate`, `checkpoint`).
+2. Open **Cursor Settings → Rules** and confirm the project rules under `.cursor/rules/` appear (`00-core` always-on).
 3. Confirm **Skills** resolve from `.claude/skills` (and the existing `.cursor/skills` / `.agents/skills` symlinks). Do not create a second physical skills tree.
 4. Keep sandbox / network restricted for agent terminals; allow localhost only when needed for local app checks.
 
 ## 3. Auto-Run and command allowlist
 
 1. Prefer allowlist / ask-on-unknown for shell.
-2. Allow the agent wrappers explicitly:
-   - `./tools/agent/task-status`
-   - `./tools/agent/verify-fast`
-   - `./tools/agent/verify-task`
-   - `./tools/agent/final-check`
-   - `./tools/agent/health-check`
-3. Deny broad `git`, `rm`, `sudo`, `docker`/`podman` destructive commands, and pipe-to-shell downloads.
+2. Allow the agent wrappers explicitly (or use `bash tools/agent/<name>`):
+   - `task-status`, `verify-fast`, `verify-task`, `final-check`, `health-check`
+   - `bootstrap-task`, `approve-task`, `set-task-state`, `closeout-task`
+3. Deny destructive git/rm/sudo and Shell source mutations; hooks enforce path/approval context.
 4. Review untracked `.cursor/permissions.json` if present: it currently lists permissive Git write prefixes that conflict with the lean deny-first policy — tighten manually or remove.
 
 Project CLI overlay: `.cursor/cli.json` (deny precedes allow). Home CLI config remains `~/.cursor/cli-config.json`; restart the CLI after edits.
@@ -140,9 +137,51 @@ Expect `kafka-debina: ready` and `postgres-debina: ready` with tools listed. Kaf
 - Do not run write/admin operations through PostgreSQL or Kafka MCP.
 - Never store secrets under the repository.
 
-## 6. Manual approvals
+## 6. Phased approval and write scope
 
-For STANDARD:
+Canonical ACTIVE fields:
+
+```text
+policy_profile: FAST | STANDARD | DECISION
+phase: BOOTSTRAP | ANALYZING | SPEC_READY | IMPLEMENTING | VERIFYING | REVIEWING | CLOSING | BLOCKED | COMPLETED
+approval_state: NOT_REQUIRED | PENDING | APPROVED | REJECTED
+write_scope: WORK_ONLY | SPECIFICATION | IMPLEMENTATION | REVIEW | CLOSEOUT
+lane: backward-compat mirror of policy_profile only
+```
+
+Rules (normative):
+
+```text
+STANDARD analysis does not require implementation approval.
+STANDARD implementation requires explicit approval.
+FAST is not a security bypass.
+A policy profile is not a write permission.
+Shell must not be used to bypass structured file-write controls.
+Build and test outputs are not equivalent to source mutations.
+Hooks protect boundaries.
+Skills and Spec Kit drive workflow.
+```
+
+- `ANALYZING` + `WORK_ONLY` may write `work/active/<ACTIVE_TASK>/**` without `.approved`.
+- `ANALYZING` + `SPECIFICATION` may write bound active feature artifacts:
+  - `work/active/<ACTIVE_TASK>/**`
+  - `.specify/feature.json`
+  - `specs/<BOUND_FEATURE>/**`
+- `SPECIFICATION` does **not** grant implementation permission.
+- For STANDARD and DECISION, `approval_state=PENDING` during `ANALYZING` and `SPEC_READY` is normal.
+  `PENDING` blocks implementation; it does not block specification artifacts when `write_scope=SPECIFICATION`.
+- At `SPEC_READY`, scope returns to `WORK_ONLY` while implementation approval remains pending.
+- `work/ACTIVE.json` is task authority. `.specify/feature.json` is feature metadata only.
+- Only the feature bound to the active Debina task may be modified.
+- Planning permission is not implementation permission.
+- `ACTIVE.json` / `QUEUE.md` updates go through `tools/agent/bootstrap-task`, `set-task-state`, `approve-task`, `closeout-task`.
+- `IMPLEMENTING` for STANDARD/DECISION requires `approval_state=APPROVED` **and** `allowed_paths`.
+- Profile downgrade requires `set-task-state --allow-downgrade` with justification in `progress.md`.
+- Shell pre-check blocks redirects/`tee`/`sed -i`/interpreter writes to tracked sources; post-check reports `UNAUTHORIZED_SHELL_WRITE_DETECTED` without auto-restore.
+
+## 7. Manual approvals
+
+For STANDARD implementation:
 
 ```text
 work/approvals/<TASK-ID>.approved
@@ -156,24 +195,28 @@ work/approvals/<TASK-ID>.implementation.approved
 ```
 
 Copy from `work/templates/approval-template.txt`. Humans author these files; agents must not forge them.
+Then run `./tools/agent/approve-task` (or `bash tools/agent/approve-task`).
 
-## 7. Pilot workflow
+`.approved` means implementation approval only — not analysis permission.
 
-1. Pick one item from `planning/` into `work/QUEUE.md` `NOW`.
-2. `/debina-discover-and-specify` → `work/ACTIVE.json` + plan/progress.
-3. Human approval when STANDARD/DECISION.
+## 8. Pilot workflow
+
+1. Prefer `bash tools/agent/bootstrap-task --task-id … --policy-profile …`.
+2. Or `/debina-discover-and-specify` → ACTIVE + plan/progress with phased fields.
+3. Human approval when entering STANDARD/DECISION implementation.
 4. `/debina-implement-and-verify` → wrappers only for verify.
-5. `/debina-review-and-next-work` (Ask mode) → one `NEXT`, ≤2 `LATER`.
+5. `/debina-review-and-next-work` (Ask mode) → one `NEXT`, ≤2 `LATER`; or `bash tools/agent/closeout-task`.
 6. Human runs any `git commit` explicitly when ready.
 
-## 8. Smoke commands (human)
+## 9. Smoke commands (human)
 
 ```bash
-./tools/agent/task-status
-./tools/agent/health-check
-./tools/agent/verify-fast
+bash tools/agent/task-status
+bash tools/agent/health-check
+bash tools/agent/verify-fast
+python3 tools/agent/run_hook_synthetic_tests.py
 ```
 
 ### CLI permission caveat
 
-`.cursor/cli.json` denies bare `Shell(python3)` / `Shell(bash)` / `Shell(git)` and allows only the wrappers. If your Cursor CLI build applies deny with absolute precedence over more specific allow entries, adjust the home or project CLI config manually so wrappers remain usable without opening broad interpreters.
+`.cursor/cli.json` is a coarse first layer (allow wrappers; deny obvious git writes / `sed -i` / secret Writes). Contextual enforcement of phase, approval, and `allowed_paths` remains in `.cursor/hooks/**` via `tools/agent_policy`. Hooks are fail-closed for Write/Shell guards.
